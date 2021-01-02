@@ -22,7 +22,7 @@ async function metaData(data, msg, url) {
     process_formdata(process_hash(tokenData.hash))
   );
   console.log(formData, "OUTPUT");
-  let _meta = meta.map((item) => item).join(",");
+  let _meta = meta.map((item) => item).join(", ");
   const _embed = new MessageEmbed()
     // Set the title of the field
     .setTitle(data.name)
