@@ -24,17 +24,16 @@ async function metaData(data, msg, url) {
     process_formdata(process_hash(tokenData.hash))
   );
   console.log(formData, "OUTPUT");
-  let _meta = meta.map((item) => item).join(", ");
+  let _meta = meta.map((item) => item).join("\n");
   const _embed = new MessageEmbed()
     // Set the title of the field
     .setTitle(data.name)
 
-    .setURL(data.external_link)
+    .setURL(`https://artblocks.io/token/${url}`)
     // Set the color of the embed
     .setColor(0xff0000)
     // Set the main content of the embed
     .setThumbnail(data.image_url)
-    .setDescription(data.description)
     .addFields({
       name: "Owner",
       value: `[${data.owner.address.slice(0, 8)}](https://opensea.io/accounts/${
