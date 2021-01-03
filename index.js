@@ -57,17 +57,10 @@ async function metaData(data, msg, url) {
           }
         : { name: "Last Sale", value: "No Transactions", inline: true }
     )
-    .addFields({ name: "# Sold", value: data.num_sales, inline: true })
-    .addFields(
-      {
-        name: "AB Meta",
-        value: _meta,
-      },
-      {
-        name: "Saturation Value",
-        value: formData.saturation * 100,
-      }
-    );
+    .addFields({
+      name: "AB Meta",
+      value: _meta,
+    });
 
   console.log(meta);
 
