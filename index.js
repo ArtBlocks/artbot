@@ -180,4 +180,4 @@ bot.on("message", (msg) => {
     }
   }
 });
-// setInterval(openseaEvent, 120000);
+// setInterval(openseaEvent, 120000)
