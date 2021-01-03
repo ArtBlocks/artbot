@@ -13,7 +13,9 @@ let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 bot.login(TOKEN);
 
 async function metaData(data, msg, url) {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
   const page = await browser.newPage();
   await page.setBypassCSP(true);
   await page.goto(`https://api.artblocks.io/generator/${url}`);
