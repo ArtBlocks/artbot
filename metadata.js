@@ -10,6 +10,7 @@ const puppeteer = require("puppeteer");
     process_formdata(process_hash(tokenData.hash))
   );
 
+  console.log(meta);
   console.log(formData);
 
   await browser.close();

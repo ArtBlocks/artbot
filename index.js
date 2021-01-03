@@ -33,7 +33,7 @@ async function metaData(data, msg, url) {
     // Set the color of the embed
     .setColor(0xff0000)
     // Set the main content of the embed
-    .setImage(data.image_url)
+    .setThumbnail(data.image_url)
     .setDescription(data.description)
     .addFields({
       name: "Owner",
