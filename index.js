@@ -186,30 +186,51 @@ const eventType = async (event) => {
   console.log(event, "THE EVENT");
   switch (event) {
     case "created":
-      return `New Offer`;
+      return {
+        event_type: `New Offer`,
+        event_description: "has been listed for sale by the owner. ",
+      };
       break;
     case "successful":
-      return `New Sale`;
+      return {
+        event_type: `New Sale`,
+        event_description: "has been sold to a new owner, congrats!",
+      };
       break;
     case "bid_entered":
-      return `New Offer`;
+      return {
+        event_type: `New Bid`,
+        event_description: "has a new bid.",
+      };
       break;
     case "bid_withdrawn":
-      return `Bid Withdrawn`;
+      return {
+        event_type: `Bid Withdrawn`,
+        event_description: "bid has been withdrawn.",
+      };
       break;
     case "cancelled":
-      return `Offer Cancelled`;
+      return {
+        event_type: `Listing Cancelled`,
+        event_description: "has been removed from listings.",
+      };
       break;
     case "offer_entered":
-      return `Offer Entered`;
+      return {
+        event_type: `New Offer`,
+        event_description: "has a new Offer.",
+      };
       break;
     default:
-      console.log("dont know");
+      return {
+        event_type: `New Event`,
+        event_description: "has a new event.",
+      };
   }
 };
 
 const openseaEvent = async (msg) => {
-  var aMinuteAgo = new Date(Date.now() - 1000 * 60);
+  var aMinuteAgo = new Date(Date.now() - 1000 * 10800);
   console.log(aMinuteAgo);
 
   let mintAddress = "0x0000000000000000000000000000000000000000";
@@ -234,9 +255,11 @@ const openseaEvent = async (msg) => {
           } else {
             const _embed = new MessageEmbed()
               // Set the title of the field
-              .setTitle(eventName)
+              .setTitle(eventName.event_type)
 
-              .setDescription(`${data.asset.name} has a ${eventName}.`)
+              .setDescription(
+                `${data.asset.name} ${eventName.event_description}`
+              )
 
               .setURL(`https://artblocks.io/token/${data.asset.token_id}`)
               // Set the color of the embed
