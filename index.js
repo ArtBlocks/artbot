@@ -13,20 +13,25 @@ let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 bot.login(TOKEN);
 
 async function metaData(data, msg, url) {
-  console.log(data);
   let mintAddress = "0x0000000000000000000000000000000000000000";
+
   const browser = await puppeteer.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
+
   const page = await browser.newPage();
   await page.setBypassCSP(true);
   await page.goto(`https://api.artblocks.io/generator/${url}`);
   let meta = await page.evaluate(() => init(tokenData.hash));
-  let formData = await page.evaluate(() =>
-    process_formdata(process_hash(tokenData.hash))
-  );
-  console.log(formData, "OUTPUT");
+
+  // Not currently being used
+  //   let formData = await page.evaluate(() =>
+  //     process_formdata(process_hash(tokenData.hash))
+  //   );
+  //   console.log(formData, "OUTPUT");
+
   let _meta = meta.map((item) => item).join("\n");
+
   const _embed = new MessageEmbed()
     // Set the title of the field
     .setTitle(data.asset.name)
@@ -92,6 +97,22 @@ async function metaData(data, msg, url) {
                         ? `(${data.from_account.user.username})`
                         : ""
                     } on ${new Date(data.created_date).toLocaleDateString()}`,
+              inline: true,
+            }
+          : data.event_type == "bid_withdrawn"
+          ? {
+              name: "Bid Withdrawn",
+              value: ` ${web3.utils.fromWei(
+                data.total_price,
+                "ether"
+              )}Ξ from [${data.from_account.address.slice(
+                0,
+                8
+              )}](https://opensea.io/accounts/${data.from_account.address}) ${
+                data.asset.owner.user !== null
+                  ? `(${data.from_account.user.username})`
+                  : ""
+              }  on ${new Date(data.created_date).toLocaleDateString()}`,
               inline: true,
             }
           : {
