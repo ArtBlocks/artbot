@@ -200,13 +200,16 @@ const eventType = async (event) => {
     case "cancelled":
       return `Offer Cancelled`;
       break;
+    case "offer_entered":
+      return `Offer Entered`;
+      break;
     default:
       console.log("dont know");
   }
 };
 
 const openseaEvent = async (msg) => {
-  var aMinuteAgo = new Date(Date.now() - 1000 * 60);
+  var aMinuteAgo = new Date(Date.now() - 1000 * 1200);
   console.log(aMinuteAgo);
 
   let mintAddress = "0x0000000000000000000000000000000000000000";
