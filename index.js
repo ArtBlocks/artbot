@@ -13,6 +13,8 @@ let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 bot.login(TOKEN);
 
 async function metaData(data, msg, url) {
+  console.log(data);
+  let mintAddress = "0x0000000000000000000000000000000000000000";
   const browser = await puppeteer.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
@@ -27,41 +29,88 @@ async function metaData(data, msg, url) {
   let _meta = meta.map((item) => item).join("\n");
   const _embed = new MessageEmbed()
     // Set the title of the field
-    .setTitle(data.name)
+    .setTitle(data.asset.name)
 
     .setURL(`https://artblocks.io/token/${url}`)
     // Set the color of the embed
     .setColor(0xff0000)
     // Set the main content of the embed
-    .setThumbnail(data.image_url)
+    .setThumbnail(data.asset.image_url)
+    .addFields({
+      name: "Features",
+      value: _meta,
+    })
     .addFields({
       name: "Owner",
-      value: `[${data.owner.address.slice(0, 8)}](https://opensea.io/accounts/${
-        data.owner.address
-      }) ${data.owner.user !== null ? `(${data.owner.user.username})` : ""}`,
+      value: `[${data.asset.owner.address.slice(
+        0,
+        8
+      )}](https://opensea.io/accounts/${data.asset.owner.address}) ${
+        data.asset.owner.user !== null
+          ? `(${data.asset.owner.user.username})`
+          : ""
+      }`,
       inline: true,
     })
 
     .addFields(
-      data.last_sale
-        ? {
-            name: "Last Sale",
-            value: `Sold for ${web3.utils.fromWei(
-              data.last_sale.total_price,
-              "ether"
-            )}Ξ on ${new Date(
-              data.last_sale.event_timestamp
-            ).toLocaleDateString()}`,
-            inline: true,
-          }
-        : { name: "Last Sale", value: "No Transactions", inline: true }
-    )
-    .addFields({
-      name: "AB Meta",
-      value: _meta,
-    });
-
-  console.log(meta);
+      data.event_type
+        ? data.event_type == "created"
+          ? {
+              name: "Offered At",
+              value: ` ${web3.utils.fromWei(
+                data.ending_price,
+                "ether"
+              )}Ξ on ${new Date(data.created_date).toLocaleDateString()}`,
+              inline: true,
+            }
+          : data.event_type == "successful"
+          ? {
+              name: "Last Sale",
+              value: `Sold for ${web3.utils.fromWei(
+                data.total_price,
+                "ether"
+              )}Ξ on ${new Date(data.created_date).toLocaleDateString()}`,
+              inline: true,
+            }
+          : data.event_type == "transfer"
+          ? {
+              name:
+                data.from_account.address == mintAddress
+                  ? "Minted On:"
+                  : "Recent Transfer",
+              value:
+                data.from_account.address == mintAddress
+                  ? new Date(data.created_date).toLocaleDateString()
+                  : `From [${data.from_account.address.slice(
+                      0,
+                      8
+                    )}](https://opensea.io/accounts/${
+                      data.from_account.address
+                    }) ${
+                      data.asset.owner.user !== null
+                        ? `(${data.from_account.user.username})`
+                        : ""
+                    } on ${new Date(data.created_date).toLocaleDateString()}`,
+              inline: true,
+            }
+          : {
+              name: "Current Bid",
+              value: ` ${web3.utils.fromWei(
+                data.bid_amount,
+                "ether"
+              )}Ξ from [${data.from_account.address.slice(
+                0,
+                8
+              )}](https://opensea.io/accounts/${data.from_account.address}) ${
+                data.asset.owner.user !== null
+                  ? `(${data.from_account.user.username})`
+                  : ""
+              }  on ${new Date(data.created_date).toLocaleDateString()}`,
+              inline: true,
+            }
+        : { name: "Last Sale", value: "No Transactions" }
+    );
 
   msg.channel.send(_embed);
 
@@ -70,14 +119,15 @@ async function metaData(data, msg, url) {
 
 async function singData(msg, number) {
   _val = parseInt(number.substring(1));
-  _url = _val + 8000000;
+  _token = _val + 8000000;
+  _contract = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
   if (_val > 1023 || _val < 0) {
     msg.channel.send("Invalid #");
   }
 
   await fetch(
-    "https://api.opensea.io/api/v1/asset/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/" +
-      (_val + 8000000),
+    `https://api.opensea.io/api/v1/events?asset_contract_address=${_contract}&token_id=${_token}&only_opensea=false&offset=0&limit=5`,
+
     {
       method: "GET",
       headers: {},
@@ -85,9 +135,9 @@ async function singData(msg, number) {
   )
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
+      let event = data.asset_events[0];
 
-      metaData(data, msg, _url);
+      metaData(event, msg, _token);
     })
     .catch((err) => {
       console.error(err);
