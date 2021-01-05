@@ -43,7 +43,7 @@ async function metaData(data, msg, url) {
         8
       )}](https://opensea.io/accounts/${data.asset.owner.address}) ${
         data.asset.owner.user !== null
-          ? `(${data.asset.owner.user.username.slice(0, 10)})`
+          ? `(${data.asset.owner.user.username})`
           : ""
       }`,
       inline: true,
