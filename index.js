@@ -14,6 +14,7 @@ let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 bot.login(TOKEN);
 
 async function metaData(data, msg, url) {
+  console.log(data.asset);
   let mintAddress = "0x0000000000000000000000000000000000000000";
 
   const browser = await puppeteer.launch({
@@ -25,11 +26,16 @@ async function metaData(data, msg, url) {
   await page.goto(`https://api.artblocks.io/generator/${url}`);
   let meta = await page.evaluate(() => init(tokenData.hash));
 
-  // Not currently being used
-  //   let formData = await page.evaluate(() =>
-  //     process_formdata(process_hash(tokenData.hash))
-  //   );
-  //   console.log(formData, "OUTPUT");
+  let sat = await page.evaluate((sat) => sat);
+
+  const formData = await page.evaluate(() =>
+    process_formdata(process_hash(tokenData.hash))
+  );
+
+  let renderData = await page.evaluate(() =>
+    render(generate_renderdata(process_formdata(process_hash(tokenData.hash))))
+  );
+  console.log(renderData, "OUTPUT");
 
   let _meta = meta.map((item) => item).join("\n");
 
@@ -378,7 +384,7 @@ const openseaEvent = async (msg) => {
                         )}](https://opensea.io/accounts/${
                           data.from_account.address
                         }) ${
-                          data.asset.owner.user !== null
+                          data.from_account.user !== null
                             ? `(${data.from_account.user.username})`
                             : ""
                         }  on ${new Date(
