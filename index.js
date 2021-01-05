@@ -15,6 +15,7 @@ let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 bot.login(TOKEN);
 
 async function metaData(data, msg, url) {
+  console.log(data);
   // console.log(data.asset);
   let mintAddress = "0x0000000000000000000000000000000000000000";
 
@@ -85,7 +86,7 @@ async function metaData(data, msg, url) {
                       data.from_account.address
                     }) ${
                       data.asset.owner.user !== null
-                        ? `(${data.from_account.user.usernameslice(0, 10)})`
+                        ? `(${data.from_account.user.username.slice(0, 10)})`
                         : ""
                     } on ${new Date(data.created_date).toLocaleDateString()}`,
               inline: true,
@@ -112,12 +113,12 @@ async function metaData(data, msg, url) {
               value: ` ${web3.utils.fromWei(
                 data.total_price,
                 "ether"
-              )}Ξ from [${data.from_account.address.slice(
+              )}Ξ from [${data.asset.owner.address.slice(
                 0,
                 8
-              )}](https://opensea.io/accounts/${data.from_account.address}) ${
+              )}](https://opensea.io/accounts/${data.asset.owner.address}) ${
                 data.asset.owner.user !== null
-                  ? `(${data.from_account.user.usernameslice(0, 10)})`
+                  ? `(${data.asset.owner.user.username})`
                   : ""
               }  on ${new Date(data.created_date).toLocaleDateString()}`,
               inline: true,
@@ -131,7 +132,7 @@ async function metaData(data, msg, url) {
                 0,
                 8
               )}](https://opensea.io/accounts/${data.from_account.address}) ${
-                data.asset.owner.user !== null
+                data.from_account.user !== null
                   ? `(${data.from_account.user.username.slice(0, 10)})`
                   : ""
               }  on ${new Date(data.created_date).toLocaleDateString()}`,
@@ -224,7 +225,7 @@ const eventType = async (event) => {
 };
 
 const openseaEvent = async (msg) => {
-  var aMinuteAgo = new Date(Date.now() - 1000 * 60);
+  var aMinuteAgo = new Date(Date.now() - 1000 * 2600);
   console.log(aMinuteAgo);
 
   let mintAddress = "0x0000000000000000000000000000000000000000";
@@ -340,7 +341,7 @@ const openseaEvent = async (msg) => {
                         )}](https://opensea.io/accounts/${
                           data.from_account.address
                         }) ${
-                          data.asset.owner.user !== null
+                          data.from_account.user !== null
                             ? `(${data.from_account.user.username.slice(
                                 0,
                                 10
