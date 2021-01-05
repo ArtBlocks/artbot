@@ -1,17 +1,7 @@
-const puppeteer = require("puppeteer");
+const { init } = require("./singularity");
 
-(async () => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.setBypassCSP(true);
-  await page.goto("https://api.artblocks.io/generator/8000224");
-  let meta = await page.evaluate(() => init(tokenData.hash));
-  let formData = await page.evaluate(() =>
-    process_formdata(process_hash(tokenData.hash))
-  );
+let features = init(
+  "0x063f43824719df21ca82494e0c96f42f99b6b0961641e13158d328bce0974753"
+);
 
-  console.log(meta);
-  console.log(formData);
-
-  await browser.close();
-})();
+console.log(features);

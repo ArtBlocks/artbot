@@ -1,7 +1,6 @@
 require("dotenv").config();
 const { Client, MessageEmbed } = require("discord.js");
 const Web3 = require("web3");
-const puppeteer = require("puppeteer");
 const fetch = require("node-fetch");
 const bot = new Client();
 const TOKEN = process.env.TOKEN;
@@ -9,35 +8,20 @@ const CHANNEL_SING = process.env.CHANNEL_SING;
 const CHANNEL_TRADE = process.env.CHANNEL_TRADE;
 const SERVER = process.env.SERVER;
 
+const { init } = require("./singularity");
+
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 
 bot.login(TOKEN);
 
 async function metaData(data, msg, url) {
-  console.log(data.asset);
+  // console.log(data.asset);
   let mintAddress = "0x0000000000000000000000000000000000000000";
 
-  const browser = await puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
-
-  const page = await browser.newPage();
-  await page.setBypassCSP(true);
-  await page.goto(`https://api.artblocks.io/generator/${url}`);
-  let meta = await page.evaluate(() => init(tokenData.hash));
-
-  let sat = await page.evaluate((sat) => sat);
-
-  const formData = await page.evaluate(() =>
-    process_formdata(process_hash(tokenData.hash))
-  );
-
-  let renderData = await page.evaluate(() =>
-    render(generate_renderdata(process_formdata(process_hash(tokenData.hash))))
-  );
-  console.log(renderData, "OUTPUT");
-
-  let _meta = meta.map((item) => item).join("\n");
+  let artblocks = await fetch(`https://api.artblocks.io/token/${url}`);
+  let abData = await artblocks.json();
+  let featureData = await init(abData["token hash"]);
+  let _meta = featureData.map((item) => item).join("\n");
 
   const _embed = new MessageEmbed()
     // Set the title of the field
@@ -157,8 +141,6 @@ async function metaData(data, msg, url) {
     );
 
   msg.channel.send(_embed);
-
-  await browser.close();
 }
 
 async function singData(msg, number) {
