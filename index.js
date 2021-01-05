@@ -175,7 +175,7 @@ const eventType = async (event) => {
   switch (event) {
     case "created":
       return {
-        event_type: `New Offer`,
+        event_type: `New Listing`,
         event_description: "has been listed for sale.",
         color: "#0062FF",
       };
