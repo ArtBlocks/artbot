@@ -224,7 +224,7 @@ const eventType = async (event) => {
 };
 
 const openseaEvent = async (msg) => {
-  var aMinuteAgo = new Date(Date.now() - 1000 * 3400);
+  var aMinuteAgo = new Date(Date.now() - 1000 * 60);
   console.log(aMinuteAgo);
 
   let mintAddress = "0x0000000000000000000000000000000000000000";
