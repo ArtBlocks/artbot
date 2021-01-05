@@ -224,7 +224,7 @@ const eventType = async (event) => {
 };
 
 const openseaEvent = async (msg) => {
-  var aMinuteAgo = new Date(Date.now() - 1000 * 60);
+  var aMinuteAgo = new Date(Date.now() - 1000 * 3400);
   console.log(aMinuteAgo);
 
   let mintAddress = "0x0000000000000000000000000000000000000000";
@@ -252,10 +252,14 @@ const openseaEvent = async (msg) => {
               .setTitle(eventName.event_type)
 
               .setDescription(
-                `${data.asset.name} ${eventName.event_description}`
+                `[${
+                  data.asset.name
+                }](${`https://artblocks.io/token/${data.asset.token_id}`}) ${
+                  eventName.event_description
+                }`
               )
 
-              .setURL(`https://artblocks.io/token/${data.asset.token_id}`)
+              .setURL(data.asset.permalink)
               // Set the color of the embed
               .setColor(eventName.color)
               // Set the main content of the embed
