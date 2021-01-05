@@ -43,7 +43,7 @@ async function metaData(data, msg, url) {
         8
       )}](https://opensea.io/accounts/${data.asset.owner.address}) ${
         data.asset.owner.user !== null
-          ? `(${data.asset.owner.user.username})`
+          ? `(${data.asset.owner.user.username.slice(0, 10)})`
           : ""
       }`,
       inline: true,
@@ -85,7 +85,7 @@ async function metaData(data, msg, url) {
                       data.from_account.address
                     }) ${
                       data.asset.owner.user !== null
-                        ? `(${data.from_account.user.username})`
+                        ? `(${data.from_account.user.usernameslice(0, 10)})`
                         : ""
                     } on ${new Date(data.created_date).toLocaleDateString()}`,
               inline: true,
@@ -101,7 +101,7 @@ async function metaData(data, msg, url) {
                 8
               )}](https://opensea.io/accounts/${data.from_account.address}) ${
                 data.asset.owner.user !== null
-                  ? `(${data.from_account.user.username})`
+                  ? `(${data.from_account.user.usernameslice(0, 10)})`
                   : ""
               }  on ${new Date(data.created_date).toLocaleDateString()}`,
               inline: true,
@@ -117,7 +117,7 @@ async function metaData(data, msg, url) {
                 8
               )}](https://opensea.io/accounts/${data.from_account.address}) ${
                 data.asset.owner.user !== null
-                  ? `(${data.from_account.user.username})`
+                  ? `(${data.from_account.user.usernameslice(0, 10)})`
                   : ""
               }  on ${new Date(data.created_date).toLocaleDateString()}`,
               inline: true,
@@ -132,7 +132,7 @@ async function metaData(data, msg, url) {
                 8
               )}](https://opensea.io/accounts/${data.from_account.address}) ${
                 data.asset.owner.user !== null
-                  ? `(${data.from_account.user.username})`
+                  ? `(${data.from_account.user.username.slice(0, 10)})`
                   : ""
               }  on ${new Date(data.created_date).toLocaleDateString()}`,
               inline: true,
@@ -176,37 +176,43 @@ const eventType = async (event) => {
     case "created":
       return {
         event_type: `New Offer`,
-        event_description: "has been listed for sale by the owner. ",
+        event_description: "has been listed for sale.",
+        color: "#0062FF",
       };
       break;
     case "successful":
       return {
         event_type: `New Sale`,
         event_description: "has been sold to a new owner, congrats!",
+        color: "#23FF00",
       };
       break;
     case "bid_entered":
       return {
         event_type: `New Bid`,
         event_description: "has a new bid.",
+        color: "#FFA300",
       };
       break;
     case "bid_withdrawn":
       return {
         event_type: `Bid Withdrawn`,
         event_description: "bid has been withdrawn.",
+        color: "#FFDB00",
       };
       break;
     case "cancelled":
       return {
         event_type: `Listing Cancelled`,
         event_description: "has been removed from listings.",
+        color: "#FF000A",
       };
       break;
     case "offer_entered":
       return {
         event_type: `New Offer`,
-        event_description: "has a new Offer.",
+        event_description: "has a new offer.",
+        color: "#FFA300",
       };
       break;
     default:
@@ -251,7 +257,7 @@ const openseaEvent = async (msg) => {
 
               .setURL(`https://artblocks.io/token/${data.asset.token_id}`)
               // Set the color of the embed
-              .setColor(0xff0000)
+              .setColor(eventName.color)
               // Set the main content of the embed
 
               .setThumbnail(data.asset.image_url)
@@ -262,7 +268,7 @@ const openseaEvent = async (msg) => {
                   8
                 )}](https://opensea.io/accounts/${data.asset.owner.address}) ${
                   data.asset.owner.user !== null
-                    ? `(${data.asset.owner.user.username})`
+                    ? `(${data.asset.owner.user.username.slice(0, 10)})`
                     : ""
                 }`,
                 inline: true,
@@ -308,7 +314,10 @@ const openseaEvent = async (msg) => {
                                 data.from_account.address
                               }) ${
                                 data.asset.owner.user !== null
-                                  ? `(${data.from_account.user.username})`
+                                  ? `(${data.from_account.user.username.slice(
+                                      0,
+                                      10
+                                    )})`
                                   : ""
                               } on ${new Date(
                                 data.created_date
@@ -328,7 +337,10 @@ const openseaEvent = async (msg) => {
                           data.from_account.address
                         }) ${
                           data.asset.owner.user !== null
-                            ? `(${data.from_account.user.username})`
+                            ? `(${data.from_account.user.username.slice(
+                                0,
+                                10
+                              )})`
                             : ""
                         }  on ${new Date(
                           data.created_date
@@ -348,7 +360,10 @@ const openseaEvent = async (msg) => {
                           data.from_account.address
                         }) ${
                           data.asset.owner.user !== null
-                            ? `(${data.from_account.user.username})`
+                            ? `(${data.from_account.user.username.slice(
+                                0,
+                                10
+                              )})`
                             : ""
                         }  on ${new Date(
                           data.created_date
@@ -367,7 +382,10 @@ const openseaEvent = async (msg) => {
                           data.from_account.address
                         }) ${
                           data.from_account.user !== null
-                            ? `(${data.from_account.user.username})`
+                            ? `(${data.from_account.user.username.slice(
+                                0,
+                                10
+                              )})`
                             : ""
                         }  on ${new Date(
                           data.created_date
