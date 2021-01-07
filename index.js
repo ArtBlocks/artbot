@@ -11,6 +11,8 @@ const SERVER = process.env.SERVER;
 const { init } = require("./singularity");
 const os = require("./osEvent");
 
+let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+
 bot.login(TOKEN);
 
 async function metaData(data, msg, url) {
