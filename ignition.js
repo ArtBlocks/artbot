@@ -1,31 +1,22 @@
 require("dotenv").config();
 const { Client, MessageEmbed } = require("discord.js");
-const Web3 = require("web3");
 const fetch = require("node-fetch");
-const bot = new Client();
-const TOKEN = process.env.TOKEN;
-const CHANNEL_SING = process.env.CHANNEL_SING;
-const CHANNEL_TRADE = process.env.CHANNEL_TRADE;
-const CHANNEL_IGNITION = process.env.CHANNEL_IGNITION;
-const SERVER = process.env.SERVER;
-
-const { init } = require("./singularity");
-const os = require("./osEvent");
-const ignition = require("./ignition");
+const Web3 = require("web3");
+const { ignitionFeatures } = require("./ignitionHash");
 
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
-
-bot.login(TOKEN);
+var _bot;
 
 async function metaData(data, msg, url) {
-  console.log(data);
+  //   console.log(data);
   // console.log(data.asset);
   let mintAddress = "0x0000000000000000000000000000000000000000";
 
   let artblocks = await fetch(`https://api.artblocks.io/token/${url}`);
   let abData = await artblocks.json();
-  let featureData = await init(abData["token hash"]);
-  let _meta = featureData.map((item) => item).join("\n");
+
+  console.log(abData, "ABDATA");
+  let featureData = await ignitionFeatures(abData["token hash"]);
 
   const _embed = new MessageEmbed()
     // Set the title of the field
@@ -36,9 +27,10 @@ async function metaData(data, msg, url) {
     .setColor(0xff0000)
     // Set the main content of the embed
     .setThumbnail(data.asset.image_url)
+    .addField("Live Script", `[view on artblocks.io](${abData.external_url})`)
     .addFields({
       name: "Features",
-      value: _meta,
+      value: featureData,
     })
     .addFields({
       name: "Owner",
@@ -147,11 +139,11 @@ async function metaData(data, msg, url) {
   msg.channel.send(_embed);
 }
 
-async function singData(msg, number) {
+async function ignitionData(msg, number) {
   _val = parseInt(number.substring(1));
-  _token = _val + 8000000;
+  _token = _val + 9000000;
   _contract = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
-  if (_val > 1023 || _val < 0) {
+  if (_val > 511 || _val < 0) {
     msg.channel.send("Invalid #");
   }
 
@@ -174,19 +166,4 @@ async function singData(msg, number) {
     });
 }
 
-bot.on("ready", () => {
-  console.info(`Logged in as ${bot.user.tag}!`);
-});
-
-bot.on("message", (msg) => {
-  if (msg.content.startsWith("#")) {
-    if (msg.channel.id === CHANNEL_SING) {
-      singData(msg, msg.content);
-    }
-    if (msg.channel.id === CHANNEL_IGNITION) {
-      ignition.ignitionData(msg, msg.content);
-    }
-  }
-});
-
-setInterval(os.openseaEvent, 60 * 1000, bot);
+module.exports = { ignitionData };

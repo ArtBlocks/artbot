@@ -59,7 +59,12 @@ const eventType = async (event) => {
   let details = {};
   switch (event.event_type) {
     case "created":
-      console.log(event.from_account.user, "THE USER");
+      console.log(event, "Created");
+      if (event.asset == null) {
+        console.log(event.name, "BUNDLE HERE");
+
+        break;
+      }
       details = {
         event_type: `New Listing`,
         event_description: "has been listed for sale.",
@@ -82,6 +87,7 @@ const eventType = async (event) => {
       embed(details);
       break;
     case "successful":
+      console.log(event, "Successful");
       details = {
         event_type: `New Sale`,
         event_description: "has been sold to a new owner, congrats!",
@@ -97,6 +103,7 @@ const eventType = async (event) => {
       embed(details);
       break;
     case "bid_entered":
+      console.log(event, "BID ENTERED");
       details = {
         event_type: `New Bid`,
         event_description: "has a new bid.",
@@ -119,7 +126,8 @@ const eventType = async (event) => {
       embed(details);
       break;
     case "bid_withdrawn":
-      console.log(event, "THE USER OBJECT");
+      console.log(event, "bid_withdrawn");
+
       details = {
         event_type: `Bid Withdrawn`,
         event_description: "bid has been withdrawn.",
@@ -143,33 +151,34 @@ const eventType = async (event) => {
       embed(details);
       break;
     case "cancelled":
+      console.log(event, "Cancelled");
       details = {
         event_type: `Listing Cancelled`,
         event_description: "has been removed from listings.",
         color: "#FF000A",
 
         name: "Cancelled Offer",
-        value: ` Off of ${web3.utils.fromWei(
-          event.data.total_price,
-          "ether"
-        )}Ξ has been withdrawn from [${event.seller.address.slice(
+        value: `[${event.seller.address.slice(
           0,
           8
         )}](https://opensea.io/accounts/${event.seller.address}) ${
-          event.seller.user !== null
-            ? `(${checkNull(event.from_account.user.username).trunc(8, false)})`
-            : ""
-        }  on ${new Date(event.created_date).toLocaleDateString()}`,
+          event.seller.user.username !== null || "NULL"
+            ? `(${event.seller.user.username})`
+            : `(${event.seller.user.address.slice(0, 8)})`
+        }  has withdrawn their bid on ${new Date(
+          event.created_date
+        ).toLocaleDateString()}`,
         inline: true,
         data: event,
       };
       embed(details);
       break;
     case "offer_entered":
+      console.log(event, "OFFER ENTERED");
       console.log(event.from_account.user.username, "USER NAME");
       details = {
-        event_type: `New Offer`,
-        event_description: "has a new offer.",
+        event_type: `New Bid`,
+        event_description: "has a new bid.",
         color: "#FFA300",
         name: "Current Bid",
         value: ` ${web3.utils.fromWei(
@@ -191,10 +200,7 @@ const eventType = async (event) => {
     case "transfer":
       break;
     default:
-      return {
-        event_type: `New Event`,
-        event_description: "has a new event.",
-      };
+      console.log(event, "HIT BOTTOM OF CASE");
   }
 };
 
