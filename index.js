@@ -136,7 +136,7 @@ async function metaData(data, msg, url) {
                 8
               )}](https://opensea.io/accounts/${data.from_account.address}) ${
                 data.from_account.user !== null
-                  ? `(${data.from_account.user.username.slice(0, 10)})`
+                  ? `(${data.from_account.user.username})`
                   : ""
               }  on ${new Date(data.created_date).toLocaleDateString()}`,
               inline: true,
