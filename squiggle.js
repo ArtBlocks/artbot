@@ -142,7 +142,7 @@ async function squigData(msg, number) {
   _val = parseInt(number.substring(1));
   _token = _val;
   _contract = "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a";
-  if (_val > 511 || _val < 0) {
+  if (_val > 9999 || _val < 0) {
     msg.channel.send("Invalid #");
   }
 
