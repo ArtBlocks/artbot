@@ -207,6 +207,7 @@ const eventType = async (event) => {
 async function openseaEvent(bot) {
   _bot = bot;
   var aMinuteAgo = new Date(Date.now() - 1000 * TIMER);
+  console.log(aMinuteAgo, "AGO");
 
   await fetch(
     "https://api.opensea.io/api/v1/events?only_opensea=false&asset_contract_address=0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270&offset=0&limit=200&occurred_after=" +
