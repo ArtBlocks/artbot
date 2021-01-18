@@ -1,6 +1,8 @@
 require("dotenv").config();
 const { Client, MessageEmbed } = require("discord.js");
 const Web3 = require("web3");
+const express = require("express");
+const bodyParser = require('body-parser');
 const fetch = require("node-fetch");
 const bot = new Client();
 const TOKEN = process.env.TOKEN;
@@ -18,6 +20,21 @@ const squig = require("./squiggle");
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 
 bot.login(TOKEN);
+
+const app = express();
+const PORT = process.env.port || 3000;
+
+app.use(bodyParser.json());
+app.post('/update', function(req, res){
+
+  console.log("received update with body:\n", req.body, "\n");
+
+	res.setHeader("Content-Type", "application/json");
+	res.json({"success" : true });
+});
+app.listen(PORT, function() {
+	console.log("Server is listening on port ", PORT);
+});
 
 async function metaData(data, msg, url) {
   console.log(data);
