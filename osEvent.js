@@ -21,7 +21,7 @@ String.prototype.trunc = function (n, useWordBoundary) {
 };
 
 function safeGet(path, object) {
-	path.reduce((object, key) => (object && object[key]) ?  object[key] : null, object);
+	return path.reduce((object, key) => (object && object[key]) ?  object[key] : null, object);
 }
 
 function checkNull(val) {
