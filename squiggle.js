@@ -2,6 +2,7 @@ require("dotenv").config();
 const { Client, MessageEmbed } = require("discord.js");
 const fetch = require("node-fetch");
 const Web3 = require("web3");
+const { squig } = require("./squiggleData");
 
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 var _bot;
@@ -14,8 +15,8 @@ async function metaData(data, msg, url) {
   let artblocks = await fetch(`https://api.artblocks.io/token/${url}`);
   let abData = await artblocks.json();
 
-  //   console.log(abData, "ABDATA");
-  //   let featureData = await ignitionFeatures(abData["token hash"]);
+  console.log(abData, "ABDATA");
+  let featureData = await squig(abData["token hash"]);
 
   const _embed = new MessageEmbed()
     // Set the title of the field
@@ -27,10 +28,10 @@ async function metaData(data, msg, url) {
     // Set the main content of the embed
     .setThumbnail(data.asset.image_url)
     .addField("Live Script", `[view on artblocks.io](${abData.external_url})`)
-    // .addFields({
-    //   name: "Features",
-    //   value: featureData,
-    // })
+    .addFields({
+      name: "Features",
+      value: featureData,
+    })
     .addFields({
       name: "Owner",
       value: `[${data.asset.owner.address.slice(
