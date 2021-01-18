@@ -20,6 +20,10 @@ String.prototype.trunc = function (n, useWordBoundary) {
   return isTooLong ? s_ : s_;
 };
 
+function safeGet(path, object) {
+	path.reduce((object, key) => (object && object[key]) ?  object[key] : null, object);
+}
+
 function checkNull(val) {
   if (val) {
     if (val === "null") {
@@ -39,18 +43,18 @@ async function embed(details) {
 
     .setDescription(
       `[${
-        details.data.asset.name
-      }](${`https://artblocks.io/token/${details.data.asset.token_id}`}) ${
+        safeGet(["data", "asset", "name"], details)
+      }](${`https://artblocks.io/token/${safeGet(["data", "asset", "token_id"], details)}`}) ${
         details.event_description
       }`
     )
 
-    .setURL(details.data.asset.permalink)
+    .setURL(safeGet(["data", "asset", "permalink"], details))
     // Set the color of the embed
     .setColor(details.color)
     // Set the main content of the embed
 
-    .setThumbnail(details.data.asset.image_url)
+    .setThumbnail(safeGet(["data", "asset", "image_url"], details))
     .addFields({ name: details.name, value: details.value });
   sendMessage(_embed);
 }
@@ -59,7 +63,7 @@ const eventType = async (event) => {
   let details = {};
   switch (event.event_type) {
     case "created":
-      console.log(event, "Created");
+      //console.log(event, "Created");
       if (event.asset == null) {
         console.log(event.name, "BUNDLE HERE");
 
@@ -87,7 +91,7 @@ const eventType = async (event) => {
       embed(details);
       break;
     case "successful":
-      console.log(event, "Successful");
+      //console.log(event, "Successful");
       details = {
         event_type: `New Sale`,
         event_description: "has been sold to a new owner, congrats!",
@@ -103,7 +107,7 @@ const eventType = async (event) => {
       embed(details);
       break;
     case "bid_entered":
-      console.log(event, "BID ENTERED");
+      //console.log(event, "BID ENTERED");
       details = {
         event_type: `New Bid`,
         event_description: "has a new bid.",
@@ -126,7 +130,7 @@ const eventType = async (event) => {
       embed(details);
       break;
     case "bid_withdrawn":
-      console.log(event, "bid_withdrawn");
+      //console.log(event, "bid_withdrawn");
 
       details = {
         event_type: `Bid Withdrawn`,
@@ -151,7 +155,7 @@ const eventType = async (event) => {
       embed(details);
       break;
     case "cancelled":
-      console.log(event, "Cancelled");
+      //console.log(event, "Cancelled");
       details = {
         event_type: `Listing Cancelled`,
         event_description: "has been removed from listings.",
@@ -162,8 +166,8 @@ const eventType = async (event) => {
           0,
           8
         )}](https://opensea.io/accounts/${event.seller.address}) ${
-          event.seller.user.username !== null || "NULL"
-            ? `(${event.seller.user.username})`
+          safeGet(["seller", "user", "username"], event) !== null || "NULL"
+            ? `(${safeGet(["seller", "user", "username"], event)})`
             : `(${event.seller.user.address.slice(0, 8)})`
         }  has withdrawn their bid on ${new Date(
           event.created_date
@@ -174,8 +178,8 @@ const eventType = async (event) => {
       embed(details);
       break;
     case "offer_entered":
-      console.log(event, "OFFER ENTERED");
-      console.log(event.from_account.user.username, "USER NAME");
+      //console.log(event, "OFFER ENTERED");
+      //console.log(safeGet(["seller", "user", "username"], event), "USER NAME");
       details = {
         event_type: `New Bid`,
         event_description: "has a new bid.",
