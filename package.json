@@ -17,6 +17,7 @@
   "license": "MIT",
   "dependencies": {
     "discord.js": "^12.5.1",
+    "body-parser": "^1.15.2",
     "dotenv": "^8.2.0",
     "node-fetch": "^2.6.1",
     "timeago.js": "^4.0.2",
