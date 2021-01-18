@@ -16,7 +16,7 @@ async function metaData(data, msg, url) {
   let abData = await artblocks.json();
 
   console.log(abData, "ABDATA");
-  let featureData = await squig(abData["token hash"]);
+  //   let featureData = await squig(abData["token hash"]);
 
   const _embed = new MessageEmbed()
     // Set the title of the field
@@ -28,10 +28,10 @@ async function metaData(data, msg, url) {
     // Set the main content of the embed
     .setThumbnail(data.asset.image_url)
     .addField("Live Script", `[view on artblocks.io](${abData.external_url})`)
-    .addFields({
-      name: "Features",
-      value: featureData,
-    })
+    // .addFields({
+    //   name: "Features",
+    //   value: featureData,
+    // })
     .addFields({
       name: "Owner",
       value: `[${data.asset.owner.address.slice(
