@@ -24,11 +24,10 @@ bot.login(TOKEN);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-//app.use(bodyParser.json());
-app.use(bodyParser.raw());
+app.use(bodyParser.json());
 
 app.post("/update", function (req, res) {
-  console.log("received update with body:\n", req.body, "\n");
+  console.log("received update with body:\n", JSON.stringify(req.body, null, 2), "\n");
 
   res.setHeader("Content-Type", "application/json");
   res.json({ success: true });
