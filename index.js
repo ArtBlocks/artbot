@@ -33,6 +33,14 @@ app.post("/update", function (req, res) {
   res.setHeader("Content-Type", "application/json");
   res.json({ success: true });
 });
+
+app.get("/update", function (req, res) {
+  console.log("received get with body:\n", req.body, "\n");
+
+  res.setHeader("Content-Type", "application/json");
+  res.json({ success: true });
+});
+
 app.listen(PORT, function () {
   console.log("Server is listening on port ", PORT);
 });
