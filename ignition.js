@@ -8,7 +8,7 @@ let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 var _bot;
 
 async function metaData(data, msg, url) {
-  console.log(data);
+  // console.log(data);
   // console.log(data.asset);
   let mintAddress = "0x0000000000000000000000000000000000000000";
 
