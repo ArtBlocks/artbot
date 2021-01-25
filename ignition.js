@@ -8,14 +8,14 @@ let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 var _bot;
 
 async function metaData(data, msg, url) {
-  //   console.log(data);
+  console.log(data);
   // console.log(data.asset);
   let mintAddress = "0x0000000000000000000000000000000000000000";
 
   let artblocks = await fetch(`https://api.artblocks.io/token/${url}`);
   let abData = await artblocks.json();
 
-  console.log(abData, "ABDATA");
+  // console.log(abData, "ABDATA");
   let featureData = await ignitionFeatures(abData["token hash"]);
 
   const _embed = new MessageEmbed()
@@ -80,7 +80,7 @@ async function metaData(data, msg, url) {
                     )}](https://opensea.io/accounts/${
                       data.from_account.address
                     }) ${
-                      data.asset.owner.user !== null
+                      data.from_account.user !== null
                         ? `(${data.from_account.user.username})`
                         : ""
                     } on ${new Date(data.created_date).toLocaleDateString()}`,
