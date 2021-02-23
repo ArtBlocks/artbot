@@ -1,60 +1,20 @@
 require("dotenv").config();
 const { Client, MessageEmbed } = require("discord.js");
-const Web3 = require("web3");
-const express = require("express");
-const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
-const bot = new Client();
-const TOKEN = process.env.TOKEN;
-const CHANNEL_SING = process.env.CHANNEL_SING;
-const CHANNEL_TRADE = process.env.CHANNEL_TRADE;
-const CHANNEL_IGNITION = process.env.CHANNEL_IGNITION;
-const CHANNEL_SQUIG = process.env.CHANNEL_SQUIG;
-const CHANNEL_RINGERS = process.env.CHANNEL_RINGERS;
-const SERVER = process.env.SERVER;
-
-const { init } = require("./singularity");
-const os = require("./osEvent");
-const ignition = require("./ignition");
-const squig = require("./squiggle");
-const ringers = require("./ringers");
+const Web3 = require("web3");
 
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
-
-bot.login(TOKEN);
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-app.use(bodyParser.json());
-
-app.post("/update", function (req, res) {
-  console.log("received update with body:\n", JSON.stringify(req.body, null, 2), "\n");
-
-  res.setHeader("Content-Type", "application/json");
-  res.json({ success: true });
-});
-
-app.get("/update", function (req, res) {
-  console.log("received get with body:\n", req.body, "\n");
-
-  res.setHeader("Content-Type", "application/json");
-  res.json({ success: true });
-});
-
-app.listen(PORT, function () {
-  console.log("Server is listening on port ", PORT);
-});
+var _bot;
 
 async function metaData(data, msg, url) {
-  console.log(data);
+  //   console.log(data);
   // console.log(data.asset);
   let mintAddress = "0x0000000000000000000000000000000000000000";
 
   let artblocks = await fetch(`https://api.artblocks.io/token/${url}`);
   let abData = await artblocks.json();
-  let featureData = await init(abData["token hash"]);
-  let _meta = featureData.map((item) => item).join("\n");
+
+  console.log(abData, "ABDATA");
 
   const _embed = new MessageEmbed()
     // Set the title of the field
@@ -65,10 +25,12 @@ async function metaData(data, msg, url) {
     .setColor(0xff0000)
     // Set the main content of the embed
     .setThumbnail(data.asset.image_url)
-    .addFields({
-      name: "Features",
-      value: _meta,
-    })
+    .addField("Features", `[view on artblocks.io](${abData.external_url})`)
+    .addField("Live Script", `${abData.features.join("\n")}`)
+    // .addFields({
+    //   name: "Features",
+    //   value: featureData,
+    // })
     .addFields({
       name: "Owner",
       value: `[${data.asset.owner.address.slice(
@@ -118,7 +80,7 @@ async function metaData(data, msg, url) {
                       data.from_account.address
                     }) ${
                       data.asset.owner.user !== null
-                        ? `(${data.from_account.user.username.slice(0, 10)})`
+                        ? `(${data.from_account.user.username})`
                         : ""
                     } on ${new Date(data.created_date).toLocaleDateString()}`,
               inline: true,
@@ -165,7 +127,7 @@ async function metaData(data, msg, url) {
                 8
               )}](https://opensea.io/accounts/${data.from_account.address}) ${
                 data.from_account.user !== null
-                  ? `(${data.from_account.user.username})`
+                  ? `(${data.from_account.user.username.slice(0, 10)})`
                   : ""
               }  on ${new Date(data.created_date).toLocaleDateString()}`,
               inline: true,
@@ -176,12 +138,12 @@ async function metaData(data, msg, url) {
   msg.channel.send(_embed);
 }
 
-async function singData(msg, number) {
+async function ringerData(msg, number) {
   _val = parseInt(number.substring(1));
-  _token = _val + 8000000;
+  _token = _val + 13000000;
   _contract = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
-  if (_val > 1023 || _val < 0) {
-    msg.channel.send("Invalid #");
+  if (_val > 999 || _val < 0) {
+    msg.channel.send("Invalid #, only 1000 Ringers minted.");
   }
 
   await fetch(
@@ -194,6 +156,7 @@ async function singData(msg, number) {
   )
     .then((response) => response.json())
     .then((data) => {
+      console.log(data, "LOG DATA");
       let event = data.asset_events[0];
 
       metaData(event, msg, _token);
@@ -203,25 +166,4 @@ async function singData(msg, number) {
     });
 }
 
-bot.on("ready", () => {
-  console.info(`Logged in as ${bot.user.tag}!`);
-});
-
-bot.on("message", (msg) => {
-  if (msg.content.startsWith("#")) {
-    if (msg.channel.id === CHANNEL_SING) {
-      singData(msg, msg.content);
-    }
-    if (msg.channel.id === CHANNEL_IGNITION) {
-      ignition.ignitionData(msg, msg.content);
-    }
-    if (msg.channel.id === CHANNEL_SQUIG) {
-      squig.squigData(msg, msg.content);
-    }
-    if (msg.channel.id === CHANNEL_RINGERS) {
-      ringers.ringerData(msg, msg.content);
-    }
-  }
-});
-
-setInterval(os.openseaEvent, 60 * 1000, bot);
+module.exports = { ringerData };
