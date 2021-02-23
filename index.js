@@ -18,6 +18,7 @@ const os = require("./osEvent");
 const ignition = require("./ignition");
 const squig = require("./squiggle");
 const ringers = require("./ringers");
+const CuratedProjectBot = require("./CuratedProjectBot").CuratedProjectBot;
 
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 
@@ -207,6 +208,13 @@ bot.on("ready", () => {
   console.info(`Logged in as ${bot.user.tag}!`);
 });
 
+let ringersBot = new CuratedProjectBot(
+  13000000,
+  "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+  1000,
+  "Ringers"
+)
+
 bot.on("message", (msg) => {
   if (msg.content.startsWith("#")) {
     if (msg.channel.id === CHANNEL_SING) {
@@ -219,7 +227,7 @@ bot.on("message", (msg) => {
       squig.squigData(msg, msg.content);
     }
     if (msg.channel.id === CHANNEL_RINGERS) {
-      ringers.ringerData(msg, msg.content);
+      ringersBot.getData(msg, msg.content);
     }
   }
 });
