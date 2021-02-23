@@ -21,7 +21,21 @@ class CuratedProjectBot {
   }
 
   async getData(msg, number) {
-    let pieceNumber = parseInt(number.substring(1));
+    if (number.length <= 1) {
+      msg.channel.send(
+        `Invalid format, enter # followed by the piece number of interest.`
+      );
+      return;
+    }
+
+    let afterTheHash = number.substring(1);
+    let pieceNumber;
+    if (afterTheHash.toLowerCase() == "rand" || afterTheHash[0] == "?")  {
+      pieceNumber = parseInt(Math.random() * this.editionNumber);
+    } else {
+      pieceNumber = parseInt(afterTheHash);
+    }
+
     if (pieceNumber >= this.editionNumber || pieceNumber < 0) {
       msg.channel.send(
         `Invalid #, only ${this.editionNumber} pieces minted for ${this.projectName}.`
