@@ -124,17 +124,31 @@ class CuratedProjectBot {
     let ownerUsername = ownerAccount.user !== null ?
       ownerAccount.user.username :
       UNKNOWN_USERNAME;
-    if (ownerUsername === null) { ownerUsername = UNKNOWN_USERNAME; }
+    if (ownerAccount !== null) {
+      ownerAddress = ownerAccount.address;
+      ownerAddressPreview = ownerAddress !== null ?
+        ownerAddress.slice(0, 8) :
+        UNKNOWN_ADDRESS;
+      ownerUsername = ownerAccount.user !== null ?
+        ownerAccount.user.username :
+        UNKNOWN_USERNAME;
+      if (ownerUsername === null) { ownerUsername = UNKNOWN_USERNAME; }
+    }
 
     let fromAccount = eventData.from_account;
-    let fromAddress = fromAccount.address;
-    let fromAddressPreview = fromAddress !== null ?
-      fromAddress.slice(0, 8) :
-      UNKNOWN_ADDRESS;
-    let fromUsername = fromAccount.user !== null ?
-      fromAccount.user.username :
-      UNKNOWN_USERNAME;
-    if (fromUsername === null) { fromUsername = UNKNOWN_USERNAME; }
+    let fromAddress;
+    let fromAddressPreview;
+    let fromUsername;
+    if (fromAccount !== null) {
+      fromAddress = fromAccount.address;
+      fromAddressPreview = fromAddress !== null ?
+        fromAddress.slice(0, 8) :
+        UNKNOWN_ADDRESS;
+      fromUsername = fromAccount.user !== null ?
+        fromAccount.user.username :
+        UNKNOWN_USERNAME;
+      if (fromUsername === null) { fromUsername = UNKNOWN_USERNAME; }
+    }
 
     switch (eventType) {
       case "created":
