@@ -25,8 +25,8 @@ async function metaData(data, msg, url) {
     .setColor(0xff0000)
     // Set the main content of the embed
     .setThumbnail(data.asset.image_url)
-    .addField("Features", `[view on artblocks.io](${abData.external_url})`)
-    .addField("Live Script", `${abData.features.join("\n")}`)
+    .addField("Live Script", `[view on artblocks.io](${abData.external_url})`)
+    .addField("Features", `${abData.features.join("\n")}`)
     // .addFields({
     //   name: "Features",
     //   value: featureData,
