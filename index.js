@@ -8,6 +8,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
 const bot = new Client();
+
 const TOKEN = process.env.TOKEN;
 const CHANNEL_SING = process.env.CHANNEL_SING;
 const CHANNEL_TRADE = process.env.CHANNEL_TRADE;
@@ -15,7 +16,13 @@ const CHANNEL_IGNITION = process.env.CHANNEL_IGNITION;
 const CHANNEL_SQUIG = process.env.CHANNEL_SQUIG;
 const CHANNEL_RINGERS = process.env.CHANNEL_RINGERS;
 const CHANNEL_GENESIS = process.env.CHANNEL_GENESIS;
+const CHANNEL_CONSTRUCTION = process.env.CHANNEL_CONSTRUCTION;
+const CHANNEL_DYNAMIC_SLICES = process.env.CHANNEL_DYNAMIC_SLICES;
+const CHANNEL_DECONSTRUCTIONS = process.env.CHANNEL_DECONSTRUCTIONS;
 const SERVER = process.env.SERVER;
+
+const OG_MINTING_CONTRACT_ADDRESS = "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a";
+const V2_MINTING_CONTRACT_ADDRESS = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
 
 const SQUIGGLE_PAUSE_MESSAGE = new MessageEmbed()
       // Set the title of the field
@@ -65,33 +72,51 @@ bot.on("ready", () => {
 
 let singularityBot = new CuratedProjectBot(
   8000000,
-  "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+  V2_MINTING_CONTRACT_ADDRESS,
   1024,
   "Singularity"
 );
 let ignitionBot = new CuratedProjectBot(
   9000000,
-  "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+  V2_MINTING_CONTRACT_ADDRESS,
   512,
   "Ignition"
 );
 let squiggleBot = new CuratedProjectBot(
   0,
-  "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a",
+  OG_MINTING_CONTRACT_ADDRESS,
   10000,
   "Chromie Squiggle"
 );
 let ringersBot = new CuratedProjectBot(
   13000000,
-  "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+  V2_MINTING_CONTRACT_ADDRESS,
   1000,
   "Ringers"
 );
 let genesisBot = new CuratedProjectBot(
   1000000,
-  "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a",
+  OG_MINTING_CONTRACT_ADDRESS,
   512,
   "Genesis"
+);
+let constructionBot = new CuratedProjectBot(
+  2000000,
+  OG_MINTING_CONTRACT_ADDRESS,
+  500,
+  "Construction Token"
+);
+let dynamicSlicesBot = new CuratedProjectBot(
+  4000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  512,
+  "Dynamic Slices"
+);
+let deconstructionsBot = new CuratedProjectBot(
+  7000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  200,
+  "Elevated Deconstructions"
 );
 
 bot.on("message", (msg) => {
@@ -112,6 +137,15 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_GENESIS:
         genesisBot.getData(msg, msg.content);
+        break;
+      case CHANNEL_CONSTRUCTION:
+        constructionBot.getData(msg, msg.content);
+        break;
+      case CHANNEL_DYNAMIC_SLICES:
+        dynamicSlicesBot.getData(msg, msg.content);
+        break;
+      case CHANNEL_DECONSTRUCTIONS:
+        deconstructionsBot.getData(msg, msg.content);
         break;
       default:
         console.log(`Unknown channel ID: ${msg.channel.id}`);
