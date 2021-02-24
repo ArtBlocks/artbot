@@ -16,6 +16,14 @@ const CHANNEL_SQUIG = process.env.CHANNEL_SQUIG;
 const CHANNEL_RINGERS = process.env.CHANNEL_RINGERS;
 const SERVER = process.env.SERVER;
 
+const SQUIGGLE_PAUSE_MESSAGE = new MessageEmbed()
+      // Set the title of the field
+      .setTitle('Why is minting paused?')
+      // Set the color of the embed
+      .setColor(0x00ff00)
+      // Set the main content of the embed
+      .setDescription(`It looks like you're wondering about why Chromie Squiggle minting is paused.The tl;dr is that all normal minting is over and the remaining Squiggles are reserved for special occasions!\n\nFor more details, check out the [#squiggle-announcements](https://discord.com/channels/411959613370400778/800461920008273962/800464186924466187) channel.`);
+
 const os = require("./osEvent");
 const CuratedProjectBot = require("./CuratedProjectBot").CuratedProjectBot;
 
@@ -80,6 +88,7 @@ let ringersBot = new CuratedProjectBot(
 );
 
 bot.on("message", (msg) => {
+  // Handle piece # requests.
   if (msg.content.startsWith("#")) {
     switch (msg.channel.id) {
       case CHANNEL_SING:
@@ -98,6 +107,17 @@ bot.on("message", (msg) => {
         console.log(`Unknown channel ID: ${msg.channel.id}`);
         break;
     }
+    return;
+  }
+
+  // Handle questions about the mint pausing for Chromie Squiggles.
+  //
+  // NOTE: It is important to check if the message author is the ArtBot
+  //       itself to avoid a recursive infinite loop.
+  if (msg.content.toLowerCase().includes("pause")
+             && msg.channel.id == CHANNEL_SQUIG
+             && msg.author.username !== "artbot") {
+    msg.channel.send(SQUIGGLE_PAUSE_MESSAGE);
   }
 });
 
