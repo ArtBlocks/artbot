@@ -29,18 +29,22 @@ const CHANNEL_UNIGRIDS = process.env.CHANNEL_UNIGRIDS;
 const CHANNEL_27_BIT = process.env.CHANNEL_27_BIT;
 const CHANNEL_CRYPTOBLOTS = process.env.CHANNEL_CRYPTOBLOTS;
 
+// Artist playground Discord channel IDs.
+const CHANNEL_PLAYGROUND_DANDAN = process.env.CHANNEL_PLAYGROUND_DANDAN;
+const CHANNEL_PLAYGROUND_JEFFDAVIS = process.env.CHANNEL_PLAYGROUND_JEFFDAVIS;
+
 // Minting contract addresses.
 const OG_MINTING_CONTRACT_ADDRESS = "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a";
 const V2_MINTING_CONTRACT_ADDRESS = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
 
 // Custom message shown when someone asks why Squiggle minting is paused.
 const SQUIGGLE_PAUSE_MESSAGE = new MessageEmbed()
-      // Set the title of the field
-      .setTitle('Why is minting paused?')
-      // Set the color of the embed
-      .setColor(0x00ff00)
-      // Set the main content of the embed
-      .setDescription(`It looks like you're wondering about why Chromie Squiggle minting is paused.The tl;dr is that all normal minting is over and the remaining Squiggles are reserved for special occasions!\n\nFor more details, check out the [#squiggle-announcements](https://discord.com/channels/411959613370400778/800461920008273962/800464186924466187) channel.`);
+  // Set the title of the field
+  .setTitle('Why is minting paused?')
+  // Set the color of the embed
+  .setColor(0x00ff00)
+  // Set the main content of the embed
+  .setDescription(`It looks like you're wondering about why Chromie Squiggle minting is paused.The tl;dr is that all normal minting is over and the remaining Squiggles are reserved for special occasions!\n\nFor more details, check out the [#squiggle-announcements](https://discord.com/channels/411959613370400778/800461920008273962/800464186924466187) channel.`);
 
 // App setup.
 const app = express();
@@ -158,11 +162,34 @@ let cryptoblotBot = new ProjectBot(
   "Cryptoblots"
 );
 
+// Artist playground project Discord channel message handlers.
+// jeff-davis projects
+let viewCardBot = new ProjectBot(
+  6000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  41,
+  "View Card"
+);
+let colorStudyBot = new ProjectBot(
+  16000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  2000,
+  "Color Study"
+);
+// dandan projects
+// TODO
+
 // Message event handler.
 bot.on("message", (msg) => {
+  let msgAuthor = msg.author.username;
+  let msgContent = msg.content;
+  let msgContentLowercase = msgContent.toLowerCase();
+  let channelID = msg.channel.id;
+
   // Handle piece # requests.
-  if (msg.content.startsWith("#")) {
-    switch (msg.channel.id) {
+  if (msgContent.startsWith("#")) {
+    switch (channelID) {
+      // Curated project channels.
       case CHANNEL_SING:
         singularityBot.handleNumberMessage(msg);
         break;
@@ -202,6 +229,19 @@ bot.on("message", (msg) => {
       case CHANNEL_CRYPTOBLOTS:
         cryptoblotBot.handleNumberMessage(msg);
         break;
+
+        // Artist playground channels.
+      case CHANNEL_PLAYGROUND_JEFFDAVIS:
+        if (msgContentLowercase.includes("color") &&
+          msgContentLowercase.includes("study")) {
+          colorStudyBot.handleNumberMessage(msg);
+        } else if (msgContentLowercase.includes("view") &&
+          msgContentLowercase.includes("card")) {
+          viewCardBot.handleNumberMessage(msg);
+        }
+        break;
+
+        // Fall-back, should never occur.
       default:
         console.log(`Unknown channel ID: ${msg.channel.id}`);
         break;
@@ -213,9 +253,9 @@ bot.on("message", (msg) => {
   //
   // NOTE: It is important to check if the message author is the ArtBot
   //       itself to avoid a recursive infinite loop.
-  if (msg.content.toLowerCase().includes("pause")
-             && msg.channel.id == CHANNEL_SQUIG
-             && msg.author.username !== "artbot") {
+  if (msgContentLowercase.includes("pause") &&
+    channelID == CHANNEL_SQUIG &&
+    msgAuthor !== "artbot") {
     msg.channel.send(SQUIGGLE_PAUSE_MESSAGE);
   }
 });
