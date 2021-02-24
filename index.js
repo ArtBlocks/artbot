@@ -30,6 +30,7 @@ const CHANNEL_NIMBUDS = process.env.CHANNEL_NIMBUDS;
 const CHANNEL_HYPERHASH = process.env.CHANNEL_HYPERHASH;
 const CHANNEL_UNIGRIDS = process.env.CHANNEL_UNIGRIDS;
 const CHANNEL_27_BIT = process.env.CHANNEL_27_BIT;
+const CHANNEL_SPECTRON = process.env.CHANNEL_SPECTRON;
 const CHANNEL_CRYPTOBLOTS = process.env.CHANNEL_CRYPTOBLOTS;
 
 // Artist playground Discord channel IDs.
@@ -161,6 +162,12 @@ let bitBot = new ProjectBot(
   1024,
   "27-Bit Digital"
 );
+let spectronBot = new ProjectBot(
+  17000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  400,
+  "Spectron"
+);
 let cryptoblotBot = new ProjectBot(
   3000000,
   V2_MINTING_CONTRACT_ADDRESS,
@@ -263,6 +270,9 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_27_BIT:
         bitBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_SPECTRON:
+        spectronBot.handleNumberMessage(msg);
         break;
       case CHANNEL_CRYPTOBLOTS:
         cryptoblotBot.handleNumberMessage(msg);
