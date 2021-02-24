@@ -139,7 +139,8 @@ bot.on("message", (msg) => {
         genesisBot.getData(msg, msg.content);
         break;
       case CHANNEL_CONSTRUCTION:
-        genesisBot.getData(msg, msg.content);
+        constructionBot.getData(msg, msg.content);
+        break;
       case CHANNEL_DYNAMIC_SLICES:
         dynamicSlicesBot.getData(msg, msg.content);
         break;
