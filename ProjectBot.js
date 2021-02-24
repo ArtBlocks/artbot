@@ -20,7 +20,7 @@ class ProjectBot {
     this.projectName = projectName;
   }
 
-  async handleMessage(msg) {
+  async handleNumberMessage(msg) {
     let content = msg.content;
     if (content.length <= 1) {
       msg.channel.send(
@@ -31,7 +31,7 @@ class ProjectBot {
 
     let afterTheHash = content.substring(1);
     let pieceNumber;
-    if (afterTheHash.toLowerCase() == "rand" || afterTheHash[0] == "?") {
+    if (afterTheHash.toLowerCase().includes("rand ") || afterTheHash[0] == "?") {
       pieceNumber = parseInt(Math.random() * this.editionNumber);
     } else {
       pieceNumber = parseInt(afterTheHash);
