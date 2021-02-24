@@ -13,6 +13,9 @@ const TOKEN = process.env.TOKEN;
 const SERVER = process.env.SERVER;
 const PORT = process.env.PORT || 3000;
 
+// General main Discord channel ID.
+const CHANNEL_GENERAL = process.env.CHANNEL_GENERAL;
+
 // Curated project Discord channel IDs.
 const CHANNEL_SING = process.env.CHANNEL_SING;
 const CHANNEL_TRADE = process.env.CHANNEL_TRADE;
@@ -43,7 +46,7 @@ const V2_MINTING_CONTRACT_ADDRESS = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"
 // Custom message shown when someone asks why Squiggle minting is paused.
 const SQUIGGLE_PAUSE_MESSAGE = new MessageEmbed()
   // Set the title of the field
-  .setTitle('Why is minting paused?')
+  .setTitle('Why is Squiggle minting paused?')
   // Set the color of the embed
   .setColor(0x00ff00)
   // Set the main content of the embed
@@ -313,10 +316,17 @@ bot.on("message", (msg) => {
   //
   // NOTE: It is important to check if the message author is the ArtBot
   //       itself to avoid a recursive infinite loop.
-  if (msgContentLowercase.includes("pause") &&
-    channelID == CHANNEL_SQUIG &&
-    msgAuthor !== "artbot") {
+  let messageMentionsPause = msgContentLowercase.includes("pause");
+  let messageMentionsSquiggle = msgContentLowercase.includes("squiggle");
+  let squiggleChannelPauseMentioned = messageMentionsPause &&
+                                      channelID == CHANNEL_SQUIG;
+  let generalChannelSquigglePauseMentioned = messageMentionsPause &&
+                                             messageMentionsSquiggle &&
+                                             channelID == CHANNEL_GENERAL;
+  if (msgAuthor !== "artbot" &&
+     (squiggleChannelPauseMentioned || generalChannelSquigglePauseMentioned )) {
     msg.channel.send(SQUIGGLE_PAUSE_MESSAGE);
+    return;
   }
 });
 
