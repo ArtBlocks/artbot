@@ -18,6 +18,7 @@ const CHANNEL_RINGERS = process.env.CHANNEL_RINGERS;
 const CHANNEL_GENESIS = process.env.CHANNEL_GENESIS;
 const CHANNEL_CONSTRUCTION = process.env.CHANNEL_CONSTRUCTION;
 const CHANNEL_DYNAMIC_SLICES = process.env.CHANNEL_DYNAMIC_SLICES;
+const CHANNEL_DECONSTRUCTIONS = process.env.CHANNEL_DECONSTRUCTIONS;
 const SERVER = process.env.SERVER;
 
 const OG_MINTING_CONTRACT_ADDRESS = "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a";
@@ -111,6 +112,12 @@ let dynamicSlicesBot = new CuratedProjectBot(
   512,
   "Dynamic Slices"
 );
+let deconstructionsBot = new CuratedProjectBot(
+  7000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  200,
+  "Elevated Deconstructions"
+);
 
 bot.on("message", (msg) => {
   // Handle piece # requests.
@@ -135,6 +142,9 @@ bot.on("message", (msg) => {
         genesisBot.getData(msg, msg.content);
       case CHANNEL_DYNAMIC_SLICES:
         dynamicSlicesBot.getData(msg, msg.content);
+        break;
+      case CHANNEL_DECONSTRUCTIONS:
+        deconstructionsBot.getData(msg, msg.content);
         break;
       default:
         console.log(`Unknown channel ID: ${msg.channel.id}`);
