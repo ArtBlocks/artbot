@@ -34,6 +34,7 @@ const CHANNEL_PLAYGROUND_JEFFDAVIS = process.env.CHANNEL_PLAYGROUND_JEFFDAVIS;
 const CHANNEL_PLAYGROUND_DANDAN = process.env.CHANNEL_PLAYGROUND_DANDAN;
 const CHANNEL_PLAYGROUND_PXLQ = process.env.CHANNEL_PLAYGROUND_PXLQ;
 const CHANNEL_PLAYGROUND_DMITRICHERNIAK = process.env.CHANNEL_PLAYGROUND_DMITRICHERNIAK;
+const CHANNEL_PLAYGROUND_GE1DOOT = process.env.CHANNEL_PLAYGROUND_GE1DOOT;
 
 // Minting contract addresses.
 const OG_MINTING_CONTRACT_ADDRESS = "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a";
@@ -205,6 +206,13 @@ let eternalPumpBot = new ProjectBot(
   50,
   "The Eternal Pump"
 );
+// ge1doot projects
+let utopiaBot = new ProjectBot(
+  15000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  256,
+  "Utopia"
+);
 
 // Message event handler.
 bot.on("message", (msg) => {
@@ -285,6 +293,11 @@ bot.on("message", (msg) => {
         if (msgContentLowercase.includes("eternal") &&
           msgContentLowercase.includes("pump")) {
           eternalPumpBot.handleNumberMessage(msg);
+        }
+        break;
+      case CHANNEL_PLAYGROUND_GE1DOOT:
+        if (msgContentLowercase.includes("utopia")) {
+          utopiaBot.handleNumberMessage(msg);
         }
         break;
 
