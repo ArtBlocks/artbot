@@ -30,7 +30,7 @@ class CuratedProjectBot {
 
     let afterTheHash = number.substring(1);
     let pieceNumber;
-    if (afterTheHash.toLowerCase() == "rand" || afterTheHash[0] == "?")  {
+    if (afterTheHash.toLowerCase() == "rand" || afterTheHash[0] == "?") {
       pieceNumber = parseInt(Math.random() * this.editionNumber);
     } else {
       pieceNumber = parseInt(afterTheHash);
@@ -68,6 +68,9 @@ class CuratedProjectBot {
     let artBlocksData = await artBlocksResponse.json();
     console.log(artBlocksData, "ARTBLOCKS DATA");
 
+    const assetFeatures = (artBlocksData.features !== null && artBlocksData.features.length) ?
+      `${artBlocksData.features.join("\n")}` :
+      "Not yet available.";
     const embedContent = new MessageEmbed()
       // Set the title of the field.
       .setTitle(eventData.asset.name)
@@ -80,7 +83,7 @@ class CuratedProjectBot {
       // Add "Live Script" field.
       .addField("Live Script", `[view on artblocks.io](${artBlocksData.external_url})`)
       // Add "Features" field.
-      .addField("Features", `${artBlocksData.features.join("\n")}`)
+      .addField("Features", assetFeatures)
       // Add current owner info.
       .addFields(this.parseOwnerInfo(eventData.asset.owner))
       // Add most recent event info.
@@ -103,7 +106,9 @@ class CuratedProjectBot {
     let ownerUsername = ownerAccount.user !== null ?
       ownerAccount.user.username :
       UNKNOWN_USERNAME;
-    if (ownerUsername === null) { ownerUsername = UNKNOWN_USERNAME; }
+    if (ownerUsername === null) {
+      ownerUsername = UNKNOWN_USERNAME;
+    }
 
     return {
       name: "Owner",
@@ -132,7 +137,9 @@ class CuratedProjectBot {
       ownerUsername = ownerAccount.user !== null ?
         ownerAccount.user.username :
         UNKNOWN_USERNAME;
-      if (ownerUsername === null) { ownerUsername = UNKNOWN_USERNAME; }
+      if (ownerUsername === null) {
+        ownerUsername = UNKNOWN_USERNAME;
+      }
     }
 
     let fromAccount = eventData.from_account;
@@ -147,7 +154,9 @@ class CuratedProjectBot {
       fromUsername = fromAccount.user !== null ?
         fromAccount.user.username :
         UNKNOWN_USERNAME;
-      if (fromUsername === null) { fromUsername = UNKNOWN_USERNAME; }
+      if (fromUsername === null) {
+        fromUsername = UNKNOWN_USERNAME;
+      }
     }
 
     switch (eventType) {
