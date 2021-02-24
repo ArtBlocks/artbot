@@ -15,6 +15,7 @@ const CHANNEL_IGNITION = process.env.CHANNEL_IGNITION;
 const CHANNEL_SQUIG = process.env.CHANNEL_SQUIG;
 const CHANNEL_RINGERS = process.env.CHANNEL_RINGERS;
 const CHANNEL_GENESIS = process.env.CHANNEL_GENESIS;
+const CHANNEL_CONSTRUCTION = process.env.CHANNEL_CONSTRUCTION;
 const SERVER = process.env.SERVER;
 
 const SQUIGGLE_PAUSE_MESSAGE = new MessageEmbed()
@@ -93,6 +94,12 @@ let genesisBot = new CuratedProjectBot(
   512,
   "Genesis"
 );
+let constructionBot = new CuratedProjectBot(
+  2000000,
+  "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a",
+  500,
+  "Construction Token"
+);
 
 bot.on("message", (msg) => {
   // Handle piece # requests.
@@ -112,6 +119,9 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_GENESIS:
         genesisBot.getData(msg, msg.content);
+        break;
+      case CHANNEL_CONSTRUCTION:
+        constructionBot.getData(msg, msg.content);
         break;
       default:
         console.log(`Unknown channel ID: ${msg.channel.id}`);
