@@ -20,7 +20,7 @@ class ProjectBot {
     this.projectName = projectName;
   }
 
-  async handleMessage(msg) {
+  async handleNumberMessage(msg) {
     let content = msg.content;
     if (content.length <= 1) {
       msg.channel.send(

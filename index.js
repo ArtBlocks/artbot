@@ -164,43 +164,43 @@ bot.on("message", (msg) => {
   if (msg.content.startsWith("#")) {
     switch (msg.channel.id) {
       case CHANNEL_SING:
-        singularityBot.handleMessage(msg);
+        singularityBot.handleNumberMessage(msg);
         break;
       case CHANNEL_IGNITION:
-        ignitionBot.handleMessage(msg);
+        ignitionBot.handleNumberMessage(msg);
         break;
       case CHANNEL_SQUIG:
-        squiggleBot.handleMessage(msg);
+        squiggleBot.handleNumberMessage(msg);
         break;
       case CHANNEL_RINGERS:
-        ringersBot.handleMessage(msg);
+        ringersBot.handleNumberMessage(msg);
         break;
       case CHANNEL_GENESIS:
-        genesisBot.handleMessage(msg);
+        genesisBot.handleNumberMessage(msg);
         break;
       case CHANNEL_CONSTRUCTION:
-        constructionBot.handleMessage(msg);
+        constructionBot.handleNumberMessage(msg);
         break;
       case CHANNEL_DYNAMIC_SLICES:
-        dynamicSlicesBot.handleMessage(msg);
+        dynamicSlicesBot.handleNumberMessage(msg);
         break;
       case CHANNEL_DECONSTRUCTIONS:
-        deconstructionsBot.handleMessage(msg);
+        deconstructionsBot.handleNumberMessage(msg);
         break;
       case CHANNEL_NIMBUDS:
-        nimbudsBot.handleMessage(msg);
+        nimbudsBot.handleNumberMessage(msg);
         break;
       case CHANNEL_HYPERHASH:
-        hyperhashBot.handleMessage(msg);
+        hyperhashBot.handleNumberMessage(msg);
         break;
       case CHANNEL_UNIGRIDS:
-        unigridsBot.handleMessage(msg);
+        unigridsBot.handleNumberMessage(msg);
         break;
       case CHANNEL_27_BIT:
-        bitBot.handleMessage(msg);
+        bitBot.handleNumberMessage(msg);
         break;
       case CHANNEL_CRYPTOBLOTS:
-        cryptoblotBot.handleMessage(msg);
+        cryptoblotBot.handleNumberMessage(msg);
         break;
       default:
         console.log(`Unknown channel ID: ${msg.channel.id}`);
