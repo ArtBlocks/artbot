@@ -30,8 +30,9 @@ const CHANNEL_27_BIT = process.env.CHANNEL_27_BIT;
 const CHANNEL_CRYPTOBLOTS = process.env.CHANNEL_CRYPTOBLOTS;
 
 // Artist playground Discord channel IDs.
-const CHANNEL_PLAYGROUND_DANDAN = process.env.CHANNEL_PLAYGROUND_DANDAN;
 const CHANNEL_PLAYGROUND_JEFFDAVIS = process.env.CHANNEL_PLAYGROUND_JEFFDAVIS;
+const CHANNEL_PLAYGROUND_DANDAN = process.env.CHANNEL_PLAYGROUND_DANDAN;
+const CHANNEL_PLAYGROUND_PXLQ = process.env.CHANNEL_PLAYGROUND_PXLQ;
 
 // Minting contract addresses.
 const OG_MINTING_CONTRACT_ADDRESS = "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a";
@@ -177,7 +178,12 @@ let colorStudyBot = new ProjectBot(
   "Color Study"
 );
 // dandan projects
-// TODO
+let gen2Bot = new ProjectBot(
+  18000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  256,
+  "Gen 2"
+);
 
 // Message event handler.
 bot.on("message", (msg) => {
@@ -240,8 +246,17 @@ bot.on("message", (msg) => {
           viewCardBot.handleNumberMessage(msg);
         }
         break;
+      case CHANNEL_PLAYGROUND_DANDAN:
+        if (msgContentLowercase.includes("gen2") ||
+          msgContentLowercase.includes("gen 2")) {
+          gen2Bot.handleNumberMessage(msg);
+        }
+        break;
+      case CHANNEL_PLAYGROUND_PXLQ:
+        //TODO
+        break;
 
-        // Fall-back, should never occur.
+        // Fall-back (should never occur).
       default:
         console.log(`Unknown channel ID: ${msg.channel.id}`);
         break;
