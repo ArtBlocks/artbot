@@ -184,6 +184,19 @@ let gen2Bot = new ProjectBot(
   256,
   "Gen 2"
 );
+// pxlq projects
+let sentienceBot = new ProjectBot(
+  20000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  144,
+  "Sentience"
+);
+let cyberCitiesBot = new ProjectBot(
+  14000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  256,
+  "Cyber Cities"
+);
 
 // Message event handler.
 bot.on("message", (msg) => {
@@ -253,7 +266,12 @@ bot.on("message", (msg) => {
         }
         break;
       case CHANNEL_PLAYGROUND_PXLQ:
-        //TODO
+        if (msgContentLowercase.includes("cyber") &&
+          msgContentLowercase.includes("cities")) {
+          cyberCitiesBot.handleNumberMessage(msg);
+        } else if (msgContentLowercase.includes("sentience")) {
+          sentienceBot.handleNumberMessage(msg);
+        }
         break;
 
         // Fall-back (should never occur).
