@@ -10,6 +10,8 @@ const fetch = require("node-fetch");
 const bot = new Client();
 
 const TOKEN = process.env.TOKEN;
+const SERVER = process.env.SERVER;
+
 const CHANNEL_SING = process.env.CHANNEL_SING;
 const CHANNEL_TRADE = process.env.CHANNEL_TRADE;
 const CHANNEL_IGNITION = process.env.CHANNEL_IGNITION;
@@ -19,7 +21,11 @@ const CHANNEL_GENESIS = process.env.CHANNEL_GENESIS;
 const CHANNEL_CONSTRUCTION = process.env.CHANNEL_CONSTRUCTION;
 const CHANNEL_DYNAMIC_SLICES = process.env.CHANNEL_DYNAMIC_SLICES;
 const CHANNEL_DECONSTRUCTIONS = process.env.CHANNEL_DECONSTRUCTIONS;
-const SERVER = process.env.SERVER;
+const CHANNEL_NIMBUDS = process.env.CHANNEL_NIMBUDS;
+const CHANNEL_HYPERHASH = process.env.CHANNEL_HYPERHASH;
+const CHANNEL_UNIGRIDS = process.env.CHANNEL_UNIGRIDS;
+const CHANNEL_27_BIT = process.env.CHANNEL_27_BIT;
+const CHANNEL_CRYPTOBLOTS = process.env.CHANNEL_CRYPTOBLOTS;
 
 const OG_MINTING_CONTRACT_ADDRESS = "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a";
 const V2_MINTING_CONTRACT_ADDRESS = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
@@ -118,6 +124,36 @@ let deconstructionsBot = new CuratedProjectBot(
   200,
   "Elevated Deconstructions"
 );
+let nimbudsBot = new CuratedProjectBot(
+  10000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  400,
+  "Nimbuds"
+);
+let hyperhashBot = new CuratedProjectBot(
+  11000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  369,
+  "HyperHash"
+);
+let unigridsBot = new CuratedProjectBot(
+  12000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  421,
+  "Unigrids"
+);
+let bitBot = new CuratedProjectBot(
+  21000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1024,
+  "27-Bit Digital"
+);
+let cryptoblotBot = new CuratedProjectBot(
+  3000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1921,
+  "Cryptoblots"
+);
 
 bot.on("message", (msg) => {
   // Handle piece # requests.
@@ -146,6 +182,21 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_DECONSTRUCTIONS:
         deconstructionsBot.getData(msg, msg.content);
+        break;
+      case CHANNEL_NIMBUDS:
+        nimbudsBot.getData(msg, msg.content);
+        break;
+      case CHANNEL_HYPERHASH:
+        hyperhashBot.getData(msg, msg.content);
+        break;
+      case CHANNEL_UNIGRIDS:
+        unigridsBot.getData(msg, msg.content);
+        break;
+      case CHANNEL_27_BIT:
+        bitBot.getData(msg, msg.content);
+        break;
+      case CHANNEL_CRYPTOBLOTS:
+        cryptoblotBot.getData(msg, msg.content);
         break;
       default:
         console.log(`Unknown channel ID: ${msg.channel.id}`);
