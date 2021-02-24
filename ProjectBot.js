@@ -12,7 +12,7 @@ const EMBED_COLOR = 0xff0000;
 const UNKNOWN_ADDRESS = "unknown";
 const UNKNOWN_USERNAME = "unknown";
 
-class CuratedProjectBot {
+class ProjectBot {
   constructor(projectNumber, mintContract, editionNumber, projectName) {
     this.projectNumber = projectNumber;
     this.mintContract = mintContract;
@@ -20,15 +20,16 @@ class CuratedProjectBot {
     this.projectName = projectName;
   }
 
-  async getData(msg, number) {
-    if (number.length <= 1) {
+  async handleMessage(msg) {
+    let content = msg.content;
+    if (content.length <= 1) {
       msg.channel.send(
         `Invalid format, enter # followed by the piece number of interest.`
       );
       return;
     }
 
-    let afterTheHash = number.substring(1);
+    let afterTheHash = content.substring(1);
     let pieceNumber;
     if (afterTheHash.toLowerCase() == "rand" || afterTheHash[0] == "?") {
       pieceNumber = parseInt(Math.random() * this.editionNumber);
@@ -229,4 +230,4 @@ class CuratedProjectBot {
   }
 }
 
-module.exports.CuratedProjectBot = CuratedProjectBot;
+module.exports.ProjectBot = ProjectBot;

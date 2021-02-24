@@ -6,7 +6,7 @@ const {
 const express = require("express");
 const bodyParser = require("body-parser");
 const os = require("./osEvent");
-const CuratedProjectBot = require("./CuratedProjectBot").CuratedProjectBot;
+const ProjectBot = require("./ProjectBot").ProjectBot;
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
@@ -79,79 +79,79 @@ bot.on("ready", () => {
 });
 
 // Curated project Discord channel message handlers.
-let singularityBot = new CuratedProjectBot(
+let singularityBot = new ProjectBot(
   8000000,
   V2_MINTING_CONTRACT_ADDRESS,
   1024,
   "Singularity"
 );
-let ignitionBot = new CuratedProjectBot(
+let ignitionBot = new ProjectBot(
   9000000,
   V2_MINTING_CONTRACT_ADDRESS,
   512,
   "Ignition"
 );
-let squiggleBot = new CuratedProjectBot(
+let squiggleBot = new ProjectBot(
   0,
   OG_MINTING_CONTRACT_ADDRESS,
   10000,
   "Chromie Squiggle"
 );
-let ringersBot = new CuratedProjectBot(
+let ringersBot = new ProjectBot(
   13000000,
   V2_MINTING_CONTRACT_ADDRESS,
   1000,
   "Ringers"
 );
-let genesisBot = new CuratedProjectBot(
+let genesisBot = new ProjectBot(
   1000000,
   OG_MINTING_CONTRACT_ADDRESS,
   512,
   "Genesis"
 );
-let constructionBot = new CuratedProjectBot(
+let constructionBot = new ProjectBot(
   2000000,
   OG_MINTING_CONTRACT_ADDRESS,
   500,
   "Construction Token"
 );
-let dynamicSlicesBot = new CuratedProjectBot(
+let dynamicSlicesBot = new ProjectBot(
   4000000,
   V2_MINTING_CONTRACT_ADDRESS,
   512,
   "Dynamic Slices"
 );
-let deconstructionsBot = new CuratedProjectBot(
+let deconstructionsBot = new ProjectBot(
   7000000,
   V2_MINTING_CONTRACT_ADDRESS,
   200,
   "Elevated Deconstructions"
 );
-let nimbudsBot = new CuratedProjectBot(
+let nimbudsBot = new ProjectBot(
   10000000,
   V2_MINTING_CONTRACT_ADDRESS,
   400,
   "Nimbuds"
 );
-let hyperhashBot = new CuratedProjectBot(
+let hyperhashBot = new ProjectBot(
   11000000,
   V2_MINTING_CONTRACT_ADDRESS,
   369,
   "HyperHash"
 );
-let unigridsBot = new CuratedProjectBot(
+let unigridsBot = new ProjectBot(
   12000000,
   V2_MINTING_CONTRACT_ADDRESS,
   421,
   "Unigrids"
 );
-let bitBot = new CuratedProjectBot(
+let bitBot = new ProjectBot(
   21000000,
   V2_MINTING_CONTRACT_ADDRESS,
   1024,
   "27-Bit Digital"
 );
-let cryptoblotBot = new CuratedProjectBot(
+let cryptoblotBot = new ProjectBot(
   3000000,
   V2_MINTING_CONTRACT_ADDRESS,
   1921,
@@ -164,43 +164,43 @@ bot.on("message", (msg) => {
   if (msg.content.startsWith("#")) {
     switch (msg.channel.id) {
       case CHANNEL_SING:
-        singularityBot.getData(msg, msg.content);
+        singularityBot.handleMessage(msg);
         break;
       case CHANNEL_IGNITION:
-        ignitionBot.getData(msg, msg.content);
+        ignitionBot.handleMessage(msg);
         break;
       case CHANNEL_SQUIG:
-        squiggleBot.getData(msg, msg.content);
+        squiggleBot.handleMessage(msg);
         break;
       case CHANNEL_RINGERS:
-        ringersBot.getData(msg, msg.content);
+        ringersBot.handleMessage(msg);
         break;
       case CHANNEL_GENESIS:
-        genesisBot.getData(msg, msg.content);
+        genesisBot.handleMessage(msg);
         break;
       case CHANNEL_CONSTRUCTION:
-        constructionBot.getData(msg, msg.content);
+        constructionBot.handleMessage(msg);
         break;
       case CHANNEL_DYNAMIC_SLICES:
-        dynamicSlicesBot.getData(msg, msg.content);
+        dynamicSlicesBot.handleMessage(msg);
         break;
       case CHANNEL_DECONSTRUCTIONS:
-        deconstructionsBot.getData(msg, msg.content);
+        deconstructionsBot.handleMessage(msg);
         break;
       case CHANNEL_NIMBUDS:
-        nimbudsBot.getData(msg, msg.content);
+        nimbudsBot.handleMessage(msg);
         break;
       case CHANNEL_HYPERHASH:
-        hyperhashBot.getData(msg, msg.content);
+        hyperhashBot.handleMessage(msg);
         break;
       case CHANNEL_UNIGRIDS:
-        unigridsBot.getData(msg, msg.content);
+        unigridsBot.handleMessage(msg);
         break;
       case CHANNEL_27_BIT:
-        bitBot.getData(msg, msg.content);
+        bitBot.handleMessage(msg);
         break;
       case CHANNEL_CRYPTOBLOTS:
-        cryptoblotBot.getData(msg, msg.content);
+        cryptoblotBot.handleMessage(msg);
         break;
       default:
         console.log(`Unknown channel ID: ${msg.channel.id}`);
