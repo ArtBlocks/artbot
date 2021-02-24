@@ -33,6 +33,7 @@ const CHANNEL_CRYPTOBLOTS = process.env.CHANNEL_CRYPTOBLOTS;
 const CHANNEL_PLAYGROUND_JEFFDAVIS = process.env.CHANNEL_PLAYGROUND_JEFFDAVIS;
 const CHANNEL_PLAYGROUND_DANDAN = process.env.CHANNEL_PLAYGROUND_DANDAN;
 const CHANNEL_PLAYGROUND_PXLQ = process.env.CHANNEL_PLAYGROUND_PXLQ;
+const CHANNEL_PLAYGROUND_DMITRICHERNIAK = process.env.CHANNEL_PLAYGROUND_DMITRICHERNIAK;
 
 // Minting contract addresses.
 const OG_MINTING_CONTRACT_ADDRESS = "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a";
@@ -197,6 +198,13 @@ let cyberCitiesBot = new ProjectBot(
   256,
   "Cyber Cities"
 );
+// dmitri-cherniak projects
+let eternalPumpBot = new ProjectBot(
+  22000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  50,
+  "The Eternal Pump"
+);
 
 // Message event handler.
 bot.on("message", (msg) => {
@@ -271,6 +279,12 @@ bot.on("message", (msg) => {
           cyberCitiesBot.handleNumberMessage(msg);
         } else if (msgContentLowercase.includes("sentience")) {
           sentienceBot.handleNumberMessage(msg);
+        }
+        break;
+      case CHANNEL_PLAYGROUND_DMITRICHERNIAK:
+        if (msgContentLowercase.includes("eternal") &&
+          msgContentLowercase.includes("pump")) {
+          eternalPumpBot.handleNumberMessage(msg);
         }
         break;
 
