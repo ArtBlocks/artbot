@@ -25,6 +25,7 @@ const CHANNEL_NIMBUDS = process.env.CHANNEL_NIMBUDS;
 const CHANNEL_HYPERHASH = process.env.CHANNEL_HYPERHASH;
 const CHANNEL_UNIGRIDS = process.env.CHANNEL_UNIGRIDS;
 const CHANNEL_27_BIT = process.env.CHANNEL_27_BIT;
+const CHANNEL_CRYPTOBLOTS = process.env.CHANNEL_CRYPTOBLOTS;
 
 const OG_MINTING_CONTRACT_ADDRESS = "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a";
 const V2_MINTING_CONTRACT_ADDRESS = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
@@ -147,6 +148,12 @@ let bitBot = new CuratedProjectBot(
   1024,
   "27-Bit Digital"
 );
+let cryptoblotBot = new CuratedProjectBot(
+  3000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1921,
+  "Cryptoblots"
+);
 
 bot.on("message", (msg) => {
   // Handle piece # requests.
@@ -187,6 +194,9 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_27_BIT:
         bitBot.getData(msg, msg.content);
+        break;
+      case CHANNEL_CRYPTOBLOTS:
+        cryptoblotBot.getData(msg, msg.content);
         break;
       default:
         console.log(`Unknown channel ID: ${msg.channel.id}`);
