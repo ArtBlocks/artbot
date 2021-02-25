@@ -8,6 +8,10 @@ let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 
 // TODO: Clean up this class and consolidate duplicated logic across
 //       this class and ProjectBot.js
+//
+//.      Only do so if this class isn't replaced with a webhook
+//       implementation entirely (likely) or usage of the OpenSea SDK (also
+//       likely).
 class OSTradeListener {
   constructor(bot, channelID, collectionName, pollInterval) {
     this.bot = bot;
