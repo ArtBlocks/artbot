@@ -360,7 +360,6 @@ bot.on("message", (msg) => {
 
 // Trade activity channel Discord event handlers.
 // Initialize and set up OpenSea event listener polling.
-// TODO: To be replaced with a webhook implementation.
 const pollInterval = TIMER * 1000;
 let curatedActivityListener = new OSTradeListener(
   bot,
