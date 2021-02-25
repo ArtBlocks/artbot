@@ -5,20 +5,24 @@ const {
 } = require("discord.js");
 const express = require("express");
 const bodyParser = require("body-parser");
-const os = require("./osEvent");
+const OSTradeListener = require("./OSTradeListener").OSTradeListener;
 const ProjectBot = require("./ProjectBot").ProjectBot;
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
 const SERVER = process.env.SERVER;
+const TIMER = process.env.TIMER;
 const PORT = process.env.PORT || 3000;
 
 // General main Discord channel ID.
 const CHANNEL_GENERAL = process.env.CHANNEL_GENERAL;
 
+// Trade activity Discord channel IDs.
+const CHANNEL_TRADE = process.env.CHANNEL_TRADE;
+const CHANNEL_TRADE_PLAYGROUND = process.env.CHANNEL_TRADE_PLAYGROUND;
+
 // Curated project Discord channel IDs.
 const CHANNEL_SING = process.env.CHANNEL_SING;
-const CHANNEL_TRADE = process.env.CHANNEL_TRADE;
 const CHANNEL_IGNITION = process.env.CHANNEL_IGNITION;
 const CHANNEL_SQUIG = process.env.CHANNEL_SQUIG;
 const CHANNEL_RINGERS = process.env.CHANNEL_RINGERS;
@@ -340,6 +344,27 @@ bot.on("message", (msg) => {
   }
 });
 
-// Set up OpenSea event listener polling.
-// TODO(jakerockland@): Replace with webhook implementation.
-setInterval(os.openseaEvent, 60 * 1000, bot);
+// Trade activity channel Discord event handlers.
+// Initialize and set up OpenSea event listener polling.
+// TODO: To be replaced with a webhook implementation.
+const pollInterval = TIMER * 1000;
+let curatedActivityListener = new OSTradeListener(
+  bot,
+  CHANNEL_TRADE,
+  "art-blocks",
+  pollInterval
+);
+setInterval(
+  () => { curatedActivityListener.pollTradeEvents(); },
+  pollInterval
+);
+let playgroundActivityListener = new OSTradeListener(
+  bot,
+  CHANNEL_TRADE_PLAYGROUND,
+  "art-blocks-playground",
+  pollInterval
+);
+setInterval(
+  () => { playgroundActivityListener.pollTradeEvents(); },
+  pollInterval
+);
