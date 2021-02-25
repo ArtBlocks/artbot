@@ -43,6 +43,7 @@ const CHANNEL_PLAYGROUND_DANDAN = process.env.CHANNEL_PLAYGROUND_DANDAN;
 const CHANNEL_PLAYGROUND_PXLQ = process.env.CHANNEL_PLAYGROUND_PXLQ;
 const CHANNEL_PLAYGROUND_DMITRICHERNIAK = process.env.CHANNEL_PLAYGROUND_DMITRICHERNIAK;
 const CHANNEL_PLAYGROUND_GE1DOOT = process.env.CHANNEL_PLAYGROUND_GE1DOOT;
+const CHANNEL_PLAYGROUND_KAI = process.env.CHANNEL_PLAYGROUND_KAI;
 
 // Minting contract addresses.
 const OG_MINTING_CONTRACT_ADDRESS = "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a";
@@ -227,6 +228,13 @@ let utopiaBot = new ProjectBot(
   256,
   "Utopia"
 );
+// kai projects
+let pixelGlassBot = new ProjectBot(
+  24000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  256,
+  "Pixel Glass"
+);
 
 // Message event handler.
 bot.on("message", (msg) => {
@@ -317,6 +325,12 @@ bot.on("message", (msg) => {
           utopiaBot.handleNumberMessage(msg);
         }
         break;
+      case CHANNEL_PLAYGROUND_KAI:
+        if (msgContentLowercase.includes("pixel") &&
+          msgContentLowercase.includes("glass")) {
+          pixelGlassBot.handleNumberMessage(msg);
+        }
+        break;
 
         // Fall-back (should never occur).
       default:
@@ -333,12 +347,12 @@ bot.on("message", (msg) => {
   let messageMentionsPause = msgContentLowercase.includes("pause");
   let messageMentionsSquiggle = msgContentLowercase.includes("squiggle");
   let squiggleChannelPauseMentioned = messageMentionsPause &&
-                                      channelID == CHANNEL_SQUIG;
+    channelID == CHANNEL_SQUIG;
   let generalChannelSquigglePauseMentioned = messageMentionsPause &&
-                                             messageMentionsSquiggle &&
-                                             channelID == CHANNEL_GENERAL;
+    messageMentionsSquiggle &&
+    channelID == CHANNEL_GENERAL;
   if (msgAuthor !== "artbot" &&
-     (squiggleChannelPauseMentioned || generalChannelSquigglePauseMentioned )) {
+    (squiggleChannelPauseMentioned || generalChannelSquigglePauseMentioned)) {
     msg.channel.send(SQUIGGLE_PAUSE_MESSAGE);
     return;
   }
@@ -355,7 +369,9 @@ let curatedActivityListener = new OSTradeListener(
   pollInterval
 );
 setInterval(
-  () => { curatedActivityListener.pollTradeEvents(); },
+  () => {
+    curatedActivityListener.pollTradeEvents();
+  },
   pollInterval
 );
 let playgroundActivityListener = new OSTradeListener(
@@ -365,6 +381,8 @@ let playgroundActivityListener = new OSTradeListener(
   pollInterval
 );
 setInterval(
-  () => { playgroundActivityListener.pollTradeEvents(); },
+  () => {
+    playgroundActivityListener.pollTradeEvents();
+  },
   pollInterval
 );
