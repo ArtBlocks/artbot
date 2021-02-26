@@ -378,6 +378,9 @@ bot.on("message", (msg) => {
   if (msgAuthor !== ARTBOT_USERNAME) {
     // Some shared helper variables.
     let inGeneralChannel = (channelID == CHANNEL_GENERAL);
+    let mentionedArtBot = msgContentLowercase.includes(ARTBOT_USERNAME) ||
+      msgContentLowercase.includes(bot.user.id);
+    let mentionedArtBotOrInGeneral = mentionedArtBot || inGeneralChannel;
     let containsQuestion = msgContentLowercase.includes("?");
 
     // Handle questions about the mint pausing for Chromie Squiggles.
@@ -391,10 +394,10 @@ bot.on("message", (msg) => {
       msgContentLowercase.includes("squigle") ||
       msgContentLowercase.includes("squigglle") ||
       msgContentLowercase.includes("squiglle");
-    let squiggleChannelPauseMentioned = mentionsPause && inGeneralChannel;
+    let squiggleChannelPauseMentioned = mentionsPause && inSquiggleChannel;
     let generalChannelSquigglePauseMentioned = mentionsPause &&
       messageMentionsSquiggle &&
-      inGeneralChannel;
+      mentionedArtBotOrInGeneral;
     if (squiggleChannelPauseMentioned || generalChannelSquigglePauseMentioned) {
       msg.channel.send(SQUIGGLE_PAUSE_MESSAGE);
       return;
@@ -402,9 +405,7 @@ bot.on("message", (msg) => {
 
     // Only answer the following questions if ArtBlot is pinged directly
     // or the message was sent in #general.
-    let mentionedArtBot = msgContentLowercase.includes(ARTBOT_USERNAME) ||
-      msgContentLowercase.includes(bot.user.id);
-    if (mentionedArtBot || inGeneralChannel) {
+    if (mentionedArtBotOrInGeneral) {
       // Handle drop questions by sending a link to #events
       let mentionsDrop = msgContentLowercase.includes("drop");
       if (containsQuestion && mentionsDrop) {
