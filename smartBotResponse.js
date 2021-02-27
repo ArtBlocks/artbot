@@ -2,10 +2,18 @@ require("dotenv").config();
 const {
   MessageEmbed
 } = require("discord.js");
+const fetch = require("node-fetch");
 
 // Discord channel IDs.
 const CHANNEL_GENERAL = process.env.CHANNEL_GENERAL;
 const CHANNEL_SQUIG = process.env.CHANNEL_SQUIG;
+
+// Specific OpenSea assets for fetching project stats for "ArtBlocks Curated"
+// and "Artist Playground".
+// Squiggle #0
+const ARTBLOCKS_CURATED_ASSET = "https://api.opensea.io/api/v1/asset/0x059edd72cd353df5106d2b9cc5ab83a52287ac3a/0";
+// View Card #0
+const ARTBLOCKS_PLAYGROUND_ASSET = "https://api.opensea.io/api/v1/asset/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/6000000";
 
 // ArtBot details..
 const ARTBOT_USERNAME = "artbot";
@@ -58,7 +66,7 @@ const OPENSEA_LINKS_MESSAGE = new MessageEmbed()
 
 // Returns a message for ArtBot to return when being smart, or null if
 // ArtBot has nothing to say.
-function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID) {
+async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID) {
   // NOTE: It is important to check if the message author is the ArtBot
   //       itself to avoid a recursive infinite loop.
   if (msgAuthor == ARTBOT_USERNAME) {
@@ -119,8 +127,32 @@ function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID) {
   if (containsQuestion && mentionedOpenSea) {
     return OPENSEA_LINKS_MESSAGE;
   }
+  // Handle project stats requests.
+  let mentionedMetrics = msgContentLowercase.includes("metric");
+  if (containsQuestion && mentionedMetrics) {
+    let curatedResponse = await fetch(ARTBLOCKS_CURATED_ASSET);
+    let curatedData = await curatedResponse.json();
+    let curatedStats = curatedData.collection.stats;
+
+    let playgroundResponse = await fetch(ARTBLOCKS_PLAYGROUND_ASSET);
+    let playgroundData = await playgroundResponse.json();
+    let playgroundStats = playgroundData.collection.stats;
+
+    return new MessageEmbed()
+      // Set the title of the field
+      .setTitle('What are the latest ArtBlocks metrics?')
+      // Set the color of the embed
+      .setColor(ARTBOT_GREEN)
+      // Set the main content of the embed
+      .addField("**Curated Projects**", parseKeyMetrics(curatedStats))
+      .addField("**Artist Playground**", parseKeyMetrics(playgroundStats));
+  }
 
   return null;
+}
+
+function parseKeyMetrics(stats) {
+  return `**Number of Pieces:** ${parseInt(stats.count)}\n**Number of Owners:** ${parseInt(stats.num_owners)}\n**Whale Ratio (Pieces/Owner):** ${parseInt(stats.count/stats.num_owners)}\n**Total Volume:** ${parseInt(stats.total_volume)}Ξ\n**Total Sales:** ${parseInt(stats.total_sales)}Ξ\n**Average Price:** ${parseFloat(stats.average_price).toFixed(4)}Ξ\n**7-Day Volume:** ${parseInt(stats.seven_day_volume)}Ξ\n**7-Day Sales:** ${parseInt(stats.seven_day_sales)}Ξ\n**7-Day Average Price:** ${parseFloat(stats.seven_day_average_price).toFixed(4)}Ξ`;
 }
 
 module.exports.smartBotResponse = smartBotResponse;
