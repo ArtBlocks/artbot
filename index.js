@@ -35,6 +35,7 @@ const CHANNEL_UNIGRIDS = process.env.CHANNEL_UNIGRIDS;
 const CHANNEL_27_BIT = process.env.CHANNEL_27_BIT;
 const CHANNEL_SPECTRON = process.env.CHANNEL_SPECTRON;
 const CHANNEL_CRYPTOBLOTS = process.env.CHANNEL_CRYPTOBLOTS;
+const CHANNEL_ARCHETYPE = process.env.CHANNEL_ARCHETYPE;
 
 // Artist playground Discord channel IDs.
 const CHANNEL_PLAYGROUND_JEFFDAVIS = process.env.CHANNEL_PLAYGROUND_JEFFDAVIS;
@@ -169,6 +170,12 @@ let cryptoblotBot = new ProjectBot(
   1921,
   "Cryptoblots"
 );
+let archetypeBot = new ProjectBot(
+  23000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  600,
+  "Archetype"
+);
 
 // Artist playground project Discord channel message handlers.
 // #jeff-davis projects
@@ -278,6 +285,9 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_CRYPTOBLOTS:
         cryptoblotBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_ARCHETYPE:
+        archetypeBot.handleNumberMessage(msg);
         break;
 
         // Artist playground channels.
