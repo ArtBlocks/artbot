@@ -43,8 +43,8 @@ class ProjectBot {
       return;
     }
 
-    let tokenNumber = pieceNumber + this.projectNumber;
-    let openSeaURL = `https://api.opensea.io/api/v1/events?asset_contract_address=${this.mintContract}&token_id=${tokenNumber}&only_opensea=false&offset=0&limit=5`;
+    let tokenID = pieceNumber + this.projectNumber;
+    let openSeaURL = `https://api.opensea.io/api/v1/asset/${this.mintContract}/${tokenID}/`;
 
     await fetch(
         openSeaURL, {
@@ -53,18 +53,17 @@ class ProjectBot {
         }
       )
       .then((response) => response.json())
-      .then((data) => {
-        console.log(data, "OPENSEA DATA");
-        let eventData = data.asset_events[0];
-        this.metaData(eventData, msg, tokenNumber);
+      .then((openSeaData) => {
+        console.log(openSeaData, "OPENSEA DATA");
+        this.metaData(openSeaData, msg, tokenID);
       })
       .catch((err) => {
         console.error(err);
       });
   }
 
-  async metaData(eventData, msg, url) {
-    let artBlocksResponse = await fetch(`https://api.artblocks.io/token/${url}`);
+  async metaData(openSeaData, msg, tokenID) {
+    let artBlocksResponse = await fetch(`https://api.artblocks.io/token/${tokenID}`);
     let artBlocksData = await artBlocksResponse.json();
     console.log(artBlocksData, "ARTBLOCKS DATA");
 
@@ -73,27 +72,23 @@ class ProjectBot {
       "Not yet available.";
     const embedContent = new MessageEmbed()
       // Set the title of the field.
-      .setTitle(eventData.asset.name)
+      .setTitle(openSeaData.name)
       // Add link to OpenSea listing.
-      .setURL(eventData.asset.permalink)
+      .setURL(openSeaData.permalink)
       // Set the color of the embed.
       .setColor(EMBED_COLOR)
       // Set the main content of the embed
-      .setThumbnail(eventData.asset.image_url)
+      .setThumbnail(openSeaData.image_url)
       // Add "Live Script" field.
       .addField("Live Script", `[view on artblocks.io](${artBlocksData.external_url})`)
       // Add "Features" field.
       .addField("Features", assetFeatures)
+      // Add sale number details.
+      .addField("Total Sales", this.parseNumSales(openSeaData.num_sales))
       // Add current owner info.
-      .addFields(this.parseOwnerInfo(eventData.asset.owner))
-      // Add most recent event info.
-      .addFields(
-        eventData.event_type !== null ?
-        this.parseEventInfo(eventData) : {
-          name: "Last Sale",
-          value: "No Transactions"
-        }
-      );
+      .addFields(this.parseOwnerInfo(openSeaData.owner))
+      // Add sale info.
+      .addFields(this.parseSaleInfo(openSeaData.last_sale));
     msg.channel.send(embedContent);
   }
 
@@ -117,115 +112,49 @@ class ProjectBot {
     };
   }
 
-  parseEventInfo(eventData) {
-    let eventType = eventData.event_type;
-    let eventDate = new Date(eventData.created_date).toLocaleDateString();
-
-    let ownerAccount = eventData.asset.owner;
-    let ownerAddress = ownerAccount.address;
-    let ownerAddressPreview = ownerAddress !== null ?
-      ownerAddress.slice(0, 8) :
-      UNKNOWN_ADDRESS;
-    let ownerUsername = ownerAccount.user !== null ?
-      ownerAccount.user.username :
-      UNKNOWN_USERNAME;
-    if (ownerAccount !== null) {
-      ownerAddress = ownerAccount.address;
-      ownerAddressPreview = ownerAddress !== null ?
-        ownerAddress.slice(0, 8) :
-        UNKNOWN_ADDRESS;
-      ownerUsername = ownerAccount.user !== null ?
-        ownerAccount.user.username :
-        UNKNOWN_USERNAME;
-      if (ownerUsername === null) {
-        ownerUsername = UNKNOWN_USERNAME;
-      }
-    }
-
-    let fromAccount = eventData.from_account;
-    let fromAddress;
-    let fromAddressPreview;
-    let fromUsername;
-    if (fromAccount !== null) {
-      fromAddress = fromAccount.address;
-      fromAddressPreview = fromAddress !== null ?
-        fromAddress.slice(0, 8) :
-        UNKNOWN_ADDRESS;
-      fromUsername = fromAccount.user !== null ?
-        fromAccount.user.username :
-        UNKNOWN_USERNAME;
-      if (fromUsername === null) {
-        fromUsername = UNKNOWN_USERNAME;
-      }
-    }
-
-    switch (eventType) {
-      case "created":
-        return {
-          name: "Offered At",
-          value: ` ${web3.utils.fromWei(
-                  eventData.ending_price,
-                  "ether"
-                )}Ξ on ${eventDate}`,
-          inline: true,
-        };
-
-      case "successful":
-        return {
-          name: "Last Sale",
-          value: `Sold for ${web3.utils.fromWei(
-                  eventData.total_price,
-                  "ether"
-                )}Ξ on ${eventDate}`,
-          inline: true,
-        };
-
-      case "transfer":
-        if (fromAddress == MINT_ADDRESS) {
-          return {
-            name: "Minted On:",
-            value: `${eventDate}`,
-            inline: true,
-          };
+  parseSaleInfo(saleInfo) {
+    if (saleInfo !== null && saleInfo.event_type == "successful") {
+      let eventDate = new Date(saleInfo.created_date).toLocaleDateString();
+      let sellerAccount = saleInfo.transaction.to_account;
+      let sellerAddress;
+      let sellerAddressPreview;
+      let sellerUsername;
+      if (sellerAccount !== null) {
+        sellerAddress = sellerAccount.address;
+        sellerAddressPreview = sellerAddress !== null ?
+          sellerAddress.slice(0, 8) :
+          UNKNOWN_ADDRESS;
+        sellerUsername = sellerAccount.user !== null ?
+          sellerAccount.user.username :
+          UNKNOWN_USERNAME;
+        if (sellerUsername === null) {
+          sellerUsername = UNKNOWN_USERNAME;
         }
-        return {
-          name: "Recent Transfer",
-          value: `From [${fromAddressPreview}](https://opensea.io/accounts/${
-                        fromAddress
-                      }) (${fromUsername}) on ${eventDate}`,
-          inline: true,
-        };
+      }
 
-      case "bid_withdrawn":
-        return {
-          name: "Bid Withdrawn",
-          value: ` ${web3.utils.fromWei(
-                    eventData.total_price,
-                    "ether"
-                  )}Ξ from [${fromAddressPreview}](https://opensea.io/accounts/${fromAddress}) (${fromUsername}) on ${eventDate}`,
-          inline: true,
-        };
-
-      case "cancelled":
-        return {
-          name: "Canceled Offer",
-          value: ` ${web3.utils.fromWei(
-                  eventData.total_price,
-                  "ether"
-                )}Ξ from [${ownerAddressPreview}](https://opensea.io/accounts/${ownerAddress}) (${ownerUsername}) on ${eventDate}`,
-          inline: true,
-        };
-
-      default:
-        return {
-          name: "Current Bid",
-          value: ` ${web3.utils.fromWei(
-                  eventData.bid_amount,
-                  "ether"
-                )}Ξ from [${fromAddressPreview}](https://opensea.io/accounts/${fromAddress}) (${fromUsername}) on ${eventDate}`,
-          inline: true,
-        }
+      return {
+        name: "Last Sale",
+        value: `Sold for ${web3.utils.fromWei(
+                saleInfo.total_price,
+                "ether"
+              )}Ξ by [${sellerAddressPreview}](https://opensea.io/accounts/${
+                      sellerAddress
+                    }) (${sellerUsername}) on ${eventDate}`,
+        inline: true,
+      };
     }
+    return {
+      name: "Last Sale",
+      value: "N/A",
+      inline: true,
+    };
+  }
+
+  parseNumSales(numSales) {
+    if (numSales == 0) {
+      return "None";
+    }
+    return `${numSales}`;
   }
 }
 
