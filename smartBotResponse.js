@@ -35,7 +35,7 @@ const NEXT_DROP_MESSAGE = new MessageEmbed()
   // Set the color of the embed
   .setColor(ARTBOT_GREEN)
   // Set the main content of the embed
-  .setDescription(`It looks like you're wondering about when the next drop is.\n\nCheck for details on upcoming scheduled releases in the [#events](https://discord.com/channels/411959613370400778/800784659940245504) and [#announcements](https://discord.com/channels/411959613370400778/781730104337235968) channels.`);
+  .setDescription(`It looks like you're wondering about when the next drop is.\n\nCheck for details on upcoming scheduled releases in the [#calendar](https://discord.com/channels/411959613370400778/800784659940245504) and [#announcements](https://discord.com/channels/411959613370400778/781730104337235968) channels.`);
 
 // Custom message shown when someone asks what the "Factory" is.
 const FACTORY_MESSAGE = new MessageEmbed()
