@@ -152,7 +152,7 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
 }
 
 function parseKeyMetrics(stats) {
-  return `**Number of Pieces:** ${parseInt(stats.count)}\n**Number of Owners:** ${parseInt(stats.num_owners)}\n**Whale Ratio (Pieces/Owner):** ${parseInt(stats.count/stats.num_owners)}\n**Total Volume:** ${parseInt(stats.total_volume)}Ξ\n**Total Sales:** ${parseInt(stats.total_sales)}Ξ\n**Average Price:** ${parseFloat(stats.average_price).toFixed(4)}Ξ\n**7-Day Volume:** ${parseInt(stats.seven_day_volume)}Ξ\n**7-Day Sales:** ${parseInt(stats.seven_day_sales)}Ξ\n**7-Day Average Price:** ${parseFloat(stats.seven_day_average_price).toFixed(4)}Ξ`;
+  return `**Number of Pieces:** ${parseInt(stats.count)}\n**Number of Owners:** ${parseInt(stats.num_owners)}\n**Whale Ratio (Pieces/Owner):** ${parseInt(stats.count/stats.num_owners)}\n**Total Volume:** ${parseInt(stats.total_volume)}Ξ\n**Total Sales:** ${parseInt(stats.total_sales)}Ξ\n**Average Price:** ${parseFloat(stats.average_price).toFixed(4)}Ξ\n**7-Day Volume:** ${parseInt(stats.seven_day_volume)}Ξ\n**7-Day Sales:** ${parseInt(stats.seven_day_sales)}Ξ\n**7-Day Average Price:** ${parseFloat(stats.seven_day_average_price).toFixed(4)}Ξ\n**7-Day Change:** ${parseFloat(stats.seven_day_change * 100).toFixed(2)}%`;
 }
 
 module.exports.smartBotResponse = smartBotResponse;
