@@ -333,7 +333,7 @@ bot.on("message", (msg) => {
   // Handle special info questions that ArtBot knows how to answer.
   let artBotID = bot.user.id;
   let smartResponse =
-    smartResponse.smartBotResponse(msgContentLowercase, msgAuthor, artBotID);
+    smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID);
   if (smartResponse !== null) {
     msg.channel.send(smartResponse);
   }

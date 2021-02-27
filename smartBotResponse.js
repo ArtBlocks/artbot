@@ -3,8 +3,9 @@ const {
   MessageEmbed
 } = require("discord.js");
 
-// General main Discord channel ID.
+// Discord channel IDs.
 const CHANNEL_GENERAL = process.env.CHANNEL_GENERAL;
+const CHANNEL_SQUIG = process.env.CHANNEL_SQUIG;
 
 // ArtBot details..
 const ARTBOT_USERNAME = "artbot";
@@ -46,66 +47,80 @@ const PLAYGROUND_VS_CURATED_MESSAGE = new MessageEmbed()
   // Set the main content of the embed
   .setDescription(`It looks like you're wondering about the difference between Curated Projects and the Artist Playground. Here is the tl;dr:\n\nArt Blocks as a platform has established a curation board to carefully select projects for inclusion in the "official" Art Blocks Curated Collection.\n\nArtists that have been included in the Curated Collection are then allowed to deploy a project of their choice in the Artist Playground. These projects are not "curated" and subsequently are not promoted as an official Art Blocks drop or considered to be part of the "official" Art Blocks collection.\n\nCheck out [artblocks.io/learn](https://artblocks.io/learn) for a full explanation!`);
 
+// Custom message shown when someone asks for the OpenSea links.
+const OPENSEA_LINKS_MESSAGE = new MessageEmbed()
+  // Set the title of the field
+  .setTitle('Looking for ArtBlocks on OpenSea?')
+  // Set the color of the embed
+  .setColor(ARTBOT_GREEN)
+  // Set the main content of the embed
+  .setDescription(`There are three ArtBlocks collections on OpenSea:\n• [ArtBlocks Curated](https://opensea.io/assets/art-blocks)\n• [ArtBlocks Playground](https://opensea.io/assets/art-blocks-playground)\n• [ArtBlocks Factory](https://opensea.io/assets/art-blocks-factory)`);
+
 // Returns a message for ArtBot to return when being smart, or null if
 // ArtBot has nothing to say.
-function smartBotResponse(msgContentLowercase, msgAuthor, artBotID) {
-    // NOTE: It is important to check if the message author is the ArtBot
-    //       itself to avoid a recursive infinite loop.
-    if (msgAuthor == ARTBOT_USERNAME) {
-        return null;
-    }
-
-    // Some shared helper variables.
-    let inGeneralChannel = (channelID == CHANNEL_GENERAL);
-    let mentionedArtBot = msgContentLowercase.includes(ARTBOT_USERNAME) ||
-      msgContentLowercase.includes(artBotID);
-    let mentionedArtBotOrInGeneral = mentionedArtBot || inGeneralChannel;
-    let containsQuestion = msgContentLowercase.includes("?");
-
-    // Handle questions about the mint pausing for Chromie Squiggles.
-    let inSquiggleChannel = (channelID == CHANNEL_SQUIG);
-    // Both "pause" and "stopped" are keywords.
-    let mentionsPause = msgContentLowercase.includes("pause") ||
-      msgContentLowercase.includes("stopped");
-    // Handle some common misspellings of "squiggle":
-    // “squigle”, “squigglle”, “squiglle”
-    let messageMentionsSquiggle = msgContentLowercase.includes("squiggle") ||
-      msgContentLowercase.includes("squigle") ||
-      msgContentLowercase.includes("squigglle") ||
-      msgContentLowercase.includes("squiglle");
-    let squiggleChannelPauseMentioned = mentionsPause && inSquiggleChannel;
-    let generalChannelSquigglePauseMentioned = mentionsPause &&
-      messageMentionsSquiggle &&
-      mentionedArtBotOrInGeneral;
-    if (squiggleChannelPauseMentioned || generalChannelSquigglePauseMentioned) {
-      return SQUIGGLE_PAUSE_MESSAGE;
-    }
-
-    // Only answer the following questions if ArtBlot is pinged directly
-    // or the message was sent in #general.
-    if (mentionedArtBotOrInGeneral) {
-        return null;
-    }
-
-    // Handle drop questions by sending a link to #events
-    let mentionsDrop = msgContentLowercase.includes("drop");
-    if (containsQuestion && mentionsDrop) {
-        return NEXT_DROP_MESSAGE;
-    }
-    // Handle questions about factory by redirecting to:
-    // https://discord.com/channels/411959613370400778/411959613370400780/814171687133511720
-    let mentionsFactory = msgContentLowercase.includes("factory");
-    if (containsQuestion && mentionsFactory) {
-        return FACTORY_MESSAGE;
-    }
-    // Handle questions about Curated Projects vs. Artist Playground.
-    let mentionedCuratedOrPlayground = msgContentLowercase.includes("curated") ||
-    msgContentLowercase.includes("playground");
-    if (containsQuestion && mentionedCuratedOrPlayground) {
-        return PLAYGROUND_VS_CURATED_MESSAGE;
-    }
-
+function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID) {
+  // NOTE: It is important to check if the message author is the ArtBot
+  //       itself to avoid a recursive infinite loop.
+  if (msgAuthor == ARTBOT_USERNAME) {
     return null;
+  }
+
+  // Some shared helper variables.
+  let inGeneralChannel = (channelID == CHANNEL_GENERAL);
+  let mentionedArtBot = msgContentLowercase.includes(ARTBOT_USERNAME) ||
+    msgContentLowercase.includes(artBotID);
+  let mentionedArtBotOrInGeneral = mentionedArtBot || inGeneralChannel;
+  let containsQuestion = msgContentLowercase.includes("?");
+
+  // Handle questions about the mint pausing for Chromie Squiggles.
+  let inSquiggleChannel = (channelID == CHANNEL_SQUIG);
+  // Both "pause" and "stopped" are keywords.
+  let mentionsPause = msgContentLowercase.includes("pause") ||
+    msgContentLowercase.includes("stopped");
+  // Handle some common misspellings of "squiggle":
+  // “squigle”, “squigglle”, “squiglle”
+  let messageMentionsSquiggle = msgContentLowercase.includes("squiggle") ||
+    msgContentLowercase.includes("squigle") ||
+    msgContentLowercase.includes("squigglle") ||
+    msgContentLowercase.includes("squiglle");
+  let squiggleChannelPauseMentioned = mentionsPause && inSquiggleChannel;
+  let generalChannelSquigglePauseMentioned = mentionsPause &&
+    messageMentionsSquiggle &&
+    mentionedArtBotOrInGeneral;
+  if (squiggleChannelPauseMentioned || generalChannelSquigglePauseMentioned) {
+    return SQUIGGLE_PAUSE_MESSAGE;
+  }
+
+  // Only answer the following questions if ArtBlot is pinged directly
+  // or the message was sent in #general.
+  if (!mentionedArtBotOrInGeneral) {
+    return null;
+  }
+
+  // Handle drop questions by sending a link to #events
+  let mentionsDrop = msgContentLowercase.includes("drop");
+  if (containsQuestion && mentionsDrop) {
+    return NEXT_DROP_MESSAGE;
+  }
+  // Handle questions about factory by redirecting to:
+  // https://discord.com/channels/411959613370400778/411959613370400780/814171687133511720
+  let mentionsFactory = msgContentLowercase.includes("factory");
+  if (containsQuestion && mentionsFactory) {
+    return FACTORY_MESSAGE;
+  }
+  // Handle questions about Curated Projects vs. Artist Playground.
+  let mentionedCuratedOrPlayground = msgContentLowercase.includes("curated") ||
+    msgContentLowercase.includes("playground");
+  if (containsQuestion && mentionedCuratedOrPlayground) {
+    return PLAYGROUND_VS_CURATED_MESSAGE;
+  }
+  // Handle OpenSea link requests.
+  let mentionedOpenSea = msgContentLowercase.includes("opensea");
+  if (containsQuestion && mentionedOpenSea) {
+    return OPENSEA_LINKS_MESSAGE;
+  }
+
+  return null;
 }
 
 module.exports.smartBotResponse = smartBotResponse;
