@@ -332,11 +332,13 @@ bot.on("message", (msg) => {
 
   // Handle special info questions that ArtBot knows how to answer.
   let artBotID = bot.user.id;
-  let smartResponse =
-    smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID);
-  if (smartResponse !== null) {
-    msg.channel.send(smartResponse);
-  }
+  smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
+    (smartResponse) => {
+      if (smartResponse !== null) {
+        msg.channel.send(smartResponse);
+      }
+    }
+  );
 });
 
 // Trade activity channel Discord event handlers.
