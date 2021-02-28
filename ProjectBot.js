@@ -7,7 +7,7 @@ const Web3 = require("web3");
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 
 const MINT_ADDRESS = "0x0000000000000000000000000000000000000000";
-const EMBED_COLOR = 0xff0000;
+const EMBED_COLOR = 0x00ff00;
 const UNKNOWN_ADDRESS = "unknown";
 const UNKNOWN_USERNAME = "unknown";
 
@@ -28,6 +28,7 @@ class ProjectBot {
       return;
     }
 
+    let imageRequested = content.toLowerCase().includes("image");
     let afterTheHash = content.substring(1);
     let pieceNumber;
     if (afterTheHash.toLowerCase().includes("rand ") || afterTheHash[0] == "?") {
@@ -55,18 +56,35 @@ class ProjectBot {
       .then((response) => response.json())
       .then((openSeaData) => {
         console.log(openSeaData, "OPENSEA DATA");
-        this.metaData(openSeaData, msg, tokenID);
+        this.sendMetaDataMessage(openSeaData, msg, tokenID, imageRequested);
       })
       .catch((err) => {
         console.error(err);
       });
   }
 
-  async metaData(openSeaData, msg, tokenID) {
+  async sendMetaDataMessage(openSeaData, msg, tokenID, imageRequested) {
     let artBlocksResponse = await fetch(`https://api.artblocks.io/token/${tokenID}`);
     let artBlocksData = await artBlocksResponse.json();
     console.log(artBlocksData, "ARTBLOCKS DATA");
 
+    // If user requested large image, return just this data along with
+    // a link to the OpenSea page and ArtBlocks live script.
+    if (imageRequested) {
+      const imageContent = new MessageEmbed()
+        // Set the title of the field.
+        .setTitle(openSeaData.name)
+        // Add link to OpenSea listing.
+        .setURL(openSeaData.permalink)
+        // Set the color of the embed.
+        .setColor(EMBED_COLOR)
+        // Set the full image for embed.
+        .setImage(openSeaData.image_url);
+      msg.channel.send(imageContent);
+      return;
+    }
+
+    // Otherwise, return full metadata for the asset.
     const assetFeatures = (artBlocksData.features !== null && artBlocksData.features.length) ?
       `${artBlocksData.features.join("\n")}` :
       "Not yet available.";
