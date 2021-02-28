@@ -76,8 +76,6 @@ class ProjectBot {
         .setTitle(openSeaData.name)
         // Add link to OpenSea listing.
         .setURL(openSeaData.permalink)
-        // // Set the color of the embed.
-        // .setColor(EMBED_COLOR)
         // Set the full image for embed.
         .setImage(openSeaData.image_url);
       msg.channel.send(imageContent);
