@@ -28,7 +28,7 @@ class ProjectBot {
       return;
     }
 
-    let imageRequested = content.toLowerCase().includes("image");
+    let detailsRequested = content.toLowerCase().includes("detail");
     let afterTheHash = content.substring(1);
     let pieceNumber;
     if (afterTheHash.toLowerCase().includes("rand ") || afterTheHash[0] == "?") {
@@ -56,26 +56,28 @@ class ProjectBot {
       .then((response) => response.json())
       .then((openSeaData) => {
         console.log(openSeaData, "OPENSEA DATA");
-        this.sendMetaDataMessage(openSeaData, msg, tokenID, imageRequested);
+        this.sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested);
       })
       .catch((err) => {
         console.error(err);
       });
   }
 
-  async sendMetaDataMessage(openSeaData, msg, tokenID, imageRequested) {
+  async sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested) {
     let artBlocksResponse = await fetch(`https://api.artblocks.io/token/${tokenID}`);
     let artBlocksData = await artBlocksResponse.json();
     console.log(artBlocksData, "ARTBLOCKS DATA");
 
-    // If user requested large image, return just this data along with
-    // a link to the OpenSea page and ArtBlocks live script.
-    if (imageRequested) {
+    // If user did *not* request full details, return just a large image,
+    // along with a link to the OpenSea page and ArtBlocks live script.
+    if (!detailsRequested) {
       const imageContent = new MessageEmbed()
         // Set the title of the field.
         .setTitle(openSeaData.name)
         // Add link to OpenSea listing.
         .setURL(openSeaData.permalink)
+        // Add "Live Script" field.
+        .addField("Want More Info?", `Add "details" to your ArtBot command or [view on artblocks.io](${artBlocksData.external_url}).`)
         // Set the full image for embed.
         .setImage(openSeaData.image_url);
       msg.channel.send(imageContent);
@@ -94,7 +96,7 @@ class ProjectBot {
       // Set the color of the embed.
       .setColor(EMBED_COLOR)
       // Set the main content of the embed
-      .setThumbnail(openSeaData.image_url)
+      .setThumbnail(openSeaData.image_thumbnail_url)
       // Add "Live Script" field.
       .addField("Live Script", `[view on artblocks.io](${artBlocksData.external_url})`)
       // Add "Features" field.
