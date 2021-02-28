@@ -225,6 +225,12 @@ let utopiaBot = new ProjectBot(
   256,
   "Utopia"
 );
+let r3sonanceBot = new ProjectBot(
+  19000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  512,
+  "R3sonance"
+);
 // #kai projects
 let pixelGlassBot = new ProjectBot(
   24000000,
@@ -323,6 +329,8 @@ bot.on("message", (msg) => {
       case CHANNEL_PLAYGROUND_GE1DOOT:
         if (msgContentLowercase.includes("utopia")) {
           utopiaBot.handleNumberMessage(msg);
+        } else if (msgContentLowercase.includes("r3")) {
+          r3sonanceBot.handleNumberMessage(msg);
         }
         break;
       case CHANNEL_PLAYGROUND_KAI:
