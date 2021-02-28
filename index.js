@@ -9,6 +9,7 @@ const bodyParser = require("body-parser");
 const OSTradeListener = require("./OSTradeListener").OSTradeListener;
 const ProjectBot = require("./ProjectBot").ProjectBot;
 const smartBotResponse = require("./smartBotResponse").smartBotResponse;
+const addressCollectionHandler = require("./addressCollectionHandler").addressCollectionHandler;
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
@@ -44,6 +45,9 @@ const CHANNEL_PLAYGROUND_PXLQ = process.env.CHANNEL_PLAYGROUND_PXLQ;
 const CHANNEL_PLAYGROUND_DMITRICHERNIAK = process.env.CHANNEL_PLAYGROUND_DMITRICHERNIAK;
 const CHANNEL_PLAYGROUND_GE1DOOT = process.env.CHANNEL_PLAYGROUND_GE1DOOT;
 const CHANNEL_PLAYGROUND_KAI = process.env.CHANNEL_PLAYGROUND_KAI;
+
+// Special address collection channel.
+const CHANNEL_ADDRESS_COLLECTION = process.env.CHANNEL_ADDRESS_COLLECTION;
 
 // Minting contract addresses.
 const OG_MINTING_CONTRACT_ADDRESS = "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a";
@@ -239,6 +243,13 @@ bot.on("message", (msg) => {
   let msgContent = msg.content;
   let msgContentLowercase = msgContent.toLowerCase();
   let channelID = msg.channel.id;
+
+  // If message is in special address collection channel, forward message
+  // to that handler and return early.
+  if (channelID == CHANNEL_ADDRESS_COLLECTION) {
+    addressCollectionHandler(msg);
+    return;
+  }
 
   // Handle piece # requests.
   if (msgContent.startsWith("#")) {
