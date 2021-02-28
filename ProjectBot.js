@@ -76,10 +76,10 @@ class ProjectBot {
         .setTitle(openSeaData.name)
         // Add link to OpenSea listing.
         .setURL(openSeaData.permalink)
-        // Set the full image for embed.
-        .setImage(openSeaData.image_url)
         // Add "Live Script" field.
-        .addField("Live Script", `[view on artblocks.io](${artBlocksData.external_url})`);
+        .addField("Want More Info?", `Add "details" to your ArtBot command or [view on artblocks.io](${artBlocksData.external_url}).`)
+        // Set the full image for embed.
+        .setImage(openSeaData.image_url);
       msg.channel.send(imageContent);
       return;
     }
