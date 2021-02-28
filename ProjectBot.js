@@ -7,7 +7,7 @@ const Web3 = require("web3");
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 
 const MINT_ADDRESS = "0x0000000000000000000000000000000000000000";
-const EMBED_COLOR = 0x00ff00;
+const EMBED_COLOR = 0xff0000;
 const UNKNOWN_ADDRESS = "unknown";
 const UNKNOWN_USERNAME = "unknown";
 
@@ -76,8 +76,8 @@ class ProjectBot {
         .setTitle(openSeaData.name)
         // Add link to OpenSea listing.
         .setURL(openSeaData.permalink)
-        // Set the color of the embed.
-        .setColor(EMBED_COLOR)
+        // // Set the color of the embed.
+        // .setColor(EMBED_COLOR)
         // Set the full image for embed.
         .setImage(openSeaData.image_url);
       msg.channel.send(imageContent);
