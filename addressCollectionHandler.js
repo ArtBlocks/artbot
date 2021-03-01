@@ -2,12 +2,19 @@ require("dotenv").config();
 const {
   MessageEmbed
 } = require("discord.js");
+const {
+  google
+} = require('googleapis');
 const fetch = require("node-fetch");
 const Web3 = require("web3");
 
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 
-// ArtBot details..
+// Google sheet API details.
+const GOOGLE_SHEET_ID = process.env.GOOGLE_SHEET_ID;
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+
+// ArtBot details.
 const ARTBOT_USERNAME = "artbot";
 const ARTBOT_RED = 0xff0000;
 const ARTBOT_GREEN = 0x00ff00;
@@ -47,6 +54,11 @@ async function addressCollectionHandler(msg) {
   msg.reply(ADDRESS_RECORDED_MESSAGE);
 
   // TODO: add fall-back message
+}
+
+// Adds a given address to address collection Google sheet.
+async function addAddressToGoogleSheet(address) {
+  `?key=GOOGLE_API_KEY`
 }
 
 module.exports.addressCollectionHandler = addressCollectionHandler;
