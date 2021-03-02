@@ -6,9 +6,13 @@ const {
   google
 } = require('googleapis');
 const fetch = require("node-fetch");
+const fs = require('fs');
 const Web3 = require("web3");
 
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+
+// Discord address book to use.
+const DISCORD_ADDRESSBOOK="411959613370400778";
 
 // Google sheet API details.
 const GOOGLE_SHEET_ID = process.env.GOOGLE_SHEET_ID;
@@ -41,7 +45,21 @@ const FAILED_TO_CONNECT_MESSAGE = `**Failure:** Could not record address, please
 const ADDRESS_RECORDED_MESSAGE = `**Success:** Your address has been recorded. Thank you!`;
 
 class AddressCollector {
-  constructor() {}
+  constructor() {
+    // Create Discord lookup list.
+    //
+    // Note: This algorithm has a lookup complexity of O(n), which is not as
+    // ideal as the O(1) approach of using a hashmap (with a similar initial
+    // parsing cost).
+    //
+    // However, the added complexity of implementing this as a hashmap is
+    // likely not worth the added complexity if the the total number of
+    // Discord lookup members is on the order of thousands.
+    this.discordLookup = fs.readFileSync(`./${DISCORD_ADDRESSBOOK}.csv`)
+    .toString() // Convert file buffer to string.
+    .split('\n') // Split into array based on newlines.
+    .map(line => line.trim()); // Remove any extra whitespace.
+  }
 
   // Handles a message for the address aggregation channel.
   // If the address is valid and the sender is part of the allowlist, record the
@@ -49,18 +67,26 @@ class AddressCollector {
   // Otherwise, respond to the user notifying them of the failure to record their
   // address. (TODO: Do we always tell the user the cause of the failure?)
   async addressCollectionHandler(msg) {
-    let msgAuthor = msg.author.username;
+    let msgAuthorUsername = msg.author.username;
+    let msgAuthorID = msg.author.id;
     let msgContent = msg.content;
 
     // NOTE: It is important to check if the message author is the ArtBot
     //       itself to avoid a recursive infinite loop.
-    if (msgAuthor == ARTBOT_USERNAME) {
+    if (msgAuthorUsername == ARTBOT_USERNAME) {
       return;
     }
 
     // Check if message is a valid wallet address and return early otherwise.
     if (!web3.utils.isAddress(msgContent)) {
       msg.reply(INVALID_ADDRESS_MESSAGE);
+      return;
+    }
+
+    // Check if message sender is part of the Discord member list or not.
+    if (!this.discordLookup.includes(msgAuthorID)) {
+      console.log(msgAuthorID);
+      msg.reply(NON_ALLOWLIST_MESSAGE);
       return;
     }
 
