@@ -1,0 +1,103 @@
+require("dotenv").config();
+const {
+  MessageEmbed
+} = require("discord.js");
+const {
+  google
+} = require('googleapis');
+const fetch = require("node-fetch");
+const Web3 = require("web3");
+
+const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+
+// Google sheet API details.
+const GOOGLE_SHEET_ID = process.env.GOOGLE_SHEET_ID;
+const GOOGLE_AUTH_DETAILS = process.env.GOOGLE_AUTH_DETAILS;
+
+// ArtBot details.
+const ARTBOT_USERNAME = "artbot";
+const ARTBOT_RED = 0xff0000;
+const ARTBOT_GREEN = 0x00ff00;
+
+// Google Sheets API posting.
+const parsedCredentials = JSON.parse(GOOGLE_AUTH_DETAILS);
+const jwtClient = new google.auth.JWT({
+  email: parsedCredentials.client_email,
+  key: parsedCredentials.private_key,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets']
+});
+const sheetsService = google.sheets('v4');
+
+// A message for when invalid wallet address is entered.
+const INVALID_ADDRESS_MESSAGE = `**Invalid Wallet Address:** Your address was not recorded due to malformed input. Your wallet address should be a 20-byte string, starting with "0x"`;
+
+// A message for when address not recorded due to lack of allowlist membership.
+const NON_ALLOWLIST_MESSAGE = `**Discord User Not Allowlisted:** Your address was not recorded due to now belonging in the Discord at time of allowlist creation.`;
+
+// Failed to connect.
+const FAILED_TO_CONNECT_MESSAGE = `**Failure:** Could not record address, please try again later.`;
+
+// A message for when address is recorded as expected.
+const ADDRESS_RECORDED_MESSAGE = `**Success:** Your address has been recorded. Thank you!`;
+
+class AddressCollector {
+  constructor() {}
+
+  // Handles a message for the address aggregation channel.
+  // If the address is valid and the sender is part of the allowlist, record the
+  // address in the allowlist set.
+  // Otherwise, respond to the user notifying them of the failure to record their
+  // address. (TODO: Do we always tell the user the cause of the failure?)
+  async addressCollectionHandler(msg) {
+    let msgAuthor = msg.author.username;
+    let msgContent = msg.content;
+
+    // NOTE: It is important to check if the message author is the ArtBot
+    //       itself to avoid a recursive infinite loop.
+    if (msgAuthor == ARTBOT_USERNAME) {
+      return;
+    }
+
+    // Check if message is a valid wallet address and return early otherwise.
+    if (!web3.utils.isAddress(msgContent)) {
+      msg.reply(INVALID_ADDRESS_MESSAGE);
+      return;
+    }
+
+    // Authenticate request to Google Sheets API.
+    jwtClient.authorize(function(error, tokens) {
+      if (error) {
+        console.log(error);
+        msg.reply(FAILED_TO_CONNECT_MESSAGE);
+        return;
+      } else {
+        console.log("Successfully connected!");
+
+        // Adds address to address collection Google sheet.
+        sheetsService.spreadsheets.values.append({
+          auth: jwtClient,
+          spreadsheetId: GOOGLE_SHEET_ID,
+          range: 'Addresses!A1',
+          valueInputOption: 'RAW',
+          resource: {
+            values: [
+              [msgContent]
+            ]
+          },
+        }, (error, result) => {
+          if (error) {
+            console.log(error);
+            msg.reply(FAILED_TO_CONNECT_MESSAGE);
+            return;
+          } else {
+            console.log(`Successfully added: ${msgContent}`);
+            msg.reply(ADDRESS_RECORDED_MESSAGE);
+            return;
+          }
+        });
+      }
+    });
+  }
+}
+
+module.exports.AddressCollector = AddressCollector;

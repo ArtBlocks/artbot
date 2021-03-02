@@ -4,7 +4,7 @@ const {
 const fetch = require("node-fetch");
 const Web3 = require("web3");
 
-let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 
 // TODO: Clean up this class and consolidate duplicated logic across
 //       this class and ProjectBot.js

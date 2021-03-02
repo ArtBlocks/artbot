@@ -6,10 +6,10 @@ const {
 const express = require("express");
 const bodyParser = require("body-parser");
 
+const AddressCollector = require("./AddressCollector").AddressCollector;
 const OSTradeListener = require("./OSTradeListener").OSTradeListener;
 const ProjectBot = require("./ProjectBot").ProjectBot;
 const smartBotResponse = require("./smartBotResponse").smartBotResponse;
-const addressCollectionHandler = require("./addressCollectionHandler").addressCollectionHandler;
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
@@ -237,6 +237,9 @@ let pixelGlassBot = new ProjectBot(
   "Pixel Glass"
 );
 
+// Special address collector.
+let addressCollector = new AddressCollector();
+
 // Message event handler.
 bot.on("message", (msg) => {
   let msgAuthor = msg.author.username;
@@ -247,7 +250,7 @@ bot.on("message", (msg) => {
   // If message is in special address collection channel, forward message
   // to that handler and return early.
   if (channelID == CHANNEL_ADDRESS_COLLECTION) {
-    addressCollectionHandler(msg);
+    addressCollector.addressCollectionHandler(msg);
     return;
   }
 
@@ -364,28 +367,28 @@ bot.on("message", (msg) => {
 
 // Trade activity channel Discord event handlers.
 // Initialize and set up OpenSea event listener polling.
-const pollInterval = TIMER * 1000;
-let curatedActivityListener = new OSTradeListener(
-  bot,
-  CHANNEL_TRADE,
-  "art-blocks",
-  pollInterval
-);
-setInterval(
-  () => {
-    curatedActivityListener.pollTradeEvents();
-  },
-  pollInterval
-);
-let playgroundActivityListener = new OSTradeListener(
-  bot,
-  CHANNEL_TRADE_PLAYGROUND,
-  "art-blocks-playground",
-  pollInterval
-);
-setInterval(
-  () => {
-    playgroundActivityListener.pollTradeEvents();
-  },
-  pollInterval
-);
+// const pollInterval = TIMER * 1000;
+// let curatedActivityListener = new OSTradeListener(
+//   bot,
+//   CHANNEL_TRADE,
+//   "art-blocks",
+//   pollInterval
+// );
+// setInterval(
+//   () => {
+//     curatedActivityListener.pollTradeEvents();
+//   },
+//   pollInterval
+// );
+// let playgroundActivityListener = new OSTradeListener(
+//   bot,
+//   CHANNEL_TRADE_PLAYGROUND,
+//   "art-blocks-playground",
+//   pollInterval
+// );
+// setInterval(
+//   () => {
+//     playgroundActivityListener.pollTradeEvents();
+//   },
+//   pollInterval
+// );
