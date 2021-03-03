@@ -353,7 +353,7 @@ bot.on("message", (msg) => {
   smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
     (smartResponse) => {
       if (smartResponse !== null) {
-        msg.channel.send(smartResponse);
+        msg.reply.send(smartResponse);
       }
     }
   );
