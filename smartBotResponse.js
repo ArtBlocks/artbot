@@ -57,6 +57,15 @@ const OPENSEA_LINKS_MESSAGE = new MessageEmbed()
   // Set the main content of the embed
   .setDescription(`There are three ArtBlocks collections on OpenSea:\n• [ArtBlocks Curated](https://opensea.io/assets/art-blocks)\n• [ArtBlocks Playground](https://opensea.io/assets/art-blocks-playground)\n• [ArtBlocks Factory](https://opensea.io/assets/art-blocks-factory)`);
 
+// Custom message shown when someone asks about when the next drop is.
+const HELP_MESSAGE = new MessageEmbed()
+  // Set the title of the field
+  .setTitle('Looking for help?')
+  // Set the color of the embed
+  .setColor(ARTBOT_GREEN)
+  // Set the main content of the embed
+  .setDescription(`These are the things you can ask me:\n\n**squiggle paused?**: An explanation of why Chromie Squiggle minting is paused.\n**drop?**: Where to find information about the next drop.\n**playground?** (or **curated?** or **factory?**): Information about the different types of Art Blocks projects.\n**opensea?**: Links to the three different Art Blocks collections on OpenSea (Curated, Playground, and Factory).\n**metrics?**: The latest Art Blocks platform metrics.`);
+
 // Returns a message for ArtBot to return when being smart, or null if
 // ArtBot has nothing to say.
 async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID) {
@@ -100,7 +109,12 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
     return null;
   }
 
-  // Handle drop questions by sending a link to #events
+  // Handle requests for help!
+  let mentionsHelp = msgContentLowercase.includes("help");
+  if (containsQuestion && mentionsHelp) {
+    return HELP_MESSAGE;
+  }
+  // Handle drop questions.
   let mentionsDrop = msgContentLowercase.includes("drop");
   if (containsQuestion && mentionsDrop) {
     return NEXT_DROP_MESSAGE;
