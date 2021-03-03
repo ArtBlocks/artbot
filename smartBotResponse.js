@@ -37,23 +37,15 @@ const NEXT_DROP_MESSAGE = new MessageEmbed()
   // Set the main content of the embed
   .setDescription(`It looks like you're wondering about when the next drop is.\n\nFor details on upcoming scheduled **Curated Project** releases, please check the [#calendar](https://discord.com/channels/411959613370400778/800784659940245504) and [#announcements](https://discord.com/channels/411959613370400778/781730104337235968) channels.\n\n**Artist Playground** drops are entirely coordinated by the artists, so it is up to them to spread the word on social media and in Discord. When they are announced for the entire Discord, you will find them in [#playground-announcements](https://discord.com/channels/411959613370400778/816383725582942208)`);
 
-// Custom message shown when someone asks what the "Factory" is.
-const FACTORY_MESSAGE = new MessageEmbed()
+// Custom message shown when someone asks what the "Playground" vs. "Curated"
+// vs. "Factory" is.
+const PLAYGROUND_CURATED_FACTORY_MESSAGE = new MessageEmbed()
   // Set the title of the field
-  .setTitle('What is the ArtBlocks Factory?')
+  .setTitle('How are "Curated", "Playground", and "Factory" different?')
   // Set the color of the embed
   .setColor(ARTBOT_GREEN)
   // Set the main content of the embed
-  .setDescription(`It looks like you're wondering what the ArtBlocks Factory is.\n\nCheck out [this explaination from snowfro@](https://discord.com/channels/411959613370400778/411959613370400780/814171687133511720) :).`);
-
-// Custom message shown when someone asks what the "Playground" vs. "Curated" is.
-const PLAYGROUND_VS_CURATED_MESSAGE = new MessageEmbed()
-  // Set the title of the field
-  .setTitle('How are "Curated" and "Playground" different?')
-  // Set the color of the embed
-  .setColor(ARTBOT_GREEN)
-  // Set the main content of the embed
-  .setDescription(`It looks like you're wondering about the difference between Curated Projects and the Artist Playground. Here is the tl;dr:\n\nArt Blocks as a platform has established a curation board to carefully select projects for inclusion in the "official" Art Blocks Curated Collection.\n\nArtists that have been included in the Curated Collection are then allowed to deploy a project of their choice in the Artist Playground. These projects are not "curated" and subsequently are not promoted as an official Art Blocks drop or considered to be part of the "official" Art Blocks collection.\n\nCheck out [artblocks.io/learn](https://artblocks.io/learn) for a full explanation!`);
+  .setDescription(`It looks like you're wondering about the different types of Art Blocks projects.\n\n**Art Blocks Curated** is the most strictly curated offering in the Art Blocks product suite. Submissions are made by individual artists or collaborations and approved by the curation board before they go live. These highly innovative releases by renowned artists reflect astounding beauty and innovation both artistically and technically.\n\n**Art Blocks Playground** is the place where artists who have previously been approved for curated drops are encouraged to play and innovative. Like all Art Blocks releases, these projects must meet a quality standard, but with the Playground, experimentation is encouraged.\n\n**Art Blocks Factory** allows artists who do not wish to wait for approval by the Curation Board a place to launch their generative art. While requirements are somewhat relaxed compared to Curated drops, the releases in Factory will reflect the innovation, creativity, and artistic beauty associated with the Art Blocks community.\n\nCheck out [artblocks.io/learn](https://artblocks.io/learn) for a full explanation!`);
 
 // Custom message shown when someone asks for the OpenSea links.
 const OPENSEA_LINKS_MESSAGE = new MessageEmbed()
@@ -110,17 +102,12 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   if (containsQuestion && mentionsDrop) {
     return NEXT_DROP_MESSAGE;
   }
-  // Handle questions about factory by redirecting to:
-  // https://discord.com/channels/411959613370400778/411959613370400780/814171687133511720
-  let mentionsFactory = msgContentLowercase.includes("factory");
-  if (containsQuestion && mentionsFactory) {
-    return FACTORY_MESSAGE;
-  }
-  // Handle questions about Curated Projects vs. Artist Playground.
-  let mentionedCuratedOrPlayground = msgContentLowercase.includes("curated") ||
-    msgContentLowercase.includes("playground");
-  if (containsQuestion && mentionedCuratedOrPlayground) {
-    return PLAYGROUND_VS_CURATED_MESSAGE;
+  // Handle questions about Curated Projects vs. Artist Playground vs. Factory.
+  let mentionedCuratedPlaygroundFactory = msgContentLowercase.includes("curated")
+    || msgContentLowercase.includes("playground")
+    || msgContentLowercase.includes("factory");
+  if (containsQuestion && mentionedCuratedPlaygroundFactory) {
+    return PLAYGROUND_CURATED_FACTORY_MESSAGE;
   }
   // Handle OpenSea link requests.
   let mentionedOpenSea = msgContentLowercase.includes("opensea");
