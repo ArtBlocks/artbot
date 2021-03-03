@@ -6,6 +6,7 @@ const fetch = require("node-fetch");
 
 // Discord channel IDs.
 const CHANNEL_GENERAL = process.env.CHANNEL_GENERAL;
+const CHANNEL_HELP = process.env.CHANNEL_HELP;
 const CHANNEL_SQUIG = process.env.CHANNEL_SQUIG;
 
 // Specific OpenSea assets for fetching project stats for "ArtBlocks Curated"
@@ -66,10 +67,12 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   }
 
   // Some shared helper variables.
-  let inGeneralChannel = (channelID == CHANNEL_GENERAL);
+  let inGeneralOrHelpChannel =
+    (channelID == CHANNEL_GENERAL) || (channelID == CHANNEL_HELP);
   let mentionedArtBot = msgContentLowercase.includes(ARTBOT_USERNAME) ||
     msgContentLowercase.includes(artBotID);
-  let mentionedArtBotOrInGeneral = mentionedArtBot || inGeneralChannel;
+  let mentionedArtBotOrInGeneralOrHelp =
+    mentionedArtBot || inGeneralOrHelpChannel;
   let containsQuestion = msgContentLowercase.includes("?");
 
   // Handle questions about the mint pausing for Chromie Squiggles.
@@ -86,14 +89,14 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   let squiggleChannelPauseMentioned = mentionsPause && inSquiggleChannel;
   let generalChannelSquigglePauseMentioned = mentionsPause &&
     messageMentionsSquiggle &&
-    mentionedArtBotOrInGeneral;
+    mentionedArtBotOrInGeneralOrHelp;
   if (squiggleChannelPauseMentioned || generalChannelSquigglePauseMentioned) {
     return SQUIGGLE_PAUSE_MESSAGE;
   }
 
   // Only answer the following questions if ArtBlot is pinged directly
   // or the message was sent in #general.
-  if (!mentionedArtBotOrInGeneral) {
+  if (!mentionedArtBotOrInGeneralOrHelp) {
     return null;
   }
 
@@ -103,9 +106,9 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
     return NEXT_DROP_MESSAGE;
   }
   // Handle questions about Curated Projects vs. Artist Playground vs. Factory.
-  let mentionedCuratedPlaygroundFactory = msgContentLowercase.includes("curated")
-    || msgContentLowercase.includes("playground")
-    || msgContentLowercase.includes("factory");
+  let mentionedCuratedPlaygroundFactory = msgContentLowercase.includes("curated") ||
+    msgContentLowercase.includes("playground") ||
+    msgContentLowercase.includes("factory");
   if (containsQuestion && mentionedCuratedPlaygroundFactory) {
     return PLAYGROUND_CURATED_FACTORY_MESSAGE;
   }
