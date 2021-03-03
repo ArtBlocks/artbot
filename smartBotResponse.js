@@ -6,6 +6,7 @@ const fetch = require("node-fetch");
 
 // Discord channel IDs.
 const CHANNEL_GENERAL = process.env.CHANNEL_GENERAL;
+const CHANNEL_HELP = process.env.CHANNEL_HELP;
 const CHANNEL_SQUIG = process.env.CHANNEL_SQUIG;
 
 // Specific OpenSea assets for fetching project stats for "ArtBlocks Curated"
@@ -56,6 +57,15 @@ const OPENSEA_LINKS_MESSAGE = new MessageEmbed()
   // Set the main content of the embed
   .setDescription(`There are three ArtBlocks collections on OpenSea:\n• [ArtBlocks Curated](https://opensea.io/assets/art-blocks)\n• [ArtBlocks Playground](https://opensea.io/assets/art-blocks-playground)\n• [ArtBlocks Factory](https://opensea.io/assets/art-blocks-factory)`);
 
+// Custom message shown when someone asks about when the next drop is.
+const HELP_MESSAGE = new MessageEmbed()
+  // Set the title of the field
+  .setTitle('Looking for help?')
+  // Set the color of the embed
+  .setColor(ARTBOT_GREEN)
+  // Set the main content of the embed
+  .setDescription(`These are the things you can ask me:\n\n**squiggle paused?**: An explanation of why Chromie Squiggle minting is paused.\n**drop?**: Where to find information about the next drop.\n**playground?** (or **curated?** or **factory?**): Information about the different types of Art Blocks projects.\n**opensea?**: Links to the three different Art Blocks collections on OpenSea (Curated, Playground, and Factory).\n**metrics?**: The latest Art Blocks platform metrics.`);
+
 // Returns a message for ArtBot to return when being smart, or null if
 // ArtBot has nothing to say.
 async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID) {
@@ -66,10 +76,12 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   }
 
   // Some shared helper variables.
-  let inGeneralChannel = (channelID == CHANNEL_GENERAL);
+  let inGeneralOrHelpChannel =
+    (channelID == CHANNEL_GENERAL) || (channelID == CHANNEL_HELP);
   let mentionedArtBot = msgContentLowercase.includes(ARTBOT_USERNAME) ||
     msgContentLowercase.includes(artBotID);
-  let mentionedArtBotOrInGeneral = mentionedArtBot || inGeneralChannel;
+  let mentionedArtBotOrInGeneralOrHelp =
+    mentionedArtBot || inGeneralOrHelpChannel;
   let containsQuestion = msgContentLowercase.includes("?");
 
   // Handle questions about the mint pausing for Chromie Squiggles.
@@ -86,26 +98,31 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   let squiggleChannelPauseMentioned = mentionsPause && inSquiggleChannel;
   let generalChannelSquigglePauseMentioned = mentionsPause &&
     messageMentionsSquiggle &&
-    mentionedArtBotOrInGeneral;
+    mentionedArtBotOrInGeneralOrHelp;
   if (squiggleChannelPauseMentioned || generalChannelSquigglePauseMentioned) {
     return SQUIGGLE_PAUSE_MESSAGE;
   }
 
   // Only answer the following questions if ArtBlot is pinged directly
   // or the message was sent in #general.
-  if (!mentionedArtBotOrInGeneral) {
+  if (!mentionedArtBotOrInGeneralOrHelp) {
     return null;
   }
 
-  // Handle drop questions by sending a link to #events
+  // Handle requests for help!
+  let mentionsHelp = msgContentLowercase.includes("help");
+  if (containsQuestion && mentionsHelp) {
+    return HELP_MESSAGE;
+  }
+  // Handle drop questions.
   let mentionsDrop = msgContentLowercase.includes("drop");
   if (containsQuestion && mentionsDrop) {
     return NEXT_DROP_MESSAGE;
   }
   // Handle questions about Curated Projects vs. Artist Playground vs. Factory.
-  let mentionedCuratedPlaygroundFactory = msgContentLowercase.includes("curated")
-    || msgContentLowercase.includes("playground")
-    || msgContentLowercase.includes("factory");
+  let mentionedCuratedPlaygroundFactory = msgContentLowercase.includes("curated") ||
+    msgContentLowercase.includes("playground") ||
+    msgContentLowercase.includes("factory");
   if (containsQuestion && mentionedCuratedPlaygroundFactory) {
     return PLAYGROUND_CURATED_FACTORY_MESSAGE;
   }
