@@ -31,7 +31,7 @@ class ProjectBot {
     let detailsRequested = content.toLowerCase().includes("detail");
     let afterTheHash = content.substring(1);
     let pieceNumber;
-    if (afterTheHash.toLowerCase().includes("rand ") || afterTheHash[0] == "?") {
+    if (afterTheHash[0] == "?") {
       pieceNumber = parseInt(Math.random() * this.editionNumber);
     } else {
       pieceNumber = parseInt(afterTheHash);

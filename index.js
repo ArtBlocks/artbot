@@ -11,6 +11,7 @@ const OSTradeListener = require("./OSTradeListener").OSTradeListener;
 const ProjectBot = require("./ProjectBot").ProjectBot;
 const smartBotResponse = require("./smartBotResponse").smartBotResponse;
 const ringerSinglesTransform = require("./ringerHandler").ringerSinglesTransform;
+const ringerSetsTransform = require("./ringerHandler").ringerSetsTransform;
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
@@ -276,8 +277,12 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_RINGERS:
         let ringerSinglesTransformedValue = ringerSinglesTransform(msg.content);
+        let ringerSetsTransformedValue = ringerSetsTransform(msg.content);
         if (ringerSinglesTransformedValue !== null) {
           msg.content = ringerSinglesTransformedValue;
+        } else
+        if (ringerSetsTransformedValue !== null) {
+          msg.content = ringerSetsTransformedValue;
         }
         console.log(msg.content);
         ringersBot.handleNumberMessage(msg);
@@ -373,7 +378,12 @@ bot.on("message", (msg) => {
   smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
     (smartResponse) => {
       if (smartResponse !== null) {
-        msg.reply(null, {embed: smartResponse, allowedMentions: {repliedUser: true}});
+        msg.reply(null, {
+          embed: smartResponse,
+          allowedMentions: {
+            repliedUser: true
+          }
+        });
       }
     }
   );
