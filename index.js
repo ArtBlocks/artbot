@@ -10,6 +10,7 @@ const AddressCollector = require("./AddressCollector").AddressCollector;
 const OSTradeListener = require("./OSTradeListener").OSTradeListener;
 const ProjectBot = require("./ProjectBot").ProjectBot;
 const smartBotResponse = require("./smartBotResponse").smartBotResponse;
+const ringerSinglesTransform = require("./ringerHandler").ringerSinglesTransform;
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
@@ -274,6 +275,11 @@ bot.on("message", (msg) => {
         squiggleBot.handleNumberMessage(msg);
         break;
       case CHANNEL_RINGERS:
+        let ringerSinglesTransformedValue = ringerSinglesTransform(msg.content);
+        if (ringerSinglesTransformedValue !== null) {
+          msg.content = ringerSinglesTransformedValue;
+        }
+        console.log(msg.content);
         ringersBot.handleNumberMessage(msg);
         break;
       case CHANNEL_GENESIS:
