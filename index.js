@@ -373,8 +373,8 @@ bot.on("message", (msg) => {
   );
 });
 
-Trade activity channel Discord event handlers.
-Initialize and set up OpenSea event listener polling.
+// Trade activity channel Discord event handlers.
+// Initialize and set up OpenSea event listener polling.
 const pollInterval = TIMER * 1000;
 let curatedActivityListener = new OSTradeListener(
   bot,
