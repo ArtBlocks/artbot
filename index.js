@@ -373,30 +373,30 @@ bot.on("message", (msg) => {
   );
 });
 
-// Trade activity channel Discord event handlers.
-// Initialize and set up OpenSea event listener polling.
-// const pollInterval = TIMER * 1000;
-// let curatedActivityListener = new OSTradeListener(
-//   bot,
-//   CHANNEL_TRADE,
-//   "art-blocks",
-//   pollInterval
-// );
-// setInterval(
-//   () => {
-//     curatedActivityListener.pollTradeEvents();
-//   },
-//   pollInterval
-// );
-// let playgroundActivityListener = new OSTradeListener(
-//   bot,
-//   CHANNEL_TRADE_PLAYGROUND,
-//   "art-blocks-playground",
-//   pollInterval
-// );
-// setInterval(
-//   () => {
-//     playgroundActivityListener.pollTradeEvents();
-//   },
-//   pollInterval
-// );
+Trade activity channel Discord event handlers.
+Initialize and set up OpenSea event listener polling.
+const pollInterval = TIMER * 1000;
+let curatedActivityListener = new OSTradeListener(
+  bot,
+  CHANNEL_TRADE,
+  "art-blocks",
+  pollInterval
+);
+setInterval(
+  () => {
+    curatedActivityListener.pollTradeEvents();
+  },
+  pollInterval
+);
+let playgroundActivityListener = new OSTradeListener(
+  bot,
+  CHANNEL_TRADE_PLAYGROUND,
+  "art-blocks-playground",
+  pollInterval
+);
+setInterval(
+  () => {
+    playgroundActivityListener.pollTradeEvents();
+  },
+  pollInterval
+);
