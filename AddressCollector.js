@@ -107,7 +107,7 @@ class AddressCollector {
           valueInputOption: 'RAW',
           resource: {
             values: [
-              [msgContent]
+              [msgContent, msgAuthorID, Date.now()]
             ]
           },
         }, (error, result) => {
