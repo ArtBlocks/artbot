@@ -35,11 +35,11 @@ const sheetsService = google.sheets('v4');
 // A message for when invalid wallet address is entered.
 const INVALID_ADDRESS_MESSAGE = `**Invalid Wallet Address:** Your address was not recorded due to malformed input. Your wallet address should be a 20-byte string, starting with "0x"`;
 
-// A message for when address not recorded due to lack of allowlist membership.
-const NON_ALLOWLIST_MESSAGE = `**Discord User Not Allowlisted:** Your address was not recorded due to now belonging in the Discord at time of allowlist creation.`;
+// A message for when address not recorded due to lack of VIP list membership.
+const NON_ALLOWLIST_MESSAGE = `**Not An Early Member:** Your address was not recorded due to not having joined the Discord prior end of February 2021.`;
 
 // Failed to connect.
-const FAILED_TO_CONNECT_MESSAGE = `**Failure:** Could not record address, please try again later.`;
+const FAILED_TO_CONNECT_MESSAGE = `**Failure:** Could not record address due to a connection issue, please try again later.`;
 
 // A message for when address is recorded as expected.
 const ADDRESS_RECORDED_MESSAGE = `**Success:** Your address has been recorded. Thank you!`;
@@ -62,8 +62,8 @@ class AddressCollector {
   }
 
   // Handles a message for the address aggregation channel.
-  // If the address is valid and the sender is part of the allowlist, record the
-  // address in the allowlist set.
+  // If the address is valid and the sender is part of the VIP list, record the
+  // address in the VIP list set.
   // Otherwise, respond to the user notifying them of the failure to record their
   // address. (TODO: Do we always tell the user the cause of the failure?)
   async addressCollectionHandler(msg) {
