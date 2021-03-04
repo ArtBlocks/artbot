@@ -4,7 +4,7 @@ const {
 const fetch = require("node-fetch");
 const Web3 = require("web3");
 
-let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 
 const MINT_ADDRESS = "0x0000000000000000000000000000000000000000";
 const EMBED_COLOR = 0xff0000;
