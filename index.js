@@ -47,6 +47,8 @@ const CHANNEL_PLAYGROUND_PXLQ = process.env.CHANNEL_PLAYGROUND_PXLQ;
 const CHANNEL_PLAYGROUND_DMITRICHERNIAK = process.env.CHANNEL_PLAYGROUND_DMITRICHERNIAK;
 const CHANNEL_PLAYGROUND_GE1DOOT = process.env.CHANNEL_PLAYGROUND_GE1DOOT;
 const CHANNEL_PLAYGROUND_KAI = process.env.CHANNEL_PLAYGROUND_KAI;
+const CHANNEL_PLAYGROUND_BEERVANGEER = process.env.CHANNEL_PLAYGROUND_BEERVANGEER;
+const CHANNEL_PLAYGROUND_LUXPRIS = process.env.CHANNEL_PLAYGROUND_LUXPRIS;
 
 // Special address collection channel.
 const CHANNEL_ADDRESS_COLLECTION = process.env.CHANNEL_ADDRESS_COLLECTION;
@@ -244,6 +246,20 @@ let pixelGlassBot = new ProjectBot(
   256,
   "Pixel Glass"
 );
+// #beervangeer projects
+let energySculptureBot = new ProjectBot(
+  26000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  369,
+  "EnergySculpture"
+);
+// #luxpris projects
+let pathfindersBot = new ProjectBot(
+  25000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1000,
+  "Pathfinders"
+);
 
 // Special address collector.
 let addressCollector = new AddressCollector();
@@ -362,6 +378,17 @@ bot.on("message", (msg) => {
         if (msgContentLowercase.includes("pixel") &&
           msgContentLowercase.includes("glass")) {
           pixelGlassBot.handleNumberMessage(msg);
+        }
+        break;
+      case CHANNEL_PLAYGROUND_BEERVANGEER:
+        if (msgContentLowercase.includes("energy") &&
+          msgContentLowercase.includes("sculpture")) {
+          energySculptureBot.handleNumberMessage(msg);
+        }
+        break;
+      case CHANNEL_PLAYGROUND_LUXPRIS:
+        if (msgContentLowercase.includes("pathfinder")) {
+          pathfindersBot.handleNumberMessage(msg);
         }
         break;
 
