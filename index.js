@@ -39,6 +39,7 @@ const CHANNEL_27_BIT = process.env.CHANNEL_27_BIT;
 const CHANNEL_SPECTRON = process.env.CHANNEL_SPECTRON;
 const CHANNEL_CRYPTOBLOTS = process.env.CHANNEL_CRYPTOBLOTS;
 const CHANNEL_ARCHETYPE = process.env.CHANNEL_ARCHETYPE;
+const CHANNEL_720_MINUTES = process.env.CHANNEL_720_MINUTES;
 
 // Artist playground Discord channel IDs.
 const CHANNEL_PLAYGROUND_JEFFDAVIS = process.env.CHANNEL_PLAYGROUND_JEFFDAVIS;
@@ -183,6 +184,12 @@ let archetypeBot = new ProjectBot(
   V2_MINTING_CONTRACT_ADDRESS,
   600,
   "Archetype"
+);
+let minutesBot = new ProjectBot(
+  27000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  720,
+  "720 Minutes"
 );
 
 // Artist playground project Discord channel message handlers.
@@ -335,6 +342,9 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_ARCHETYPE:
         archetypeBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_720_MINUTES:
+        minutesBot.handleNumberMessage(msg);
         break;
 
         // Artist playground channels.
