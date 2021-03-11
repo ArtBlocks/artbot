@@ -76,12 +76,10 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   }
 
   // Some shared helper variables.
-  let inGeneralOrHelpChannel =
-    (channelID == CHANNEL_GENERAL) || (channelID == CHANNEL_HELP);
+  let inHelpChannel = (channelID == CHANNEL_HELP);
   let mentionedArtBot = msgContentLowercase.includes(ARTBOT_USERNAME) ||
     msgContentLowercase.includes(artBotID);
-  let mentionedArtBotOrInGeneralOrHelp =
-    mentionedArtBot || inGeneralOrHelpChannel;
+  let mentionedArtBotOrInOrHelp = mentionedArtBot || inHelpChannel;
   let containsQuestion = msgContentLowercase.includes("?");
 
   // Handle questions about the mint pausing for Chromie Squiggles.
@@ -96,10 +94,11 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
     msgContentLowercase.includes("squigglle") ||
     msgContentLowercase.includes("squiglle");
   let squiggleChannelPauseMentioned = mentionsPause && inSquiggleChannel;
-  let generalChannelSquigglePauseMentioned = mentionsPause &&
+  let artbotOrHelpChannelSquigglePauseMentioned =
+    mentionsPause &&
     messageMentionsSquiggle &&
-    mentionedArtBotOrInGeneralOrHelp;
-  if (squiggleChannelPauseMentioned || generalChannelSquigglePauseMentioned) {
+    mentionedArtBotOrInOrHelp;
+  if (squiggleChannelPauseMentioned || artbotOrHelpChannelSquigglePauseMentioned) {
     return SQUIGGLE_PAUSE_MESSAGE;
   }
 
