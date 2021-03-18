@@ -40,6 +40,7 @@ const CHANNEL_SPECTRON = process.env.CHANNEL_SPECTRON;
 const CHANNEL_CRYPTOBLOTS = process.env.CHANNEL_CRYPTOBLOTS;
 const CHANNEL_ARCHETYPE = process.env.CHANNEL_ARCHETYPE;
 const CHANNEL_720_MINUTES = process.env.CHANNEL_720_MINUTES;
+const CHANNEL_APPARITIONS = process.env.CHANNEL_APPARITIONS;
 
 // Artist playground Discord channel IDs.
 const CHANNEL_PLAYGROUND_JEFFDAVIS = process.env.CHANNEL_PLAYGROUND_JEFFDAVIS;
@@ -191,6 +192,12 @@ let minutesBot = new ProjectBot(
   720,
   "720 Minutes"
 );
+let apparitionsBot = new ProjectBot(
+  28000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1500,
+  "Apparitions"
+)
 
 // Artist playground project Discord channel message handlers.
 // #jeff-davis projects
@@ -345,6 +352,9 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_720_MINUTES:
         minutesBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_APPARITIONS:
+        apparitionsBot.handleNumberMessage(msg);
         break;
 
         // Artist playground channels.

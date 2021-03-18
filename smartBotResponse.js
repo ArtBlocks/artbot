@@ -104,7 +104,7 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
 
   // Only answer the following questions if ArtBlot is pinged directly
   // or the message was sent in #general.
-  if (!mentionedArtBotOrInGeneralOrHelp) {
+  if (!mentionedArtBotOrInOrHelp) {
     return null;
   }
 
