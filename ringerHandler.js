@@ -12,10 +12,11 @@ function ringerSinglesTransform(messageContent) {
     return null;
   }
 
-  if (!ringerSingles.hasOwnProperty(singleKeyString)) {
+  let singleKeyStringLowercase = singleKeyString.toLowerCase();
+  if (!ringerSingles.hasOwnProperty(singleKeyStringLowercase)) {
     return null;
   }
-  return `#${ringerSingles[singleKeyString]}`;
+  return `#${ringerSingles[singleKeyStringLowercase]}`;
 }
 
 function ringerSetsTransform(messageContent) {
@@ -33,11 +34,12 @@ function ringerSetsTransform(messageContent) {
     return null;
   }
 
-  if (!ringerSets.hasOwnProperty(setKeyString)) {
+  let setKeyStringLowercase = setKeyString.toLowerCase();
+  if (!ringerSets.hasOwnProperty(setKeyStringLowercase)) {
     return null;
   }
 
-  let setItems = ringerSets[setKeyString];
+  let setItems = ringerSets[setKeyStringLowercase];
   let randomSetItem = setItems[Math.floor(Math.random() * setItems.length)];
   return `#${randomSetItem}`;
 }
