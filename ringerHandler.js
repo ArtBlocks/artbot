@@ -8,7 +8,7 @@ function ringerSinglesTransform(messageContent) {
 
   let afterTheHash = messageContent.substring(1);
   let singleKeyString = afterTheHash.split(' ')[0];
-  if (singleKeyString === null) {
+  if (singleKeyString === null || !singleKeyString) {
     return null;
   }
 
@@ -30,7 +30,7 @@ function ringerSetsTransform(messageContent) {
   }
 
   let setKeyString = afterTheHash.split(' ')[1];
-  if (setKeyString === null) {
+  if (setKeyString === null || !setKeyString) {
     return null;
   }
 
