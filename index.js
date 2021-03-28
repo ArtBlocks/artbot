@@ -334,7 +334,6 @@ bot.on("message", (msg) => {
         if (ringerSetsTransformedValue !== null) {
           msg.content = ringerSetsTransformedValue;
         }
-        console.log(msg.content);
         ringersBot.handleNumberMessage(msg);
         break;
       case CHANNEL_GENESIS:
