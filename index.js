@@ -247,6 +247,12 @@ let cyberCitiesBot = new ProjectBot(
   256,
   "Cyber Cities"
 );
+let hieroglyphsBot = new ProjectBot(
+  30000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1250,
+  "Hieroglyphs"
+);
 // #dmitri-cherniak projects
 let eternalPumpBot = new ProjectBot(
   22000000,
@@ -399,6 +405,8 @@ bot.on("message", (msg) => {
           cyberCitiesBot.handleNumberMessage(msg);
         } else if (msgContentLowercase.includes("sentience")) {
           sentienceBot.handleNumberMessage(msg);
+        } else if (msgContentLowercase.includes("hieroglyphs")) {
+          hieroglyphsBot.handleNumberMessage(msg);
         }
         break;
       case CHANNEL_PLAYGROUND_DMITRICHERNIAK:
