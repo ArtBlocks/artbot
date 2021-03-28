@@ -41,6 +41,8 @@ const CHANNEL_CRYPTOBLOTS = process.env.CHANNEL_CRYPTOBLOTS;
 const CHANNEL_ARCHETYPE = process.env.CHANNEL_ARCHETYPE;
 const CHANNEL_720_MINUTES = process.env.CHANNEL_720_MINUTES;
 const CHANNEL_APPARITIONS = process.env.CHANNEL_APPARITIONS;
+const CHANNEL_INSPIRALS = process.env.CHANNEL_INSPIRALS;
+const CHANNEL_AERIAL_VIEW = process.env.CHANNEL_AERIAL_VIEW;
 
 // Artist playground Discord channel IDs.
 const CHANNEL_PLAYGROUND_JEFFDAVIS = process.env.CHANNEL_PLAYGROUND_JEFFDAVIS;
@@ -197,7 +199,19 @@ let apparitionsBot = new ProjectBot(
   V2_MINTING_CONTRACT_ADDRESS,
   1500,
   "Apparitions"
-)
+);
+let inspiralsBot = new ProjectBot(
+  29000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1000,
+  "Inspirals"
+);
+let aerialViewBot = new ProjectBot(
+  35000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1000,
+  "Aerial View"
+);
 
 // Artist playground project Discord channel message handlers.
 // #jeff-davis projects
@@ -355,6 +369,12 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_APPARITIONS:
         apparitionsBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_INSPIRALS:
+        inspiralsBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_AERIAL_VIEW:
+        aerialViewBot.handleNumberMessage(msg);
         break;
 
         // Artist playground channels.
