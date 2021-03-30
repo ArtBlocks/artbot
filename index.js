@@ -9,6 +9,7 @@ const bodyParser = require("body-parser");
 const AddressCollector = require("./AddressCollector").AddressCollector;
 const OSTradeListener = require("./OSTradeListener").OSTradeListener;
 const ProjectBot = require("./ProjectBot").ProjectBot;
+const triageActivityMessage = require("./activityTriager").triageActivityMessage;
 const smartBotResponse = require("./smartBotResponse").smartBotResponse;
 const ringerSinglesTransform = require("./ringerHandler").ringerSinglesTransform;
 const ringerSetsTransform = require("./ringerHandler").ringerSetsTransform;
@@ -20,8 +21,7 @@ const TIMER = process.env.TIMER;
 const PORT = process.env.PORT || 3000;
 
 // Trade activity Discord channel IDs.
-const CHANNEL_TRADE = process.env.CHANNEL_TRADE;
-const CHANNEL_TRADE_PLAYGROUND = process.env.CHANNEL_TRADE_PLAYGROUND;
+const PROD_CHANNEL_ACTIVITY_ALL = process.env.PROD_CHANNEL_ACTIVITY_ALL;
 
 // Curated project Discord channel IDs.
 const CHANNEL_SING = process.env.CHANNEL_SING;
@@ -305,6 +305,13 @@ bot.on("message", (msg) => {
   let msgContentLowercase = msgContent.toLowerCase();
   let channelID = msg.channel.id;
 
+  // If the message is in the activity channel, forward the message on
+  // to the appropriate sub-channel.
+  if (channelID == PROD_CHANNEL_ACTIVITY_ALL) {
+    triageActivityMessage(msg, bot);
+    return;
+  }
+
   // If message is in special address collection channel, forward message
   // to that handler and return early.
   if (channelID == CHANNEL_ADDRESS_COLLECTION) {
@@ -462,31 +469,3 @@ bot.on("message", (msg) => {
     }
   );
 });
-
-// Trade activity channel Discord event handlers.
-// Initialize and set up OpenSea event listener polling.
-const pollInterval = TIMER * 1000;
-let curatedActivityListener = new OSTradeListener(
-  bot,
-  CHANNEL_TRADE,
-  "art-blocks",
-  pollInterval
-);
-setInterval(
-  () => {
-    curatedActivityListener.pollTradeEvents();
-  },
-  pollInterval
-);
-let playgroundActivityListener = new OSTradeListener(
-  bot,
-  CHANNEL_TRADE_PLAYGROUND,
-  "art-blocks-playground",
-  pollInterval
-);
-setInterval(
-  () => {
-    playgroundActivityListener.pollTradeEvents();
-  },
-  pollInterval
-);
