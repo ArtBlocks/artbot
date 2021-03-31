@@ -9,10 +9,16 @@ const bodyParser = require("body-parser");
 const AddressCollector = require("./AddressCollector").AddressCollector;
 const OSTradeListener = require("./OSTradeListener").OSTradeListener;
 const ProjectBot = require("./ProjectBot").ProjectBot;
+
+// Special handlers.
 const triageActivityMessage = require("./activityTriager").triageActivityMessage;
 const smartBotResponse = require("./smartBotResponse").smartBotResponse;
+
+// Per-channel handlers.
 const ringerSinglesTransform = require("./ringerHandler").ringerSinglesTransform;
 const ringerSetsTransform = require("./ringerHandler").ringerSetsTransform;
+const apparitionSinglesTransform = require("./apparitionHandler").apparitionSinglesTransform;
+const apparitionSetsTransform = require("./apparitionHandler").apparitionSetsTransform;
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
@@ -380,6 +386,16 @@ bot.on("message", (msg) => {
         minutesBot.handleNumberMessage(msg);
         break;
       case CHANNEL_APPARITIONS:
+        let apparitionSinglesTransformedValue =
+          apparitionSinglesTransform(msg.content);
+        let apparitionSetsTransformedValue =
+          apparitionSetsTransform(msg.content);
+        if (apparitionSinglesTransformedValue !== null) {
+          msg.content = apparitionSinglesTransformedValue;
+        } else
+        if (apparitionSetsTransformedValue !== null) {
+          msg.content = apparitionSetsTransformedValue;
+        }
         apparitionsBot.handleNumberMessage(msg);
         break;
       case CHANNEL_INSPIRALS:
