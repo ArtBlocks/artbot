@@ -44,6 +44,9 @@ async function triageActivityMessage(msg, bot) {
     let artBlocksResponse = await fetch(`https://api.artblocks.io/token/${tokenID}`);
     let artBlocksData = await artBlocksResponse.json();
 
+    // Update thumbnail image to use larger variant from Art Blocks API.
+    embed.setThumbnail(artBlocksData.image);
+
     // Add inline field for viewing live script on Art Blocks.
     embed.addField("Live Script", `[view on artblocks.io](${artBlocksData.external_url})`, true);
 
