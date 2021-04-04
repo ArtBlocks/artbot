@@ -50,8 +50,11 @@ async function triageActivityMessage(msg, bot) {
     // Add inline field for viewing live script on Art Blocks.
     embed.addField("Live Script", `[view on artblocks.io](${artBlocksData.external_url})`, true);
 
-    // Update embed author name to reflect piece name rather than token number.
-    embed.setAuthor(`${eventName}: ${artBlocksData.name}`, null, authorURL);
+    // Update to remove author name and to reflect this info in piece name
+    // rather than token number as the title and URL field..
+    embed.author = null;
+    embed.setTitle(`${eventName}: ${artBlocksData.name}`);
+    embed.setURL(authorURL);
 
     // Determine channel from the curation status of the piece.
     // Fall-back to factory as the default (so that no messages accidentally
