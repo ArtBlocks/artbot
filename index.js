@@ -29,6 +29,9 @@ const PORT = process.env.PORT || 3000;
 // Trade activity Discord channel IDs.
 const PROD_CHANNEL_ACTIVITY_ALL = process.env.PROD_CHANNEL_ACTIVITY_ALL;
 
+// Special Squiggle DAO honorary channel ID.
+const CHANNEL_SQUIGGLE_DAO_SQUIGGLE_SQUARE = process.env.CHANNEL_SQUIGGLE_DAO_SQUIGGLE_SQUARE;
+
 // Curated project Discord channel IDs.
 const CHANNEL_SING = process.env.CHANNEL_SING;
 const CHANNEL_IGNITION = process.env.CHANNEL_IGNITION;
@@ -359,6 +362,7 @@ bot.on("message", (msg) => {
         ignitionBot.handleNumberMessage(msg);
         break;
       case CHANNEL_SQUIG:
+      case CHANNEL_SQUIGGLE_DAO_SQUIGGLE_SQUARE:
         squiggleBot.handleNumberMessage(msg);
         break;
       case CHANNEL_RINGERS:
