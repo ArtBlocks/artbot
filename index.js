@@ -61,6 +61,7 @@ const CHANNEL_PLAYGROUND_KAI = process.env.CHANNEL_PLAYGROUND_KAI;
 const CHANNEL_PLAYGROUND_BEERVANGEER = process.env.CHANNEL_PLAYGROUND_BEERVANGEER;
 const CHANNEL_PLAYGROUND_LUXPRIS = process.env.CHANNEL_PLAYGROUND_LUXPRIS;
 const CHANNEL_PLAYGROUND_GOLID = process.env.CHANNEL_PLAYGROUND_GOLID;
+const CHANNEL_PLAYGROUND_ALEXIS_ANDRE = process.env.CHANNEL_PLAYGROUND_ALEXIS_ANDRE;
 
 // Special address collection channel.
 const CHANNEL_ADDRESS_COLLECTION = process.env.CHANNEL_ADDRESS_COLLECTION;
@@ -315,6 +316,13 @@ let paperArmadaBot = new ProjectBot(
   3000,
   "Paper Armada"
 );
+// #alexis-andrew projects
+let voidBot =  new ProjectBot(
+  42000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  500,
+  "Void"
+);
 
 // Special address collector.
 let addressCollector = new AddressCollector();
@@ -482,6 +490,11 @@ bot.on("message", (msg) => {
       case CHANNEL_PLAYGROUND_GOLID:
         if (msgContentLowercase.includes("armada")) {
           paperArmadaBot.handleNumberMessage(msg);
+        }
+        break;
+      case CHANNEL_PLAYGROUND_ALEXIS_ANDRE:
+        if (msgContentLowercase.includes("void")) {
+          voidBot.handleNumberMessage(msg);
         }
         break;
 
