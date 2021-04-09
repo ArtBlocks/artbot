@@ -49,6 +49,7 @@ const CHANNEL_720_MINUTES = process.env.CHANNEL_720_MINUTES;
 const CHANNEL_APPARITIONS = process.env.CHANNEL_APPARITIONS;
 const CHANNEL_INSPIRALS = process.env.CHANNEL_INSPIRALS;
 const CHANNEL_AERIAL_VIEW = process.env.CHANNEL_AERIAL_VIEW;
+const CHANNEL_SYNAPSES = process.env.CHANNEL_SYNAPSES;
 
 // Artist playground Discord channel IDs.
 const CHANNEL_PLAYGROUND_JEFFDAVIS = process.env.CHANNEL_PLAYGROUND_JEFFDAVIS;
@@ -217,6 +218,12 @@ let aerialViewBot = new ProjectBot(
   V2_MINTING_CONTRACT_ADDRESS,
   1000,
   "Aerial View"
+);
+let synapsesBot = new ProjectBot(
+  39000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  700,
+  "Synapses"
 );
 
 // Artist playground project Discord channel message handlers.
@@ -403,6 +410,9 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_AERIAL_VIEW:
         aerialViewBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_SYNAPSES:
+        synapsesBot.handleNumberMessage(msg);
         break;
 
         // Artist playground channels.
