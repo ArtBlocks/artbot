@@ -79,7 +79,7 @@ class ProjectBot {
         // Add "Live Script" field.
         .addField("Want More Info?", `Add "details" to your ArtBot command or [view on artblocks.io](${artBlocksData.external_url}).`)
         // Set the full image for embed.
-        .setImage(openSeaData.image_url);
+        .setImage(artBlocksData.image);
       msg.channel.send(imageContent);
       return;
     }
