@@ -60,6 +60,7 @@ const CHANNEL_PLAYGROUND_GE1DOOT = process.env.CHANNEL_PLAYGROUND_GE1DOOT;
 const CHANNEL_PLAYGROUND_KAI = process.env.CHANNEL_PLAYGROUND_KAI;
 const CHANNEL_PLAYGROUND_BEERVANGEER = process.env.CHANNEL_PLAYGROUND_BEERVANGEER;
 const CHANNEL_PLAYGROUND_LUXPRIS = process.env.CHANNEL_PLAYGROUND_LUXPRIS;
+const CHANNEL_PLAYGROUND_GOLID = process.env.CHANNEL_PLAYGROUND_GOLID;
 
 // Special address collection channel.
 const CHANNEL_ADDRESS_COLLECTION = process.env.CHANNEL_ADDRESS_COLLECTION;
@@ -307,6 +308,13 @@ let pathfindersBot = new ProjectBot(
   1000,
   "Pathfinders"
 );
+// #kjetil-golid projects
+let paperArmadaBot = new ProjectBot(
+  37000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  3000,
+  "Paper Armada"
+);
 
 // Special address collector.
 let addressCollector = new AddressCollector();
@@ -471,8 +479,13 @@ bot.on("message", (msg) => {
           pathfindersBot.handleNumberMessage(msg);
         }
         break;
+      case CHANNEL_PLAYGROUND_GOLID:
+        if (msgContentLowercase.includes("armada")) {
+          paperArmadaBot.handleNumberMessage(msg);
+        }
+        break;
 
-        // Fall-back (should never occur).
+      // Fall-back (should never occur).
       default:
         console.log(`Unknown channel ID: ${msg.channel.id}`);
         break;
