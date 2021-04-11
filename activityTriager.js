@@ -7,6 +7,8 @@ const fetch = require("node-fetch");
 const CHANNEL_TRADE = process.env.CHANNEL_TRADE;
 const CHANNEL_TRADE_PLAYGROUND = process.env.CHANNEL_TRADE_PLAYGROUND;
 const CHANNEL_TRADE_FACTORY = process.env.CHANNEL_TRADE_FACTORY;
+const CHANNEL_SALES = process.env.CHANNEL_SALES;
+const CHANNEL_LISTINGS = process.env.CHANNEL_LISTINGS;
 
 async function triageActivityMessage(msg, bot) {
   // Iterate through entire array of embeds, though there should only
@@ -69,8 +71,15 @@ async function triageActivityMessage(msg, bot) {
       tradeChannel = CHANNEL_TRADE_FACTORY;
     }
 
-    // Forward on updated message.
+    // Forward on updated message to the per-curation status feed.
     bot.channels.cache.get(tradeChannel).send(embed);
+
+    // Forward sales events also to special sales channel.
+    if (eventName.includes("Successful")) {
+        bot.channels.cache.get(CHANNEL_SALES).send(embed);
+    } else if (eventName.includes("Created")) {
+        bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
+    }
   }
 }
 
