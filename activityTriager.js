@@ -10,6 +10,9 @@ const CHANNEL_TRADE_FACTORY = process.env.CHANNEL_TRADE_FACTORY;
 const CHANNEL_SALES = process.env.CHANNEL_SALES;
 const CHANNEL_LISTINGS = process.env.CHANNEL_LISTINGS;
 
+// Addresses which should be omitted entirely from event feeds.
+const BAN_ADDRESS_OSTremendousLogicalYak = "0x7058634bc1394af83aa0a3589d6b818e4c35295a";
+
 async function triageActivityMessage(msg, bot) {
   // Iterate through entire array of embeds, though there should only
   // ever be one at a time per message.
@@ -29,6 +32,12 @@ async function triageActivityMessage(msg, bot) {
 
     // Get current description.
     let description = embed.description;
+
+    // Return early if description includes bot-banned user.
+    if (description.includes(BAN_ADDRESS_OSTremendousLogicalYak)) {
+        console.log(`Skipping message propagation for ${BAN_ADDRESS_OSTremendousLogicalYak}`);
+        return;
+    }
 
     // Split off the "Description" text within the description.
     let descriptionDescriptionIndex = description.indexOf("\n**Description:**");
