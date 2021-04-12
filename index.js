@@ -53,6 +53,7 @@ const CHANNEL_APPARITIONS = process.env.CHANNEL_APPARITIONS;
 const CHANNEL_INSPIRALS = process.env.CHANNEL_INSPIRALS;
 const CHANNEL_AERIAL_VIEW = process.env.CHANNEL_AERIAL_VIEW;
 const CHANNEL_SYNAPSES = process.env.CHANNEL_SYNAPSES;
+const CHANNEL_ALGOBOTS = process.env.CHANNEL_ALGOBOTS;
 
 // Artist playground Discord channel IDs.
 const CHANNEL_PLAYGROUND_JEFFDAVIS = process.env.CHANNEL_PLAYGROUND_JEFFDAVIS;
@@ -229,6 +230,12 @@ let synapsesBot = new ProjectBot(
   V2_MINTING_CONTRACT_ADDRESS,
   700,
   "Synapses"
+);
+let algobotsBot = new ProjectBot(
+  40000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  500,
+  "Algobots"
 );
 
 // Artist playground project Discord channel message handlers.
@@ -434,8 +441,11 @@ bot.on("message", (msg) => {
       case CHANNEL_SYNAPSES:
         synapsesBot.handleNumberMessage(msg);
         break;
+      case CHANNEL_ALGOBOTS:
+        algobotsBot.handleNumberMessage(msg);
+        break;
 
-        // Artist playground channels.
+      // Artist playground channels.
       case CHANNEL_PLAYGROUND_JEFFDAVIS:
         if (msgContentLowercase.includes("color") &&
           msgContentLowercase.includes("study")) {
