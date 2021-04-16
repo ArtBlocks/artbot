@@ -9,6 +9,7 @@ const CHANNEL_TRADE_PLAYGROUND = process.env.CHANNEL_TRADE_PLAYGROUND;
 const CHANNEL_TRADE_FACTORY = process.env.CHANNEL_TRADE_FACTORY;
 const CHANNEL_SALES = process.env.CHANNEL_SALES;
 const CHANNEL_LISTINGS = process.env.CHANNEL_LISTINGS;
+const CHANNEL_SQUIGGLE_SALES = process.env.CHANNEL_SQUIGGLE_SALES;
 
 // Addresses which should be omitted entirely from event feeds.
 const BAN_ADDRESS_OSTremendousLogicalYak = "0x7058634bc1394af83aa0a3589d6b818e4c35295a";
@@ -86,6 +87,10 @@ async function triageActivityMessage(msg, bot) {
     // Forward sales events also to special sales channel.
     if (eventName.includes("Successful")) {
         bot.channels.cache.get(CHANNEL_SALES).send(embed);
+        // Forward all Chromie Squiggles sales on to the DAO.
+        if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
+            bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
+        }
     } else if (eventName.includes("Created")) {
         bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
     }
