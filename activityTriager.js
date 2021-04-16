@@ -12,7 +12,10 @@ const CHANNEL_LISTINGS = process.env.CHANNEL_LISTINGS;
 const CHANNEL_SQUIGGLE_SALES = process.env.CHANNEL_SQUIGGLE_SALES;
 
 // Addresses which should be omitted entirely from event feeds.
-const BAN_ADDRESS_OSTremendousLogicalYak = "0x7058634bc1394af83aa0a3589d6b818e4c35295a";
+const BAN_ADDRESSES = [
+    "0x7058634bc1394af83aa0a3589d6b818e4c35295a",
+    "0x8491fc2625aeece9abc897ef29544e825a72d66e"
+];
 
 async function triageActivityMessage(msg, bot) {
   // Iterate through entire array of embeds, though there should only
@@ -35,9 +38,12 @@ async function triageActivityMessage(msg, bot) {
     let description = embed.description;
 
     // Return early if description includes bot-banned user.
-    if (description.includes(BAN_ADDRESS_OSTremendousLogicalYak)) {
-        console.log(`Skipping message propagation for ${BAN_ADDRESS_OSTremendousLogicalYak}`);
-        return;
+    for (var i = BAN_ADDRESSES.length - 1; i >= 0; i--) {
+        const bannedAddress = BAN_ADDRESSES[i];
+        if (description.includes(bannedAddress)) {
+            console.log(`Skipping message propagation for ${bannedAddress}`);
+            return;
+        }
     }
 
     // Split off the "Description" text within the description.
