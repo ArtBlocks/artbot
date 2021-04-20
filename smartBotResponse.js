@@ -31,6 +31,15 @@ const SQUIGGLE_PAUSE_MESSAGE = new MessageEmbed()
   // Set the main content of the embed
   .setDescription(`It looks like you're wondering about why Chromie Squiggle minting is paused.The tl;dr is that all normal minting is over and the remaining Squiggles are reserved for special occasions!\n\nFor more details, check out the [#squiggle-announcements](https://discord.com/channels/411959613370400778/800461920008273962/800464186924466187) channel.`);
 
+// Custom message shown when someone asks about applications.
+const APPLICATIONS_MESSAGE = new MessageEmbed()
+  // Set the title of the field
+  .setTitle('How to I apply to release my project on Art Blocks?')
+  // Set the color of the embed
+  .setColor(ARTBOT_GREEN)
+  // Set the main content of the embed
+  .setDescription(`It looks like you're wondering about the Art Blocks application process.\n\nArtist applications are temporarily closed while we get caught up on the backlog. We to reopen them in the next month or so.\n\nIn the meantime, please visit [#tech-talk](https://discord.com/channels/411959613370400778/763407935127945226) for help on how to get started and feel free to share your progress in [#ab-only-project-share](https://discord.com/channels/411959613370400778/791072987268644894).`);
+
 // Custom message shown when someone asks about when the next drop is.
 const NEXT_DROP_MESSAGE = new MessageEmbed()
   // Set the title of the field
@@ -131,6 +140,11 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   let mentionedOpenSea = msgContentLowercase.includes("opensea");
   if (containsQuestion && mentionedOpenSea) {
     return OPENSEA_LINKS_MESSAGE;
+  }
+  // Handle application questions.
+  let mentionedApplications = msgContentLowercase.includes("application") || msgContentLowercase.includes("apply");
+  if (containsQuestion && mentionedApplications) {
+    return APPLICATIONS_MESSAGE;
   }
   // Handle project stats requests.
   let mentionedMetrics = msgContentLowercase.includes("metric");
