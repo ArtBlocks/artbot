@@ -75,7 +75,7 @@ const HELP_MESSAGE = new MessageEmbed()
   // Set the color of the embed
   .setColor(ARTBOT_GREEN)
   // Set the main content of the embed
-  .setDescription(`These are the things you can ask me:\n\n**squiggle paused?**: An explanation of why Chromie Squiggle minting is paused.\n**drop?**: Where to find information about the next drop.\n**playground?** (or **curated?** or **factory?**): Information about the different types of Art Blocks projects.\n**opensea?**: Links to the three different Art Blocks collections on OpenSea (Curated, Playground, and Factory).\n**metrics?**: The latest Art Blocks platform metrics.`);
+  .setDescription(`These are the things you can ask me:\n\n**squiggle paused?**: An explanation of why Chromie Squiggle minting is paused.\n**drop?**: Where to find information about the next drop.\n**playground?** (or **curated?** or **factory?**): Information about the different types of Art Blocks projects.\n**opensea?**: Links to the three different Art Blocks collections on OpenSea (Curated, Playground, and Factory).\n**metrics?**: The latest Art Blocks platform metrics.\n**applications?**: An explanation of the current state of the Art Blocks application process.`);
 
 // Returns a message for ArtBot to return when being smart, or null if
 // ArtBot has nothing to say.
