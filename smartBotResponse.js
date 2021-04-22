@@ -15,8 +15,8 @@ const CHANNEL_SQUIG = process.env.CHANNEL_SQUIG;
 const ARTBLOCKS_CURATED_ASSET = "https://api.opensea.io/api/v1/asset/0x059edd72cd353df5106d2b9cc5ab83a52287ac3a/0";
 // View Card #0
 const ARTBLOCKS_PLAYGROUND_ASSET = "https://api.opensea.io/api/v1/asset/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/6000000";
-// Variant Plan #0
-const ARTBLOCKS_FACTORY_ASSET = "https://api.opensea.io/api/v1/asset/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/5000000";
+// Light Beams #0
+const ARTBLOCKS_FACTORY_ASSET = "https://api.opensea.io/api/v1/asset/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/32000000";
 
 // ArtBot details..
 const ARTBOT_USERNAME = "artbot";
