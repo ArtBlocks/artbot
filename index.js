@@ -54,6 +54,8 @@ const CHANNEL_INSPIRALS = process.env.CHANNEL_INSPIRALS;
 const CHANNEL_AERIAL_VIEW = process.env.CHANNEL_AERIAL_VIEW;
 const CHANNEL_SYNAPSES = process.env.CHANNEL_SYNAPSES;
 const CHANNEL_ALGOBOTS = process.env.CHANNEL_ALGOBOTS;
+const CHANNEL_ELEMENTALS = process.env.CHANNEL_ELEMENTALS;
+const CHANNEL_SUBSCAPES = process.env.CHANNEL_SUBSCAPES;
 
 // Artist playground Discord channel IDs.
 const CHANNEL_PLAYGROUND_JEFFDAVIS = process.env.CHANNEL_PLAYGROUND_JEFFDAVIS;
@@ -236,6 +238,18 @@ let algobotsBot = new ProjectBot(
   V2_MINTING_CONTRACT_ADDRESS,
   500,
   "Algobots"
+);
+let elementalsBot = new ProjectBot(
+  41000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  600,
+  "Elementals"
+);
+let subscapesBot = new ProjectBot(
+  53000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  650,
+  "Subscapes"
 );
 
 // Artist playground project Discord channel message handlers.
@@ -443,6 +457,12 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_ALGOBOTS:
         algobotsBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_ELEMENTALS:
+        elementalsBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_SUBSCAPES:
+        subscapesBot.handleNumberMessage(msg);
         break;
 
       // Artist playground channels.
