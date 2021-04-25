@@ -51,6 +51,15 @@ async function triageActivityMessage(msg, bot) {
         }
     }
 
+    // Return early if event is a referral.
+    for (var i = embed.fields.length - 1; i >= 0; i--) {
+        const embedField = embed.fields[i];
+        if (embedField.name.includes("Referral Reward")) {
+            console.log(`Skipping message propagation for referral.`);
+            return;
+        }
+    }
+
     // Split off the "Description" text within the description.
     let descriptionDescriptionIndex = description.indexOf("\n**Description:**");
     description = description.substring(0, descriptionDescriptionIndex + 1);
