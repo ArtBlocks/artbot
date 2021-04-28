@@ -23,7 +23,6 @@ const apparitionSetsTransform = require("./apparitionHandler").apparitionSetsTra
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
 const SERVER = process.env.SERVER;
-const TIMER = process.env.TIMER;
 const PORT = process.env.PORT || 3000;
 
 // Trade activity Discord channel IDs.
@@ -32,42 +31,30 @@ const PROD_CHANNEL_ACTIVITY_ALL = process.env.PROD_CHANNEL_ACTIVITY_ALL;
 // Special Squiggle DAO honorary channel ID.
 const CHANNEL_SQUIGGLE_DAO_SQUIGGLE_SQUARE = process.env.CHANNEL_SQUIGGLE_DAO_SQUIGGLE_SQUARE;
 
-// Curated project Discord channel IDs.
-const CHANNEL_SING = process.env.CHANNEL_SING;
-const CHANNEL_IGNITION = process.env.CHANNEL_IGNITION;
-const CHANNEL_SQUIG = process.env.CHANNEL_SQUIG;
-const CHANNEL_RINGERS = process.env.CHANNEL_RINGERS;
-const CHANNEL_GENESIS = process.env.CHANNEL_GENESIS;
-const CHANNEL_CONSTRUCTION = process.env.CHANNEL_CONSTRUCTION;
-const CHANNEL_DYNAMIC_SLICES = process.env.CHANNEL_DYNAMIC_SLICES;
-const CHANNEL_DECONSTRUCTIONS = process.env.CHANNEL_DECONSTRUCTIONS;
-const CHANNEL_NIMBUDS = process.env.CHANNEL_NIMBUDS;
-const CHANNEL_HYPERHASH = process.env.CHANNEL_HYPERHASH;
-const CHANNEL_UNIGRIDS = process.env.CHANNEL_UNIGRIDS;
-const CHANNEL_27_BIT = process.env.CHANNEL_27_BIT;
-const CHANNEL_SPECTRON = process.env.CHANNEL_SPECTRON;
-const CHANNEL_CRYPTOBLOTS = process.env.CHANNEL_CRYPTOBLOTS;
-const CHANNEL_ARCHETYPE = process.env.CHANNEL_ARCHETYPE;
-const CHANNEL_720_MINUTES = process.env.CHANNEL_720_MINUTES;
-const CHANNEL_APPARITIONS = process.env.CHANNEL_APPARITIONS;
-const CHANNEL_INSPIRALS = process.env.CHANNEL_INSPIRALS;
-const CHANNEL_AERIAL_VIEW = process.env.CHANNEL_AERIAL_VIEW;
-const CHANNEL_SYNAPSES = process.env.CHANNEL_SYNAPSES;
-const CHANNEL_ALGOBOTS = process.env.CHANNEL_ALGOBOTS;
-const CHANNEL_ELEMENTALS = process.env.CHANNEL_ELEMENTALS;
-const CHANNEL_SUBSCAPES = process.env.CHANNEL_SUBSCAPES;
-
-// Artist playground Discord channel IDs.
-const CHANNEL_PLAYGROUND_JEFFDAVIS = process.env.CHANNEL_PLAYGROUND_JEFFDAVIS;
-const CHANNEL_PLAYGROUND_DANDAN = process.env.CHANNEL_PLAYGROUND_DANDAN;
-const CHANNEL_PLAYGROUND_PXLQ = process.env.CHANNEL_PLAYGROUND_PXLQ;
-const CHANNEL_PLAYGROUND_DMITRICHERNIAK = process.env.CHANNEL_PLAYGROUND_DMITRICHERNIAK;
-const CHANNEL_PLAYGROUND_GE1DOOT = process.env.CHANNEL_PLAYGROUND_GE1DOOT;
-const CHANNEL_PLAYGROUND_KAI = process.env.CHANNEL_PLAYGROUND_KAI;
-const CHANNEL_PLAYGROUND_BEERVANGEER = process.env.CHANNEL_PLAYGROUND_BEERVANGEER;
-const CHANNEL_PLAYGROUND_LUXPRIS = process.env.CHANNEL_PLAYGROUND_LUXPRIS;
-const CHANNEL_PLAYGROUND_GOLID = process.env.CHANNEL_PLAYGROUND_GOLID;
-const CHANNEL_PLAYGROUND_ALEXIS_ANDRE = process.env.CHANNEL_PLAYGROUND_ALEXIS_ANDRE;
+// Curated artist Discord channel IDs.
+const CHANNEL_AARON_PENNE = process.env.CHANNEL_AARON_PENNE;
+const CHANNEL_ALEXIS_ANDRE = process.env.CHANNEL_ALEXIS_ANDRE;
+const CHANNEL_BEERVANGEER = process.env.CHANNEL_BEERVANGEER;
+const CHANNEL_BRYAN_BRINKMAN = process.env.CHANNEL_BRYAN_BRINKMAN;
+const CHANNEL_CHAOSCONSTRUCT = process.env.CHANNEL_CHAOSCONSTRUCT;
+const CHANNEL_DAIM = process.env.CHANNEL_DAIM;
+const CHANNEL_DALENZ = process.env.CHANNEL_DALENZ;
+const CHANNEL_DANDAN = process.env.CHANNEL_DANDAN;
+const CHANNEL_DMITRI_CHERNIAK = process.env.CHANNEL_DMITRI_CHERNIAK;
+const CHANNEL_GE1DOOT = process.env.CHANNEL_GE1DOOT;
+const CHANNEL_HIDEKI = process.env.CHANNEL_HIDEKI;
+const CHANNEL_JEFF_DAVIS = process.env.CHANNEL_JEFF_DAVIS;
+const CHANNEL_KAI = process.env.CHANNEL_KAI;
+const CHANNEL_GOLID = process.env.CHANNEL_GOLID;
+const CHANNEL_LUXPRIS = process.env.CHANNEL_LUXPRIS;
+const CHANNEL_MATT_DESL = process.env.CHANNEL_MATT_DESL;
+const CHANNEL_MICHAEL_CONNOLLY = process.env.CHANNEL_MICHAEL_CONNOLLY;
+const CHANNEL_PXLQ = process.env.CHANNEL_PXLQ;
+const CHANNEL_RADIX = process.env.CHANNEL_RADIX;
+const CHANNEL_SIMON_DE_MAI = process.env.CHANNEL_SIMON_DE_MAI;
+const CHANNEL_SNOWFRO = process.env.CHANNEL_SNOWFRO;
+const CHANNEL_STINA_JONES = process.env.CHANNEL_STINA_JONES;
+const CHANNEL_ZEBLOCKS = process.env.CHANNEL_ZEBLOCKS;
 
 // Special address collection channel.
 const CHANNEL_ADDRESS_COLLECTION = process.env.CHANNEL_ADDRESS_COLLECTION;
@@ -376,64 +363,119 @@ bot.on("message", (msg) => {
   if (msgContent.startsWith("#")) {
     switch (channelID) {
       // Curated project channels.
-      case CHANNEL_SING:
+      case CHANNEL_HIDEKI:
         singularityBot.handleNumberMessage(msg);
         break;
-      case CHANNEL_IGNITION:
-        ignitionBot.handleNumberMessage(msg);
+      case CHANNEL_GE1DOOT:
+        if (msgContentLowercase.includes("utopia")) {
+          utopiaBot.handleNumberMessage(msg);
+        } else if (msgContentLowercase.includes("r3")) {
+          r3sonanceBot.handleNumberMessage(msg);
+        } else {
+          ignitionBot.handleNumberMessage(msg);
+        }
         break;
-      case CHANNEL_SQUIG:
+      case CHANNEL_SNOWFRO:
       case CHANNEL_SQUIGGLE_DAO_SQUIGGLE_SQUARE:
         squiggleBot.handleNumberMessage(msg);
         break;
-      case CHANNEL_RINGERS:
-        let ringerSinglesTransformedValue = ringerSinglesTransform(msg.content);
-        let ringerSetsTransformedValue = ringerSetsTransform(msg.content);
-        if (ringerSinglesTransformedValue !== null) {
-          msg.content = ringerSinglesTransformedValue;
-        } else
-        if (ringerSetsTransformedValue !== null) {
-          msg.content = ringerSetsTransformedValue;
+      case CHANNEL_DMITRI_CHERNIAK:
+        if (msgContentLowercase.includes("eternal") &&
+          msgContentLowercase.includes("pump")) {
+          eternalPumpBot.handleNumberMessage(msg);
+        } else {
+          let ringerSinglesTransformedValue = ringerSinglesTransform(msg.content);
+          let ringerSetsTransformedValue = ringerSetsTransform(msg.content);
+          if (ringerSinglesTransformedValue !== null) {
+            msg.content = ringerSinglesTransformedValue;
+          } else
+          if (ringerSetsTransformedValue !== null) {
+            msg.content = ringerSetsTransformedValue;
+          }
+          ringersBot.handleNumberMessage(msg);
         }
-        ringersBot.handleNumberMessage(msg);
         break;
-      case CHANNEL_GENESIS:
-        genesisBot.handleNumberMessage(msg);
+      case CHANNEL_DANDAN:
+        if (msgContentLowercase.includes("gen2") ||
+          msgContentLowercase.includes("gen 2")) {
+          gen2Bot.handleNumberMessage(msg);
+        } else {
+          genesisBot.handleNumberMessage(msg);
+        }
         break;
-      case CHANNEL_CONSTRUCTION:
-        constructionBot.handleNumberMessage(msg);
+      case CHANNEL_JEFF_DAVIS:
+        if (msgContentLowercase.includes("color") &&
+          msgContentLowercase.includes("study")) {
+          colorStudyBot.handleNumberMessage(msg);
+        } else if (msgContentLowercase.includes("view") &&
+          msgContentLowercase.includes("card")) {
+          viewCardBot.handleNumberMessage(msg);
+        } else {
+          constructionBot.handleNumberMessage(msg);
+        }
         break;
-      case CHANNEL_DYNAMIC_SLICES:
-        dynamicSlicesBot.handleNumberMessage(msg);
+      case CHANNEL_PXLQ:
+        if (msgContentLowercase.includes("cyber") &&
+          msgContentLowercase.includes("cities")) {
+          cyberCitiesBot.handleNumberMessage(msg);
+        } else if (msgContentLowercase.includes("sentience")) {
+          sentienceBot.handleNumberMessage(msg);
+        } else if (msgContentLowercase.includes("hieroglyphs")) {
+          hieroglyphsBot.handleNumberMessage(msg);
+        } else {
+          dynamicSlicesBot.handleNumberMessage(msg);
+        }
         break;
-      case CHANNEL_DECONSTRUCTIONS:
-        deconstructionsBot.handleNumberMessage(msg);
+      case CHANNEL_LUXPRIS:
+        if (msgContentLowercase.includes("pathfinder")) {
+          pathfindersBot.handleNumberMessage(msg);
+        } else {
+          deconstructionsBot.handleNumberMessage(msg);
+        }
         break;
-      case CHANNEL_NIMBUDS:
+      case CHANNEL_BRYAN_BRINKMAN:
         nimbudsBot.handleNumberMessage(msg);
         break;
-      case CHANNEL_HYPERHASH:
-        hyperhashBot.handleNumberMessage(msg);
+      case CHANNEL_BEERVANGEER:
+        if (msgContentLowercase.includes("energy") &&
+          msgContentLowercase.includes("sculpture")) {
+          energySculptureBot.handleNumberMessage(msg);
+        } else {
+          hyperhashBot.handleNumberMessage(msg);
+        }
         break;
-      case CHANNEL_UNIGRIDS:
+      case CHANNEL_ZEBLOCKS:
         unigridsBot.handleNumberMessage(msg);
         break;
-      case CHANNEL_27_BIT:
-        bitBot.handleNumberMessage(msg);
+      case CHANNEL_KAI:
+        if (msgContentLowercase.includes("pixel") &&
+          msgContentLowercase.includes("glass")) {
+          pixelGlassBot.handleNumberMessage(msg);
+        } else {
+          bitBot.handleNumberMessage(msg);
+        }
         break;
-      case CHANNEL_SPECTRON:
+      case CHANNEL_SIMON_DE_MAI:
         spectronBot.handleNumberMessage(msg);
         break;
-      case CHANNEL_CRYPTOBLOTS:
+      case CHANNEL_DAIM:
         cryptoblotBot.handleNumberMessage(msg);
         break;
-      case CHANNEL_ARCHETYPE:
-        archetypeBot.handleNumberMessage(msg);
+      case CHANNEL_GOLID:
+        if (msgContentLowercase.includes("armada")) {
+          paperArmadaBot.handleNumberMessage(msg);
+        } else {
+          archetypeBot.handleNumberMessage(msg);
+        }
         break;
-      case CHANNEL_720_MINUTES:
-        minutesBot.handleNumberMessage(msg);
+      case CHANNEL_ALEXIS_ANDRE:
+        if (msgContentLowercase.includes("void")) {
+          voidBot.handleNumberMessage(msg);
+        } else {
+          minutesBot.handleNumberMessage(msg);
+        }
         break;
-      case CHANNEL_APPARITIONS:
+      case CHANNEL_AARON_PENNE:
         let apparitionSinglesTransformedValue =
           apparitionSinglesTransform(msg.content);
         let apparitionSetsTransformedValue =
@@ -446,90 +488,23 @@ bot.on("message", (msg) => {
         }
         apparitionsBot.handleNumberMessage(msg);
         break;
-      case CHANNEL_INSPIRALS:
+      case CHANNEL_RADIX:
         inspiralsBot.handleNumberMessage(msg);
         break;
-      case CHANNEL_AERIAL_VIEW:
+      case CHANNEL_DALENZ:
         aerialViewBot.handleNumberMessage(msg);
         break;
-      case CHANNEL_SYNAPSES:
+      case CHANNEL_CHAOSCONSTRUCT:
         synapsesBot.handleNumberMessage(msg);
         break;
-      case CHANNEL_ALGOBOTS:
+      case CHANNEL_STINA_JONES:
         algobotsBot.handleNumberMessage(msg);
         break;
-      case CHANNEL_ELEMENTALS:
+      case CHANNEL_MICHAEL_CONNOLLY:
         elementalsBot.handleNumberMessage(msg);
         break;
-      case CHANNEL_SUBSCAPES:
+      case CHANNEL_MATT_DESL:
         subscapesBot.handleNumberMessage(msg);
-        break;
-
-      // Artist playground channels.
-      case CHANNEL_PLAYGROUND_JEFFDAVIS:
-        if (msgContentLowercase.includes("color") &&
-          msgContentLowercase.includes("study")) {
-          colorStudyBot.handleNumberMessage(msg);
-        } else if (msgContentLowercase.includes("view") &&
-          msgContentLowercase.includes("card")) {
-          viewCardBot.handleNumberMessage(msg);
-        }
-        break;
-      case CHANNEL_PLAYGROUND_DANDAN:
-        if (msgContentLowercase.includes("gen2") ||
-          msgContentLowercase.includes("gen 2")) {
-          gen2Bot.handleNumberMessage(msg);
-        }
-        break;
-      case CHANNEL_PLAYGROUND_PXLQ:
-        if (msgContentLowercase.includes("cyber") &&
-          msgContentLowercase.includes("cities")) {
-          cyberCitiesBot.handleNumberMessage(msg);
-        } else if (msgContentLowercase.includes("sentience")) {
-          sentienceBot.handleNumberMessage(msg);
-        } else if (msgContentLowercase.includes("hieroglyphs")) {
-          hieroglyphsBot.handleNumberMessage(msg);
-        }
-        break;
-      case CHANNEL_PLAYGROUND_DMITRICHERNIAK:
-        if (msgContentLowercase.includes("eternal") &&
-          msgContentLowercase.includes("pump")) {
-          eternalPumpBot.handleNumberMessage(msg);
-        }
-        break;
-      case CHANNEL_PLAYGROUND_GE1DOOT:
-        if (msgContentLowercase.includes("utopia")) {
-          utopiaBot.handleNumberMessage(msg);
-        } else if (msgContentLowercase.includes("r3")) {
-          r3sonanceBot.handleNumberMessage(msg);
-        }
-        break;
-      case CHANNEL_PLAYGROUND_KAI:
-        if (msgContentLowercase.includes("pixel") &&
-          msgContentLowercase.includes("glass")) {
-          pixelGlassBot.handleNumberMessage(msg);
-        }
-        break;
-      case CHANNEL_PLAYGROUND_BEERVANGEER:
-        if (msgContentLowercase.includes("energy") &&
-          msgContentLowercase.includes("sculpture")) {
-          energySculptureBot.handleNumberMessage(msg);
-        }
-        break;
-      case CHANNEL_PLAYGROUND_LUXPRIS:
-        if (msgContentLowercase.includes("pathfinder")) {
-          pathfindersBot.handleNumberMessage(msg);
-        }
-        break;
-      case CHANNEL_PLAYGROUND_GOLID:
-        if (msgContentLowercase.includes("armada")) {
-          paperArmadaBot.handleNumberMessage(msg);
-        }
-        break;
-      case CHANNEL_PLAYGROUND_ALEXIS_ANDRE:
-        if (msgContentLowercase.includes("void")) {
-          voidBot.handleNumberMessage(msg);
-        }
         break;
 
       // Fall-back (should never occur).

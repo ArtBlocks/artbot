@@ -7,7 +7,7 @@ const fetch = require("node-fetch");
 // Discord channel IDs.
 const CHANNEL_GENERAL = process.env.CHANNEL_GENERAL;
 const CHANNEL_HELP = process.env.CHANNEL_HELP;
-const CHANNEL_SQUIG = process.env.CHANNEL_SQUIG;
+const CHANNEL_SNOWFRO = process.env.CHANNEL_SNOWFRO;
 
 // Specific OpenSea assets for fetching project stats for "ArtBlocks Curated"
 // and "Artist Playground".
@@ -103,7 +103,7 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   let containsQuestion = msgContentLowercase.includes("?");
 
   // Handle questions about the mint pausing for Chromie Squiggles.
-  let inSquiggleChannel = (channelID == CHANNEL_SQUIG);
+  let inSnowfroChannel = (channelID == CHANNEL_SNOWFRO);
   // Both "pause" and "stopped" are keywords.
   let mentionsPause = msgContentLowercase.includes("pause") ||
     msgContentLowercase.includes("stopped");
@@ -113,7 +113,7 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
     msgContentLowercase.includes("squigle") ||
     msgContentLowercase.includes("squigglle") ||
     msgContentLowercase.includes("squiglle");
-  let squiggleChannelPauseMentioned = mentionsPause && inSquiggleChannel;
+  let squiggleChannelPauseMentioned = mentionsPause && inSnowfroChannel;
   let artbotOrHelpChannelSquigglePauseMentioned =
     mentionsPause &&
     messageMentionsSquiggle &&
