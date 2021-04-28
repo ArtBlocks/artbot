@@ -55,7 +55,7 @@ class AddressCollector {
     // However, the added complexity of implementing this as a hashmap is
     // likely not worth the added complexity if the the total number of
     // Discord lookup members is on the order of thousands.
-    this.discordLookup = fs.readFileSync(`./${DISCORD_ADDRESSBOOK}.csv`)
+    this.discordLookup = fs.readFileSync(`./Classes/${DISCORD_ADDRESSBOOK}.csv`)
     .toString() // Convert file buffer to string.
     .split('\n') // Split into array based on newlines.
     .map(line => line.trim()); // Remove any extra whitespace.

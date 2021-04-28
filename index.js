@@ -6,19 +6,18 @@ const {
 const express = require("express");
 const bodyParser = require("body-parser");
 
-const AddressCollector = require("./AddressCollector").AddressCollector;
-const OSTradeListener = require("./OSTradeListener").OSTradeListener;
-const ProjectBot = require("./ProjectBot").ProjectBot;
+const AddressCollector = require("./Classes/AddressCollector").AddressCollector;
+const ProjectBot = require("./Classes/ProjectBot").ProjectBot;
 
 // Special handlers.
-const triageActivityMessage = require("./activityTriager").triageActivityMessage;
-const smartBotResponse = require("./smartBotResponse").smartBotResponse;
+const triageActivityMessage = require("./Utils/activityTriager").triageActivityMessage;
+const smartBotResponse = require("./Utils/smartBotResponse").smartBotResponse;
 
 // Per-channel handlers.
-const ringerSinglesTransform = require("./ringerHandler").ringerSinglesTransform;
-const ringerSetsTransform = require("./ringerHandler").ringerSetsTransform;
-const apparitionSinglesTransform = require("./apparitionHandler").apparitionSinglesTransform;
-const apparitionSetsTransform = require("./apparitionHandler").apparitionSetsTransform;
+const ringerSinglesTransform = require("./ProjectHandlerHelpers/ringerHandler").ringerSinglesTransform;
+const ringerSetsTransform = require("./ProjectHandlerHelpers/ringerHandler").ringerSetsTransform;
+const apparitionSinglesTransform = require("./ProjectHandlerHelpers/apparitionHandler").apparitionSinglesTransform;
+const apparitionSetsTransform = require("./ProjectHandlerHelpers/apparitionHandler").apparitionSetsTransform;
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
