@@ -379,7 +379,7 @@ bot.on("message", (msg) => {
         squiggleBot.handleNumberMessage(msg);
         break;
       case CHANNEL_DMITRI_CHERNIAK:
-        if (msgContentLowercase.includes("eternal") &&
+        if (msgContentLowercase.includes("eternal") ||
           msgContentLowercase.includes("pump")) {
           eternalPumpBot.handleNumberMessage(msg);
         } else {
