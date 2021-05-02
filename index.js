@@ -238,7 +238,6 @@ let subscapesBot = new ProjectBot(
   650,
   "Subscapes"
 );
-
 let numbersInMotionBot = new ProjectBot(
   59000000,
   V2_MINTING_CONTRACT_ADDRESS,
