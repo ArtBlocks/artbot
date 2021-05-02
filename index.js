@@ -48,6 +48,7 @@ const CHANNEL_GOLID = process.env.CHANNEL_GOLID;
 const CHANNEL_LUXPRIS = process.env.CHANNEL_LUXPRIS;
 const CHANNEL_MATT_DESL = process.env.CHANNEL_MATT_DESL;
 const CHANNEL_MICHAEL_CONNOLLY = process.env.CHANNEL_MICHAEL_CONNOLLY;
+const CHANNEL_NUMBERSINMOTION = process.env.CHANNEL_NUMBERSINMOTION;
 const CHANNEL_PXLQ = process.env.CHANNEL_PXLQ;
 const CHANNEL_RADIX = process.env.CHANNEL_RADIX;
 const CHANNEL_SIMON_DE_MAI = process.env.CHANNEL_SIMON_DE_MAI;
@@ -236,6 +237,13 @@ let subscapesBot = new ProjectBot(
   V2_MINTING_CONTRACT_ADDRESS,
   650,
   "Subscapes"
+);
+
+let numbersInMotionBot = new ProjectBot(
+  59000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  600,
+  "Watercolor Dreams"
 );
 
 // Artist playground project Discord channel message handlers.
@@ -504,6 +512,9 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_MATT_DESL:
         subscapesBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_NUMBERSINMOTION:
+        numbersInMotionBot.handleNumberMessage(msg);
         break;
 
       // Fall-back (should never occur).
