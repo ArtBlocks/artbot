@@ -8,16 +8,17 @@ async function handleGiveawayMessage(msg, bot) {
     const ms = require('ms'); // npm install ms
     const args = msg.content.slice('giveaway!'.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
-    console.log(args);
 
     // giveaway!start 2d 1 Awesome prize!
     // Will create a giveaway with a duration of two days, with one winner and the prize will be "Awesome prize!"
     
 
-        // If the member doesn't have enough permissions
- /*       if(!msg.member.hasPermission('MANAGE_MESSAGES') && !msg.member.roles.cache.some((r) => r.name === "Giveaways")){
-            return msg.channel.send(':x: You need to have the manage messages permissions to start giveaways.');
-        }*/
+    // If this is a valid command, and the member doesn't have enough permissions, return an error
+    if ((command === "start") || (command === "reroll") || (command === "end")) {
+        if(!msg.member.hasPermission('MANAGE_MESSAGES') && !msg.member.roles.cache.some((r) => r.name === "giveaway master")){
+            return msg.channel.send(':x: You need to have the right permissions to start giveaways.');
+        }
+    }
 
     if (command === "start") {
 
@@ -25,7 +26,6 @@ async function handleGiveawayMessage(msg, bot) {
         let giveawayDuration = args[0];
         // If the duration isn't valid
         if(!giveawayDuration || isNaN(ms(giveawayDuration))){
-            console.log(giveawayDuration);
             return msg.channel.send(':x: You have to specify a valid duration!');
         }
 
