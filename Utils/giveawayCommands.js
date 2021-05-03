@@ -46,7 +46,12 @@ async function handleGiveawayMessage(msg, bot) {
         bot.giveawaysManager.start(msg.channel, {
             time: ms(giveawayDuration),
             winnerCount: parseInt(giveawayNumberWinners),
-            prize: giveawayPrize
+            prize: giveawayPrize,
+            messages: {
+                giveaway:  "\n🎉🎉 **GIVEAWAY** 🎉🎉",
+                giveawayEnded:  "\n🎉🎉 **GIVEAWAY ENDED** 🎉🎉",
+                embedFooter: ""
+            }
         }).then((gData) => {
             console.log(gData); // {...} (messageID, end date and more)
         });
