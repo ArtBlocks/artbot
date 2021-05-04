@@ -83,14 +83,14 @@ async function handleGiveawayMessage(msg, bot) {
         // Success message
         .then(() => {
                 // Success message
-                msg.channel.send('Giveaway will end in less than '+(client.giveawaysManager.options.updateCountdownEvery/1000)+' seconds...');
+                msg.channel.send('Giveaway will end in less than '+(bot.giveawaysManager.options.updateCountdownEvery/1000)+' seconds...');
         })
         .catch((e) => {
-                if(e.startsWith(`Giveaway with message ID ${giveaway.messageID} is already ended.`)){
-                msg.channel.send('This giveaway is already ended!');
+                if(e.toString().startsWith(`Giveaway with message ID ${giveaway.messageID} is already ended.`)){
+                    msg.channel.send('This giveaway is already ended!');
                 } else {
-                console.error(e);
-                msg.channel.send('An error occured...');
+                    console.error(e);
+                    msg.channel.send('An error occured...');
                 }
         });
     }
