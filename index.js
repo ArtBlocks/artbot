@@ -95,6 +95,12 @@ app.listen(PORT, function() {
 // Bot setup.
 const bot = new Client();
 
+bot.login(TOKEN);
+
+bot.on("ready", () => {
+  console.info(`Logged in as ${bot.user.tag}!`);
+});
+
 
 //Manage Giveaways with Artbot
 bot.giveawaysManager = new GiveawaysManager(bot, {
@@ -115,13 +121,6 @@ bot.giveawaysManager.on("giveawayReactionRemoved", (giveaway, member, reaction) 
 });
 bot.giveawaysManager.on("giveawayEnded", (giveaway, winners) => {
     console.log(`Giveaway #${giveaway.messageID} ended! Winners: ${winners.map((member) => member.user.username).join(', ')}`);
-});
-
-
-bot.login(TOKEN);
-
-bot.on("ready", () => {
-  console.info(`Logged in as ${bot.user.tag}!`);
 });
 
 // Curated project Discord channel message handlers.
