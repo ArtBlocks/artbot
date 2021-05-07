@@ -133,17 +133,11 @@ async function handleGiveawayMessage(msg, bot) {
 
     if (command === "start") {
         return handleGiveawayStart(msg, bot, args);
-    }
-
-    if (command === "end") {
+    } else if (command === "end") {
         return handleGiveawayEnd(msg, bot, args);
-    }
-
-    if (command === "reroll") {
+    } else if (command === "reroll") {
         return handleGiveawayReroll(msg, bot, args);
-    }
-   
-    if (command === "help") {
+    } else if (command === "help") {
         return msg.channel.send("Giveaway Usage:  giveaway![start|end|reroll] <time> <winner_count> <prize>");
     }
 }
