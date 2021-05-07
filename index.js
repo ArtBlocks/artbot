@@ -297,6 +297,13 @@ let colorStudyBot = new ProjectBot(
   2000,
   "Color Study"
 );
+let rhythmBot = new ProjectBot(
+  57000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  400,
+  "Rhythm"
+);
+  
 // #dandan projects
 let gen2Bot = new ProjectBot(
   18000000,
@@ -455,7 +462,9 @@ bot.on("message", (msg) => {
         }
         break;
       case CHANNEL_JEFF_DAVIS:
-        if (msgContentLowercase.includes("color") &&
+        if (msgContentLowercase.includes("rhythm")) {
+          rhythmBot.handleNumberMessage(msg);
+        } else if (msgContentLowercase.includes("color") &&
           msgContentLowercase.includes("study")) {
           colorStudyBot.handleNumberMessage(msg);
         } else if (msgContentLowercase.includes("view") &&
