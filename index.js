@@ -3,6 +3,7 @@ const {
   Client,
   MessageEmbed
 } = require("discord.js");
+const { GiveawaysManager } = require('discord-giveaways');
 const express = require("express");
 const bodyParser = require("body-parser");
 
@@ -12,7 +13,7 @@ const ProjectBot = require("./Classes/ProjectBot").ProjectBot;
 // Special handlers.
 const triageActivityMessage = require("./Utils/activityTriager").triageActivityMessage;
 const smartBotResponse = require("./Utils/smartBotResponse").smartBotResponse;
-
+const handleGiveawayMessage = require("./Utils/giveawayCommands").handleGiveawayMessage;
 // Per-channel handlers.
 const ringerSinglesTransform = require("./ProjectHandlerHelpers/ringerHandler").ringerSinglesTransform;
 const ringerSetsTransform = require("./ProjectHandlerHelpers/ringerHandler").ringerSetsTransform;
@@ -55,6 +56,7 @@ const CHANNEL_SIMON_DE_MAI = process.env.CHANNEL_SIMON_DE_MAI;
 const CHANNEL_SNOWFRO = process.env.CHANNEL_SNOWFRO;
 const CHANNEL_STINA_JONES = process.env.CHANNEL_STINA_JONES;
 const CHANNEL_ZEBLOCKS = process.env.CHANNEL_ZEBLOCKS;
+const CHANNEL_MINTS = process.env.CHANNEL_MINTS;
 
 // Special address collection channel.
 const CHANNEL_ADDRESS_COLLECTION = process.env.CHANNEL_ADDRESS_COLLECTION;
@@ -99,6 +101,28 @@ bot.on("ready", () => {
   console.info(`Logged in as ${bot.user.tag}!`);
 });
 
+
+//Manage Giveaways with Artbot
+bot.giveawaysManager = new GiveawaysManager(bot, {
+    storage: "./giveaways.json",
+    updateCountdownEvery: 5000,
+    default: {
+        botsCanWin: false,
+        embedColor: "#FF0000",
+        reaction: "🎉"
+    }
+});
+
+bot.giveawaysManager.on("giveawayReactionAdded", (giveaway, member, reaction) => {
+    console.log(`${member.user.tag} entered giveaway #${giveaway.messageID} (${reaction.emoji.name})`);
+});
+bot.giveawaysManager.on("giveawayReactionRemoved", (giveaway, member, reaction) => {
+    console.log(`${member.user.tag} unreact to giveaway #${giveaway.messageID} (${reaction.emoji.name})`);
+});
+bot.giveawaysManager.on("giveawayEnded", (giveaway, winners) => {
+    console.log(`Giveaway #${giveaway.messageID} ended! Winners: ${winners.map((member) => member.user.username).join(', ')}`);
+});
+
 // Curated project Discord channel message handlers.
 let singularityBot = new ProjectBot(
   8000000,
@@ -109,6 +133,7 @@ let singularityBot = new ProjectBot(
 let ignitionBot = new ProjectBot(
   9000000,
   V2_MINTING_CONTRACT_ADDRESS,
+
   512,
   "Ignition"
 );
@@ -363,6 +388,13 @@ bot.on("message", (msg) => {
   if (channelID == CHANNEL_ADDRESS_COLLECTION) {
     addressCollector.addressCollectionHandler(msg);
     return;
+  }
+
+  if (channelID == CHANNEL_MINTS) {
+    if (msgContentLowercase.includes("giveaway!")) {
+      console.log("Time for a giveaway");
+      handleGiveawayMessage(msg, bot);
+    }
   }
 
   // Handle piece # requests.
