@@ -45,7 +45,7 @@ async function handleGiveawayStart(msg, bot, args) {
 
 function findGiveaway(bot, args) {
 
-    let result =   
+    let result =
             // Search with giveaway prize
             bot.giveawaysManager.giveaways.find((g) => g.prize === args.join(' ')) ||
             // Search with giveaway ID
@@ -60,7 +60,7 @@ async function handleGiveawayEnd(msg, bot, args) {
     if(!args[0]){
         return msg.channel.send(':x: You have to specify a valid message ID!');
     }
- 
+
     // Find the specified giveaway
     let giveaway = findGiveaway(bot, args);
     if(!giveaway){
@@ -126,7 +126,7 @@ async function handleGiveawayMessage(msg, bot) {
 
     // If this is a valid command, and the member doesn't have enough permissions, return an error
     if ((command === "start") || (command === "reroll") || (command === "end")) {
-        if(!msg.member.hasPermission('MANAGE_MESSAGES') && !msg.member.roles.cache.some((r) => r.name === "giveaway master")){
+        if(!msg.member.hasPermission('MANAGE_MESSAGES') && !msg.member.roles.cache.some((r) => r.name.toLowerCase() === "giveaway master")){
             return msg.channel.send(':x: You need to have the right permissions to start giveaways.');
         }
     }
