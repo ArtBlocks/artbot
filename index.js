@@ -276,12 +276,6 @@ let bubbleBlobbyBot = new ProjectBot(
   500,
   "Bubble Blobby"
 );
-let lightBeamsBot = new ProjectBot(
-  32000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  150,
-  "Light Beams"
-);
 
 // Artist playground project Discord channel message handlers.
 // #jeff-davis projects
@@ -303,7 +297,7 @@ let rhythmBot = new ProjectBot(
   400,
   "Rhythm"
 );
-  
+
 // #dandan projects
 let gen2Bot = new ProjectBot(
   18000000,
@@ -570,13 +564,8 @@ bot.on("message", (msg) => {
         numbersInMotionBot.handleNumberMessage(msg);
         break;
       case CHANNEL_JASON_TING:
-        if (msgContentLowercase.includes("light") ||
-            msgContentLowercase.includes("beam")) {
-            lightBeamsBot.handleNumberMessage(msg); 
-        } else {
-            bubbleBlobbyBot.handleNumberMessage(msg);
-        }
-        break;       
+        bubbleBlobbyBot.handleNumberMessage(msg);
+        break;
 
       // Fall-back (should never occur).
       default:
