@@ -43,6 +43,7 @@ const CHANNEL_DANDAN = process.env.CHANNEL_DANDAN;
 const CHANNEL_DMITRI_CHERNIAK = process.env.CHANNEL_DMITRI_CHERNIAK;
 const CHANNEL_GE1DOOT = process.env.CHANNEL_GE1DOOT;
 const CHANNEL_HIDEKI = process.env.CHANNEL_HIDEKI;
+const CHANNEL_JASON_TING = process.env.CHANNEL_JASON_TING;
 const CHANNEL_JEFF_DAVIS = process.env.CHANNEL_JEFF_DAVIS;
 const CHANNEL_KAI = process.env.CHANNEL_KAI;
 const CHANNEL_GOLID = process.env.CHANNEL_GOLID;
@@ -269,6 +270,18 @@ let numbersInMotionBot = new ProjectBot(
   600,
   "Watercolor Dreams"
 );
+let bubbleBlobbyBot = new ProjectBot(
+  62000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  500,
+  "Bubble Blobby"
+);
+let lightBeamsBot = new ProjectBot(
+  32000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  150,
+  "Light Beams"
+);
 
 // Artist playground project Discord channel message handlers.
 // #jeff-davis projects
@@ -284,6 +297,13 @@ let colorStudyBot = new ProjectBot(
   2000,
   "Color Study"
 );
+let rhythmBot = new ProjectBot(
+  57000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  400,
+  "Rhythm"
+);
+  
 // #dandan projects
 let gen2Bot = new ProjectBot(
   18000000,
@@ -442,7 +462,9 @@ bot.on("message", (msg) => {
         }
         break;
       case CHANNEL_JEFF_DAVIS:
-        if (msgContentLowercase.includes("color") &&
+        if (msgContentLowercase.includes("rhythm")) {
+          rhythmBot.handleNumberMessage(msg);
+        } else if (msgContentLowercase.includes("color") &&
           msgContentLowercase.includes("study")) {
           colorStudyBot.handleNumberMessage(msg);
         } else if (msgContentLowercase.includes("view") &&
@@ -547,6 +569,14 @@ bot.on("message", (msg) => {
       case CHANNEL_NUMBERSINMOTION:
         numbersInMotionBot.handleNumberMessage(msg);
         break;
+      case CHANNEL_JASON_TING:
+        if (msgContentLowercase.includes("light") ||
+            msgContentLowercase.includes("beam")) {
+            lightBeamsBot.handleNumberMessage(msg); 
+        } else {
+            bubbleBlobbyBot.handleNumberMessage(msg);
+        }
+        break;       
 
       // Fall-back (should never occur).
       default:
