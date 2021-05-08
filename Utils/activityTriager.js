@@ -4,9 +4,6 @@ const {
 const fetch = require("node-fetch");
 
 // Trade activity Discord channel IDs.
-const CHANNEL_TRADE = process.env.CHANNEL_TRADE;
-const CHANNEL_TRADE_PLAYGROUND = process.env.CHANNEL_TRADE_PLAYGROUND;
-const CHANNEL_TRADE_FACTORY = process.env.CHANNEL_TRADE_FACTORY;
 const CHANNEL_SALES = process.env.CHANNEL_SALES;
 const CHANNEL_LISTINGS = process.env.CHANNEL_LISTINGS;
 const CHANNEL_SQUIGGLE_SALES = process.env.CHANNEL_SQUIGGLE_SALES;
@@ -88,23 +85,7 @@ async function triageActivityMessage(msg, bot) {
     embed.setTitle(`${eventName}: ${artBlocksData.name}`);
     embed.setURL(authorURL);
 
-    // Determine channel from the curation status of the piece.
-    // Fall-back to factory as the default (so that no messages accidentally
-    // get dropped).
-    let curationStatus = artBlocksData.curation_status;
-    var tradeChannel;
-    if (curationStatus == "curated") {
-      tradeChannel = CHANNEL_TRADE;
-    } else if (curationStatus == "playground") {
-      tradeChannel = CHANNEL_TRADE_PLAYGROUND;
-    } else {
-      tradeChannel = CHANNEL_TRADE_FACTORY;
-    }
-
-    // Forward on updated message to the per-curation status feed.
-    bot.channels.cache.get(tradeChannel).send(embed);
-
-    // Forward sales events also to special sales channel.
+    // Only forward sales events and listing events.
     if (eventName.includes("Successful")) {
         bot.channels.cache.get(CHANNEL_SALES).send(embed);
         // Forward all Chromie Squiggles sales on to the DAO.
