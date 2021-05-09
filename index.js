@@ -305,6 +305,12 @@ let gen2Bot = new ProjectBot(
   256,
   "Gen 2"
 );
+let gen3Bot = new ProjectBot(
+  48000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1024,
+  "Gen 3"
+);
 // #pxlq projects
 let sentienceBot = new ProjectBot(
   20000000,
@@ -451,6 +457,9 @@ bot.on("message", (msg) => {
         if (msgContentLowercase.includes("gen2") ||
           msgContentLowercase.includes("gen 2")) {
           gen2Bot.handleNumberMessage(msg);
+        } else if (msgContentLowercase.includes("gen3") ||
+          msgContentLowercase.includes("gen 3")) {
+          gen3Bot.handleNumberMessage(msg);
         } else {
           genesisBot.handleNumberMessage(msg);
         }
