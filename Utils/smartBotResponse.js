@@ -91,9 +91,9 @@ async generateGasPriceMessage() {
     let gasStationResponse = await fetch(`https://ethgasstation.info/api/ethgasAPI.json?api-key=${GASSTATION_API_KEY}`);
     let gasStationData = await gasStationResponse.json();
     let fireString = '';
-    if (gasStationData.average > 400) {
+    if (gasStationData.average > 4000) {
         fireString = ':fire::fire:';
-    } else if (gasStationData.average > 200) {
+    } else if (gasStationData.average > 2000) {
         fireString = ':fire:';
     }
     return new MessageEmbed()
