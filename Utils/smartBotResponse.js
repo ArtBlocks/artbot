@@ -87,7 +87,7 @@ const HELP_MESSAGE = new MessageEmbed()
   // Set the main content of the embed
   .setDescription(`These are the things you can ask me:\n\n**squiggle paused?**: An explanation of why Chromie Squiggle minting is paused.\n**drop?**: Where to find information about the next drop.\n**playground?** (or **curated?** or **factory?**): Information about the different types of Art Blocks projects.\n**opensea?**: Links to the three different Art Blocks collections on OpenSea (Curated, Playground, and Factory).\n**metrics?**: The latest Art Blocks platform metrics.\n**applications?**: An explanation of the current state of the Art Blocks application process.\n**gas?**: An explanation of what gas is and why you should **never** modify the gas limit.`);
 
-async generateGasPriceMessage() {
+async function generateGasPriceMessage() {
     let gasStationResponse = await fetch(`https://ethgasstation.info/api/ethgasAPI.json?api-key=${GASSTATION_API_KEY}`);
     let gasStationData = await gasStationResponse.json();
     let fireString = '';
