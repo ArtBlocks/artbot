@@ -8,6 +8,7 @@ const fetch = require("node-fetch");
 const CHANNEL_GENERAL = process.env.CHANNEL_GENERAL;
 const CHANNEL_HELP = process.env.CHANNEL_HELP;
 const CHANNEL_SNOWFRO = process.env.CHANNEL_SNOWFRO;
+const GASSTATION_API_KEY = process.env.GASSTATION_API_KEY;
 
 // Specific OpenSea assets for fetching project stats for "ArtBlocks Curated"
 // and "Artist Playground".
@@ -86,6 +87,28 @@ const HELP_MESSAGE = new MessageEmbed()
   // Set the main content of the embed
   .setDescription(`These are the things you can ask me:\n\n**squiggle paused?**: An explanation of why Chromie Squiggle minting is paused.\n**drop?**: Where to find information about the next drop.\n**playground?** (or **curated?** or **factory?**): Information about the different types of Art Blocks projects.\n**opensea?**: Links to the three different Art Blocks collections on OpenSea (Curated, Playground, and Factory).\n**metrics?**: The latest Art Blocks platform metrics.\n**applications?**: An explanation of the current state of the Art Blocks application process.\n**gas?**: An explanation of what gas is and why you should **never** modify the gas limit.`);
 
+async function generateGasPriceMessage() {
+    let gasStationResponse = await fetch(`https://ethgasstation.info/api/ethgasAPI.json?api-key=${GASSTATION_API_KEY}`);
+    let gasStationData = await gasStationResponse.json();
+    let fireString = '';
+    if (gasStationData.average > 4000) {
+        fireString = ':fire::fire:';
+    } else if (gasStationData.average > 2000) {
+        fireString = ':fire:';
+    }
+    return new MessageEmbed()
+        // Set the title of the field
+        .setTitle(fireString + ':fuelpump: Gas Prices :fuelpump:' + fireString)
+        // Set the color of the embed
+        .setColor(ARTBOT_GREEN)
+        // Set the main content of the embed
+        .setDescription(`:rocket:RAPID: ${gasStationData.fastest/10} :airplane:FAST: ${gasStationData.fast/10} :blue_car:STANDARD: ${gasStationData.average/10}`);
+
+}
+
+
+
+
 // Returns a message for ArtBot to return when being smart, or null if
 // ArtBot has nothing to say.
 async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID) {
@@ -158,7 +181,11 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   // Handle gas questions.
   let mentionedGas = msgContentLowercase.includes("gas");
   if (containsQuestion && mentionedGas) {
-    return GAS_MESSAGE;
+    if (msgContentLowercase.includes("price")) {
+        return generateGasPriceMessage();
+    } else {
+        return GAS_MESSAGE;
+    }
   }
   // Handle project stats requests.
   let mentionedMetrics = msgContentLowercase.includes("metric");
