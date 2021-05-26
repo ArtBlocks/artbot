@@ -14,11 +14,14 @@ const ProjectBot = require("./Classes/ProjectBot").ProjectBot;
 const triageActivityMessage = require("./Utils/activityTriager").triageActivityMessage;
 const smartBotResponse = require("./Utils/smartBotResponse").smartBotResponse;
 const handleGiveawayMessage = require("./Utils/giveawayCommands").handleGiveawayMessage;
+
 // Per-channel handlers.
 const ringerSinglesTransform = require("./ProjectHandlerHelpers/ringerHandler").ringerSinglesTransform;
 const ringerSetsTransform = require("./ProjectHandlerHelpers/ringerHandler").ringerSetsTransform;
 const apparitionSinglesTransform = require("./ProjectHandlerHelpers/apparitionHandler").apparitionSinglesTransform;
 const apparitionSetsTransform = require("./ProjectHandlerHelpers/apparitionHandler").apparitionSetsTransform;
+const subscapeSinglesTransform = require("./ProjectHandlerHelpers/subscapeHandler").subscapeSinglesTransform;
+const subscapeSetsTransform = require("./ProjectHandlerHelpers/subscapeHandler").subscapeSetsTransform;
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
@@ -567,6 +570,16 @@ bot.on("message", (msg) => {
         elementalsBot.handleNumberMessage(msg);
         break;
       case CHANNEL_MATT_DESL:
+        let subscapeSinglesTransformedValue =
+          subscapeSinglesTransform(msg.content);
+        let subscapeSetsTransformedValue =
+          subscapeSetsTransform(msg.content);
+        if (subscapeSinglesTransformedValue !== null) {
+          msg.content = subscapeSinglesTransformedValue;
+        } else
+        if (subscapeSetsTransformedValue !== null) {
+          msg.content = subscapeSetsTransformedValue;
+        }
         subscapesBot.handleNumberMessage(msg);
         break;
       case CHANNEL_NUMBERSINMOTION:
