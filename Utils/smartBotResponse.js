@@ -32,7 +32,7 @@ const ARTBOT_HOW_ARE_YOU = new MessageEmbed()
   // Set the main content of the embed
   .setDescription(`I'm doing well! :) Oh, also here is a puzzle piece that Generative Artworks gave me to hold onto.`)
   // Set the image that is displayed
-  .setImage('https://imgur.com/oghbL60');
+  .setImage('https://i.imgur.com/oghbL60.jpg');
 
 
 // Custom message shown when someone asks why Squiggle minting is paused.
