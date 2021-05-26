@@ -22,6 +22,8 @@ const apparitionSinglesTransform = require("./ProjectHandlerHelpers/apparitionHa
 const apparitionSetsTransform = require("./ProjectHandlerHelpers/apparitionHandler").apparitionSetsTransform;
 const subscapeSinglesTransform = require("./ProjectHandlerHelpers/subscapeHandler").subscapeSinglesTransform;
 const subscapeSetsTransform = require("./ProjectHandlerHelpers/subscapeHandler").subscapeSetsTransform;
+const watercolorDreamsSinglesTransform = require("./ProjectHandlerHelpers/watercolorDreamsHandler").watercolorDreamsSinglesTransform;
+const watercolorDreamsSetsTransform = require("./ProjectHandlerHelpers/watercolorDreamsHandler").watercolorDreamsSetsTransform;
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
@@ -583,6 +585,15 @@ bot.on("message", (msg) => {
         subscapesBot.handleNumberMessage(msg);
         break;
       case CHANNEL_NUMBERSINMOTION:
+        let watercolorDreamsSinglesTransformedValue =
+          watercolorDreamsSinglesTransform(msg.content);
+        let watercolorDreamsSetsTransformedValue =
+          watercolorDreamsSetsTransform(msg.content);
+        if (watercolorDreamsSinglesTransformedValue !== null) {
+          msg.content = watercolorDreamsSinglesTransformedValue;
+        } else if (watercolorDreamsSetsTransformedValue !== null) {
+          msg.content = watercolorDreamsSetsTransformedValue;
+        }
         numbersInMotionBot.handleNumberMessage(msg);
         break;
       case CHANNEL_JASON_TING:
