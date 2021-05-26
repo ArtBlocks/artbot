@@ -23,6 +23,18 @@ const ARTBLOCKS_FACTORY_ASSET = "https://api.opensea.io/api/v1/asset/0xa7d8d9ef8
 const ARTBOT_USERNAME = "artbot";
 const ARTBOT_GREEN = 0x00ff00;
 
+// Thank you message for people asking the artbot how it is.
+const ARTBOT_HOW_ARE_YOU = new MessageEmbed()
+  // Set the title of the field
+  .setTitle('Thank you for caring!')
+  // Set the color of the embed
+  .setColor(ARTBOT_GREEN)
+  // Set the main content of the embed
+  .setDescription(`I'm doing well! :) Oh, also here is a puzzle piece that Generative Artworks gave me to hold onto.`)
+  // Set the image that is displayed
+  .setImage('https://imgur.com/oghbL60');
+
+
 // Custom message shown when someone asks why Squiggle minting is paused.
 const SQUIGGLE_PAUSE_MESSAGE = new MessageEmbed()
   // Set the title of the field
@@ -171,6 +183,13 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   if (containsQuestion && mentionedOpenSea) {
     return OPENSEA_LINKS_MESSAGE;
   }
+
+  // Handle how are you messages.
+  let mentionedHowAreYou = msgContentLowercase.includes("how are you")
+  if (mentionedArtBot && mentionedHowAreYou) {
+    return ARTBOT_HOW_ARE_YOU;
+  }
+
   // Handle application questions.
   let mentionedApplications = msgContentLowercase.includes("application") || msgContentLowercase.includes("apply");
   if (containsQuestion && mentionedApplications) {
