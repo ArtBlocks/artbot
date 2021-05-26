@@ -13,10 +13,10 @@ function subscapeSinglesTransform(messageContent) {
   }
 
   let singleKeyStringLowercase = singleKeyString.toLowerCase();
-  if (!subscapesingles.hasOwnProperty(singleKeyStringLowercase)) {
+  if (!subscapeSingles.hasOwnProperty(singleKeyStringLowercase)) {
     return null;
   }
-  return `#${subscapesingles[singleKeyStringLowercase]}`;
+  return `#${subscapeSingles[singleKeyStringLowercase]}`;
 }
 
 function subscapeSetsTransform(messageContent) {
@@ -35,11 +35,11 @@ function subscapeSetsTransform(messageContent) {
   }
 
   let setKeyStringLowercase = setKeyString.toLowerCase();
-  if (!subscapesets.hasOwnProperty(setKeyStringLowercase)) {
+  if (!subscapeSets.hasOwnProperty(setKeyStringLowercase)) {
     return null;
   }
 
-  let setItems = subscapesets[setKeyStringLowercase];
+  let setItems = subscapeSets[setKeyStringLowercase];
   let randomSetItem = setItems[Math.floor(Math.random() * setItems.length)];
   return `#${randomSetItem}`;
 }
