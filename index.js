@@ -390,6 +390,19 @@ let voidBot =  new ProjectBot(
   500,
   "Void"
 );
+let messengersBot =  new ProjectBot(
+  68000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  350,
+  "Messengers"
+);
+// #aaron-penne projects
+let returnBot =  new ProjectBot(
+  77000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  300,
+  "Return"
+);
 
 // Special address collector.
 let addressCollector = new AddressCollector();
@@ -539,22 +552,29 @@ bot.on("message", (msg) => {
       case CHANNEL_ALEXIS_ANDRE:
         if (msgContentLowercase.includes("void")) {
           voidBot.handleNumberMessage(msg);
+        } else 
+        if (msgContentLowercase.includes("messengers")) {
+          messengersBot.handleNumberMessage(msg);
         } else {
           minutesBot.handleNumberMessage(msg);
         }
         break;
       case CHANNEL_AARON_PENNE:
-        let apparitionSinglesTransformedValue =
-          apparitionSinglesTransform(msg.content);
-        let apparitionSetsTransformedValue =
-          apparitionSetsTransform(msg.content);
-        if (apparitionSinglesTransformedValue !== null) {
-          msg.content = apparitionSinglesTransformedValue;
-        } else
-        if (apparitionSetsTransformedValue !== null) {
-          msg.content = apparitionSetsTransformedValue;
+        if (msgContentLowercase.includes("return")) {
+          returnBot.handleNumberMessage(msg);
+        } else {
+          let apparitionSinglesTransformedValue =
+            apparitionSinglesTransform(msg.content);
+          let apparitionSetsTransformedValue =
+            apparitionSetsTransform(msg.content);
+          if (apparitionSinglesTransformedValue !== null) {
+            msg.content = apparitionSinglesTransformedValue;
+          } else
+          if (apparitionSetsTransformedValue !== null) {
+            msg.content = apparitionSetsTransformedValue;
+          }
+          apparitionsBot.handleNumberMessage(msg);
         }
-        apparitionsBot.handleNumberMessage(msg);
         break;
       case CHANNEL_RADIX:
         inspiralsBot.handleNumberMessage(msg);
