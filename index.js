@@ -9,21 +9,12 @@ const bodyParser = require("body-parser");
 
 const AddressCollector = require("./Classes/AddressCollector").AddressCollector;
 const ProjectBot = require("./Classes/ProjectBot").ProjectBot;
+const ProjectHandlerHelper = require("./Classes/ProjectHandlerHelper").ProjectHandlerHelper;
 
 // Special handlers.
 const triageActivityMessage = require("./Utils/activityTriager").triageActivityMessage;
 const smartBotResponse = require("./Utils/smartBotResponse").smartBotResponse;
 const handleGiveawayMessage = require("./Utils/giveawayCommands").handleGiveawayMessage;
-
-// Per-channel handlers.
-const ringerSinglesTransform = require("./ProjectHandlerHelpers/ringerHandler").ringerSinglesTransform;
-const ringerSetsTransform = require("./ProjectHandlerHelpers/ringerHandler").ringerSetsTransform;
-const apparitionSinglesTransform = require("./ProjectHandlerHelpers/apparitionHandler").apparitionSinglesTransform;
-const apparitionSetsTransform = require("./ProjectHandlerHelpers/apparitionHandler").apparitionSetsTransform;
-const subscapeSinglesTransform = require("./ProjectHandlerHelpers/subscapeHandler").subscapeSinglesTransform;
-const subscapeSetsTransform = require("./ProjectHandlerHelpers/subscapeHandler").subscapeSetsTransform;
-const watercolorDreamsSinglesTransform = require("./ProjectHandlerHelpers/watercolorDreamsHandler").watercolorDreamsSinglesTransform;
-const watercolorDreamsSetsTransform = require("./ProjectHandlerHelpers/watercolorDreamsHandler").watercolorDreamsSetsTransform;
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
@@ -431,6 +422,32 @@ let returnBot =  new ProjectBot(
   "Return"
 );
 
+// Per-channel handlers.
+const apparitionSingles = require("./NamedMappings/apparitionSingles.json");
+const apparitionSets = require("./NamedMappings/apparitionSets.json");
+let apparitionHandlerHelper = new ProjectHandlerHelper(
+  apparitionSingles,
+  apparitionSets
+);
+const ringerSingles = require("./NamedMappings/ringerSingles.json");
+const ringerSets = require("./NamedMappings/ringerSets.json");
+let ringerHandlerHelper = new ProjectHandlerHelper(
+  ringerSingles,
+  ringerSets
+);
+const subscapeSingles = require("./NamedMappings/subscapeSingles.json");
+const subscapeSets = require("./NamedMappings/subscapeSets.json");
+let subscapeHandlerHelper = new ProjectHandlerHelper(
+  subscapeSingles,
+  subscapeSets
+);
+const watercolorDreamSingles = require("./NamedMappings/watercolorDreamSingles.json");
+const watercolorDreamSets = require("./NamedMappings/watercolorDreamSets.json");
+let watercolorDreamHandlerHelper = new ProjectHandlerHelper(
+  watercolorDreamSingles,
+  watercolorDreamSets
+);
+
 // Special address collector.
 let addressCollector = new AddressCollector();
 
@@ -487,8 +504,10 @@ bot.on("message", (msg) => {
           msgContentLowercase.includes("pump")) {
           eternalPumpBot.handleNumberMessage(msg);
         } else {
-          let ringerSinglesTransformedValue = ringerSinglesTransform(msg.content);
-          let ringerSetsTransformedValue = ringerSetsTransform(msg.content);
+          let ringerSinglesTransformedValue =
+            ringerHandlerHelper.singlesTransform(msg.content);
+          let ringerSetsTransformedValue =
+            ringerHandlerHelper.setsTransform(msg.content);
           if (ringerSinglesTransformedValue !== null) {
             msg.content = ringerSinglesTransformedValue;
           } else
@@ -591,9 +610,9 @@ bot.on("message", (msg) => {
           returnBot.handleNumberMessage(msg);
         } else {
           let apparitionSinglesTransformedValue =
-            apparitionSinglesTransform(msg.content);
+            apparitionHandlerHelper.singlesTransform(msg.content);
           let apparitionSetsTransformedValue =
-            apparitionSetsTransform(msg.content);
+            apparitionHandlerHelper.setsTransform(msg.content);
           if (apparitionSinglesTransformedValue !== null) {
             msg.content = apparitionSinglesTransformedValue;
           } else
@@ -620,9 +639,9 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_MATT_DESL:
         let subscapeSinglesTransformedValue =
-          subscapeSinglesTransform(msg.content);
+          subscapeHandlerHelper.singlesTransform(msg.content);
         let subscapeSetsTransformedValue =
-          subscapeSetsTransform(msg.content);
+          subscapeHandlerHelper.setsTransform(msg.content);
         if (subscapeSinglesTransformedValue !== null) {
           msg.content = subscapeSinglesTransformedValue;
         } else
@@ -633,9 +652,9 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_NUMBERSINMOTION:
         let watercolorDreamsSinglesTransformedValue =
-          watercolorDreamsSinglesTransform(msg.content);
+          watercolorDreamHandlerHelper.singlesTransform(msg.content);
         let watercolorDreamsSetsTransformedValue =
-          watercolorDreamsSetsTransform(msg.content);
+          watercolorDreamHandlerHelper.setsTransform(msg.content);
         if (watercolorDreamsSinglesTransformedValue !== null) {
           msg.content = watercolorDreamsSinglesTransformedValue;
         } else if (watercolorDreamsSetsTransformedValue !== null) {
