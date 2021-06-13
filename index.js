@@ -47,6 +47,7 @@ const CHANNEL_DALENZ = process.env.CHANNEL_DALENZ;
 const CHANNEL_DANDAN = process.env.CHANNEL_DANDAN;
 const CHANNEL_DMITRI_CHERNIAK = process.env.CHANNEL_DMITRI_CHERNIAK;
 const CHANNEL_GE1DOOT = process.env.CHANNEL_GE1DOOT;
+const CHANNEL_HAN_X_NICOLAS_DANIEL = process.env.CHANNEL_HAN_X_NICOLAS_DANIEL;
 const CHANNEL_HIDEKI = process.env.CHANNEL_HIDEKI;
 const CHANNEL_JASON_TING = process.env.CHANNEL_JASON_TING;
 const CHANNEL_JEFF_DAVIS = process.env.CHANNEL_JEFF_DAVIS;
@@ -59,9 +60,14 @@ const CHANNEL_NUMBERSINMOTION = process.env.CHANNEL_NUMBERSINMOTION;
 const CHANNEL_PXLQ = process.env.CHANNEL_PXLQ;
 const CHANNEL_RADIX = process.env.CHANNEL_RADIX;
 const CHANNEL_SIMON_DE_MAI = process.env.CHANNEL_SIMON_DE_MAI;
+const CHANNEL_SHVEMBLDR = process.env.CHANNEL_SHVEMBLDR;
 const CHANNEL_SNOWFRO = process.env.CHANNEL_SNOWFRO;
+const CHANNEL_STEFAN_CONTIERO = process.env.CHANNEL_STEFAN_CONTIERO;
 const CHANNEL_STINA_JONES = process.env.CHANNEL_STINA_JONES;
+const CHANNEL_TYLER_HOBBS = process.env.CHANNEL_TYLER_HOBBS;
 const CHANNEL_ZEBLOCKS = process.env.CHANNEL_ZEBLOCKS;
+
+// Mints channel, for giveaways.
 const CHANNEL_MINTS = process.env.CHANNEL_MINTS;
 
 // Special address collection channel.
@@ -100,13 +106,11 @@ app.listen(PORT, function() {
 
 // Bot setup.
 const bot = new Client();
-
 bot.login(TOKEN);
 
 bot.on("ready", () => {
   console.info(`Logged in as ${bot.user.tag}!`);
 });
-
 
 //Manage Giveaways with Artbot
 bot.giveawaysManager = new GiveawaysManager(bot, {
@@ -118,7 +122,6 @@ bot.giveawaysManager = new GiveawaysManager(bot, {
         reaction: "🎉"
     }
 });
-
 bot.giveawaysManager.on("giveawayReactionAdded", (giveaway, member, reaction) => {
     console.log(`${member.user.tag} entered giveaway #${giveaway.messageID} (${reaction.emoji.name})`);
 });
@@ -280,6 +283,30 @@ let bubbleBlobbyBot = new ProjectBot(
   V2_MINTING_CONTRACT_ADDRESS,
   500,
   "Bubble Blobby"
+);
+let algoRhythmsBot = new ProjectBot(
+  64000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1000,
+  "AlgoRhythms"
+);
+let frammentiBot = new ProjectBot(
+  72000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  555,
+  "Frammenti"
+);
+let blocksOfArtBot = new ProjectBot(
+  74000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  500,
+  "The Blocks of Art"
+);
+let fidenzaBot = new ProjectBot(
+  78000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  999,
+  "Fidenza"
 );
 
 // Artist playground project Discord channel message handlers.
@@ -552,7 +579,7 @@ bot.on("message", (msg) => {
       case CHANNEL_ALEXIS_ANDRE:
         if (msgContentLowercase.includes("void")) {
           voidBot.handleNumberMessage(msg);
-        } else 
+        } else
         if (msgContentLowercase.includes("messengers")) {
           messengersBot.handleNumberMessage(msg);
         } else {
@@ -618,6 +645,18 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_JASON_TING:
         bubbleBlobbyBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_HAN_X_NICOLAS_DANIEL:
+        algoRhythmsBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_TYLER_HOBBS:
+        fidenzaBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_SHVEMBLDR:
+        blocksOfArtBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_STEFAN_CONTIERO:
+        frammentiBot.handleNumberMessage(msg);
         break;
 
       // Fall-back (should never occur).
