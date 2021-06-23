@@ -42,6 +42,7 @@ const CHANNEL_HAN_X_NICOLAS_DANIEL = process.env.CHANNEL_HAN_X_NICOLAS_DANIEL;
 const CHANNEL_HIDEKI = process.env.CHANNEL_HIDEKI;
 const CHANNEL_JASON_TING = process.env.CHANNEL_JASON_TING;
 const CHANNEL_JEFF_DAVIS = process.env.CHANNEL_JEFF_DAVIS;
+const CHANNEL_JOSHUA_BAGLEY = process.env.CHANNEL_JOSHUA_BAGLEY;
 const CHANNEL_KAI = process.env.CHANNEL_KAI;
 const CHANNEL_GOLID = process.env.CHANNEL_GOLID;
 const CHANNEL_LUXPRIS = process.env.CHANNEL_LUXPRIS;
@@ -299,6 +300,12 @@ let fidenzaBot = new ProjectBot(
   999,
   "Fidenza"
 );
+let dreamsBot = new ProjectBot(
+  89000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  700,
+  "Dreams"
+);
 
 // Artist playground project Discord channel message handlers.
 // #jeff-davis projects
@@ -541,6 +548,9 @@ bot.on("message", (msg) => {
           constructionBot.handleNumberMessage(msg);
         }
         break;
+      case CHANNEL_JOSHUA_BAGLEY:
+          dreamsBot.handleNumberMessage(msg);
+          break;
       case CHANNEL_PXLQ:
         if (msgContentLowercase.includes("cyber") &&
           msgContentLowercase.includes("cities")) {
