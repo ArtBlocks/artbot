@@ -10,6 +10,7 @@ const CHANNEL_SQUIGGLE_SALES = process.env.CHANNEL_SQUIGGLE_SALES;
 
 // Addresses which should be omitted entirely from event feeds.
 const BAN_ADDRESSES = [
+    "0x45d91f318b2abc6b569b6637c84cdb66486eb9ee",
     "0x7058634bc1394af83aa0a3589d6b818e4c35295a",
     "0x8491fc2625aeece9abc897ef29544e825a72d66e",
     "0xbcba11ef0dc585f028d8f4442e82ee6ceecbcbba",
