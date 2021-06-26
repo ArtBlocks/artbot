@@ -454,6 +454,12 @@ let watercolorDreamHandlerHelper = new ProjectHandlerHelper(
   watercolorDreamSingles,
   watercolorDreamSets
 );
+const dreamSingles = require("./NamedMappings/dreamSingles.json");
+const dreamSets = require("./NamedMappings/dreamSets.json");
+let dreamHandlerHelper = new ProjectHandlerHelper(
+  dreamSingles,
+  dreamSets
+);
 
 // Special address collector.
 let addressCollector = new AddressCollector();
@@ -549,6 +555,16 @@ bot.on("message", (msg) => {
         }
         break;
       case CHANNEL_JOSHUA_BAGLEY:
+          let dreamSinglesTransformedValue =
+            dreamHandlerHelper.singlesTransform(msg.content);
+          let dreamSetsTransformedValue =
+            dreamHandlerHelper.setsTransform(msg.content);
+          if (dreamSinglesTransformedValue !== null) {
+            msg.content = dreamSinglesTransformedValue;
+          } else
+          if (dreamSetsTransformedValue !== null) {
+            msg.content = dreamSetsTransformedValue;
+          }
           dreamsBot.handleNumberMessage(msg);
           break;
       case CHANNEL_PXLQ:
