@@ -8,6 +8,7 @@ const CHANNEL_SALES_CHAT = process.env.CHANNEL_SALES_CHAT;
 const CHANNEL_SALES = process.env.CHANNEL_SALES;
 const CHANNEL_LISTINGS = process.env.CHANNEL_LISTINGS;
 const CHANNEL_SQUIGGLE_SALES = process.env.CHANNEL_SQUIGGLE_SALES;
+const CHANNEL_SQUIGGLE_LISTINGS = process.env.CHANNEL_SQUIGGLE_LISTINGS;
 
 // Addresses which should be omitted entirely from event feeds.
 const BAN_ADDRESSES = [
@@ -102,6 +103,10 @@ async function triageActivityMessage(msg, bot) {
         }
     } else if (eventName.includes("Created")) {
         bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
+        // Forward all Chromie Squiggles listings on to the DAO.
+        if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
+            bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
+        }
     }
   }
 }
