@@ -4,6 +4,7 @@ const {
 const fetch = require("node-fetch");
 
 // Trade activity Discord channel IDs.
+const CHANNEL_SALES_CHAT = process.env.CHANNEL_SALES_CHAT;
 const CHANNEL_SALES = process.env.CHANNEL_SALES;
 const CHANNEL_LISTINGS = process.env.CHANNEL_LISTINGS;
 const CHANNEL_SQUIGGLE_SALES = process.env.CHANNEL_SQUIGGLE_SALES;
@@ -94,6 +95,7 @@ async function triageActivityMessage(msg, bot) {
     // Only forward sales events and listing events.
     if (eventName.includes("Successful")) {
         bot.channels.cache.get(CHANNEL_SALES).send(embed);
+        bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
         // Forward all Chromie Squiggles sales on to the DAO.
         if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
             bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
