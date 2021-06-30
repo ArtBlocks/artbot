@@ -51,6 +51,7 @@ const CHANNEL_MICHAEL_CONNOLLY = process.env.CHANNEL_MICHAEL_CONNOLLY;
 const CHANNEL_NUMBERSINMOTION = process.env.CHANNEL_NUMBERSINMOTION;
 const CHANNEL_PXLQ = process.env.CHANNEL_PXLQ;
 const CHANNEL_RADIX = process.env.CHANNEL_RADIX;
+const CHANNEL_REAS = process.env.CHANNEL_REAS;
 const CHANNEL_SIMON_DE_MAI = process.env.CHANNEL_SIMON_DE_MAI;
 const CHANNEL_SHVEMBLDR = process.env.CHANNEL_SHVEMBLDR;
 const CHANNEL_SNOWFRO = process.env.CHANNEL_SNOWFRO;
@@ -305,6 +306,12 @@ let dreamsBot = new ProjectBot(
   V2_MINTING_CONTRACT_ADDRESS,
   700,
   "Dreams"
+);
+let centuryBot = new ProjectBot(
+  100000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1000,
+  "Century"
 );
 
 // Artist playground project Discord channel message handlers.
@@ -702,6 +709,9 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_STEFAN_CONTIERO:
         frammentiBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_REAS:
+        centuryBot.handleNumberMessage(msg);
         break;
 
       // Fall-back (should never occur).
