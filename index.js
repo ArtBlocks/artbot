@@ -675,7 +675,11 @@ bot.on("message", (msg) => {
         algobotsBot.handleNumberMessage(msg);
         break;
       case CHANNEL_MICHAEL_CONNOLLY:
-        elementalsBot.handleNumberMessage(msg);
+        if (msgContentLowercase.includes("divisions")) {
+          divisionsBot.handleNumberMessage(msg);
+        } else {
+          elementalsBot.handleNumberMessage(msg);
+        }
         break;
       case CHANNEL_MATT_DESL:
         let subscapeSinglesTransformedValue =
