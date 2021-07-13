@@ -435,6 +435,13 @@ let returnBot =  new ProjectBot(
   300,
   "Return"
 );
+// #michael-connolly projects
+let divisionsBot = new ProjectBot(
+  108000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  500,
+  "Divisions"
+);
 
 // Per-channel handlers.
 const apparitionSingles = require("./NamedMappings/apparitionSingles.json");
