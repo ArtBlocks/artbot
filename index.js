@@ -442,6 +442,13 @@ let divisionsBot = new ProjectBot(
   500,
   "Divisions"
 );
+// #radix projects
+let eccentricsBot = new ProjectBot(
+  104000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  400,
+  "Eccentrics"
+);
 
 // Per-channel handlers.
 const apparitionSingles = require("./NamedMappings/apparitionSingles.json");
@@ -663,7 +670,11 @@ bot.on("message", (msg) => {
         }
         break;
       case CHANNEL_RADIX:
-        inspiralsBot.handleNumberMessage(msg);
+        if (msgContentLowercase.includes("eccentric")) {
+          eccentricsBot.handleNumberMessage(msg);
+        } else {
+          inspiralsBot.handleNumberMessage(msg);
+        }
         break;
       case CHANNEL_DALENZ:
         aerialViewBot.handleNumberMessage(msg);
@@ -675,7 +686,7 @@ bot.on("message", (msg) => {
         algobotsBot.handleNumberMessage(msg);
         break;
       case CHANNEL_MICHAEL_CONNOLLY:
-        if (msgContentLowercase.includes("divisions")) {
+        if (msgContentLowercase.includes("division")) {
           divisionsBot.handleNumberMessage(msg);
         } else {
           elementalsBot.handleNumberMessage(msg);
