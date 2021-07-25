@@ -506,11 +506,11 @@ bot.on("message", (msg) => {
     return;
   }
 
-  if (channelID == CHANNEL_MINTS) {
-    if (msgContentLowercase.includes("giveaway!")) {
-      console.log("Time for a giveaway");
-      handleGiveawayMessage(msg, bot);
-    }
+  // Respond to giveaway requests.
+  if (msgContentLowercase.includes("giveaway!")) {
+    console.log("Time for a giveaway");
+    handleGiveawayMessage(msg, bot);
+    return;
   }
 
   // Handle piece # requests.
