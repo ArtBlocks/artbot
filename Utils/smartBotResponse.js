@@ -51,7 +51,8 @@ const APPLICATIONS_MESSAGE = new MessageEmbed()
   // Set the color of the embed
   .setColor(ARTBOT_GREEN)
   // Set the main content of the embed
-  .setDescription(`It looks like you're wondering about the Art Blocks application process.\n\nArtist applications are temporarily closed while we get caught up on the backlog. We plan to reopen them in the next month or so.\n\nIn the meantime, please visit [#tech-talk](https://discord.com/channels/411959613370400778/763407935127945226) for help on how to get started and feel free to share your progress in [#ab-only-project-share](https://discord.com/channels/411959613370400778/791072987268644894).`);
+  .setDescription(`It looks like you're wondering about the Art Blocks application process.\n\nInfo on how to apply to Art Blocks can be found in [#applications](https://discord.com/channels/411959613370400778/450278286862450701).\n\nBefore you apply, make sure:\n1) You're ready and able to share your creative history with us.
+\n2) You can deliver a functioning script (we cannot help you create one).\n3) Your work is original.\n\nIf you can check those boxes, head over to [#applications](https://discord.com/channels/411959613370400778/450278286862450701), read the full statement, and click the link to apply.`);
 
 // Custom message shown when someone asks about gas.
 const GAS_MESSAGE = new MessageEmbed()
