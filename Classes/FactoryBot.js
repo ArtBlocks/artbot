@@ -18,7 +18,7 @@ const UNKNOWN_ADDRESS = "unknown";
 const UNKNOWN_USERNAME = "unknown";
 const METADATA_REFRESH = process.env.METADATA_REFRESH_INTERVAL_MINUTES;
 
-
+// This array will hold ProjectBot classes for all the Factory Projects we find
 let factoryBotList = [];
 
 class FactoryBot {
@@ -34,8 +34,8 @@ class FactoryBot {
     for (let i = 0; i < projectList.length; i++) {
        let projectData = await getArtBlocksProject(projectList[i]); 
 
-       console.log(`Refreshing project cache for Project ${projectList[i]} ${projectData.name}`);
-       if (isFactoryProject(projectList[i])) {
+       if (projectData && isFactoryProject(projectList[i])) {
+	   console.log(`Refreshing project cache for Project ${projectList[i]} ${projectData.name}`);
            let newBot = new ProjectBot(
                    projectList[i]*1000000,
                    V2_MINTING_CONTRACT_ADDRESS,
@@ -52,7 +52,6 @@ class FactoryBot {
  
   async handleNumberMessage(msg) {
 
-    console.log(msg.content);
     let content = msg.content;
 
     if (content.length <= 1) {
@@ -62,13 +61,12 @@ class FactoryBot {
       return;
     }
 
-    let detailsRequested = content.toLowerCase().includes("detail");
     let afterTheHash = content.substring(1);
     let nameIndex = content.substr(content.indexOf(" ")+1).toLowerCase().replace(/\s+/g, '');
-    console.log(nameIndex);
-    if (factoryBotList[nameIndex]) {
-       console.log(factoryBotList[nameIndex]);
-       factoryBotList[nameIndex].handleNumberMessage(msg);
+    console.log(`Searching for project ${nameIndex}`);
+    let projBot = factoryBotList[nameIndex];
+    if (projBot) {
+       projBot.handleNumberMessage(msg);
     }
   }
 
