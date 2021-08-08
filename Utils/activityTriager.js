@@ -38,7 +38,9 @@ const BAN_ADDRESSES = [
     "0xd523c78cdc2ddbaafa0db1a3f4b35baf799501ff",
     "0x907df6e3ef654854520bb7c71f8b6c2f14ca3a87",
     "0x9fde734f42920221db35fe7e2405c8a68b7539df",
-    "0x406dd0831439abb26c51de18baa031dbb267cb7e"
+    "0x406dd0831439abb26c51de18baa031dbb267cb7e",
+    "0x5a3a9d7c2f2d2fb9dfae78fda79134ba6d706352",
+    "0xcd969f0eb423c2e6eb486da3268c048e04963c12"
 ];
 
 async function triageActivityMessage(msg, bot) {
