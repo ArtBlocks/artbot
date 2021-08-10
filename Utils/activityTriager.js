@@ -83,7 +83,8 @@ async function triageActivityMessage(msg, bot) {
             console.log(`Skipping message propagation for referral.`);
             return;
         }
-        if (embedField.name.includes("Fixed Price") || embedField.name.includes("SOLD for")) {
+        if (embedField.name.includes("Fixed Price") ||
+            embedField.name.includes("SOLD for")) {
             priceField = embedField;
         }
     }
