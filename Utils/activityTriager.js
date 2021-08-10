@@ -11,7 +11,7 @@ const CHANNEL_SQUIGGLE_SALES = process.env.CHANNEL_SQUIGGLE_SALES;
 const CHANNEL_SQUIGGLE_LISTINGS = process.env.CHANNEL_SQUIGGLE_LISTINGS;
 
 // Addresses which should be omitted entirely from event feeds.
-const BAN_ADDRESSES = [
+const BAN_ADDRESSES = new Set([
     "0x45d91f318b2abc6b569b6637c84cdb66486eb9ee",
     "0x3c3fb7e51d8cfcc9451100dddf59255c6d7fc5c2",
     "0x7058634bc1394af83aa0a3589d6b818e4c35295a",
@@ -41,7 +41,7 @@ const BAN_ADDRESSES = [
     "0x406dd0831439abb26c51de18baa031dbb267cb7e",
     "0x5a3a9d7c2f2d2fb9dfae78fda79134ba6d706352",
     "0xcd969f0eb423c2e6eb486da3268c048e04963c12"
-];
+]);
 
 async function triageActivityMessage(msg, bot) {
   // Iterate through entire array of embeds, though there should only
@@ -51,25 +51,27 @@ async function triageActivityMessage(msg, bot) {
     let embed = embeds[i];
 
     // Determine the item that the event is associated with.
-    let openseaURL = embed.author.url;
+    console.log("START");
+    console.log(embed);
+    let openseaURL = embed.author ? embed.author.url : embed.url;
     let urlComponents = openseaURL.split("/");
     let tokenID = urlComponents[urlComponents.length - 1];
 
     // Extract out the "author name".
-    let authorName = embed.author.name;
-    let authorURL = embed.author.url;
-    let eventName = authorName.split(":")[0];
+    let authorName = embed.author ? embed.author.name : null;
+    let eventName = authorName ? authorName.split(":")[0] : null;
 
     // Get current description.
     let description = embed.description;
+    let owner = description.substring(
+        description.lastIndexOf("**Owner:**") + 1,
+        description.lastIndexOf("(")
+    );
 
     // Return early if description includes bot-banned user.
-    for (var i = BAN_ADDRESSES.length - 1; i >= 0; i--) {
-        const bannedAddress = BAN_ADDRESSES[i];
-        if (description.includes(bannedAddress)) {
-            console.log(`Skipping message propagation for ${bannedAddress}`);
-            return;
-        }
+    if (BAN_ADDRESSES.has(owner)) {
+        console.log(`Skipping message propagation for ${bannedAddress}`);
+        return;
     }
 
     // Return early if event is a referral.
@@ -106,23 +108,29 @@ async function triageActivityMessage(msg, bot) {
     // Update to remove author name and to reflect this info in piece name
     // rather than token number as the title and URL field..
     embed.author = null;
-    embed.setTitle(`${eventName}: ${artBlocksData.name}`);
-    embed.setURL(authorURL);
+    if (eventName) {
+        embed.setTitle(`${eventName}: ${artBlocksData.name}`);
+    } else {
+        eventName = embed.title;
+    }
+    embed.setURL(openseaURL);
 
+    console.log(embed);
+    console.log("END");
     // Only forward sales events and listing events.
     if (eventName.includes("Successful")) {
         bot.channels.cache.get(CHANNEL_SALES).send(embed);
         bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
         // Forward all Chromie Squiggles sales on to the DAO.
-        if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
-            bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
-        }
+        // if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
+        //     bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
+        // }
     } else if (eventName.includes("Created")) {
         bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
         // Forward all Chromie Squiggles listings on to the DAO.
-        if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
-            bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
-        }
+        // if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
+        //     bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
+        // }
     }
   }
 }

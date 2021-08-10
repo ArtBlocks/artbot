@@ -34,7 +34,6 @@ const ARTBOT_HOW_ARE_YOU = new MessageEmbed()
   // Set the image that is displayed
   .setImage('https://i.imgur.com/oghbL60.jpg');
 
-
 // Custom message shown when someone asks why Squiggle minting is paused.
 const SQUIGGLE_PAUSE_MESSAGE = new MessageEmbed()
   // Set the title of the field
