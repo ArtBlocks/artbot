@@ -40,48 +40,54 @@ const BAN_ADDRESSES = new Set([
     "0x9fde734f42920221db35fe7e2405c8a68b7539df",
     "0x406dd0831439abb26c51de18baa031dbb267cb7e",
     "0x5a3a9d7c2f2d2fb9dfae78fda79134ba6d706352",
-    "0xcd969f0eb423c2e6eb486da3268c048e04963c12"
+    "0xcd969f0eb423c2e6eb486da3268c048e04963c12",
+    "0xb08a13cbc99c9631b7b2593e22ec803af23fe97d"
 ]);
 
 async function triageActivityMessage(msg, bot) {
   // Iterate through entire array of embeds, though there should only
   // ever be one at a time per message.
-  let embeds = msg.embeds
+  let embeds = msg.embeds;
   for (i = 0; i < embeds.length; i++) {
     let embed = embeds[i];
 
+    if (embed.author == null) {
+        return;
+    }
+
     // Determine the item that the event is associated with.
-    console.log("START");
-    console.log(embed);
-    let openseaURL = embed.author ? embed.author.url : embed.url;
+    let openseaURL = embed.author.url;
     let urlComponents = openseaURL.split("/");
     let tokenID = urlComponents[urlComponents.length - 1];
 
     // Extract out the "author name".
-    let authorName = embed.author ? embed.author.name : null;
-    let eventName = authorName ? authorName.split(":")[0] : null;
+    let authorName = embed.author.name;
+    let eventName = authorName.split(":")[0];
 
     // Get current description.
     let description = embed.description;
-    let owner = description.substring(
-        description.lastIndexOf("**Owner:**") + 1,
-        description.lastIndexOf("(")
-    );
+    let re = /.*Owner\:\*\*\s+(.*)\s+\(.*/;
+    var owner = description.match(re)[0].split(" ")[2].trim();
 
     // Return early if description includes bot-banned user.
     if (BAN_ADDRESSES.has(owner)) {
-        console.log(`Skipping message propagation for ${bannedAddress}`);
+        console.log(`Skipping message propagation for ${owner}`);
         return;
     }
 
     // Return early if event is a referral.
+    let priceField;
     for (var i = embed.fields.length - 1; i >= 0; i--) {
         const embedField = embed.fields[i];
         if (embedField.name.includes("Referral Reward")) {
             console.log(`Skipping message propagation for referral.`);
             return;
         }
+        if (embedField.name.includes("Fixed Price") || embedField.name.includes("SOLD for")) {
+            priceField = embedField;
+        }
     }
+    embed.fields = [priceField];
 
     // Split off the "Description" text within the description.
     let descriptionDescriptionIndex = description.indexOf("\n**Description:**");
@@ -108,29 +114,23 @@ async function triageActivityMessage(msg, bot) {
     // Update to remove author name and to reflect this info in piece name
     // rather than token number as the title and URL field..
     embed.author = null;
-    if (eventName) {
-        embed.setTitle(`${eventName}: ${artBlocksData.name}`);
-    } else {
-        eventName = embed.title;
-    }
+    embed.setTitle(`${eventName}: ${artBlocksData.name}`);
     embed.setURL(openseaURL);
 
-    console.log(embed);
-    console.log("END");
     // Only forward sales events and listing events.
     if (eventName.includes("Successful")) {
         bot.channels.cache.get(CHANNEL_SALES).send(embed);
         bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
         // Forward all Chromie Squiggles sales on to the DAO.
-        // if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
-        //     bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
-        // }
+        if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
+            bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
+        }
     } else if (eventName.includes("Created")) {
         bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
         // Forward all Chromie Squiggles listings on to the DAO.
-        // if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
-        //     bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
-        // }
+        if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
+            bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
+        }
     }
   }
 }
