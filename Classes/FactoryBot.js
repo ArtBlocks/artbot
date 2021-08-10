@@ -11,11 +11,9 @@ const ProjectBot = require("./ProjectBot").ProjectBot;
 
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 
-const MINT_ADDRESS = "0x0000000000000000000000000000000000000000";
 const V2_MINTING_CONTRACT_ADDRESS = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
-const EMBED_COLOR = 0xff0000;
-const UNKNOWN_ADDRESS = "unknown";
-const UNKNOWN_USERNAME = "unknown";
+
+// Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH = process.env.METADATA_REFRESH_INTERVAL_MINUTES;
 
 // This array will hold ProjectBot classes for all the Factory Projects we find
