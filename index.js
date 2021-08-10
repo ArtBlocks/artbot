@@ -428,6 +428,12 @@ let messengersBot =  new ProjectBot(
   350,
   "Messengers"
 );
+let obiceraBot =  new ProjectBot(
+  13000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  529,
+  "Obicera"
+);
 // #aaron-penne projects
 let returnBot =  new ProjectBot(
   77000000,
@@ -648,6 +654,9 @@ bot.on("message", (msg) => {
         } else
         if (msgContentLowercase.includes("messengers")) {
           messengersBot.handleNumberMessage(msg);
+        } else
+        if (msgContentLowercase.includes("obicera")) {
+          obiceraBot.handleNumberMessage(msg);
         } else {
           minutesBot.handleNumberMessage(msg);
         }
