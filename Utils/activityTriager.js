@@ -118,7 +118,7 @@ async function triageActivityMessage(msg, bot) {
     // Update to remove author name and to reflect this info in piece name
     // rather than token number as the title and URL field..
     embed.author = null;
-    embed.setTitle(`${eventName}: ${artBlocksData.name}`);
+    embed.setTitle(`${artBlocksData.name}`);
     embed.setURL(openseaURL);
 
     // Only forward sales events and listing events.
