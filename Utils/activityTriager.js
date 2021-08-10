@@ -99,6 +99,9 @@ async function triageActivityMessage(msg, bot) {
     let lastIndex = description.length - 1;
     description = description.substring(nameLineBreakIndex, lastIndex);
 
+    // Remove (ethereum) from names
+    description = description.replace('(ethereum)', '');
+
     // Update description with parsed and modified string.
     embed.setDescription(description.trim());
 
