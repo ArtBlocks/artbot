@@ -100,7 +100,7 @@ async function triageActivityMessage(msg, bot) {
     description = description.substring(nameLineBreakIndex, lastIndex);
 
     // Remove (ethereum) from names
-    description = description.replace('(ethereum)', '');
+    description = description.replace(/\(ethereum\)/g, '');
 
     // Update description with parsed and modified string.
     embed.setDescription(description.trim());
