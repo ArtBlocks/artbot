@@ -44,14 +44,21 @@ const SQUIGGLE_PAUSE_MESSAGE = new MessageEmbed()
   // Set the main content of the embed
   .setDescription(`It looks like you're wondering about why Chromie Squiggle minting is paused.The tl;dr is that all normal minting is over and the remaining Squiggles are reserved for special occasions!\n\nFor more details, check out the [#squiggle-announcements](https://discord.com/channels/411959613370400778/800461920008273962/800464186924466187) channel.`);
 
-// Custom message shown when someone asks about applications.
-const APPLICATIONS_MESSAGE = new MessageEmbed()
+// Custom messages shown when someone asks about applications.
+const APPLICATIONS_OPEN_MESSAGE = new MessageEmbed()
   // Set the title of the field
   .setTitle('How do I apply to release my project on Art Blocks?')
   // Set the color of the embed
   .setColor(ARTBOT_GREEN)
   // Set the main content of the embed
   .setDescription(`It looks like you're wondering about the Art Blocks application process.\n\nInfo on how to apply to Art Blocks can be found in [#applications](https://discord.com/channels/411959613370400778/450278286862450701).\n\nBefore you apply, make sure:\n1) You're ready and able to share your creative history with us.\n2) You can deliver a functioning script (we cannot help you create one).\n3) Your work is original.\n\nIf you can check those boxes, head over to [#applications](https://discord.com/channels/411959613370400778/450278286862450701), read the full statement, and click the link to apply.`);
+const APPLICATIONS_CLOSED_MESSAGE = new MessageEmbed()
+  // Set the title of the field
+  .setTitle('How do I apply to release my project on Art Blocks?')
+  // Set the color of the embed
+  .setColor(ARTBOT_GREEN)
+  // Set the main content of the embed
+  .setDescription(`It looks like you're wondering about the Art Blocks application process.\n\nArtist applications are currently closed, please visit [#applications](https://discord.com/channels/411959613370400778/450278286862450701) for updates and additional info.`);
 
 // Custom message shown when someone asks about gas.
 const GAS_MESSAGE = new MessageEmbed()
@@ -193,7 +200,7 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   // Handle application questions.
   let mentionedApplications = msgContentLowercase.includes("application") || msgContentLowercase.includes("apply");
   if (containsQuestion && mentionedApplications) {
-    return APPLICATIONS_MESSAGE;
+    return APPLICATIONS_CLOSED_MESSAGE;
   }
   // Handle gas questions.
   let mentionedGas = msgContentLowercase.includes("gas");
