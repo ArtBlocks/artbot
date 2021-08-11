@@ -9,6 +9,7 @@ const bodyParser = require("body-parser");
 
 const AddressCollector = require("./Classes/AddressCollector").AddressCollector;
 const ProjectBot = require("./Classes/ProjectBot").ProjectBot;
+const FactoryBot = require("./Classes/FactoryBot").FactoryBot;
 const ProjectHandlerHelper = require("./Classes/ProjectHandlerHelper").ProjectHandlerHelper;
 
 // Special handlers.
@@ -62,6 +63,9 @@ const CHANNEL_ZEBLOCKS = process.env.CHANNEL_ZEBLOCKS;
 
 // Mints channel, for giveaways.
 const CHANNEL_MINTS = process.env.CHANNEL_MINTS;
+
+// Factory Channel
+const CHANNEL_FACTORY = process.env.CHANNEL_FACTORY;
 
 // Special address collection channel.
 const CHANNEL_ADDRESS_COLLECTION = process.env.CHANNEL_ADDRESS_COLLECTION;
@@ -456,6 +460,9 @@ let eccentricsBot = new ProjectBot(
   "Eccentrics"
 );
 
+let factoryParty = new FactoryBot();
+	
+
 // Per-channel handlers.
 const apparitionSingles = require("./NamedMappings/apparitionSingles.json");
 const apparitionSets = require("./NamedMappings/apparitionSets.json");
@@ -743,6 +750,9 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_REAS:
         centuryBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_FACTORY:
+        factoryParty.handleNumberMessage(msg);
         break;
 
       // Fall-back (should never occur).
