@@ -14,7 +14,7 @@ const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 const V2_MINTING_CONTRACT_ADDRESS = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
 
 // Refresh takes around one minute, so recommend setting this to 60 minutes
-const METADATA_REFRESH = process.env.METADATA_REFRESH_INTERVAL_MINUTES;
+const METADATA_REFRESH_INTERVAL_MINUTES = process.env.METADATA_REFRESH_INTERVAL_MINUTES;
 
 // This array will hold ProjectBot classes for all the Factory Projects we find
 let factoryBotList = [];
@@ -22,7 +22,7 @@ let factoryBotList = [];
 class FactoryBot {
   constructor(projectNumber, mintContract, editionNumber, projectName) {
     this.initialize();
-    setInterval(this.initialize, METADATA_REFRESH * 60000);
+    setInterval(this.initialize, METADATA_REFRESH_INTERVAL_MINUTES * 60000);
   }
 
   async initialize() {
@@ -30,7 +30,7 @@ class FactoryBot {
     let projectList = await getArtBlocksPlatform();
 
     for (let i = 0; i < projectList.length; i++) {
-       let projectData = await getArtBlocksProject(projectList[i]); 
+       let projectData = await getArtBlocksProject(projectList[i]);
 
        if (projectData && isFactoryProject(projectList[i])) {
 	   console.log(`Refreshing project cache for Project ${projectList[i]} ${projectData.name}`);
@@ -47,7 +47,7 @@ class FactoryBot {
     }
 
   }
- 
+
   async handleNumberMessage(msg) {
 
     let content = msg.content;
