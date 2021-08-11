@@ -31,12 +31,14 @@ const CHANNEL_SQUIGGLE_DAO_SQUIGGLE_SQUARE = process.env.CHANNEL_SQUIGGLE_DAO_SQ
 // Curated artist Discord channel IDs.
 const CHANNEL_AARON_PENNE = process.env.CHANNEL_AARON_PENNE;
 const CHANNEL_ALEXIS_ANDRE = process.env.CHANNEL_ALEXIS_ANDRE;
+const CHANNEL_ALIDA_SUN = process.env.CHANNEL_ALIDA_SUN;
 const CHANNEL_BEERVANGEER = process.env.CHANNEL_BEERVANGEER;
 const CHANNEL_BRYAN_BRINKMAN = process.env.CHANNEL_BRYAN_BRINKMAN;
 const CHANNEL_CHAOSCONSTRUCT = process.env.CHANNEL_CHAOSCONSTRUCT;
 const CHANNEL_DAIM = process.env.CHANNEL_DAIM;
 const CHANNEL_DALENZ = process.env.CHANNEL_DALENZ;
 const CHANNEL_DANDAN = process.env.CHANNEL_DANDAN;
+const CHANNEL_DARIEN_BRITO = process.env.CHANNEL_DARIEN_BRITO;
 const CHANNEL_DMITRI_CHERNIAK = process.env.CHANNEL_DMITRI_CHERNIAK;
 const CHANNEL_GE1DOOT = process.env.CHANNEL_GE1DOOT;
 const CHANNEL_HAN_X_NICOLAS_DANIEL = process.env.CHANNEL_HAN_X_NICOLAS_DANIEL;
@@ -52,6 +54,7 @@ const CHANNEL_MICHAEL_CONNOLLY = process.env.CHANNEL_MICHAEL_CONNOLLY;
 const CHANNEL_NUMBERSINMOTION = process.env.CHANNEL_NUMBERSINMOTION;
 const CHANNEL_PXLQ = process.env.CHANNEL_PXLQ;
 const CHANNEL_RADIX = process.env.CHANNEL_RADIX;
+const CHANNEL_RAFAEL_ROZENDAAL = process.env.CHANNEL_RAFAEL_ROZENDAAL;
 const CHANNEL_REAS = process.env.CHANNEL_REAS;
 const CHANNEL_SIMON_DE_MAI = process.env.CHANNEL_SIMON_DE_MAI;
 const CHANNEL_SHVEMBLDR = process.env.CHANNEL_SHVEMBLDR;
@@ -317,6 +320,24 @@ let centuryBot = new ProjectBot(
   1000,
   "Century"
 );
+let glitchBot = new ProjectBot(
+  114000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1000,
+  "glitch crystal monsters"
+);
+let endlessBot = new ProjectBot(
+  120000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1000,
+  "Endless Nameless"
+);
+let pigmentsBot = new ProjectBot(
+  129000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1024,
+  "Pigments"
+);
 
 // Artist playground project Discord channel message handlers.
 // #jeff-davis projects
@@ -433,7 +454,7 @@ let messengersBot =  new ProjectBot(
   "Messengers"
 );
 let obiceraBot =  new ProjectBot(
-  13000000,
+  130000000,
   V2_MINTING_CONTRACT_ADDRESS,
   529,
   "Obicera"
@@ -654,6 +675,15 @@ bot.on("message", (msg) => {
         } else {
           archetypeBot.handleNumberMessage(msg);
         }
+        break;
+      case CHANNEL_ALIDA_SUN:
+        glitchBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_RAFAEL_ROZENDAAL:
+        endlessBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_DARIEN_BRITO:
+        pigmentsBot.handleNumberMessage(msg);
         break;
       case CHANNEL_ALEXIS_ANDRE:
         if (msgContentLowercase.includes("void")) {
