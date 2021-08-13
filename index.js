@@ -488,7 +488,7 @@ let ecumenopolisBot = new ProjectBot(
 );
 
 let factoryParty = new FactoryBot();
-	
+
 
 // Per-channel handlers.
 const apparitionSingles = require("./NamedMappings/apparitionSingles.json");
@@ -616,9 +616,9 @@ bot.on("message", (msg) => {
         }
         break;
       case CHANNEL_JOSHUA_BAGLEY:
-        if (msgContentLowercase.includes("ecumenopolis"){
+        if (msgContentLowercase.includes("ecumenopolis")) {
           ecumenopolisBot.handleNumberMessage(msg);
-        } else {	  
+        } else {
           let dreamSinglesTransformedValue =
             dreamHandlerHelper.singlesTransform(msg.content);
           let dreamSetsTransformedValue =
