@@ -68,6 +68,15 @@ const GAS_MESSAGE = new MessageEmbed()
   // Set the main content of the embed
   .setDescription(`It looks like you're wondering what the deal is with gas.\n\ntl;dr: **Never** modify the gas _limit_, increase the gas _price_ if you want your transaction prioritized.\n\nAll transactions on the Ethereum blockchain consume "gas" in order to be processed, as a way of ensuring that the network is not spammed with value-less transactions.\n\nThe gas _price_ is the amount of Ether (usually measured in the fractional units of "gwei") that you are willing to pay per gas unit that your transaction consumes. If you want your transaction to be approved more quickly, you can increase this to be higher than [the going rate](https://www.gasnow.org/) in order to incentivize miners to process your transaction over other pending transactions.\n\nThe gas _limit_ is the total amount of gas that you are willing to allow your transaction to consume. This amount is auto-magically estimated by MetaMask based on the complexity of the transaction you are performing. Unless you are an expert, you should **never** modify this value. Increasing the gas limit will have no impact on the priority of your transaction, while decreasing it may result in your transaction failing due to "running out of gas" and you losing a transaction fee in the process.`);
 
+// Custom message shown when someone asks artbot about high gas.
+const MM_HIGH_GAS_MESSAGE = new MessageEmbed()
+  // Set the title of the field
+  .setTitle('Why is MetaMask showing an extremely high gas fee?')
+  // Set the color of the embed
+  .setColor(ARTBOT_GREEN)
+  // Set the main content of the embed
+  .setDescription(`MetaMask shows an extremely high gas fee when the purchase won't go through. For example:\n\n- You have insufficient funds in your wallet to pay for mint and estimated gas.\n- The one-mint-per-wallet limiter is on and you are trying to make a second mint.\n- You are trying to mint when the project already sold out or paused.\n\nThis is a [current bug](https://github.com/MetaMask/metamask-extension/issues/10862) with MetaMask.`);
+
 // Custom message shown when someone asks about when the next drop is.
 const NEXT_DROP_MESSAGE = new MessageEmbed()
   // Set the title of the field
@@ -200,6 +209,11 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   let mentionedApplications = msgContentLowercase.includes("application") || msgContentLowercase.includes("apply");
   if (containsQuestion && mentionedApplications) {
     return APPLICATIONS_CLOSED_MESSAGE;
+  }
+  // Handle metamask high gas questions.
+  let mentionedHighGas = msgContentLowercase.includes("gas") && msgContentLowercase.includes("high");
+  if (mentionedArtBot && containsQuestion && mentionedHighGas) {
+    return MM_HIGH_GAS_MESSAGE;
   }
   // Handle gas questions.
   let mentionedGas = msgContentLowercase.includes("gas");
