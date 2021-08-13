@@ -480,6 +480,12 @@ let eccentricsBot = new ProjectBot(
   400,
   "Eccentrics"
 );
+let ecumenopolisBot = new ProjectBot(
+  119000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  676,
+  "Ecumenopolis"
+);
 
 let factoryParty = new FactoryBot();
 	
@@ -610,6 +616,9 @@ bot.on("message", (msg) => {
         }
         break;
       case CHANNEL_JOSHUA_BAGLEY:
+        if (msgContentLowercase.includes("ecumenopolis"){
+          ecumenopolisBot.handleNumberMessage(msg);
+        } else {	  
           let dreamSinglesTransformedValue =
             dreamHandlerHelper.singlesTransform(msg.content);
           let dreamSetsTransformedValue =
@@ -621,7 +630,8 @@ bot.on("message", (msg) => {
             msg.content = dreamSetsTransformedValue;
           }
           dreamsBot.handleNumberMessage(msg);
-          break;
+	}
+        break;
       case CHANNEL_PXLQ:
         if (msgContentLowercase.includes("cyber") &&
           msgContentLowercase.includes("cities")) {
