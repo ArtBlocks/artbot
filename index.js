@@ -480,11 +480,19 @@ let eccentricsBot = new ProjectBot(
   400,
   "Eccentrics"
 );
+// #joshua-bagley projects
 let ecumenopolisBot = new ProjectBot(
   119000000,
   V2_MINTING_CONTRACT_ADDRESS,
   676,
   "Ecumenopolis"
+);
+// #stefan-contiero projects
+let rinascitaBot = new ProjectBot(
+  121000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1111,
+  "Rinascita"
 );
 
 let factoryParty = new FactoryBot();
@@ -786,7 +794,14 @@ bot.on("message", (msg) => {
         blocksOfArtBot.handleNumberMessage(msg);
         break;
       case CHANNEL_STEFAN_CONTIERO:
-        frammentiBot.handleNumberMessage(msg);
+	let number = msgContentLowercase.match(/\d+/);
+    	if (number) number = parseInt(number[0]);
+		    
+	if (msgContentLowercase.includes("rina") || number > 554) {
+          rinascitaBot.handleNumberMessage(msg);
+        } else {
+          frammentiBot.handleNumberMessage(msg);
+        }
         break;
       case CHANNEL_REAS:
         centuryBot.handleNumberMessage(msg);
