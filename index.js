@@ -794,10 +794,11 @@ bot.on("message", (msg) => {
         blocksOfArtBot.handleNumberMessage(msg);
         break;
       case CHANNEL_STEFAN_CONTIERO:
-	let number = msgContentLowercase.match(/\d+/);
-    	if (number) number = parseInt(number[0]);
-		    
-	if (msgContentLowercase.includes("rina") || number > 554) {
+        let tokenId = msgContentLowercase.match(/\d+/);
+        if (tokenId) tokenId = parseInt(number[0]);
+	
+	// check if requested tokenId is greater than total Frammenti tokens
+        if (msgContentLowercase.includes("rina") || tokenId > 554) {
           rinascitaBot.handleNumberMessage(msg);
         } else {
           frammentiBot.handleNumberMessage(msg);
