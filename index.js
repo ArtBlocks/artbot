@@ -795,7 +795,7 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_STEFAN_CONTIERO:
         let tokenId = msgContentLowercase.match(/\d+/);
-        if (tokenId) tokenId = parseInt(number[0]);
+        if (tokenId) tokenId = parseInt(tokenId[0]);
 	
 	// check if requested tokenId is greater than total Frammenti tokens
         if (msgContentLowercase.includes("rina") || tokenId > 554) {
