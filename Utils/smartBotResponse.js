@@ -86,6 +86,14 @@ const NEXT_DROP_MESSAGE = new MessageEmbed()
   // Set the main content of the embed
   .setDescription(`It looks like you're wondering about when the next drop is.\n\nFor details on upcoming scheduled **Curated Project** releases, please check the [#calendar](https://discord.com/channels/411959613370400778/800784659940245504) and [#announcements](https://discord.com/channels/411959613370400778/781730104337235968) channels.\n\n**Artist Playground** drops are entirely coordinated by the artists, so it is up to them to spread the word on social media and in Discord. When they are announced for the entire Discord, you will find them in [#playground-announcements](https://discord.com/channels/411959613370400778/816383725582942208)`);
 
+const OPENSEA_CURATED_MESSAGE = new MessageEmbed()
+  // Set the title of the field
+  .setTitle('Why is this non-curated project showing up as "ArtBlocks Curated" on OpenSea?')
+  // Set the color of the embed
+  .setColor(ARTBOT_GREEN)
+  // Set the main content of the embed
+  .setDescription(`When a project is just minted, there's a delay in OpenSea pulling in the mint's metadata, which includes what collection the mint is in. During this time, OpenSea doesn't know what collection the mint is in, so OpenSea temporarily puts it in "ArtBlocks Curated". Once OpenSea gets the metadata, the mint will be put into its correct collection.`);
+
 // Custom message shown when someone asks what the "Playground" vs. "Curated"
 // vs. "Factory" is.
 const PLAYGROUND_CURATED_FACTORY_MESSAGE = new MessageEmbed()
@@ -185,6 +193,11 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   let mentionsDrop = msgContentLowercase.includes("drop");
   if (containsQuestion && mentionsDrop) {
     return NEXT_DROP_MESSAGE;
+  }
+  // handle when people are confused about opensea saying a project is curated
+  let mentionedOpenSeaCurated = msgContentLowercase.includes("opensea curated");
+  if (mentionedArtBot && containsQuestion && mentionedOpenSeaCurated) {
+    return OPENSEA_CURATED_MESSAGE;
   }
   // Handle questions about Curated Projects vs. Artist Playground vs. Factory.
   let mentionedCuratedPlaygroundFactory = msgContentLowercase.includes("curated") ||
