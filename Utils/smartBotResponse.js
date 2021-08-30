@@ -194,8 +194,10 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   if (containsQuestion && mentionsDrop) {
     return NEXT_DROP_MESSAGE;
   }
-  // handle when people are confused about opensea saying a project is curated
-  let mentionedOpenSeaCurated = msgContentLowercase.includes("opensea curated");
+  // Handle when people are confused about OpenSea is saying a project is curated
+  let mentionedOpenSeaCurated =
+    msgContentLowercase.includes("opensea") &&
+    msgContentLowercase.includes("curated");
   if (mentionedArtBot && containsQuestion && mentionedOpenSeaCurated) {
     return OPENSEA_CURATED_MESSAGE;
   }
