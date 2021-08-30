@@ -62,6 +62,7 @@ const CHANNEL_SNOWFRO = process.env.CHANNEL_SNOWFRO;
 const CHANNEL_STEFAN_CONTIERO = process.env.CHANNEL_STEFAN_CONTIERO;
 const CHANNEL_STINA_JONES = process.env.CHANNEL_STINA_JONES;
 const CHANNEL_TYLER_HOBBS = process.env.CHANNEL_TYLER_HOBBS;
+const CHANNEL_WILLIAM_TAN = process.env.CHANNEL_WILLIAM_TAN;
 const CHANNEL_ZEBLOCKS = process.env.CHANNEL_ZEBLOCKS;
 
 // Mints channel, for giveaways.
@@ -494,6 +495,13 @@ let rinascitaBot = new ProjectBot(
   1111,
   "Rinascita"
 );
+// #william-tan projects
+let scribbledsBot = new ProjectBOT(
+  131000000,
+  V2_MINTING_CONTRACT_ADDRESS
+  1024,
+  "Scribbled Boundaries"
+);
 
 let factoryParty = new FactoryBot();
 
@@ -528,6 +536,12 @@ const dreamSets = require("./NamedMappings/dreamSets.json");
 let dreamHandlerHelper = new ProjectHandlerHelper(
   dreamSingles,
   dreamSets
+);
+const scribbledSingles = require("./NamedMappings/scribbledSingles.json");
+const scribbledSets = require("./NamedMappings/scribbledSets.json");
+let scribbledHandlerHelper = new ProjectHandlerHelper(
+  scribbledSingles,
+  scribbledSets
 );
 
 // Special address collector.
@@ -796,6 +810,19 @@ bot.on("message", (msg) => {
       case CHANNEL_STEFAN_CONTIERO:
         let tokenId = msgContentLowercase.match(/\d+/);
         if (tokenId) tokenId = parseInt(tokenId[0]);
+      case CHANNEL_WILLIAM_TAN:
+        let scribbledSinglesTransformedValue =
+          scribbledHandlerHelper.singlesTransform(msg.content);
+        let scribbledSetsTransformedValue =
+          scribbledHandlerHelper.setsTransform(msg.content);
+        if (scribbledSinglesTransformedValue !== null) {
+          msg.content = scribbledSinglesTransformedValue;
+        } else
+        if (scribbledSetsTransformedValue !== null) {
+          msg.content = scribbledSetsTransformedValue;
+        }
+        scribbledBot.handleNumberMessage(msg);
+        break;
 	
 	// check if requested tokenId is greater than total Frammenti tokens
         if (msgContentLowercase.includes("rina") || tokenId > 554) {
