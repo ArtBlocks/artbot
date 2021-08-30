@@ -807,8 +807,15 @@ bot.on("message", (msg) => {
         blocksOfArtBot.handleNumberMessage(msg);
         break;
       case CHANNEL_STEFAN_CONTIERO:
-        let tokenId = msgContentLowercase.match(/\d+/);
-        if (tokenId) tokenId = parseInt(tokenId[0]);
+        let tokenID = msgContentLowercase.match(/\d+/);
+        if (tokenID) tokenID = parseInt(tokenId[0]);
+        // Check if requested tokenID is greater than total Frammenti tokens
+        if (msgContentLowercase.includes("rina") || tokenID > 554) {
+          rinascitaBot.handleNumberMessage(msg);
+        } else {
+          frammentiBot.handleNumberMessage(msg);
+        }
+        break;
       case CHANNEL_WILLIAM_TAN:
         let scribbledSinglesTransformedValue =
           scribbledHandlerHelper.singlesTransform(msg.content);
@@ -816,19 +823,10 @@ bot.on("message", (msg) => {
           scribbledHandlerHelper.setsTransform(msg.content);
         if (scribbledSinglesTransformedValue !== null) {
           msg.content = scribbledSinglesTransformedValue;
-        } else
-        if (scribbledSetsTransformedValue !== null) {
+        } else if (scribbledSetsTransformedValue !== null) {
           msg.content = scribbledSetsTransformedValue;
         }
         scribbledBot.handleNumberMessage(msg);
-        break;
-
-	// check if requested tokenId is greater than total Frammenti tokens
-        if (msgContentLowercase.includes("rina") || tokenId > 554) {
-          rinascitaBot.handleNumberMessage(msg);
-        } else {
-          frammentiBot.handleNumberMessage(msg);
-        }
         break;
       case CHANNEL_REAS:
         centuryBot.handleNumberMessage(msg);
