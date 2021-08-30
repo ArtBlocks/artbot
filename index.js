@@ -143,7 +143,6 @@ let singularityBot = new ProjectBot(
 let ignitionBot = new ProjectBot(
   9000000,
   V2_MINTING_CONTRACT_ADDRESS,
-
   512,
   "Ignition"
 );
@@ -496,9 +495,9 @@ let rinascitaBot = new ProjectBot(
   "Rinascita"
 );
 // #william-tan projects
-let scribbledsBot = new ProjectBOT(
+let scribbledsBot = new ProjectBot(
   131000000,
-  V2_MINTING_CONTRACT_ADDRESS
+  V2_MINTING_CONTRACT_ADDRESS,
   1024,
   "Scribbled Boundaries"
 );
@@ -823,7 +822,7 @@ bot.on("message", (msg) => {
         }
         scribbledBot.handleNumberMessage(msg);
         break;
-	
+
 	// check if requested tokenId is greater than total Frammenti tokens
         if (msgContentLowercase.includes("rina") || tokenId > 554) {
           rinascitaBot.handleNumberMessage(msg);
