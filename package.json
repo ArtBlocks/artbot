@@ -17,8 +17,8 @@
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.15.2",
-    "discord.js": "^12.5.1",
     "discord-giveaways": "^4.5.1",
+    "discord.js": "^12.5.1",
     "dotenv": "^8.2.0",
     "googleapis": "^39.2.0",
     "ms": "^2.0.0",
