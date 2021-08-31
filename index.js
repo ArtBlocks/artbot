@@ -57,6 +57,7 @@ const CHANNEL_PXLQ = process.env.CHANNEL_PXLQ;
 const CHANNEL_RADIX = process.env.CHANNEL_RADIX;
 const CHANNEL_RAFAEL_ROZENDAAL = process.env.CHANNEL_RAFAEL_ROZENDAAL;
 const CHANNEL_REAS = process.env.CHANNEL_REAS;
+const CHANNEL_RICH_LORD = process.env.CHANNEL_RICH_LORD;
 const CHANNEL_SIMON_DE_MAI = process.env.CHANNEL_SIMON_DE_MAI;
 const CHANNEL_SHVEMBLDR = process.env.CHANNEL_SHVEMBLDR;
 const CHANNEL_SNOWFRO = process.env.CHANNEL_SNOWFRO;
@@ -513,6 +514,19 @@ const scribbledBot = new ProjectBot(
     1024,
     'Scribbled Boundaries',
 );
+// #rich-lord projects
+let octoGardenBot = new ProjectBot(
+  103000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  333,
+  "Octo Garden"
+);
+let geometryRunnersBot = new ProjectBot(
+  138000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1000,
+  "Geometry Runners"
+);
 
 const factoryParty = new FactoryBot();
 const randomGuy = new RandomBot();
@@ -553,6 +567,12 @@ const scribbledSets = require('./NamedMappings/scribbledSets.json');
 const scribbledHandlerHelper = new ProjectHandlerHelper(
     scribbledSingles,
     scribbledSets,
+);
+const geometryRunnersSingles = require("./NamedMappings/geometryRunnersSingles.json");
+const geometryRunnersSets = require("./NamedMappings/geometryRunnersSets.json");
+let geometryRunnersHandlerHelper = new ProjectHandlerHelper(
+  geometryRunnersSingles,
+  geometryRunnersSets
 );
 
 // Special address collector.
@@ -846,6 +866,23 @@ bot.on('message', (msg) => {
         }
         scribbledBot.handleNumberMessage(msg);
         break;
+      case CHANNEL_RICH_LORD:
+        if (msgContentLowercase.includes("octoGarden")) {
+          octoGardenBot.handleNumberMessage(msg);
+        } else {
+          let geometryRunnersSinglesTransformedValue =
+            geometryRunnersHandlerHelper.singlesTransform(msg.content);
+          let geometryRunnersSetsTransformedValue =
+            geometryRunnersHandlerHelper.setsTransform(msg.content);
+          if (geometryRunnersSinglesTransformedValue !== null) {
+            msg.content = geometryRunnersSinglesTransformedValue;
+          } else
+          if (geometryRunnersSetsTransformedValue !== null) {
+            msg.content = geometryRunnersSetsTransformedValue;
+          }
+          geometryRunnersBot.handleNumberMessage(msg);
+          }
+        break;	    
       case CHANNEL_REAS:
         centuryBot.handleNumberMessage(msg);
         break;
