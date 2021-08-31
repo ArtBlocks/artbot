@@ -412,6 +412,12 @@ let r3sonanceBot = new ProjectBot(
   512,
   "R3sonance"
 );
+let auroraIvBot = new ProjectBot(
+  56000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  128,
+  "Aurora IV"
+);
 // #kai projects
 let pixelGlassBot = new ProjectBot(
   24000000,
@@ -586,6 +592,8 @@ bot.on("message", (msg) => {
           utopiaBot.handleNumberMessage(msg);
         } else if (msgContentLowercase.includes("r3")) {
           r3sonanceBot.handleNumberMessage(msg);
+	} else if (msgContentLowercase.includes("aurora")) {
+          auroraIvBot.handleNumberMessage(msg);
         } else {
           ignitionBot.handleNumberMessage(msg);
         }
