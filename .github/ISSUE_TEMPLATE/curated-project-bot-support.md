@@ -2,7 +2,7 @@
 name: Curated Project Bot Support
 about: 'Ticket for requesting bot support for a new Curated project. '
 title: "[CURATED PROJECT] Project #N"
-labels: enhancement
+labels: curated, project-query-support
 assignees: jakerockland
 
 ---
