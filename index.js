@@ -515,17 +515,17 @@ const scribbledBot = new ProjectBot(
     'Scribbled Boundaries',
 );
 // #rich-lord projects
-let octoGardenBot = new ProjectBot(
-  103000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  333,
-  "Octo Garden"
+const octoGardenBot = new ProjectBot(
+    103000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    333,
+    'Octo Garden',
 );
-let geometryRunnersBot = new ProjectBot(
-  138000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1000,
-  "Geometry Runners"
+const geometryRunnersBot = new ProjectBot(
+    138000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Geometry Runners',
 );
 
 const factoryParty = new FactoryBot();
@@ -568,11 +568,11 @@ const scribbledHandlerHelper = new ProjectHandlerHelper(
     scribbledSingles,
     scribbledSets,
 );
-const geometryRunnersSingles = require("./NamedMappings/geometryRunnersSingles.json");
-const geometryRunnersSets = require("./NamedMappings/geometryRunnersSets.json");
-let geometryRunnersHandlerHelper = new ProjectHandlerHelper(
-  geometryRunnersSingles,
-  geometryRunnersSets
+const geometryRunnersSingles = require('./NamedMappings/geometryRunnersSingles.json');
+const geometryRunnersSets = require('./NamedMappings/geometryRunnersSets.json');
+const geometryRunnersHandlerHelper = new ProjectHandlerHelper(
+    geometryRunnersSingles,
+    geometryRunnersSets,
 );
 
 // Special address collector.
@@ -867,12 +867,12 @@ bot.on('message', (msg) => {
         scribbledBot.handleNumberMessage(msg);
         break;
       case CHANNEL_RICH_LORD:
-        if (msgContentLowercase.includes("octoGarden")) {
+        if (msgContentLowercase.includes('octoGarden')) {
           octoGardenBot.handleNumberMessage(msg);
         } else {
-          let geometryRunnersSinglesTransformedValue =
+          const geometryRunnersSinglesTransformedValue =
             geometryRunnersHandlerHelper.singlesTransform(msg.content);
-          let geometryRunnersSetsTransformedValue =
+          const geometryRunnersSetsTransformedValue =
             geometryRunnersHandlerHelper.setsTransform(msg.content);
           if (geometryRunnersSinglesTransformedValue !== null) {
             msg.content = geometryRunnersSinglesTransformedValue;
@@ -881,8 +881,8 @@ bot.on('message', (msg) => {
             msg.content = geometryRunnersSetsTransformedValue;
           }
           geometryRunnersBot.handleNumberMessage(msg);
-          }
-        break;	    
+        }
+        break;
       case CHANNEL_REAS:
         centuryBot.handleNumberMessage(msg);
         break;
