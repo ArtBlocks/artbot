@@ -4,6 +4,10 @@ const {
 } = require('discord.js');
 const fetch = require('node-fetch');
 
+// The non-prod testing channel in https://discord.gg/g4dkpRruqJ.
+const CHANNEL_TESTING_GENERAL_NON_PROD = 785144843986665475;
+const ARTBOT_IS_PROD = process.env.ARTBOT_IS_PROD;
+
 // Discord channel IDs.
 const CHANNEL_GENERAL = process.env.CHANNEL_GENERAL;
 const CHANNEL_HELP = process.env.CHANNEL_HELP;
@@ -150,10 +154,15 @@ async function generateGasPriceMessage() {
  * ArtBot has nothing to say.
  */
 async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID) {
+  // Bail early if not in prod environment and not using test channel.
+  if (!ARTBOT_IS_PROD && channelID !== CHANNEL_TESTING_GENERAL_NON_PROD) {
+    return;
+  }
+
   /*
-     * NOTE: It is important to check if the message author is the ArtBot
-     *       Itself to avoid a recursive infinite loop.
-     */
+   * NOTE: It is important to check if the message author is the ArtBot
+   *       Itself to avoid a recursive infinite loop.
+   */
   if (msgAuthor == ARTBOT_USERNAME) {
     return null;
   }
