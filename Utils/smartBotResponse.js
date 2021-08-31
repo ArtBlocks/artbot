@@ -26,6 +26,15 @@ const ARTBOT_USERNAME = 'artbot';
 const ARTBOT_GREEN = 0x00ff00;
 
 // Thank you message for people asking the artbot how it is.
+const ARTBOT_WEATHER = new MessageEmbed()
+// Set the title of the field
+    .setTitle('The weather!')
+// Set the color of the embed
+    .setColor(ARTBOT_GREEN)
+// Set the main content of the embed
+    .setDescription("The weather is bleh!");
+
+// Thank you message for people asking the artbot how it is.
 const ARTBOT_HOW_ARE_YOU = new MessageEmbed()
 // Set the title of the field
     .setTitle('Thank you for caring!')
@@ -224,6 +233,11 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   const mentionedOpenSea = msgContentLowercase.includes('opensea');
   if (containsQuestion && mentionedOpenSea) {
     return OPENSEA_LINKS_MESSAGE;
+  }
+  // Handle Weather messages.
+  const mentionedWeather = msgContentLowercase.includes('weather');
+  if (containsQuestion && mentionedWeather) {
+    return ARTBOT_WEATHER;
   }
 
   // Handle how are you messages.
