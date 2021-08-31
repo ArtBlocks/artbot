@@ -9,13 +9,13 @@ class ProjectHandlerHelper {
       return null;
     }
 
-    let afterTheHash = messageContent.substring(1);
-    let singleKeyString = afterTheHash.split(' ')[0];
+    const afterTheHash = messageContent.substring(1);
+    const singleKeyString = afterTheHash.split(' ')[0];
     if (singleKeyString === null || !singleKeyString) {
       return null;
     }
 
-    let singleKeyStringLowercase = singleKeyString.toLowerCase();
+    const singleKeyStringLowercase = singleKeyString.toLowerCase();
     if (!this.singles.hasOwnProperty(singleKeyStringLowercase)) {
       return null;
     }
@@ -27,23 +27,23 @@ class ProjectHandlerHelper {
       return null;
     }
 
-    let afterTheHash = messageContent.substring(1);
-    if (!(afterTheHash[0] == "?")) {
+    const afterTheHash = messageContent.substring(1);
+    if (!(afterTheHash[0] == '?')) {
       return null;
     }
 
-    let setKeyString = afterTheHash.split(' ')[1];
+    const setKeyString = afterTheHash.split(' ')[1];
     if (setKeyString === null || !setKeyString) {
       return null;
     }
 
-    let setKeyStringLowercase = setKeyString.toLowerCase();
+    const setKeyStringLowercase = setKeyString.toLowerCase();
     if (!this.sets.hasOwnProperty(setKeyStringLowercase)) {
       return null;
     }
 
-    let setItems = this.sets[setKeyStringLowercase];
-    let randomSetItem = setItems[Math.floor(Math.random() * setItems.length)];
+    const setItems = this.sets[setKeyStringLowercase];
+    const randomSetItem = setItems[Math.floor(Math.random() * setItems.length)];
     return `#${randomSetItem}`;
   }
 }

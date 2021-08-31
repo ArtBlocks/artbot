@@ -1,25 +1,25 @@
-require("dotenv").config();
+require('dotenv').config();
 const {
-  MessageEmbed
-} = require("discord.js");
+  MessageEmbed,
+} = require('discord.js');
 const {
-  google
+  google,
 } = require('googleapis');
-const fetch = require("node-fetch");
+const fetch = require('node-fetch');
 const fs = require('fs');
-const Web3 = require("web3");
+const Web3 = require('web3');
 
-const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545');
 
 // Discord address book to use.
-const DISCORD_ADDRESSBOOK="411959613370400778";
+const DISCORD_ADDRESSBOOK='411959613370400778';
 
 // Google sheet API details.
 const GOOGLE_SHEET_ID = process.env.GOOGLE_SHEET_ID;
 const GOOGLE_AUTH_DETAILS = process.env.GOOGLE_AUTH_DETAILS;
 
 // ArtBot details.
-const ARTBOT_USERNAME = "artbot";
+const ARTBOT_USERNAME = 'artbot';
 const ARTBOT_RED = 0xff0000;
 const ARTBOT_GREEN = 0x00ff00;
 
@@ -28,7 +28,7 @@ const parsedCredentials = JSON.parse(GOOGLE_AUTH_DETAILS);
 const jwtClient = new google.auth.JWT({
   email: parsedCredentials.client_email,
   key: parsedCredentials.private_key,
-  scopes: ['https://www.googleapis.com/auth/spreadsheets']
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 const sheetsService = google.sheets('v4');
 
@@ -56,9 +56,9 @@ class AddressCollector {
     // likely not worth the added complexity if the the total number of
     // Discord lookup members is on the order of thousands.
     this.discordLookup = fs.readFileSync(`./Classes/${DISCORD_ADDRESSBOOK}.csv`)
-    .toString() // Convert file buffer to string.
-    .split('\n') // Split into array based on newlines.
-    .map(line => line.trim()); // Remove any extra whitespace.
+        .toString() // Convert file buffer to string.
+        .split('\n') // Split into array based on newlines.
+        .map((line) => line.trim()); // Remove any extra whitespace.
   }
 
   // Handles a message for the address aggregation channel.
@@ -67,9 +67,9 @@ class AddressCollector {
   // Otherwise, respond to the user notifying them of the failure to record their
   // address. (TODO: Do we always tell the user the cause of the failure?)
   async addressCollectionHandler(msg) {
-    let msgAuthorUsername = msg.author.username;
-    let msgAuthorID = msg.author.id;
-    let msgContent = msg.content;
+    const msgAuthorUsername = msg.author.username;
+    const msgAuthorID = msg.author.id;
+    const msgContent = msg.content;
 
     // NOTE: It is important to check if the message author is the ArtBot
     //       itself to avoid a recursive infinite loop.
@@ -97,7 +97,7 @@ class AddressCollector {
         msg.reply(FAILED_TO_CONNECT_MESSAGE);
         return;
       } else {
-        console.log("Successfully connected!");
+        console.log('Successfully connected!');
 
         // Adds address to address collection Google sheet.
         sheetsService.spreadsheets.values.append({
@@ -107,8 +107,8 @@ class AddressCollector {
           valueInputOption: 'RAW',
           resource: {
             values: [
-              [msgContent, msgAuthorID, Date.now()]
-            ]
+              [msgContent, msgAuthorID, Date.now()],
+            ],
           },
         }, (error, result) => {
           if (error) {

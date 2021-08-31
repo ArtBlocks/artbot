@@ -1,22 +1,22 @@
-require("dotenv").config();
+require('dotenv').config();
 const {
   Client,
-  MessageEmbed
-} = require("discord.js");
-const { GiveawaysManager } = require('discord-giveaways');
-const express = require("express");
-const bodyParser = require("body-parser");
+  MessageEmbed,
+} = require('discord.js');
+const {GiveawaysManager} = require('discord-giveaways');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-const AddressCollector = require("./Classes/AddressCollector").AddressCollector;
-const ProjectBot = require("./Classes/ProjectBot").ProjectBot;
-const FactoryBot = require("./Classes/FactoryBot").FactoryBot;
-const RandomBot = require("./Classes/RandomBot").RandomBot;
-const ProjectHandlerHelper = require("./Classes/ProjectHandlerHelper").ProjectHandlerHelper;
+const AddressCollector = require('./Classes/AddressCollector').AddressCollector;
+const ProjectBot = require('./Classes/ProjectBot').ProjectBot;
+const FactoryBot = require('./Classes/FactoryBot').FactoryBot;
+const RandomBot = require('./Classes/RandomBot').RandomBot;
+const ProjectHandlerHelper = require('./Classes/ProjectHandlerHelper').ProjectHandlerHelper;
 
 // Special handlers.
-const triageActivityMessage = require("./Utils/activityTriager").triageActivityMessage;
-const smartBotResponse = require("./Utils/smartBotResponse").smartBotResponse;
-const handleGiveawayMessage = require("./Utils/giveawayCommands").handleGiveawayMessage;
+const triageActivityMessage = require('./Utils/activityTriager').triageActivityMessage;
+const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse;
+const handleGiveawayMessage = require('./Utils/giveawayCommands').handleGiveawayMessage;
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
@@ -79,523 +79,530 @@ const CHANNEL_ART_CHAT = process.env.CHANNEL_ART_CHAT;
 const CHANNEL_ADDRESS_COLLECTION = process.env.CHANNEL_ADDRESS_COLLECTION;
 
 // Minting contract addresses.
-const OG_MINTING_CONTRACT_ADDRESS = "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a";
-const V2_MINTING_CONTRACT_ADDRESS = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
+const OG_MINTING_CONTRACT_ADDRESS = '0x059edd72cd353df5106d2b9cc5ab83a52287ac3a';
+const V2_MINTING_CONTRACT_ADDRESS = '0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270';
 
 // App setup.
 const app = express();
 
 app.use(bodyParser.json());
 
-app.post("/update", function(req, res) {
-  console.log("received update with body:\n", JSON.stringify(req.body, null, 2), "\n");
+app.post('/update', function(req, res) {
+  console.log('received update with body:\n', JSON.stringify(req.body, null, 2), '\n');
 
-  res.setHeader("Content-Type", "application/json");
+  res.setHeader('Content-Type', 'application/json');
   res.json({
-    success: true
+    success: true,
   });
 });
 
-app.get("/update", function(req, res) {
-  console.log("received get with body:\n", req.body, "\n");
+app.get('/update', function(req, res) {
+  console.log('received get with body:\n', req.body, '\n');
 
-  res.setHeader("Content-Type", "application/json");
+  res.setHeader('Content-Type', 'application/json');
   res.json({
-    success: true
+    success: true,
   });
 });
 
 app.listen(PORT, function() {
-  console.log("Server is listening on port ", PORT);
+  console.log('Server is listening on port ', PORT);
 });
 
 // Bot setup.
 const bot = new Client();
 bot.login(TOKEN);
 
-bot.on("ready", () => {
+bot.on('ready', () => {
   console.info(`Logged in as ${bot.user.tag}!`);
 });
 
-//Manage Giveaways with Artbot
+// Manage Giveaways with Artbot
 bot.giveawaysManager = new GiveawaysManager(bot, {
-    storage: "./giveaways.json",
-    updateCountdownEvery: 5000,
-    default: {
-        botsCanWin: false,
-        embedColor: "#FF0000",
-        reaction: "🎉"
-    }
+  storage: './giveaways.json',
+  updateCountdownEvery: 5000,
+  default: {
+    botsCanWin: false,
+    embedColor: '#FF0000',
+    reaction: '🎉',
+  },
 });
-bot.giveawaysManager.on("giveawayReactionAdded", (giveaway, member, reaction) => {
-    console.log(`${member.user.tag} entered giveaway #${giveaway.messageID} (${reaction.emoji.name})`);
+bot.giveawaysManager.on('giveawayReactionAdded', (giveaway, member, reaction) => {
+  console.log(`${member.user.tag} entered giveaway #${giveaway.messageID} (${reaction.emoji.name})`);
 });
-bot.giveawaysManager.on("giveawayReactionRemoved", (giveaway, member, reaction) => {
-    console.log(`${member.user.tag} unreact to giveaway #${giveaway.messageID} (${reaction.emoji.name})`);
+bot.giveawaysManager.on('giveawayReactionRemoved', (giveaway, member, reaction) => {
+  console.log(`${member.user.tag} unreact to giveaway #${giveaway.messageID} (${reaction.emoji.name})`);
 });
-bot.giveawaysManager.on("giveawayEnded", (giveaway, winners) => {
-    console.log(`Giveaway #${giveaway.messageID} ended! Winners: ${winners.map((member) => member.user.username).join(', ')}`);
+bot.giveawaysManager.on('giveawayEnded', (giveaway, winners) => {
+  console.log(`Giveaway #${giveaway.messageID} ended! Winners: ${winners.map((member) => member.user.username).join(', ')}`);
 });
 
 // Curated project Discord channel message handlers.
-let singularityBot = new ProjectBot(
-  8000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1024,
-  "Singularity"
+const singularityBot = new ProjectBot(
+    8000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1024,
+    'Singularity',
 );
-let ignitionBot = new ProjectBot(
-  9000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  512,
-  "Ignition"
+const ignitionBot = new ProjectBot(
+    9000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    512,
+    'Ignition',
 );
-let squiggleBot = new ProjectBot(
-  0,
-  OG_MINTING_CONTRACT_ADDRESS,
-  10000,
-  "Chromie Squiggle"
+const squiggleBot = new ProjectBot(
+    0,
+    OG_MINTING_CONTRACT_ADDRESS,
+    10000,
+    'Chromie Squiggle',
 );
-let ringersBot = new ProjectBot(
-  13000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1000,
-  "Ringers"
+const ringersBot = new ProjectBot(
+    13000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Ringers',
 );
-let genesisBot = new ProjectBot(
-  1000000,
-  OG_MINTING_CONTRACT_ADDRESS,
-  512,
-  "Genesis"
+const genesisBot = new ProjectBot(
+    1000000,
+    OG_MINTING_CONTRACT_ADDRESS,
+    512,
+    'Genesis',
 );
-let constructionBot = new ProjectBot(
-  2000000,
-  OG_MINTING_CONTRACT_ADDRESS,
-  500,
-  "Construction Token"
+const constructionBot = new ProjectBot(
+    2000000,
+    OG_MINTING_CONTRACT_ADDRESS,
+    500,
+    'Construction Token',
 );
-let dynamicSlicesBot = new ProjectBot(
-  4000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  512,
-  "Dynamic Slices"
+const dynamicSlicesBot = new ProjectBot(
+    4000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    512,
+    'Dynamic Slices',
 );
-let deconstructionsBot = new ProjectBot(
-  7000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  200,
-  "Elevated Deconstructions"
+const deconstructionsBot = new ProjectBot(
+    7000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    200,
+    'Elevated Deconstructions',
 );
-let nimbudsBot = new ProjectBot(
-  10000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  400,
-  "Nimbuds"
+const nimbudsBot = new ProjectBot(
+    10000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    400,
+    'Nimbuds',
 );
-let hyperhashBot = new ProjectBot(
-  11000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  369,
-  "HyperHash"
+const hyperhashBot = new ProjectBot(
+    11000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    369,
+    'HyperHash',
 );
-let unigridsBot = new ProjectBot(
-  12000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  421,
-  "Unigrids"
+const unigridsBot = new ProjectBot(
+    12000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    421,
+    'Unigrids',
 );
-let bitBot = new ProjectBot(
-  21000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1024,
-  "27-Bit Digital"
+const bitBot = new ProjectBot(
+    21000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1024,
+    '27-Bit Digital',
 );
-let spectronBot = new ProjectBot(
-  17000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  400,
-  "Spectron"
+const spectronBot = new ProjectBot(
+    17000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    400,
+    'Spectron',
 );
-let cryptoblotBot = new ProjectBot(
-  3000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1921,
-  "Cryptoblots"
+const cryptoblotBot = new ProjectBot(
+    3000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1921,
+    'Cryptoblots',
 );
-let archetypeBot = new ProjectBot(
-  23000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  600,
-  "Archetype"
+const archetypeBot = new ProjectBot(
+    23000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    600,
+    'Archetype',
 );
-let minutesBot = new ProjectBot(
-  27000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  720,
-  "720 Minutes"
+const minutesBot = new ProjectBot(
+    27000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    720,
+    '720 Minutes',
 );
-let apparitionsBot = new ProjectBot(
-  28000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1500,
-  "Apparitions"
+const apparitionsBot = new ProjectBot(
+    28000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1500,
+    'Apparitions',
 );
-let inspiralsBot = new ProjectBot(
-  29000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1000,
-  "Inspirals"
+const inspiralsBot = new ProjectBot(
+    29000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Inspirals',
 );
-let aerialViewBot = new ProjectBot(
-  35000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1000,
-  "Aerial View"
+const aerialViewBot = new ProjectBot(
+    35000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Aerial View',
 );
-let synapsesBot = new ProjectBot(
-  39000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  700,
-  "Synapses"
+const synapsesBot = new ProjectBot(
+    39000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    700,
+    'Synapses',
 );
-let algobotsBot = new ProjectBot(
-  40000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  500,
-  "Algobots"
+const algobotsBot = new ProjectBot(
+    40000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    500,
+    'Algobots',
 );
-let elementalsBot = new ProjectBot(
-  41000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  600,
-  "Elementals"
+const elementalsBot = new ProjectBot(
+    41000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    600,
+    'Elementals',
 );
-let subscapesBot = new ProjectBot(
-  53000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  650,
-  "Subscapes"
+const subscapesBot = new ProjectBot(
+    53000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    650,
+    'Subscapes',
 );
-let numbersInMotionBot = new ProjectBot(
-  59000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  600,
-  "Watercolor Dreams"
+const numbersInMotionBot = new ProjectBot(
+    59000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    600,
+    'Watercolor Dreams',
 );
-let bubbleBlobbyBot = new ProjectBot(
-  62000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  500,
-  "Bubble Blobby"
+const bubbleBlobbyBot = new ProjectBot(
+    62000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    500,
+    'Bubble Blobby',
 );
-let algoRhythmsBot = new ProjectBot(
-  64000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1000,
-  "AlgoRhythms"
+const algoRhythmsBot = new ProjectBot(
+    64000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'AlgoRhythms',
 );
-let frammentiBot = new ProjectBot(
-  72000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  555,
-  "Frammenti"
+const frammentiBot = new ProjectBot(
+    72000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    555,
+    'Frammenti',
 );
-let blocksOfArtBot = new ProjectBot(
-  74000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  500,
-  "The Blocks of Art"
+const blocksOfArtBot = new ProjectBot(
+    74000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    500,
+    'The Blocks of Art',
 );
-let fidenzaBot = new ProjectBot(
-  78000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  999,
-  "Fidenza"
+const fidenzaBot = new ProjectBot(
+    78000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    999,
+    'Fidenza',
 );
-let dreamsBot = new ProjectBot(
-  89000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  700,
-  "Dreams"
+const dreamsBot = new ProjectBot(
+    89000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    700,
+    'Dreams',
 );
-let centuryBot = new ProjectBot(
-  100000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1000,
-  "Century"
+const centuryBot = new ProjectBot(
+    100000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Century',
 );
-let glitchBot = new ProjectBot(
-  114000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1000,
-  "glitch crystal monsters"
+const glitchBot = new ProjectBot(
+    114000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'glitch crystal monsters',
 );
-let endlessBot = new ProjectBot(
-  120000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1000,
-  "Endless Nameless"
+const endlessBot = new ProjectBot(
+    120000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Endless Nameless',
 );
-let pigmentsBot = new ProjectBot(
-  129000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1024,
-  "Pigments"
+const pigmentsBot = new ProjectBot(
+    129000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1024,
+    'Pigments',
 );
 
-// Artist playground project Discord channel message handlers.
-// #jeff-davis projects
-let viewCardBot = new ProjectBot(
-  6000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  41,
-  "View Card"
+/*
+ * Artist playground project Discord channel message handlers.
+ * #jeff-davis projects
+ */
+const viewCardBot = new ProjectBot(
+    6000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    41,
+    'View Card',
 );
-let colorStudyBot = new ProjectBot(
-  16000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  2000,
-  "Color Study"
+const colorStudyBot = new ProjectBot(
+    16000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    2000,
+    'Color Study',
 );
-let rhythmBot = new ProjectBot(
-  57000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  400,
-  "Rhythm"
+const rhythmBot = new ProjectBot(
+    57000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    400,
+    'Rhythm',
 );
 
 // #dandan projects
-let gen2Bot = new ProjectBot(
-  18000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  256,
-  "Gen 2"
+const gen2Bot = new ProjectBot(
+    18000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    256,
+    'Gen 2',
 );
-let gen3Bot = new ProjectBot(
-  48000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1024,
-  "Gen 3"
+const gen3Bot = new ProjectBot(
+    48000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1024,
+    'Gen 3',
 );
 // #pxlq projects
-let sentienceBot = new ProjectBot(
-  20000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  144,
-  "Sentience"
+const sentienceBot = new ProjectBot(
+    20000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    144,
+    'Sentience',
 );
-let cyberCitiesBot = new ProjectBot(
-  14000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  256,
-  "Cyber Cities"
+const cyberCitiesBot = new ProjectBot(
+    14000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    256,
+    'Cyber Cities',
 );
-let hieroglyphsBot = new ProjectBot(
-  30000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1250,
-  "Hieroglyphs"
+const hieroglyphsBot = new ProjectBot(
+    30000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1250,
+    'Hieroglyphs',
 );
 // #dmitri-cherniak projects
-let eternalPumpBot = new ProjectBot(
-  22000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  50,
-  "The Eternal Pump"
+const eternalPumpBot = new ProjectBot(
+    22000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    50,
+    'The Eternal Pump',
 );
 // #ge1doot projects
-let utopiaBot = new ProjectBot(
-  15000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  256,
-  "Utopia"
+const utopiaBot = new ProjectBot(
+    15000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    256,
+    'Utopia',
 );
-let r3sonanceBot = new ProjectBot(
-  19000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  512,
-  "R3sonance"
+const r3sonanceBot = new ProjectBot(
+    19000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    512,
+    'R3sonance',
 );
-let auroraIvBot = new ProjectBot(
-  56000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  128,
-  "Aurora IV"
+const auroraIvBot = new ProjectBot(
+    56000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    128,
+    'Aurora IV',
 );
 // #kai projects
-let pixelGlassBot = new ProjectBot(
-  24000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  256,
-  "Pixel Glass"
+const pixelGlassBot = new ProjectBot(
+    24000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    256,
+    'Pixel Glass',
 );
 // #beervangeer projects
-let energySculptureBot = new ProjectBot(
-  26000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  369,
-  "EnergySculpture"
+const energySculptureBot = new ProjectBot(
+    26000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    369,
+    'EnergySculpture',
 );
 // #luxpris projects
-let pathfindersBot = new ProjectBot(
-  25000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1000,
-  "Pathfinders"
+const pathfindersBot = new ProjectBot(
+    25000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Pathfinders',
 );
 // #kjetil-golid projects
-let paperArmadaBot = new ProjectBot(
-  37000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  3000,
-  "Paper Armada"
+const paperArmadaBot = new ProjectBot(
+    37000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    3000,
+    'Paper Armada',
 );
 // #alexis-andrew projects
-let voidBot =  new ProjectBot(
-  42000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  500,
-  "Void"
+const voidBot = new ProjectBot(
+    42000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    500,
+    'Void',
 );
-let messengersBot =  new ProjectBot(
-  68000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  350,
-  "Messengers"
+const messengersBot = new ProjectBot(
+    68000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    350,
+    'Messengers',
 );
-let obiceraBot =  new ProjectBot(
-  130000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  529,
-  "Obicera"
+const obiceraBot = new ProjectBot(
+    130000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    529,
+    'Obicera',
 );
 // #aaron-penne projects
-let returnBot =  new ProjectBot(
-  77000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  300,
-  "Return"
+const returnBot = new ProjectBot(
+    77000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    300,
+    'Return',
 );
 // #michael-connolly projects
-let divisionsBot = new ProjectBot(
-  108000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  500,
-  "Divisions"
+const divisionsBot = new ProjectBot(
+    108000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    500,
+    'Divisions',
 );
 // #radix projects
-let eccentricsBot = new ProjectBot(
-  104000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  400,
-  "Eccentrics"
+const eccentricsBot = new ProjectBot(
+    104000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    400,
+    'Eccentrics',
 );
 // #joshua-bagley projects
-let ecumenopolisBot = new ProjectBot(
-  119000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  676,
-  "Ecumenopolis"
+const ecumenopolisBot = new ProjectBot(
+    119000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    676,
+    'Ecumenopolis',
 );
 // #stefan-contiero projects
-let rinascitaBot = new ProjectBot(
-  121000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1111,
-  "Rinascita"
+const rinascitaBot = new ProjectBot(
+    121000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1111,
+    'Rinascita',
 );
 // #william-tan projects
-let scribbledBot = new ProjectBot(
-  131000000,
-  V2_MINTING_CONTRACT_ADDRESS,
-  1024,
-  "Scribbled Boundaries"
+const scribbledBot = new ProjectBot(
+    131000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1024,
+    'Scribbled Boundaries',
 );
 
-let factoryParty = new FactoryBot();
-let randomGuy = new RandomBot();
+const factoryParty = new FactoryBot();
+const randomGuy = new RandomBot();
 
 // Per-channel handlers.
-const apparitionSingles = require("./NamedMappings/apparitionSingles.json");
-const apparitionSets = require("./NamedMappings/apparitionSets.json");
-let apparitionHandlerHelper = new ProjectHandlerHelper(
-  apparitionSingles,
-  apparitionSets
+const apparitionSingles = require('./NamedMappings/apparitionSingles.json');
+const apparitionSets = require('./NamedMappings/apparitionSets.json');
+const apparitionHandlerHelper = new ProjectHandlerHelper(
+    apparitionSingles,
+    apparitionSets,
 );
-const ringerSingles = require("./NamedMappings/ringerSingles.json");
-const ringerSets = require("./NamedMappings/ringerSets.json");
-let ringerHandlerHelper = new ProjectHandlerHelper(
-  ringerSingles,
-  ringerSets
+const ringerSingles = require('./NamedMappings/ringerSingles.json');
+const ringerSets = require('./NamedMappings/ringerSets.json');
+const ringerHandlerHelper = new ProjectHandlerHelper(
+    ringerSingles,
+    ringerSets,
 );
-const subscapeSingles = require("./NamedMappings/subscapeSingles.json");
-const subscapeSets = require("./NamedMappings/subscapeSets.json");
-let subscapeHandlerHelper = new ProjectHandlerHelper(
-  subscapeSingles,
-  subscapeSets
+const subscapeSingles = require('./NamedMappings/subscapeSingles.json');
+const subscapeSets = require('./NamedMappings/subscapeSets.json');
+const subscapeHandlerHelper = new ProjectHandlerHelper(
+    subscapeSingles,
+    subscapeSets,
 );
-const watercolorDreamSingles = require("./NamedMappings/watercolorDreamSingles.json");
-const watercolorDreamSets = require("./NamedMappings/watercolorDreamSets.json");
-let watercolorDreamHandlerHelper = new ProjectHandlerHelper(
-  watercolorDreamSingles,
-  watercolorDreamSets
+const watercolorDreamSingles = require('./NamedMappings/watercolorDreamSingles.json');
+const watercolorDreamSets = require('./NamedMappings/watercolorDreamSets.json');
+const watercolorDreamHandlerHelper = new ProjectHandlerHelper(
+    watercolorDreamSingles,
+    watercolorDreamSets,
 );
-const dreamSingles = require("./NamedMappings/dreamSingles.json");
-const dreamSets = require("./NamedMappings/dreamSets.json");
-let dreamHandlerHelper = new ProjectHandlerHelper(
-  dreamSingles,
-  dreamSets
+const dreamSingles = require('./NamedMappings/dreamSingles.json');
+const dreamSets = require('./NamedMappings/dreamSets.json');
+const dreamHandlerHelper = new ProjectHandlerHelper(
+    dreamSingles,
+    dreamSets,
 );
-const scribbledSingles = require("./NamedMappings/scribbledSingles.json");
-const scribbledSets = require("./NamedMappings/scribbledSets.json");
-let scribbledHandlerHelper = new ProjectHandlerHelper(
-  scribbledSingles,
-  scribbledSets
+const scribbledSingles = require('./NamedMappings/scribbledSingles.json');
+const scribbledSets = require('./NamedMappings/scribbledSets.json');
+const scribbledHandlerHelper = new ProjectHandlerHelper(
+    scribbledSingles,
+    scribbledSets,
 );
 
 // Special address collector.
-let addressCollector = new AddressCollector();
+const addressCollector = new AddressCollector();
 
 // Message event handler.
-bot.on("message", (msg) => {
-  let msgAuthor = msg.author.username;
-  let msgContent = msg.content;
-  let msgContentLowercase = msgContent.toLowerCase();
-  let channelID = msg.channel.id;
-  // If the message is in the activity channel, forward the message on
-  // to the appropriate sub-channel.
+bot.on('message', (msg) => {
+  const msgAuthor = msg.author.username;
+  const msgContent = msg.content;
+  const msgContentLowercase = msgContent.toLowerCase();
+  const channelID = msg.channel.id;
+
+  /*
+     * If the message is in the activity channel, forward the message on
+     * To the appropriate sub-channel.
+     */
   if (channelID == PROD_CHANNEL_ACTIVITY_ALL) {
     triageActivityMessage(msg, bot);
     return;
   }
 
-  // If message is in special address collection channel, forward message
-  // to that handler and return early.
+  /*
+     * If message is in special address collection channel, forward message
+     * To that handler and return early.
+     */
   if (channelID == CHANNEL_ADDRESS_COLLECTION) {
     addressCollector.addressCollectionHandler(msg);
     return;
   }
 
   // Respond to giveaway requests.
-  if (msgContentLowercase.includes("giveaway!")) {
-    console.log("Time for a giveaway");
+  if (msgContentLowercase.includes('giveaway!')) {
+    console.log('Time for a giveaway');
     handleGiveawayMessage(msg, bot);
     return;
   }
 
   // Handle piece # requests.
-  if (msgContent.startsWith("#")) {
+  if (msgContent.startsWith('#')) {
     switch (channelID) {
       // Curated project channels.
       case CHANNEL_HIDEKI:
         singularityBot.handleNumberMessage(msg);
         break;
       case CHANNEL_GE1DOOT:
-        if (msgContentLowercase.includes("utopia")) {
+        if (msgContentLowercase.includes('utopia')) {
           utopiaBot.handleNumberMessage(msg);
-        } else if (msgContentLowercase.includes("r3")) {
+        } else if (msgContentLowercase.includes('r3')) {
           r3sonanceBot.handleNumberMessage(msg);
-        } else if (msgContentLowercase.includes("aurora")) {
+        } else if (msgContentLowercase.includes('aurora')) {
           auroraIvBot.handleNumberMessage(msg);
         } else {
           ignitionBot.handleNumberMessage(msg);
@@ -606,13 +613,13 @@ bot.on("message", (msg) => {
         squiggleBot.handleNumberMessage(msg);
         break;
       case CHANNEL_DMITRI_CHERNIAK:
-        if (msgContentLowercase.includes("eternal") ||
-          msgContentLowercase.includes("pump")) {
+        if (msgContentLowercase.includes('eternal') ||
+          msgContentLowercase.includes('pump')) {
           eternalPumpBot.handleNumberMessage(msg);
         } else {
-          let ringerSinglesTransformedValue =
+          const ringerSinglesTransformedValue =
             ringerHandlerHelper.singlesTransform(msg.content);
-          let ringerSetsTransformedValue =
+          const ringerSetsTransformedValue =
             ringerHandlerHelper.setsTransform(msg.content);
           if (ringerSinglesTransformedValue !== null) {
             msg.content = ringerSinglesTransformedValue;
@@ -624,36 +631,36 @@ bot.on("message", (msg) => {
         }
         break;
       case CHANNEL_DANDAN:
-        if (msgContentLowercase.includes("gen2") ||
-          msgContentLowercase.includes("gen 2")) {
+        if (msgContentLowercase.includes('gen2') ||
+          msgContentLowercase.includes('gen 2')) {
           gen2Bot.handleNumberMessage(msg);
-        } else if (msgContentLowercase.includes("gen3") ||
-          msgContentLowercase.includes("gen 3")) {
+        } else if (msgContentLowercase.includes('gen3') ||
+          msgContentLowercase.includes('gen 3')) {
           gen3Bot.handleNumberMessage(msg);
         } else {
           genesisBot.handleNumberMessage(msg);
         }
         break;
       case CHANNEL_JEFF_DAVIS:
-        if (msgContentLowercase.includes("rhythm")) {
+        if (msgContentLowercase.includes('rhythm')) {
           rhythmBot.handleNumberMessage(msg);
-        } else if (msgContentLowercase.includes("color") &&
-          msgContentLowercase.includes("study")) {
+        } else if (msgContentLowercase.includes('color') &&
+          msgContentLowercase.includes('study')) {
           colorStudyBot.handleNumberMessage(msg);
-        } else if (msgContentLowercase.includes("view") &&
-          msgContentLowercase.includes("card")) {
+        } else if (msgContentLowercase.includes('view') &&
+          msgContentLowercase.includes('card')) {
           viewCardBot.handleNumberMessage(msg);
         } else {
           constructionBot.handleNumberMessage(msg);
         }
         break;
       case CHANNEL_JOSHUA_BAGLEY:
-        if (msgContentLowercase.includes("ecumenopolis")) {
+        if (msgContentLowercase.includes('ecumenopolis')) {
           ecumenopolisBot.handleNumberMessage(msg);
         } else {
-          let dreamSinglesTransformedValue =
+          const dreamSinglesTransformedValue =
             dreamHandlerHelper.singlesTransform(msg.content);
-          let dreamSetsTransformedValue =
+          const dreamSetsTransformedValue =
             dreamHandlerHelper.setsTransform(msg.content);
           if (dreamSinglesTransformedValue !== null) {
             msg.content = dreamSinglesTransformedValue;
@@ -662,22 +669,22 @@ bot.on("message", (msg) => {
             msg.content = dreamSetsTransformedValue;
           }
           dreamsBot.handleNumberMessage(msg);
-	      }
+        }
         break;
       case CHANNEL_PXLQ:
-        if (msgContentLowercase.includes("cyber") &&
-          msgContentLowercase.includes("cities")) {
+        if (msgContentLowercase.includes('cyber') &&
+          msgContentLowercase.includes('cities')) {
           cyberCitiesBot.handleNumberMessage(msg);
-        } else if (msgContentLowercase.includes("sentience")) {
+        } else if (msgContentLowercase.includes('sentience')) {
           sentienceBot.handleNumberMessage(msg);
-        } else if (msgContentLowercase.includes("hieroglyphs")) {
+        } else if (msgContentLowercase.includes('hieroglyphs')) {
           hieroglyphsBot.handleNumberMessage(msg);
         } else {
           dynamicSlicesBot.handleNumberMessage(msg);
         }
         break;
       case CHANNEL_LUXPRIS:
-        if (msgContentLowercase.includes("pathfinder")) {
+        if (msgContentLowercase.includes('pathfinder')) {
           pathfindersBot.handleNumberMessage(msg);
         } else {
           deconstructionsBot.handleNumberMessage(msg);
@@ -687,8 +694,8 @@ bot.on("message", (msg) => {
         nimbudsBot.handleNumberMessage(msg);
         break;
       case CHANNEL_BEERVANGEER:
-        if (msgContentLowercase.includes("energy") &&
-          msgContentLowercase.includes("sculpture")) {
+        if (msgContentLowercase.includes('energy') &&
+          msgContentLowercase.includes('sculpture')) {
           energySculptureBot.handleNumberMessage(msg);
         } else {
           hyperhashBot.handleNumberMessage(msg);
@@ -698,8 +705,8 @@ bot.on("message", (msg) => {
         unigridsBot.handleNumberMessage(msg);
         break;
       case CHANNEL_KAI:
-        if (msgContentLowercase.includes("pixel") &&
-          msgContentLowercase.includes("glass")) {
+        if (msgContentLowercase.includes('pixel') &&
+          msgContentLowercase.includes('glass')) {
           pixelGlassBot.handleNumberMessage(msg);
         } else {
           bitBot.handleNumberMessage(msg);
@@ -712,7 +719,7 @@ bot.on("message", (msg) => {
         cryptoblotBot.handleNumberMessage(msg);
         break;
       case CHANNEL_GOLID:
-        if (msgContentLowercase.includes("armada")) {
+        if (msgContentLowercase.includes('armada')) {
           paperArmadaBot.handleNumberMessage(msg);
         } else {
           archetypeBot.handleNumberMessage(msg);
@@ -728,25 +735,25 @@ bot.on("message", (msg) => {
         pigmentsBot.handleNumberMessage(msg);
         break;
       case CHANNEL_ALEXIS_ANDRE:
-        if (msgContentLowercase.includes("void")) {
+        if (msgContentLowercase.includes('void')) {
           voidBot.handleNumberMessage(msg);
         } else
-        if (msgContentLowercase.includes("messengers")) {
+        if (msgContentLowercase.includes('messengers')) {
           messengersBot.handleNumberMessage(msg);
         } else
-        if (msgContentLowercase.includes("obicera")) {
+        if (msgContentLowercase.includes('obicera')) {
           obiceraBot.handleNumberMessage(msg);
         } else {
           minutesBot.handleNumberMessage(msg);
         }
         break;
       case CHANNEL_AARON_PENNE:
-        if (msgContentLowercase.includes("return")) {
+        if (msgContentLowercase.includes('return')) {
           returnBot.handleNumberMessage(msg);
         } else {
-          let apparitionSinglesTransformedValue =
+          const apparitionSinglesTransformedValue =
             apparitionHandlerHelper.singlesTransform(msg.content);
-          let apparitionSetsTransformedValue =
+          const apparitionSetsTransformedValue =
             apparitionHandlerHelper.setsTransform(msg.content);
           if (apparitionSinglesTransformedValue !== null) {
             msg.content = apparitionSinglesTransformedValue;
@@ -758,7 +765,7 @@ bot.on("message", (msg) => {
         }
         break;
       case CHANNEL_RADIX:
-        if (msgContentLowercase.includes("eccentric")) {
+        if (msgContentLowercase.includes('eccentric')) {
           eccentricsBot.handleNumberMessage(msg);
         } else {
           inspiralsBot.handleNumberMessage(msg);
@@ -774,16 +781,16 @@ bot.on("message", (msg) => {
         algobotsBot.handleNumberMessage(msg);
         break;
       case CHANNEL_MICHAEL_CONNOLLY:
-        if (msgContentLowercase.includes("division")) {
+        if (msgContentLowercase.includes('division')) {
           divisionsBot.handleNumberMessage(msg);
         } else {
           elementalsBot.handleNumberMessage(msg);
         }
         break;
       case CHANNEL_MATT_DESL:
-        let subscapeSinglesTransformedValue =
+        const subscapeSinglesTransformedValue =
           subscapeHandlerHelper.singlesTransform(msg.content);
-        let subscapeSetsTransformedValue =
+        const subscapeSetsTransformedValue =
           subscapeHandlerHelper.setsTransform(msg.content);
         if (subscapeSinglesTransformedValue !== null) {
           msg.content = subscapeSinglesTransformedValue;
@@ -794,9 +801,9 @@ bot.on("message", (msg) => {
         subscapesBot.handleNumberMessage(msg);
         break;
       case CHANNEL_NUMBERSINMOTION:
-        let watercolorDreamsSinglesTransformedValue =
+        const watercolorDreamsSinglesTransformedValue =
           watercolorDreamHandlerHelper.singlesTransform(msg.content);
-        let watercolorDreamsSetsTransformedValue =
+        const watercolorDreamsSetsTransformedValue =
           watercolorDreamHandlerHelper.setsTransform(msg.content);
         if (watercolorDreamsSinglesTransformedValue !== null) {
           msg.content = watercolorDreamsSinglesTransformedValue;
@@ -821,16 +828,16 @@ bot.on("message", (msg) => {
         let tokenID = msgContentLowercase.match(/\d+/);
         if (tokenID) tokenID = parseInt(tokenId[0]);
         // Check if requested tokenID is greater than total Frammenti tokens
-        if (msgContentLowercase.includes("rina") || tokenID > 554) {
+        if (msgContentLowercase.includes('rina') || tokenID > 554) {
           rinascitaBot.handleNumberMessage(msg);
         } else {
           frammentiBot.handleNumberMessage(msg);
         }
         break;
       case CHANNEL_WILLIAM_TAN:
-        let scribbledSinglesTransformedValue =
+        const scribbledSinglesTransformedValue =
           scribbledHandlerHelper.singlesTransform(msg.content);
-        let scribbledSetsTransformedValue =
+        const scribbledSetsTransformedValue =
           scribbledHandlerHelper.setsTransform(msg.content);
         if (scribbledSinglesTransformedValue !== null) {
           msg.content = scribbledSinglesTransformedValue;
@@ -846,10 +853,10 @@ bot.on("message", (msg) => {
         factoryParty.handleNumberMessage(msg);
         break;
       case CHANNEL_ART_CHAT:
-	randomGuy.handleRandomMessage(msg);
+        randomGuy.handleRandomMessage(msg);
         break;
 
-      // Fall-back (should never occur).
+        // Fall-back (should never occur).
       default:
         console.log(`Unknown channel ID: ${msg.channel.id}`);
         break;
@@ -858,17 +865,15 @@ bot.on("message", (msg) => {
   }
 
   // Handle special info questions that ArtBot knows how to answer.
-  let artBotID = bot.user.id;
-  smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
-    (smartResponse) => {
-      if (smartResponse !== null) {
-        msg.reply(null, {
-          embed: smartResponse,
-          allowedMentions: {
-            repliedUser: true
-          }
-        });
-      }
+  const artBotID = bot.user.id;
+  smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then((smartResponse) => {
+    if (smartResponse !== null) {
+      msg.reply(null, {
+        embed: smartResponse,
+        allowedMentions: {
+          repliedUser: true,
+        },
+      });
     }
-  );
+  });
 });
