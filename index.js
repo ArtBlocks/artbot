@@ -592,7 +592,7 @@ bot.on("message", (msg) => {
           utopiaBot.handleNumberMessage(msg);
         } else if (msgContentLowercase.includes("r3")) {
           r3sonanceBot.handleNumberMessage(msg);
-	} else if (msgContentLowercase.includes("aurora")) {
+        } else if (msgContentLowercase.includes("aurora")) {
           auroraIvBot.handleNumberMessage(msg);
         } else {
           ignitionBot.handleNumberMessage(msg);
