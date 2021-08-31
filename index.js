@@ -32,12 +32,14 @@ const CHANNEL_SQUIGGLE_DAO_SQUIGGLE_SQUARE = process.env.CHANNEL_SQUIGGLE_DAO_SQ
 // Curated artist Discord channel IDs.
 const CHANNEL_AARON_PENNE = process.env.CHANNEL_AARON_PENNE;
 const CHANNEL_ALEXIS_ANDRE = process.env.CHANNEL_ALEXIS_ANDRE;
+const CHANNEL_ALIDA_SUN = process.env.CHANNEL_ALIDA_SUN;
 const CHANNEL_BEERVANGEER = process.env.CHANNEL_BEERVANGEER;
 const CHANNEL_BRYAN_BRINKMAN = process.env.CHANNEL_BRYAN_BRINKMAN;
 const CHANNEL_CHAOSCONSTRUCT = process.env.CHANNEL_CHAOSCONSTRUCT;
 const CHANNEL_DAIM = process.env.CHANNEL_DAIM;
 const CHANNEL_DALENZ = process.env.CHANNEL_DALENZ;
 const CHANNEL_DANDAN = process.env.CHANNEL_DANDAN;
+const CHANNEL_DARIEN_BRITO = process.env.CHANNEL_DARIEN_BRITO;
 const CHANNEL_DMITRI_CHERNIAK = process.env.CHANNEL_DMITRI_CHERNIAK;
 const CHANNEL_GE1DOOT = process.env.CHANNEL_GE1DOOT;
 const CHANNEL_HAN_X_NICOLAS_DANIEL = process.env.CHANNEL_HAN_X_NICOLAS_DANIEL;
@@ -53,6 +55,7 @@ const CHANNEL_MICHAEL_CONNOLLY = process.env.CHANNEL_MICHAEL_CONNOLLY;
 const CHANNEL_NUMBERSINMOTION = process.env.CHANNEL_NUMBERSINMOTION;
 const CHANNEL_PXLQ = process.env.CHANNEL_PXLQ;
 const CHANNEL_RADIX = process.env.CHANNEL_RADIX;
+const CHANNEL_RAFAEL_ROZENDAAL = process.env.CHANNEL_RAFAEL_ROZENDAAL;
 const CHANNEL_REAS = process.env.CHANNEL_REAS;
 const CHANNEL_SIMON_DE_MAI = process.env.CHANNEL_SIMON_DE_MAI;
 const CHANNEL_SHVEMBLDR = process.env.CHANNEL_SHVEMBLDR;
@@ -60,6 +63,7 @@ const CHANNEL_SNOWFRO = process.env.CHANNEL_SNOWFRO;
 const CHANNEL_STEFAN_CONTIERO = process.env.CHANNEL_STEFAN_CONTIERO;
 const CHANNEL_STINA_JONES = process.env.CHANNEL_STINA_JONES;
 const CHANNEL_TYLER_HOBBS = process.env.CHANNEL_TYLER_HOBBS;
+const CHANNEL_WILLIAM_TAN = process.env.CHANNEL_WILLIAM_TAN;
 const CHANNEL_ZEBLOCKS = process.env.CHANNEL_ZEBLOCKS;
 
 // Mints channel, for giveaways.
@@ -143,7 +147,6 @@ let singularityBot = new ProjectBot(
 let ignitionBot = new ProjectBot(
   9000000,
   V2_MINTING_CONTRACT_ADDRESS,
-
   512,
   "Ignition"
 );
@@ -321,6 +324,24 @@ let centuryBot = new ProjectBot(
   1000,
   "Century"
 );
+let glitchBot = new ProjectBot(
+  114000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1000,
+  "glitch crystal monsters"
+);
+let endlessBot = new ProjectBot(
+  120000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1000,
+  "Endless Nameless"
+);
+let pigmentsBot = new ProjectBot(
+  129000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1024,
+  "Pigments"
+);
 
 // Artist playground project Discord channel message handlers.
 // #jeff-davis projects
@@ -395,6 +416,12 @@ let r3sonanceBot = new ProjectBot(
   512,
   "R3sonance"
 );
+let auroraIvBot = new ProjectBot(
+  56000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  128,
+  "Aurora IV"
+);
 // #kai projects
 let pixelGlassBot = new ProjectBot(
   24000000,
@@ -436,6 +463,12 @@ let messengersBot =  new ProjectBot(
   350,
   "Messengers"
 );
+let obiceraBot =  new ProjectBot(
+  130000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  529,
+  "Obicera"
+);
 // #aaron-penne projects
 let returnBot =  new ProjectBot(
   77000000,
@@ -457,10 +490,30 @@ let eccentricsBot = new ProjectBot(
   400,
   "Eccentrics"
 );
+// #joshua-bagley projects
+let ecumenopolisBot = new ProjectBot(
+  119000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  676,
+  "Ecumenopolis"
+);
+// #stefan-contiero projects
+let rinascitaBot = new ProjectBot(
+  121000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1111,
+  "Rinascita"
+);
+// #william-tan projects
+let scribbledBot = new ProjectBot(
+  131000000,
+  V2_MINTING_CONTRACT_ADDRESS,
+  1024,
+  "Scribbled Boundaries"
+);
 
 let factoryParty = new FactoryBot();
 let randomGuy = new RandomBot();
-	
 
 // Per-channel handlers.
 const apparitionSingles = require("./NamedMappings/apparitionSingles.json");
@@ -493,6 +546,12 @@ let dreamHandlerHelper = new ProjectHandlerHelper(
   dreamSingles,
   dreamSets
 );
+const scribbledSingles = require("./NamedMappings/scribbledSingles.json");
+const scribbledSets = require("./NamedMappings/scribbledSets.json");
+let scribbledHandlerHelper = new ProjectHandlerHelper(
+  scribbledSingles,
+  scribbledSets
+);
 
 // Special address collector.
 let addressCollector = new AddressCollector();
@@ -517,11 +576,11 @@ bot.on("message", (msg) => {
     return;
   }
 
-  if (channelID == CHANNEL_MINTS) {
-    if (msgContentLowercase.includes("giveaway!")) {
-      console.log("Time for a giveaway");
-      handleGiveawayMessage(msg, bot);
-    }
+  // Respond to giveaway requests.
+  if (msgContentLowercase.includes("giveaway!")) {
+    console.log("Time for a giveaway");
+    handleGiveawayMessage(msg, bot);
+    return;
   }
 
   // Handle piece # requests.
@@ -536,6 +595,8 @@ bot.on("message", (msg) => {
           utopiaBot.handleNumberMessage(msg);
         } else if (msgContentLowercase.includes("r3")) {
           r3sonanceBot.handleNumberMessage(msg);
+        } else if (msgContentLowercase.includes("aurora")) {
+          auroraIvBot.handleNumberMessage(msg);
         } else {
           ignitionBot.handleNumberMessage(msg);
         }
@@ -587,6 +648,9 @@ bot.on("message", (msg) => {
         }
         break;
       case CHANNEL_JOSHUA_BAGLEY:
+        if (msgContentLowercase.includes("ecumenopolis")) {
+          ecumenopolisBot.handleNumberMessage(msg);
+        } else {
           let dreamSinglesTransformedValue =
             dreamHandlerHelper.singlesTransform(msg.content);
           let dreamSetsTransformedValue =
@@ -598,7 +662,8 @@ bot.on("message", (msg) => {
             msg.content = dreamSetsTransformedValue;
           }
           dreamsBot.handleNumberMessage(msg);
-          break;
+	      }
+        break;
       case CHANNEL_PXLQ:
         if (msgContentLowercase.includes("cyber") &&
           msgContentLowercase.includes("cities")) {
@@ -653,12 +718,24 @@ bot.on("message", (msg) => {
           archetypeBot.handleNumberMessage(msg);
         }
         break;
+      case CHANNEL_ALIDA_SUN:
+        glitchBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_RAFAEL_ROZENDAAL:
+        endlessBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_DARIEN_BRITO:
+        pigmentsBot.handleNumberMessage(msg);
+        break;
       case CHANNEL_ALEXIS_ANDRE:
         if (msgContentLowercase.includes("void")) {
           voidBot.handleNumberMessage(msg);
         } else
         if (msgContentLowercase.includes("messengers")) {
           messengersBot.handleNumberMessage(msg);
+        } else
+        if (msgContentLowercase.includes("obicera")) {
+          obiceraBot.handleNumberMessage(msg);
         } else {
           minutesBot.handleNumberMessage(msg);
         }
@@ -741,7 +818,26 @@ bot.on("message", (msg) => {
         blocksOfArtBot.handleNumberMessage(msg);
         break;
       case CHANNEL_STEFAN_CONTIERO:
-        frammentiBot.handleNumberMessage(msg);
+        let tokenID = msgContentLowercase.match(/\d+/);
+        if (tokenID) tokenID = parseInt(tokenId[0]);
+        // Check if requested tokenID is greater than total Frammenti tokens
+        if (msgContentLowercase.includes("rina") || tokenID > 554) {
+          rinascitaBot.handleNumberMessage(msg);
+        } else {
+          frammentiBot.handleNumberMessage(msg);
+        }
+        break;
+      case CHANNEL_WILLIAM_TAN:
+        let scribbledSinglesTransformedValue =
+          scribbledHandlerHelper.singlesTransform(msg.content);
+        let scribbledSetsTransformedValue =
+          scribbledHandlerHelper.setsTransform(msg.content);
+        if (scribbledSinglesTransformedValue !== null) {
+          msg.content = scribbledSinglesTransformedValue;
+        } else if (scribbledSetsTransformedValue !== null) {
+          msg.content = scribbledSetsTransformedValue;
+        }
+        scribbledBot.handleNumberMessage(msg);
         break;
       case CHANNEL_REAS:
         centuryBot.handleNumberMessage(msg);

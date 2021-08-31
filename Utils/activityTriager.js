@@ -11,7 +11,7 @@ const CHANNEL_SQUIGGLE_SALES = process.env.CHANNEL_SQUIGGLE_SALES;
 const CHANNEL_SQUIGGLE_LISTINGS = process.env.CHANNEL_SQUIGGLE_LISTINGS;
 
 // Addresses which should be omitted entirely from event feeds.
-const BAN_ADDRESSES = [
+const BAN_ADDRESSES = new Set([
     "0x45d91f318b2abc6b569b6637c84cdb66486eb9ee",
     "0x3c3fb7e51d8cfcc9451100dddf59255c6d7fc5c2",
     "0x7058634bc1394af83aa0a3589d6b818e4c35295a",
@@ -25,15 +25,37 @@ const BAN_ADDRESSES = [
     "0xb1e6f68aa3ab791f2e835d84a9c1c2b054aa3598",
     "0x2ad7d5ac35319d221b2d1c7ee9edb2e3d106962e",
     "0x438681aa97bf5ecf1fe9110d1b04ed8230e2bfad",
-    "0x7342948869d97e6fe1bcf8d717a9024a43225654"
-];
+    "0x7342948869d97e6fe1bcf8d717a9024a43225654",
+    "0xa7a61f59ed97a8ccd4c9f4cb28c382b72b2446f8",
+    "0xcaa6cbff376018a5e38238d6166b6b4f2ecf49c9",
+    "0x7eea64bd72fdbc1d78c908be7f70f1daeb249951",
+    "0x39b99f561eac03e150eca45254d0bc0b9e0404fb",
+    "0x39b99f561eac03e150eca45254d0bc0b9e0404fb",
+    "0xde52ed2a4ac7aa814ae3fda95d32aa419f45200d",
+    "0x5a3a9d7c2f2d2fb9dfae78fda79134ba6d706352",
+    "0x52238ce4a874356cc64e2eaf67d7265b53b427b1",
+    "0xc4a66617ba07758f6f23efa1b90aba46ed4c4729",
+    "0xd523c78cdc2ddbaafa0db1a3f4b35baf799501ff",
+    "0x907df6e3ef654854520bb7c71f8b6c2f14ca3a87",
+    "0x9fde734f42920221db35fe7e2405c8a68b7539df",
+    "0x406dd0831439abb26c51de18baa031dbb267cb7e",
+    "0x5a3a9d7c2f2d2fb9dfae78fda79134ba6d706352",
+    "0xcd969f0eb423c2e6eb486da3268c048e04963c12",
+    "0xb08a13cbc99c9631b7b2593e22ec803af23fe97d",
+    "0x9aaacea197b3315068b8ef9c98219382b168d4b8",
+    "0x72c0877d82f4fbc7ab7da21077ef152107ccd471"
+]);
 
 async function triageActivityMessage(msg, bot) {
   // Iterate through entire array of embeds, though there should only
   // ever be one at a time per message.
-  let embeds = msg.embeds
+  let embeds = msg.embeds;
   for (i = 0; i < embeds.length; i++) {
     let embed = embeds[i];
+
+    if (embed.author == null) {
+        return;
+    }
 
     // Determine the item that the event is associated with.
     let openseaURL = embed.author.url;
@@ -42,29 +64,33 @@ async function triageActivityMessage(msg, bot) {
 
     // Extract out the "author name".
     let authorName = embed.author.name;
-    let authorURL = embed.author.url;
     let eventName = authorName.split(":")[0];
 
     // Get current description.
     let description = embed.description;
+    let re = /.*Owner\:\*\*\s+(.*)\s+\(.*/;
+    var owner = description.match(re)[0].split(" ")[2].trim();
 
     // Return early if description includes bot-banned user.
-    for (var i = BAN_ADDRESSES.length - 1; i >= 0; i--) {
-        const bannedAddress = BAN_ADDRESSES[i];
-        if (description.includes(bannedAddress)) {
-            console.log(`Skipping message propagation for ${bannedAddress}`);
-            return;
-        }
+    if (BAN_ADDRESSES.has(owner)) {
+        console.log(`Skipping message propagation for ${owner}`);
+        return;
     }
 
     // Return early if event is a referral.
+    let priceField;
     for (var i = embed.fields.length - 1; i >= 0; i--) {
         const embedField = embed.fields[i];
         if (embedField.name.includes("Referral Reward")) {
             console.log(`Skipping message propagation for referral.`);
             return;
         }
+        if (embedField.name.includes("Fixed Price") ||
+            embedField.name.includes("SOLD for")) {
+            priceField = embedField;
+        }
     }
+    embed.fields = [priceField];
 
     // Split off the "Description" text within the description.
     let descriptionDescriptionIndex = description.indexOf("\n**Description:**");
@@ -74,6 +100,9 @@ async function triageActivityMessage(msg, bot) {
     let nameLineBreakIndex = description.indexOf("\n");
     let lastIndex = description.length - 1;
     description = description.substring(nameLineBreakIndex, lastIndex);
+
+    // Remove (ethereum) from names
+    description = description.replace(/\(ethereum\)/g, '');
 
     // Update description with parsed and modified string.
     embed.setDescription(description.trim());
@@ -91,8 +120,8 @@ async function triageActivityMessage(msg, bot) {
     // Update to remove author name and to reflect this info in piece name
     // rather than token number as the title and URL field..
     embed.author = null;
-    embed.setTitle(`${eventName}: ${artBlocksData.name}`);
-    embed.setURL(authorURL);
+    embed.setTitle(`${artBlocksData.name}`);
+    embed.setURL(openseaURL);
 
     // Only forward sales events and listing events.
     if (eventName.includes("Successful")) {
