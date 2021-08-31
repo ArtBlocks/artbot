@@ -496,7 +496,7 @@ let rinascitaBot = new ProjectBot(
   "Rinascita"
 );
 // #william-tan projects
-let scribbledsBot = new ProjectBOT(
+let scribbledBot = new ProjectBOT(
   131000000,
   V2_MINTING_CONTRACT_ADDRESS
   1024,
