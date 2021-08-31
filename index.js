@@ -10,6 +10,7 @@ const bodyParser = require("body-parser");
 const AddressCollector = require("./Classes/AddressCollector").AddressCollector;
 const ProjectBot = require("./Classes/ProjectBot").ProjectBot;
 const FactoryBot = require("./Classes/FactoryBot").FactoryBot;
+const RandomBot = require("./Classes/RandomBot").RandomBot;
 const ProjectHandlerHelper = require("./Classes/ProjectHandlerHelper").ProjectHandlerHelper;
 
 // Special handlers.
@@ -70,6 +71,9 @@ const CHANNEL_MINTS = process.env.CHANNEL_MINTS;
 
 // Factory Channel
 const CHANNEL_FACTORY = process.env.CHANNEL_FACTORY;
+
+// AB Art Chat
+const CHANNEL_ART_CHAT = process.env.CHANNEL_ART_CHAT;
 
 // Special address collection channel.
 const CHANNEL_ADDRESS_COLLECTION = process.env.CHANNEL_ADDRESS_COLLECTION;
@@ -509,7 +513,7 @@ let scribbledBot = new ProjectBot(
 );
 
 let factoryParty = new FactoryBot();
-
+let randomGuy = new RandomBot();
 
 // Per-channel handlers.
 const apparitionSingles = require("./NamedMappings/apparitionSingles.json");
@@ -558,7 +562,6 @@ bot.on("message", (msg) => {
   let msgContent = msg.content;
   let msgContentLowercase = msgContent.toLowerCase();
   let channelID = msg.channel.id;
-
   // If the message is in the activity channel, forward the message on
   // to the appropriate sub-channel.
   if (channelID == PROD_CHANNEL_ACTIVITY_ALL) {
@@ -659,7 +662,7 @@ bot.on("message", (msg) => {
             msg.content = dreamSetsTransformedValue;
           }
           dreamsBot.handleNumberMessage(msg);
-	}
+	      }
         break;
       case CHANNEL_PXLQ:
         if (msgContentLowercase.includes("cyber") &&
@@ -841,6 +844,9 @@ bot.on("message", (msg) => {
         break;
       case CHANNEL_FACTORY:
         factoryParty.handleNumberMessage(msg);
+        break;
+      case CHANNEL_ART_CHAT:
+	randomGuy.handleRandomMessage(msg);
         break;
 
       // Fall-back (should never occur).
