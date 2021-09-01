@@ -527,6 +527,19 @@ const geometryRunnersBot = new ProjectBot(
     1000,
     'Geometry Runners',
 );
+// #jason-ting projects
+const lightBeamsBot = new ProjectBot(
+    32000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    150,
+    'Light Beams',
+);
+const transitionsBot = new ProjectBot(
+    117000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    4712,
+    'Transitions',
+);
 
 const factoryParty = new FactoryBot();
 const randomGuy = new RandomBot();
@@ -833,7 +846,15 @@ bot.on('message', (msg) => {
         numbersInMotionBot.handleNumberMessage(msg);
         break;
       case CHANNEL_JASON_TING:
-        bubbleBlobbyBot.handleNumberMessage(msg);
+        if (msgContentLowercase.includes('light') ||
+            msgContentLowercase.includes('beams')) {
+          lightBeamsBot.handleNumberMessage(msg);
+        } else if (msgContentLowercase.includes('bubble') ||
+                   msgContentLowercase.includes('blobby')) {
+          bubbleBlobbyBot.handleNumberMessage(msg);
+        } else {
+          transitionsBot.handleNumberMessage(msg);
+        }
         break;
       case CHANNEL_HAN_X_NICOLAS_DANIEL:
         algoRhythmsBot.handleNumberMessage(msg);
