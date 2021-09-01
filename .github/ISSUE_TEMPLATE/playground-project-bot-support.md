@@ -1,5 +1,5 @@
 ---
-name: Playgound Project Bot Support
+name: Playground Project Bot Support
 about: Ticket for requesting bot support for a new Playground project
 title: "[PLAYGROUND PROJECT] Project #N"
 labels: playground, project-query-support
