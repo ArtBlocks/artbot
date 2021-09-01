@@ -867,7 +867,7 @@ bot.on('message', (msg) => {
         scribbledBot.handleNumberMessage(msg);
         break;
       case CHANNEL_RICH_LORD:
-        if (msgContentLowercase.includes('octoGarden')) {
+        if (msgContentLowercase.includes('octogarden')) {
           octoGardenBot.handleNumberMessage(msg);
         } else {
           const geometryRunnersSinglesTransformedValue =
