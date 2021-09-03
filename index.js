@@ -29,6 +29,9 @@ const PROD_CHANNEL_ACTIVITY_ALL = process.env.PROD_CHANNEL_ACTIVITY_ALL;
 // Special Squiggle DAO honorary channel ID.
 const CHANNEL_SQUIGGLE_DAO_SQUIGGLE_SQUARE = process.env.CHANNEL_SQUIGGLE_DAO_SQUIGGLE_SQUARE;
 
+// Tyler Hobbs fidenza channel ID
+const CHANNEL_FIDENZA_GENERAL = process.env.CHANNEL_FIDENZA_GENERAL;
+
 // Curated artist Discord channel IDs.
 const CHANNEL_AARON_PENNE = process.env.CHANNEL_AARON_PENNE;
 const CHANNEL_ALEXIS_ANDRE = process.env.CHANNEL_ALEXIS_ANDRE;
@@ -862,6 +865,9 @@ bot.on('message', (msg) => {
       case CHANNEL_TYLER_HOBBS:
         fidenzaBot.handleNumberMessage(msg);
         break;
+      case CHANNEL_FIDENZA_GENERAL:
+	fidenzaBot.handleNumberMessage(msg);
+	break;
       case CHANNEL_SHVEMBLDR:
         blocksOfArtBot.handleNumberMessage(msg);
         break;
