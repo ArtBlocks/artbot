@@ -925,7 +925,7 @@ bot.on('message', (msg) => {
   // Handle special info questions that ArtBot knows how to answer.
   const artBotID = bot.user.id;
   smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then((smartResponse) => {
-    if (smartResponse !== null) {
+    if (smartResponse !== null && smartResponse !== undefined) {
       msg.reply(null, {
         embed: smartResponse,
         allowedMentions: {
