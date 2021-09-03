@@ -156,7 +156,7 @@ async function generateGasPriceMessage() {
 async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID) {
   // Bail early if not in prod environment and not using test channel.
   if (!ARTBOT_IS_PROD && channelID !== CHANNEL_TESTING_GENERAL_NON_PROD) {
-    return;
+    return null;
   }
 
   /*
