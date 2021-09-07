@@ -86,7 +86,7 @@ const MM_HIGH_GAS_MESSAGE = new MessageEmbed()
 // Custom message shown when someone asks about when the next drop is.
 const NEXT_DROP_MESSAGE = new MessageEmbed()
 // Set the title of the field
-    .setTitle('When is the next drop?')
+    .setTitle('When is the next upcoming drop?')
 // Set the color of the embed
     .setColor(ARTBOT_GREEN)
 // Set the main content of the embed
