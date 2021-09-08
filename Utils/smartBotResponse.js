@@ -90,7 +90,7 @@ const NEXT_DROP_MESSAGE = new MessageEmbed()
 // Set the color of the embed
     .setColor(ARTBOT_GREEN)
 // Set the main content of the embed
-    .setDescription(`It looks like you're wondering about when the next drop is.\n\nFor details on upcoming scheduled **Curated Project** releases, please check the [#calendar](https://discord.com/channels/411959613370400778/800784659940245504) and [#announcements](https://discord.com/channels/411959613370400778/781730104337235968) channels.\n\n**Artist Playground** drops are entirely coordinated by the artists, so it is up to them to spread the word on social media and in Discord. When they are announced for the entire Discord, you will find them in [#playground-announcements](https://discord.com/channels/411959613370400778/816383725582942208)`);
+    .setDescription(`It looks like you're wondering about when the next drop is.\n\nFor details on upcoming scheduled releases, please check the [#upcoming-projects](https://discord.com/channels/411959613370400778/872986185167949885) channel.;
 
 const OPENSEA_CURATED_MESSAGE = new MessageEmbed()
 // Set the title of the field
