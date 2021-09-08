@@ -90,7 +90,7 @@ const NEXT_DROP_MESSAGE = new MessageEmbed()
 // Set the color of the embed
     .setColor(ARTBOT_GREEN)
 // Set the main content of the embed
-    .setDescription(`It looks like you're wondering about when the next drop is.\n\nFor details on upcoming scheduled releases, please check the [#upcoming-projects] channel.;
+    .setDescription(`It looks like you're wondering about when the next drop is.\n\nFor details on upcoming scheduled releases, please check the [#upcoming-projects](https://discord.com/channels/411959613370400778/872986185167949885) channel.;
 
 const OPENSEA_CURATED_MESSAGE = new MessageEmbed()
 // Set the title of the field
