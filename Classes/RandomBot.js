@@ -26,7 +26,7 @@ class RandomBot {
   async initialize() {
     const projectList = await getArtBlocksPlatform();
     projectCount = projectList[projectList.length - 1];
-    console.log('Loading project count: ${projectCount}');
+    console.log(`Loading project count: ${projectCount}`);
   }
 
   async handleRandomMessage(msg) {
@@ -44,7 +44,7 @@ class RandomBot {
     let attempts = 0;
     while (attempts < 10) {
       const projectNumber = parseInt(Math.random() * projectCount);
-      console.log('trying to look for project ${projectNumber}');
+      console.log(`trying to look for project ${projectNumber}`);
       const projectData = await getArtBlocksProject(projectNumber);
       if (projectData) {
         const pieceNumber = parseInt(Math.random() * projectData.invocations);
