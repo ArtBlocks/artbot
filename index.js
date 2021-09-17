@@ -143,13 +143,13 @@ bot.giveawaysManager.on('giveawayEnded', (giveaway, winners) => {
 
 // Curated project Discord channel message handlers.
 const singularityBot = new ProjectBot(
-    8000000,
+    8,
     V2_MINTING_CONTRACT_ADDRESS,
     1024,
     'Singularity',
 );
 const ignitionBot = new ProjectBot(
-    9000000,
+    9,
     V2_MINTING_CONTRACT_ADDRESS,
     512,
     'Ignition',
@@ -161,187 +161,187 @@ const squiggleBot = new ProjectBot(
     'Chromie Squiggle',
 );
 const ringersBot = new ProjectBot(
-    13000000,
+    13,
     V2_MINTING_CONTRACT_ADDRESS,
     1000,
     'Ringers',
 );
 const genesisBot = new ProjectBot(
-    1000000,
+    1,
     OG_MINTING_CONTRACT_ADDRESS,
     512,
     'Genesis',
 );
 const constructionBot = new ProjectBot(
-    2000000,
+    2,
     OG_MINTING_CONTRACT_ADDRESS,
     500,
     'Construction Token',
 );
 const dynamicSlicesBot = new ProjectBot(
-    4000000,
+    4,
     V2_MINTING_CONTRACT_ADDRESS,
     512,
     'Dynamic Slices',
 );
 const deconstructionsBot = new ProjectBot(
-    7000000,
+    7,
     V2_MINTING_CONTRACT_ADDRESS,
     200,
     'Elevated Deconstructions',
 );
 const nimbudsBot = new ProjectBot(
-    10000000,
+    10,
     V2_MINTING_CONTRACT_ADDRESS,
     400,
     'Nimbuds',
 );
 const hyperhashBot = new ProjectBot(
-    11000000,
+    11,
     V2_MINTING_CONTRACT_ADDRESS,
     369,
     'HyperHash',
 );
 const unigridsBot = new ProjectBot(
-    12000000,
+    12,
     V2_MINTING_CONTRACT_ADDRESS,
     421,
     'Unigrids',
 );
 const bitBot = new ProjectBot(
-    21000000,
+    21,
     V2_MINTING_CONTRACT_ADDRESS,
     1024,
     '27-Bit Digital',
 );
 const spectronBot = new ProjectBot(
-    17000000,
+    17,
     V2_MINTING_CONTRACT_ADDRESS,
     400,
     'Spectron',
 );
 const cryptoblotBot = new ProjectBot(
-    3000000,
+    3,
     V2_MINTING_CONTRACT_ADDRESS,
     1921,
     'Cryptoblots',
 );
 const archetypeBot = new ProjectBot(
-    23000000,
+    23,
     V2_MINTING_CONTRACT_ADDRESS,
     600,
     'Archetype',
 );
 const minutesBot = new ProjectBot(
-    27000000,
+    27,
     V2_MINTING_CONTRACT_ADDRESS,
     720,
     '720 Minutes',
 );
 const apparitionsBot = new ProjectBot(
-    28000000,
+    28,
     V2_MINTING_CONTRACT_ADDRESS,
     1500,
     'Apparitions',
 );
 const inspiralsBot = new ProjectBot(
-    29000000,
+    29,
     V2_MINTING_CONTRACT_ADDRESS,
     1000,
     'Inspirals',
 );
 const aerialViewBot = new ProjectBot(
-    35000000,
+    35,
     V2_MINTING_CONTRACT_ADDRESS,
     1000,
     'Aerial View',
 );
 const synapsesBot = new ProjectBot(
-    39000000,
+    39,
     V2_MINTING_CONTRACT_ADDRESS,
     700,
     'Synapses',
 );
 const algobotsBot = new ProjectBot(
-    40000000,
+    40,
     V2_MINTING_CONTRACT_ADDRESS,
     500,
     'Algobots',
 );
 const elementalsBot = new ProjectBot(
-    41000000,
+    41,
     V2_MINTING_CONTRACT_ADDRESS,
     600,
     'Elementals',
 );
 const subscapesBot = new ProjectBot(
-    53000000,
+    53,
     V2_MINTING_CONTRACT_ADDRESS,
     650,
     'Subscapes',
 );
 const numbersInMotionBot = new ProjectBot(
-    59000000,
+    59,
     V2_MINTING_CONTRACT_ADDRESS,
     600,
     'Watercolor Dreams',
 );
 const bubbleBlobbyBot = new ProjectBot(
-    62000000,
+    62,
     V2_MINTING_CONTRACT_ADDRESS,
     500,
     'Bubble Blobby',
 );
 const algoRhythmsBot = new ProjectBot(
-    64000000,
+    64,
     V2_MINTING_CONTRACT_ADDRESS,
     1000,
     'AlgoRhythms',
 );
 const frammentiBot = new ProjectBot(
-    72000000,
+    72,
     V2_MINTING_CONTRACT_ADDRESS,
     555,
     'Frammenti',
 );
 const blocksOfArtBot = new ProjectBot(
-    74000000,
+    74,
     V2_MINTING_CONTRACT_ADDRESS,
     500,
     'The Blocks of Art',
 );
 const fidenzaBot = new ProjectBot(
-    78000000,
+    78,
     V2_MINTING_CONTRACT_ADDRESS,
     999,
     'Fidenza',
 );
 const dreamsBot = new ProjectBot(
-    89000000,
+    89,
     V2_MINTING_CONTRACT_ADDRESS,
     700,
     'Dreams',
 );
 const centuryBot = new ProjectBot(
-    100000000,
+    100,
     V2_MINTING_CONTRACT_ADDRESS,
     1000,
     'Century',
 );
 const glitchBot = new ProjectBot(
-    114000000,
+    114,
     V2_MINTING_CONTRACT_ADDRESS,
     1000,
     'glitch crystal monsters',
 );
 const endlessBot = new ProjectBot(
-    120000000,
+    120,
     V2_MINTING_CONTRACT_ADDRESS,
     1000,
     'Endless Nameless',
 );
 const pigmentsBot = new ProjectBot(
-    129000000,
+    129,
     V2_MINTING_CONTRACT_ADDRESS,
     1024,
     'Pigments',
@@ -352,19 +352,19 @@ const pigmentsBot = new ProjectBot(
  * #jeff-davis projects
  */
 const viewCardBot = new ProjectBot(
-    6000000,
+    6,
     V2_MINTING_CONTRACT_ADDRESS,
     41,
     'View Card',
 );
 const colorStudyBot = new ProjectBot(
-    16000000,
+    16,
     V2_MINTING_CONTRACT_ADDRESS,
     2000,
     'Color Study',
 );
 const rhythmBot = new ProjectBot(
-    57000000,
+    57,
     V2_MINTING_CONTRACT_ADDRESS,
     400,
     'Rhythm',
@@ -372,179 +372,179 @@ const rhythmBot = new ProjectBot(
 
 // #dandan projects
 const gen2Bot = new ProjectBot(
-    18000000,
+    18,
     V2_MINTING_CONTRACT_ADDRESS,
     256,
     'Gen 2',
 );
 const gen3Bot = new ProjectBot(
-    48000000,
+    48,
     V2_MINTING_CONTRACT_ADDRESS,
     1024,
     'Gen 3',
 );
 // #pxlq projects
 const sentienceBot = new ProjectBot(
-    20000000,
+    20,
     V2_MINTING_CONTRACT_ADDRESS,
     144,
     'Sentience',
 );
 const cyberCitiesBot = new ProjectBot(
-    14000000,
+    14,
     V2_MINTING_CONTRACT_ADDRESS,
     256,
     'Cyber Cities',
 );
 const hieroglyphsBot = new ProjectBot(
-    30000000,
+    30,
     V2_MINTING_CONTRACT_ADDRESS,
     1250,
     'Hieroglyphs',
 );
 // #dmitri-cherniak projects
 const eternalPumpBot = new ProjectBot(
-    22000000,
+    22,
     V2_MINTING_CONTRACT_ADDRESS,
     50,
     'The Eternal Pump',
 );
 // #ge1doot projects
 const utopiaBot = new ProjectBot(
-    15000000,
+    15,
     V2_MINTING_CONTRACT_ADDRESS,
     256,
     'Utopia',
 );
 const r3sonanceBot = new ProjectBot(
-    19000000,
+    19,
     V2_MINTING_CONTRACT_ADDRESS,
     512,
     'R3sonance',
 );
 const auroraIvBot = new ProjectBot(
-    56000000,
+    56,
     V2_MINTING_CONTRACT_ADDRESS,
     128,
     'Aurora IV',
 );
 // #kai projects
 const pixelGlassBot = new ProjectBot(
-    24000000,
+    24,
     V2_MINTING_CONTRACT_ADDRESS,
     256,
     'Pixel Glass',
 );
 // #beervangeer projects
 const energySculptureBot = new ProjectBot(
-    26000000,
+    26,
     V2_MINTING_CONTRACT_ADDRESS,
     369,
     'EnergySculpture',
 );
 // #luxpris projects
 const pathfindersBot = new ProjectBot(
-    25000000,
+    25,
     V2_MINTING_CONTRACT_ADDRESS,
     1000,
     'Pathfinders',
 );
 // #kjetil-golid projects
 const paperArmadaBot = new ProjectBot(
-    37000000,
+    37,
     V2_MINTING_CONTRACT_ADDRESS,
     3000,
     'Paper Armada',
 );
 // #alexis-andrew projects
 const voidBot = new ProjectBot(
-    42000000,
+    42,
     V2_MINTING_CONTRACT_ADDRESS,
     500,
     'Void',
 );
 const messengersBot = new ProjectBot(
-    68000000,
+    68,
     V2_MINTING_CONTRACT_ADDRESS,
     350,
     'Messengers',
 );
 const obiceraBot = new ProjectBot(
-    130000000,
+    130,
     V2_MINTING_CONTRACT_ADDRESS,
     529,
     'Obicera',
 );
 // #aaron-penne projects
 const returnBot = new ProjectBot(
-    77000000,
+    77,
     V2_MINTING_CONTRACT_ADDRESS,
     300,
     'Return',
 );
 // #michael-connolly projects
 const divisionsBot = new ProjectBot(
-    108000000,
+    108,
     V2_MINTING_CONTRACT_ADDRESS,
     500,
     'Divisions',
 );
 // #radix projects
 const eccentricsBot = new ProjectBot(
-    104000000,
+    104,
     V2_MINTING_CONTRACT_ADDRESS,
     400,
     'Eccentrics',
 );
 const eccentrics2Bot = new ProjectBot(
-    139000000,
+    139,
     V2_MINTING_CONTRACT_ADDRESS,
     500,
     'Eccentrics 2: Orbits',
 );
 // #joshua-bagley projects
 const ecumenopolisBot = new ProjectBot(
-    119000000,
+    119,
     V2_MINTING_CONTRACT_ADDRESS,
     676,
     'Ecumenopolis',
 );
 // #stefan-contiero projects
 const rinascitaBot = new ProjectBot(
-    121000000,
+    121,
     V2_MINTING_CONTRACT_ADDRESS,
     1111,
     'Rinascita',
 );
 // #william-tan projects
 const scribbledBot = new ProjectBot(
-    131000000,
+    131,
     V2_MINTING_CONTRACT_ADDRESS,
     1024,
     'Scribbled Boundaries',
 );
 // #rich-lord projects
 const octoGardenBot = new ProjectBot(
-    103000000,
+    103,
     V2_MINTING_CONTRACT_ADDRESS,
     333,
     'Octo Garden',
 );
 const geometryRunnersBot = new ProjectBot(
-    138000000,
+    138,
     V2_MINTING_CONTRACT_ADDRESS,
     1000,
     'Geometry Runners',
 );
 // #jason-ting projects
 const lightBeamsBot = new ProjectBot(
-    32000000,
+    32,
     V2_MINTING_CONTRACT_ADDRESS,
     150,
     'Light Beams',
 );
 const transitionsBot = new ProjectBot(
-    117000000,
+    117,
     V2_MINTING_CONTRACT_ADDRESS,
     4712,
     'Transitions',

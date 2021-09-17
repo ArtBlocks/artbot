@@ -34,7 +34,7 @@ class FactoryBot {
       if (projectData && isFactoryProject(projectList[i])) {
 	   console.log(`Refreshing project cache for Project ${projectList[i]} ${projectData.name}`);
         const newBot = new ProjectBot(
-            projectList[i]*1000000,
+            projectList[i],
             V2_MINTING_CONTRACT_ADDRESS,
             projectData.invocations,
             projectData.name,
