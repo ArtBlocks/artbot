@@ -52,6 +52,7 @@ const CHANNEL_JEFF_DAVIS = process.env.CHANNEL_JEFF_DAVIS;
 const CHANNEL_JOSHUA_BAGLEY = process.env.CHANNEL_JOSHUA_BAGLEY;
 const CHANNEL_KAI = process.env.CHANNEL_KAI;
 const CHANNEL_GOLID = process.env.CHANNEL_GOLID;
+const CHANNEL_LOREN_BEDNAR = process.env.CHANNEL_LOREN_BEDNAR;
 const CHANNEL_LUXPRIS = process.env.CHANNEL_LUXPRIS;
 const CHANNEL_MATT_DESL = process.env.CHANNEL_MATT_DESL;
 const CHANNEL_MICHAEL_CONNOLLY = process.env.CHANNEL_MICHAEL_CONNOLLY;
@@ -345,6 +346,12 @@ const pigmentsBot = new ProjectBot(
     V2_MINTING_CONTRACT_ADDRESS,
     1024,
     'Pigments',
+);
+const phasesBot = new ProjectBot(
+    143,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1024,
+    'Phase',
 );
 
 /*
@@ -921,6 +928,9 @@ bot.on('message', (msg) => {
         break;
       case CHANNEL_REAS:
         centuryBot.handleNumberMessage(msg);
+        break;
+      case CHANNEL_LOREN_BEDNAR:
+        phasesBot.handleNumberMessage(msg);
         break;
       case CHANNEL_FACTORY:
         factoryParty.handleNumberMessage(msg);
