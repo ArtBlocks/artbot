@@ -496,6 +496,12 @@ const eccentricsBot = new ProjectBot(
     400,
     'Eccentrics',
 );
+const eccentrics2Bot = new ProjectBot(
+    139000000,
+    V2_MINTING_CONTRACT_ADDRESS,
+    500,
+    'Eccentrics 2: Orbits',
+);
 // #joshua-bagley projects
 const ecumenopolisBot = new ProjectBot(
     119000000,
@@ -801,6 +807,9 @@ bot.on('message', (msg) => {
         }
         break;
       case CHANNEL_RADIX:
+        if (msgContentLowercase.includes('eccentrics2')) {
+          eccentrics2Bot.handleNumberMessage(msg);
+        } else
         if (msgContentLowercase.includes('eccentric')) {
           eccentricsBot.handleNumberMessage(msg);
         } else {
