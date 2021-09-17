@@ -48,7 +48,7 @@ class RandomBot {
       const projectData = await getArtBlocksProject(projectNumber);
       if (projectData) {
         const pieceNumber = parseInt(Math.random() * projectData.invocations);
-        const tokenID = projectNumber * 1e6 + pieceNumber;
+        const tokenID = (projectNumber * 1e6) + pieceNumber;
         const artBlocksResponse = await fetch(`https://api.artblocks.io/token/${tokenID}`, {timeout: 5000});
         const artBlocksData = await artBlocksResponse.json();
 
