@@ -510,6 +510,12 @@ const returnBot = new ProjectBot(
     300,
     'Return',
 );
+const ritualBot = new ProjectBot(
+    172,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Rituals',
+);
 // #michael-connolly projects
 const divisionsBot = new ProjectBot(
     108,
@@ -576,6 +582,20 @@ const transitionsBot = new ProjectBot(
     V2_MINTING_CONTRACT_ADDRESS,
     4712,
     'Transitions',
+);
+// #casey-reas projects
+const phototaxisBot = new ProjectBot(
+    164,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Phototaxis',
+);
+// #matt-deslauriers projects
+const meridianBot = new ProjectBot(
+    163,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Meridian',
 );
 
 const factoryParty = new FactoryBot();
@@ -821,6 +841,9 @@ bot.on('message', (msg) => {
         if (msgContentLowercase.includes('return')) {
           returnBot.handleNumberMessage(msg);
         } else {
+        if (msgContentLowercase.includes('rituals')) {
+          ritualBot.handleNumberMessage(msg);
+        } else {
           const apparitionSinglesTransformedValue =
             apparitionHandlerHelper.singlesTransform(msg.content);
           const apparitionSetsTransformedValue =
@@ -861,17 +884,20 @@ bot.on('message', (msg) => {
         }
         break;
       case CHANNEL_MATT_DESL:
-        const subscapeSinglesTransformedValue =
-          subscapeHandlerHelper.singlesTransform(msg.content);
-        const subscapeSetsTransformedValue =
-          subscapeHandlerHelper.setsTransform(msg.content);
-        if (subscapeSinglesTransformedValue !== null) {
-          msg.content = subscapeSinglesTransformedValue;
-        } else
-        if (subscapeSetsTransformedValue !== null) {
-          msg.content = subscapeSetsTransformedValue;
-        }
-        subscapesBot.handleNumberMessage(msg);
+        if (msgContentLowercase.includes('meridian')) {
+          meridianBot.handleNumberMessage(msg);
+        } else {
+          const subscapeSinglesTransformedValue =
+            subscapeHandlerHelper.singlesTransform(msg.content);
+          const subscapeSetsTransformedValue =
+            subscapeHandlerHelper.setsTransform(msg.content);
+          if (subscapeSinglesTransformedValue !== null) {
+            msg.content = subscapeSinglesTransformedValue;
+          } else
+          if (subscapeSetsTransformedValue !== null) {
+            msg.content = subscapeSetsTransformedValue;
+          }
+          subscapesBot.handleNumberMessage(msg);
         break;
       case CHANNEL_NUMBERSINMOTION:
         const watercolorDreamsSinglesTransformedValue =
@@ -948,7 +974,11 @@ bot.on('message', (msg) => {
         }
         break;
       case CHANNEL_REAS:
-        centuryBot.handleNumberMessage(msg);
+        if (msgContentLowercase.includes('century')) {
+          centuryBot.handleNumberMessage(msg);
+        } else {
+          phototaxisBot.handleNumberMessage(msg);
+        }
         break;
       case CHANNEL_LOREN_BEDNAR:
         phasesBot.handleNumberMessage(msg);
