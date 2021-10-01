@@ -35,6 +35,7 @@ const CHANNEL_FIDENZA_GENERAL = process.env.CHANNEL_FIDENZA_GENERAL;
 // Curated artist Discord channel IDs.
 const CHANNEL_AARON_PENNE = process.env.CHANNEL_AARON_PENNE;
 const CHANNEL_ALEXIS_ANDRE = process.env.CHANNEL_ALEXIS_ANDRE;
+const CHANNEL_ANNA_CARRERAS = process.env.CHANNEL_ANNA_CARRERAS;
 const CHANNEL_ALIDA_SUN = process.env.CHANNEL_ALIDA_SUN;
 const CHANNEL_BEERVANGEER = process.env.CHANNEL_BEERVANGEER;
 const CHANNEL_BRYAN_BRINKMAN = process.env.CHANNEL_BRYAN_BRINKMAN;
@@ -55,8 +56,10 @@ const CHANNEL_GOLID = process.env.CHANNEL_GOLID;
 const CHANNEL_LOREN_BEDNAR = process.env.CHANNEL_LOREN_BEDNAR;
 const CHANNEL_LUXPRIS = process.env.CHANNEL_LUXPRIS;
 const CHANNEL_MATT_DESL = process.env.CHANNEL_MATT_DESL;
+const CHANNEL_MONICA_RIZZOLLI = process.env.CHANNEL_MONICA_RIZZOLLI;
 const CHANNEL_MICHAEL_CONNOLLY = process.env.CHANNEL_MICHAEL_CONNOLLY;
 const CHANNEL_NUMBERSINMOTION = process.env.CHANNEL_NUMBERSINMOTION;
+const CHANNEL_PITER_PASMA = process.env.CHANNEL_PITER_PASMA;
 const CHANNEL_PXLQ = process.env.CHANNEL_PXLQ;
 const CHANNEL_RADIX = process.env.CHANNEL_RADIX;
 const CHANNEL_RAFAEL_ROZENDAAL = process.env.CHANNEL_RAFAEL_ROZENDAAL;
@@ -353,6 +356,24 @@ const phasesBot = new ProjectBot(
     1024,
     'Phase',
 );
+const fragmentBot = new ProjectBot(
+    159,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1024,
+    'Fragments',
+);
+const trossetsBot = new ProjectBot(
+    147,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Trossets',
+);
+const skulptuurBot = new ProjectBot(
+    173,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Skulptuur',
+);
 
 /*
  * Artist playground project Discord channel message handlers.
@@ -489,6 +510,12 @@ const returnBot = new ProjectBot(
     300,
     'Return',
 );
+const ritualBot = new ProjectBot(
+    172,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Rituals',
+);
 // #michael-connolly projects
 const divisionsBot = new ProjectBot(
     108,
@@ -555,6 +582,20 @@ const transitionsBot = new ProjectBot(
     V2_MINTING_CONTRACT_ADDRESS,
     4712,
     'Transitions',
+);
+// #casey-reas projects
+const phototaxisBot = new ProjectBot(
+    164,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Phototaxis',
+);
+// #matt-deslauriers projects
+const meridianBot = new ProjectBot(
+    163,
+    V2_MINTING_CONTRACT_ADDRESS,
+    1000,
+    'Meridian',
 );
 
 const factoryParty = new FactoryBot();
@@ -800,6 +841,9 @@ bot.on('message', (msg) => {
         if (msgContentLowercase.includes('return')) {
           returnBot.handleNumberMessage(msg);
         } else {
+        if (msgContentLowercase.includes('rituals')) {
+          ritualBot.handleNumberMessage(msg);
+        } else {
           const apparitionSinglesTransformedValue =
             apparitionHandlerHelper.singlesTransform(msg.content);
           const apparitionSetsTransformedValue =
@@ -840,17 +884,20 @@ bot.on('message', (msg) => {
         }
         break;
       case CHANNEL_MATT_DESL:
-        const subscapeSinglesTransformedValue =
-          subscapeHandlerHelper.singlesTransform(msg.content);
-        const subscapeSetsTransformedValue =
-          subscapeHandlerHelper.setsTransform(msg.content);
-        if (subscapeSinglesTransformedValue !== null) {
-          msg.content = subscapeSinglesTransformedValue;
-        } else
-        if (subscapeSetsTransformedValue !== null) {
-          msg.content = subscapeSetsTransformedValue;
-        }
-        subscapesBot.handleNumberMessage(msg);
+        if (msgContentLowercase.includes('meridian')) {
+          meridianBot.handleNumberMessage(msg);
+        } else {
+          const subscapeSinglesTransformedValue =
+            subscapeHandlerHelper.singlesTransform(msg.content);
+          const subscapeSetsTransformedValue =
+            subscapeHandlerHelper.setsTransform(msg.content);
+          if (subscapeSinglesTransformedValue !== null) {
+            msg.content = subscapeSinglesTransformedValue;
+          } else
+          if (subscapeSetsTransformedValue !== null) {
+            msg.content = subscapeSetsTransformedValue;
+          }
+          subscapesBot.handleNumberMessage(msg);
         break;
       case CHANNEL_NUMBERSINMOTION:
         const watercolorDreamsSinglesTransformedValue =
@@ -927,10 +974,23 @@ bot.on('message', (msg) => {
         }
         break;
       case CHANNEL_REAS:
-        centuryBot.handleNumberMessage(msg);
+        if (msgContentLowercase.includes('century')) {
+          centuryBot.handleNumberMessage(msg);
+        } else {
+          phototaxisBot.handleNumberMessage(msg);
+        }
         break;
       case CHANNEL_LOREN_BEDNAR:
         phasesBot.handleNumberMessage(msg);
+        break;
+	  case CHANNEL_MONICA_RIZZOLLI:
+        fragmentBot.handleNumberMessage(msg);
+        break;
+	  case CHANNEL_ANNA_CARRERAS:
+        trossetsBot.handleNumberMessage(msg);
+        break;
+	  case CHANNEL_PITER_PASMA:
+        skulptuurBot.handleNumberMessage(msg);
         break;
       case CHANNEL_FACTORY:
         factoryParty.handleNumberMessage(msg);
