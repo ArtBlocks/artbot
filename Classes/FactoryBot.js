@@ -32,13 +32,13 @@ class FactoryBot {
       const projectData = await getArtBlocksProject(projectList[i]);
 
       if (projectData && isFactoryProject(projectList[i])) {
-	   console.log(`Refreshing project cache for Project ${projectList[i]} ${projectData.name}`);
-        const newBot = new ProjectBot(
-            projectList[i],
-            V2_MINTING_CONTRACT_ADDRESS,
-            projectData.invocations,
-            projectData.name,
-        );
+        console.log(`Refreshing project cache for Project ${projectList[i]} ${projectData.name}`);
+        const newBot = new ProjectBot({
+          projectNumber: projectList[i],
+          mintContract: V2_MINTING_CONTRACT_ADDRESS,
+          editionNumber: projectData.invocations,
+          projectName: projectData.name,
+        });
         const nameIndex = projectData.name.toLowerCase().replace(/\s+/g, '');
         factoryBotList[nameIndex] = newBot;
       }

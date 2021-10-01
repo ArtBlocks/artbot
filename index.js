@@ -11,7 +11,6 @@ const AddressCollector = require('./Classes/AddressCollector').AddressCollector;
 const ProjectBot = require('./Classes/ProjectBot').ProjectBot;
 const FactoryBot = require('./Classes/FactoryBot').FactoryBot;
 const RandomBot = require('./Classes/RandomBot').RandomBot;
-const ProjectHandlerHelper = require('./Classes/ProjectHandlerHelper').ProjectHandlerHelper;
 
 // Special handlers.
 const triageActivityMessage = require('./Utils/activityTriager').triageActivityMessage;
@@ -169,6 +168,10 @@ const ringersBot = new ProjectBot(
     V2_MINTING_CONTRACT_ADDRESS,
     1000,
     'Ringers',
+    {
+        "singles": "ringerSingles.json",
+        "sets": "ringerSets.json"
+    }
 );
 const genesisBot = new ProjectBot(
     1,
@@ -247,6 +250,10 @@ const apparitionsBot = new ProjectBot(
     V2_MINTING_CONTRACT_ADDRESS,
     1500,
     'Apparitions',
+    {
+        "sets": "apparitionSets.json",
+        "singles": "apparitionSingles.json"
+    }
 );
 const inspiralsBot = new ProjectBot(
     29,
@@ -283,12 +290,20 @@ const subscapesBot = new ProjectBot(
     V2_MINTING_CONTRACT_ADDRESS,
     650,
     'Subscapes',
+    {
+        "sets": "subscapeSets.json",
+        "singles": "subscapeSingles.json"
+    }
 );
 const numbersInMotionBot = new ProjectBot(
     59,
     V2_MINTING_CONTRACT_ADDRESS,
     600,
     'Watercolor Dreams',
+    {
+        "sets": "watercolorDreamSets.json",
+        "singles": "watercolorDreamSingles.json"
+    }
 );
 const bubbleBlobbyBot = new ProjectBot(
     62,
@@ -325,6 +340,10 @@ const dreamsBot = new ProjectBot(
     V2_MINTING_CONTRACT_ADDRESS,
     700,
     'Dreams',
+    {
+        "sets": "dreamSets.json",
+        "singles": "dreamSingles.json"
+    }
 );
 const centuryBot = new ProjectBot(
     100,
@@ -556,6 +575,10 @@ const scribbledBot = new ProjectBot(
     V2_MINTING_CONTRACT_ADDRESS,
     1024,
     'Scribbled Boundaries',
+    {
+        "sets": "scribbledSets.json",
+        "singles": "scribbledSingles.json"
+    }
 );
 // #rich-lord projects
 const octoGardenBot = new ProjectBot(
@@ -569,6 +592,10 @@ const geometryRunnersBot = new ProjectBot(
     V2_MINTING_CONTRACT_ADDRESS,
     1000,
     'Geometry Runners',
+    {
+        "sets": "geometryRunnersSets.json",
+        "singles": "geometryRunnersSingles.json"
+    }
 );
 // #jason-ting projects
 const lightBeamsBot = new ProjectBot(
@@ -600,50 +627,6 @@ const meridianBot = new ProjectBot(
 
 const factoryParty = new FactoryBot();
 const randomGuy = new RandomBot();
-
-// Per-channel handlers.
-const apparitionSingles = require('./NamedMappings/apparitionSingles.json');
-const apparitionSets = require('./NamedMappings/apparitionSets.json');
-const apparitionHandlerHelper = new ProjectHandlerHelper(
-    apparitionSingles,
-    apparitionSets,
-);
-const ringerSingles = require('./NamedMappings/ringerSingles.json');
-const ringerSets = require('./NamedMappings/ringerSets.json');
-const ringerHandlerHelper = new ProjectHandlerHelper(
-    ringerSingles,
-    ringerSets,
-);
-const subscapeSingles = require('./NamedMappings/subscapeSingles.json');
-const subscapeSets = require('./NamedMappings/subscapeSets.json');
-const subscapeHandlerHelper = new ProjectHandlerHelper(
-    subscapeSingles,
-    subscapeSets,
-);
-const watercolorDreamSingles = require('./NamedMappings/watercolorDreamSingles.json');
-const watercolorDreamSets = require('./NamedMappings/watercolorDreamSets.json');
-const watercolorDreamHandlerHelper = new ProjectHandlerHelper(
-    watercolorDreamSingles,
-    watercolorDreamSets,
-);
-const dreamSingles = require('./NamedMappings/dreamSingles.json');
-const dreamSets = require('./NamedMappings/dreamSets.json');
-const dreamHandlerHelper = new ProjectHandlerHelper(
-    dreamSingles,
-    dreamSets,
-);
-const scribbledSingles = require('./NamedMappings/scribbledSingles.json');
-const scribbledSets = require('./NamedMappings/scribbledSets.json');
-const scribbledHandlerHelper = new ProjectHandlerHelper(
-    scribbledSingles,
-    scribbledSets,
-);
-const geometryRunnersSingles = require('./NamedMappings/geometryRunnersSingles.json');
-const geometryRunnersSets = require('./NamedMappings/geometryRunnersSets.json');
-const geometryRunnersHandlerHelper = new ProjectHandlerHelper(
-    geometryRunnersSingles,
-    geometryRunnersSets,
-);
 
 // Special address collector.
 const addressCollector = new AddressCollector();
@@ -707,16 +690,6 @@ bot.on('message', (msg) => {
           msgContentLowercase.includes('pump')) {
           eternalPumpBot.handleNumberMessage(msg);
         } else {
-          const ringerSinglesTransformedValue =
-            ringerHandlerHelper.singlesTransform(msg.content);
-          const ringerSetsTransformedValue =
-            ringerHandlerHelper.setsTransform(msg.content);
-          if (ringerSinglesTransformedValue !== null) {
-            msg.content = ringerSinglesTransformedValue;
-          } else
-          if (ringerSetsTransformedValue !== null) {
-            msg.content = ringerSetsTransformedValue;
-          }
           ringersBot.handleNumberMessage(msg);
         }
         break;
@@ -748,16 +721,6 @@ bot.on('message', (msg) => {
         if (msgContentLowercase.includes('ecumenopolis')) {
           ecumenopolisBot.handleNumberMessage(msg);
         } else {
-          const dreamSinglesTransformedValue =
-            dreamHandlerHelper.singlesTransform(msg.content);
-          const dreamSetsTransformedValue =
-            dreamHandlerHelper.setsTransform(msg.content);
-          if (dreamSinglesTransformedValue !== null) {
-            msg.content = dreamSinglesTransformedValue;
-          } else
-          if (dreamSetsTransformedValue !== null) {
-            msg.content = dreamSetsTransformedValue;
-          }
           dreamsBot.handleNumberMessage(msg);
         }
         break;
@@ -844,16 +807,6 @@ bot.on('message', (msg) => {
         if (msgContentLowercase.includes('rituals')) {
           ritualBot.handleNumberMessage(msg);
         } else {
-          const apparitionSinglesTransformedValue =
-            apparitionHandlerHelper.singlesTransform(msg.content);
-          const apparitionSetsTransformedValue =
-            apparitionHandlerHelper.setsTransform(msg.content);
-          if (apparitionSinglesTransformedValue !== null) {
-            msg.content = apparitionSinglesTransformedValue;
-          } else
-          if (apparitionSetsTransformedValue !== null) {
-            msg.content = apparitionSetsTransformedValue;
-          }
           apparitionsBot.handleNumberMessage(msg);
         }
         break;
@@ -887,29 +840,10 @@ bot.on('message', (msg) => {
         if (msgContentLowercase.includes('meridian')) {
           meridianBot.handleNumberMessage(msg);
         } else {
-          const subscapeSinglesTransformedValue =
-            subscapeHandlerHelper.singlesTransform(msg.content);
-          const subscapeSetsTransformedValue =
-            subscapeHandlerHelper.setsTransform(msg.content);
-          if (subscapeSinglesTransformedValue !== null) {
-            msg.content = subscapeSinglesTransformedValue;
-          } else
-          if (subscapeSetsTransformedValue !== null) {
-            msg.content = subscapeSetsTransformedValue;
-          }
           subscapesBot.handleNumberMessage(msg);
         }
         break;
-      case CHANNEL_NUMBERSINMOTION:
-        const watercolorDreamsSinglesTransformedValue =
-          watercolorDreamHandlerHelper.singlesTransform(msg.content);
-        const watercolorDreamsSetsTransformedValue =
-          watercolorDreamHandlerHelper.setsTransform(msg.content);
-        if (watercolorDreamsSinglesTransformedValue !== null) {
-          msg.content = watercolorDreamsSinglesTransformedValue;
-        } else if (watercolorDreamsSetsTransformedValue !== null) {
-          msg.content = watercolorDreamsSetsTransformedValue;
-        }
+        case CHANNEL_NUMBERSINMOTION:
         numbersInMotionBot.handleNumberMessage(msg);
         break;
       case CHANNEL_JASON_TING:
@@ -945,32 +879,13 @@ bot.on('message', (msg) => {
           frammentiBot.handleNumberMessage(msg);
         }
         break;
-      case CHANNEL_WILLIAM_TAN:
-        const scribbledSinglesTransformedValue =
-          scribbledHandlerHelper.singlesTransform(msg.content);
-        const scribbledSetsTransformedValue =
-          scribbledHandlerHelper.setsTransform(msg.content);
-        if (scribbledSinglesTransformedValue !== null) {
-          msg.content = scribbledSinglesTransformedValue;
-        } else if (scribbledSetsTransformedValue !== null) {
-          msg.content = scribbledSetsTransformedValue;
-        }
+        case CHANNEL_WILLIAM_TAN:
         scribbledBot.handleNumberMessage(msg);
         break;
       case CHANNEL_RICH_LORD:
         if (msgContentLowercase.includes('octogarden')) {
           octoGardenBot.handleNumberMessage(msg);
         } else {
-          const geometryRunnersSinglesTransformedValue =
-            geometryRunnersHandlerHelper.singlesTransform(msg.content);
-          const geometryRunnersSetsTransformedValue =
-            geometryRunnersHandlerHelper.setsTransform(msg.content);
-          if (geometryRunnersSinglesTransformedValue !== null) {
-            msg.content = geometryRunnersSinglesTransformedValue;
-          } else
-          if (geometryRunnersSetsTransformedValue !== null) {
-            msg.content = geometryRunnersSetsTransformedValue;
-          }
           geometryRunnersBot.handleNumberMessage(msg);
         }
         break;

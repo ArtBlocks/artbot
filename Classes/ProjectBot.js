@@ -3,6 +3,7 @@ const {
 } = require("discord.js");
 const fetch = require("node-fetch");
 const Web3 = require("web3");
+const { ProjectHandlerHelper } = require("./ProjectHandlerHelper");
 
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 
@@ -12,11 +13,18 @@ const UNKNOWN_ADDRESS = "unknown";
 const UNKNOWN_USERNAME = "unknown";
 
 class ProjectBot {
-  constructor(projectNumber, mintContract, editionNumber, projectName) {
+  constructor({ projectNumber, mintContract, editionNumber, projectName, namedMappings }) {
     this.projectNumber = projectNumber;
     this.mintContract = mintContract;
     this.editionNumber = editionNumber;
     this.projectName = projectName;
+    this.namedMappings = namedMappings ? ProjectBot.getProjectHandlerHelper(namedMappings) : null;
+  }
+
+  static getProjectHandlerHelper({ singles, sets }) {
+    let singlesMap = singles ? require(`../NamedMappings/${singles}`) : null;
+    let setsMap = sets ? require(`../NamedMappings/${sets}`) : null;
+    return new ProjectHandlerHelper(singlesMap, setsMap);
   }
 
   async handleNumberMessage(msg) {
@@ -26,6 +34,11 @@ class ProjectBot {
         `Invalid format, enter # followed by the piece number of interest.`
       );
       return;
+    }
+
+    // decode any mappings
+    if (this.namedMappings) {
+      content = this.namedMappings.transform(content)
     }
 
     let detailsRequested = content.toLowerCase().includes("detail");
