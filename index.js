@@ -840,7 +840,7 @@ bot.on('message', (msg) => {
       case CHANNEL_AARON_PENNE:
         if (msgContentLowercase.includes('return')) {
           returnBot.handleNumberMessage(msg);
-        } else {
+        } else
         if (msgContentLowercase.includes('rituals')) {
           ritualBot.handleNumberMessage(msg);
         } else {
@@ -898,6 +898,7 @@ bot.on('message', (msg) => {
             msg.content = subscapeSetsTransformedValue;
           }
           subscapesBot.handleNumberMessage(msg);
+        }
         break;
       case CHANNEL_NUMBERSINMOTION:
         const watercolorDreamsSinglesTransformedValue =
