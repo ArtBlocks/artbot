@@ -1,21 +1,27 @@
-# This config is equivalent to both the '.circleci/extended/orb-free.yml' and the base '.circleci/config.yml'
 version: 2.1
-
-# Orbs are reusable packages of CircleCI configuration that you may share across projects, enabling you to create encapsulated, parameterized commands, jobs, and executors that can be used across multiple projects.
-# See: https://circleci.com/docs/2.0/orb-intro/
+executors:
+  build-executor:
+    docker:
+      - image: cimg/node:lts
+      
 orbs:
-  node: circleci/node@4.7
+  node: circleci/node@4.7.0
+  
+jobs:
+  build-check:
+    environment:
+      TOKEN: ODM3NTEyNTU4NTA4Mzc2MTE3.YItoWg.ZdzdZFQlK8NMh30WFB7wrNqg5Wo
+      METADATA_REFRESH_INTERVAL_MINUTES: 60
+      PROD_CHANNEL_ACTIVITY_ALL: 859521842317754369
+      GOOGLE_AUTH_DETAILS: "{}"
+    executor: build-executor
+    steps:
+      - checkout
+      - run: |
+          npm install
+          npm start
 
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  sample: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  build-workflow:
     jobs:
-      - node/test:
-          # This is the node version to use for the `cimg/node` tag
-          # Relevant tags can be found on the CircleCI Developer Hub
-          # https://circleci.com/developer/images/image/cimg/node
-          version: '16.10'
-          # If you are using yarn, change the line below from "npm" to "yarn"
-          pkg-manager: npm
+      - build-check
