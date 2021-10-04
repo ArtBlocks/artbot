@@ -10,9 +10,8 @@ orbs:
 jobs:
   build-check:
     environment:
-      TOKEN: ODM3NTEyNTU4NTA4Mzc2MTE3.YItoWg.ZdzdZFQlK8NMh30WFB7wrNqg5Wo
-      METADATA_REFRESH_INTERVAL_MINUTES: 60
       PROD_CHANNEL_ACTIVITY_ALL: 859521842317754369
+      METADATA_REFRESH_INTERVAL_MINUTES: 60
       GOOGLE_AUTH_DETAILS: "{}"
     executor: build-executor
     steps:
