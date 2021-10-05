@@ -3,15 +3,17 @@ const {
   MessageEmbed,
 } = require('discord.js');
 const fetch = require('node-fetch');
+const projectConfig = require('../ProjectConfig/projectConfig').projectConfig;
 
-// The non-prod testing channel in https://discord.gg/g4dkpRruqJ.
-const CHANNEL_TESTING_GENERAL_NON_PROD = 785144843986665475;
 const ARTBOT_IS_PROD = process.env.ARTBOT_IS_PROD;
+// only care about the following if not in prod
+const CHANNEL_TESTING_GENERAL_NON_PROD = ARTBOT_IS_PROD ?
+  null :
+  projectConfig.chIdByName['general'];
 
 // Discord channel IDs.
-const CHANNEL_GENERAL = process.env.CHANNEL_GENERAL;
-const CHANNEL_HELP = process.env.CHANNEL_HELP;
-const CHANNEL_SNOWFRO = process.env.CHANNEL_SNOWFRO;
+const CHANNEL_HELP = projectConfig.chIdByName['help'];
+const CHANNEL_SNOWFRO = projectConfig.chIdByName['snowfro'];
 const GASSTATION_API_KEY = process.env.GASSTATION_API_KEY;
 
 /*

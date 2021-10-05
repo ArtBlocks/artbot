@@ -1,0 +1,34 @@
+{
+    "squiggleBot": {
+        "projectNumber": 0,
+        "mintContract": "OG",
+        "editionNumber": 10000,
+        "projectName": "Chromie Squiggle"
+    },
+    "ringersBot": {
+        "projectNumber": 13,
+        "mintContract": "V2",
+        "editionNumber": 1000,
+        "projectName": "Ringers",
+        "namedMappings": {
+            "sets": "ringerSets.json",
+            "singles": "ringerSingles.json"
+        }
+    },
+    "eternalPumpBot": {
+        "projectNumber": 22,
+        "mintContract": "V2",
+        "editionNumber": 50,
+        "projectName": "The Eternal Pump"
+    },
+    "watercolorDreamsBot": {
+        "projectNumber": 59,
+        "mintContract": "V2",
+        "editionNumber": 600,
+        "projectName": "Watercolor Dreams",
+        "namedMappings": {
+            "sets": "watercolorDreamSets.json",
+            "singles": "watercolorDreamSingles.json"
+        }
+    }
+}

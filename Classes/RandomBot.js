@@ -9,8 +9,6 @@ const getArtBlocksProject = require('../Utils/parseArtBlocksAPI').getArtBlocksPr
 
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545');
 
-const V2_MINTING_CONTRACT_ADDRESS = '0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270';
-
 // Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES = process.env.METADATA_REFRESH_INTERVAL_MINUTES;
 

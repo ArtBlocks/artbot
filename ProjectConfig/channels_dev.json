@@ -1,0 +1,36 @@
+{
+    "800425629785784352": {
+        "name": "snowfro",
+        "projectBotHandlers": {
+            "default": "squiggleBot"
+        }
+    },
+    "813431078705561630": {
+        "name": "dmitri-cherniak",
+        "projectBotHandlers": {
+            "default": "ringersBot",
+            "stringTriggers": {
+                "eternalPumpBot": [
+                    "eternal",
+                    "pump"
+                ]
+            }
+        }
+    },
+    "838422388478836786": {
+        "name": "numbersinmotion",
+        "projectBotHandlers": {
+            "default": "watercolorDreamsBot"
+        }
+    },
+    "825988122122649621": {
+        "name": "factory-projects",
+        "comment": "actual test server channel name is factory-activity"
+    },
+    "785144843986665475": {
+        "name": "general"
+    },
+    "816571167150309377": {
+        "name": "help"
+    }
+}
