@@ -18,7 +18,7 @@ jobs:
       - checkout
       - run: |
           npm install
-          (timeout 2m npm start; exit 0)
+          timeout 2m npm start || ( [[ $? -eq 124 ]] && echo "WARNING: Timeout reached, but that's OK" )
 
 workflows:
   build-workflow:
