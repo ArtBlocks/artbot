@@ -446,5 +446,17 @@
         "mintContract": "V2",
         "editionNumber": 1000,
         "projectName": "Meridian"
+    },
+    "portalBot": {
+        "projectNumber": 94,
+        "mintContract": "V2",
+        "editionNumber": 10,
+        "projectName": "Portal"
+    },
+    "neighborhoodBot": {
+        "projectNumber": 146,
+        "mintContract": "V2",
+        "editionNumber": 312,
+        "projectName": "Neighborhood"
     }
 }
