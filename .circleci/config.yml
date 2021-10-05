@@ -18,7 +18,7 @@ jobs:
       - checkout
       - run: |
           npm install
-          timeout --preserve-status 2m npm start
+          (timeout 2m npm start; exit 0)
 
 workflows:
   build-workflow:
