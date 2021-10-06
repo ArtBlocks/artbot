@@ -449,14 +449,14 @@
     },
     "portalBot": {
         "projectNumber": 94,
-        "mintContract": "V2",
-        "editionNumber": 10,
+        "coreContract": "V2",
+        "editionSize": 10,
         "projectName": "Portal"
     },
     "neighborhoodBot": {
         "projectNumber": 146,
-        "mintContract": "V2",
-        "editionNumber": 312,
+        "coreContract": "V2",
+        "editionSize": 312,
         "projectName": "Neighborhood"
     }
 }
