@@ -446,5 +446,17 @@
         "coreContract": "V2",
         "editionSize": 1000,
         "projectName": "Meridian"
+    },
+    "portalBot": {
+        "projectNumber": 94,
+        "coreContract": "V2",
+        "editionSize": 10,
+        "projectName": "Portal"
+    },
+    "neighborhoodBot": {
+        "projectNumber": 146,
+        "coreContract": "V2",
+        "editionSize": 312,
+        "projectName": "Neighborhood"
     }
 }

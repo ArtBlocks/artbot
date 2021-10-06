@@ -77,6 +77,12 @@
                 "viewCardBot": [
                     "view",
                     "card"
+                ],
+                "portalBot": [
+                    "portal"
+                ],
+                "neighborhoodBot": [
+                    "neighborhood"
                 ]
             }
         }
