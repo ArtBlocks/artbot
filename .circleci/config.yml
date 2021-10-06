@@ -1,0 +1,27 @@
+version: 2.1
+executors:
+  build-executor:
+    docker:
+      - image: cimg/node:lts
+      
+orbs:
+  node: circleci/node@4.7.0
+  
+jobs:
+  build-check:
+    environment:
+      # TOKEN: This ENV variable is defined within Circle CI.
+      PROD_CHANNEL_ACTIVITY_ALL: 859521842317754369
+      METADATA_REFRESH_INTERVAL_MINUTES: 60
+      GOOGLE_AUTH_DETAILS: "{}"
+    executor: build-executor
+    steps:
+      - checkout
+      - run: |
+          npm install
+          timeout 2m npm start || ( [[ $? -eq 124 ]] && echo "WARNING: Timeout reached, but that's OK" )
+
+workflows:
+  build-workflow:
+    jobs:
+      - build-check
