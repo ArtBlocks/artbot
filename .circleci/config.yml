@@ -10,6 +10,7 @@ orbs:
 jobs:
   build-check:
     environment:
+      # TOKEN: This ENV variable is defined within Circle CI.
       PROD_CHANNEL_ACTIVITY_ALL: 859521842317754369
       METADATA_REFRESH_INTERVAL_MINUTES: 60
       GOOGLE_AUTH_DETAILS: "{}"
