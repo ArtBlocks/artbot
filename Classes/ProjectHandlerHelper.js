@@ -4,7 +4,13 @@ class ProjectHandlerHelper {
     this.sets = sets;
   }
 
-  singlesTransform(messageContent) {
+  transform(messageContent) {
+    return ((this.singles && this._singlesTransform(messageContent)) ||
+      (this.sets && this._setsTransform(messageContent)) ||
+      messageContent);
+  }
+
+  _singlesTransform(messageContent) {
     if (messageContent.length <= 1) {
       return null;
     }
@@ -22,7 +28,7 @@ class ProjectHandlerHelper {
     return `#${this.singles[singleKeyStringLowercase]}`;
   }
 
-  setsTransform(messageContent) {
+  _setsTransform(messageContent) {
     if (messageContent.length <= 1) {
       return null;
     }

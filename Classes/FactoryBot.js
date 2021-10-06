@@ -8,10 +8,9 @@ const getArtBlocksPlatform = require('../Utils/parseArtBlocksAPI').getArtBlocksP
 const getArtBlocksProject = require('../Utils/parseArtBlocksAPI').getArtBlocksProject;
 const isFactoryProject = require('../Utils/parseArtBlocksAPI').isFactoryProject;
 const ProjectBot = require('./ProjectBot').ProjectBot;
+const projectConfig = require('../ProjectConfig/projectConfig').projectConfig;
 
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545');
-
-const V2_MINTING_CONTRACT_ADDRESS = '0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270';
 
 // Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES = process.env.METADATA_REFRESH_INTERVAL_MINUTES;
@@ -20,7 +19,7 @@ const METADATA_REFRESH_INTERVAL_MINUTES = process.env.METADATA_REFRESH_INTERVAL_
 const factoryBotList = [];
 
 class FactoryBot {
-  constructor(projectNumber, mintContract, editionNumber, projectName) {
+  constructor() {
     this.initialize();
     setInterval(this.initialize, METADATA_REFRESH_INTERVAL_MINUTES * 60000);
   }
@@ -32,13 +31,13 @@ class FactoryBot {
       const projectData = await getArtBlocksProject(projectList[i]);
 
       if (projectData && isFactoryProject(projectList[i])) {
-	   console.log(`Refreshing project cache for Project ${projectList[i]} ${projectData.name}`);
-        const newBot = new ProjectBot(
-            projectList[i],
-            V2_MINTING_CONTRACT_ADDRESS,
-            projectData.invocations,
-            projectData.name,
-        );
+        console.log(`Refreshing project cache for Project ${projectList[i]} ${projectData.name}`);
+        const newBot = new ProjectBot({
+          projectNumber: projectList[i],
+          coreContract: projectConfig.coreContracts.V2,
+          editionSize: projectData.invocations,
+          projectName: projectData.name,
+        });
         const nameIndex = projectData.name.toLowerCase().replace(/\s+/g, '');
         factoryBotList[nameIndex] = newBot;
       }
