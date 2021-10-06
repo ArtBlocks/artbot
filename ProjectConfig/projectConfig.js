@@ -1,5 +1,8 @@
 require('dotenv').config();
-const ARTBOT_IS_PROD = (process.env.ARTBOT_IS_PROD.toLowerCase() == 'true');
+const ARTBOT_IS_PROD = (
+  process.env.ARTBOT_IS_PROD &&
+  process.env.ARTBOT_IS_PROD.toLowerCase() == 'true'
+);
 console.log('ARTBOT_IS_PROD: ', ARTBOT_IS_PROD);
 const CHANNELS = ARTBOT_IS_PROD ?
   require('./channels.json') :

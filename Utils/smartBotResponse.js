@@ -4,8 +4,10 @@ const {
 } = require('discord.js');
 const fetch = require('node-fetch');
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig;
-
-const ARTBOT_IS_PROD = process.env.ARTBOT_IS_PROD;
+const ARTBOT_IS_PROD = (
+  process.env.ARTBOT_IS_PROD &&
+  process.env.ARTBOT_IS_PROD.toLowerCase() == 'true'
+);
 // only care about the following if not in prod
 const CHANNEL_TESTING_GENERAL_NON_PROD = ARTBOT_IS_PROD ?
   null :
