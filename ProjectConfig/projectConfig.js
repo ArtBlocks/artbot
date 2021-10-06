@@ -1,5 +1,8 @@
 require('dotenv').config();
-const ARTBOT_IS_PROD = (process.env.ARTBOT_IS_PROD.toLowerCase() == 'true');
+const ARTBOT_IS_PROD = (
+  process.env.ARTBOT_IS_PROD &&
+  process.env.ARTBOT_IS_PROD.toLowerCase() == 'true'
+);
 console.log('ARTBOT_IS_PROD: ', ARTBOT_IS_PROD);
 const CHANNELS = ARTBOT_IS_PROD ?
   require('./channels.json') :
@@ -7,13 +10,13 @@ const CHANNELS = ARTBOT_IS_PROD ?
 const PROJECT_BOTS = ARTBOT_IS_PROD ?
   require('./projectBots.json') :
   require('./projectBots_dev.json');
-const MINTER_CONTRACTS = require('./minterContracts.json');
+const CORE_CONTRACTS = require('./coreContracts.json');
 const ProjectBot = require('../Classes/ProjectBot').ProjectBot;
 
-// map from mint contract label to mint contract address
+// map from core contract label to core contract address
 Object.keys(PROJECT_BOTS).forEach((_bot) => {
-  PROJECT_BOTS[_bot].mintContract =
-    MINTER_CONTRACTS[PROJECT_BOTS[_bot].mintContract];
+  PROJECT_BOTS[_bot].coreContract =
+    CORE_CONTRACTS[PROJECT_BOTS[_bot].coreContract];
 });
 
 // utility class that routes number messages for each channel
@@ -28,6 +31,16 @@ class Channel {
     };
   };
 
+  /*
+  * This returns the appropriate project bot name to handle an incoming
+  * number (^#) message, based on lowercase message content.
+  * If any trigger words or trigger tokenID ranges are found, will
+  * return name of appropriate non-default project bot.
+  * If no trigger words or trigger tokenID ranges are found, will
+  * return name of default project bot.
+  * @return {string | null} name of project bot to handle message, null if
+  * no project bot handlers defined for this Channel.
+  */
   botNameFromNumberMsgContent(msgContentLowercase) {
     if (!this.hasProjectBotHandler) {
       return null;
@@ -74,18 +87,23 @@ class Channel {
 
 /*
 * An instance of this class is exported to provide:
-*  - interface to lookup minterContracts by label (e.g. OG, V2)
+*  - interface to lookup coreContracts by label (e.g. OG, V2)
 *  - interface to lookup channelIDs by name
 *  - interface to route incoming messages from identified project channels.
 */
 class ProjectConfig {
-  constructor(minterContracts, projectBots, channels) {
-    this.minterContracts = MINTER_CONTRACTS;
+  constructor() {
+    this.coreContracts = CORE_CONTRACTS;
     this.projectBots = ProjectConfig.buildProjectBots(PROJECT_BOTS);
     this.channels = ProjectConfig.buildChannelHandlers(CHANNELS);
-    this.chIdByName = ProjectConfig.buildChIdByName(this.channels);
+    this.chIdByName = ProjectConfig.buildChannelIDByName(this.channels);
   }
 
+  /*
+  * This parses imported projectBots json data and returns an object with
+  * keys equal to botName, values pointing to a new instance of ProjectBot.
+  * Returned object is useful for getting project bot instances by botName.
+  */
   static buildProjectBots(projectBotsJson) {
     const projectBots = {};
     Object.entries(projectBotsJson).forEach(([botName, botParams]) => {
@@ -94,6 +112,11 @@ class ProjectConfig {
     return projectBots;
   }
 
+  /*
+  * This parses imported channels json data and returns an object with
+  * keys equal to channel name, values pointing to a new instance of Channel.
+  * Returned object is useful for getting channel instances by channel ID.
+  */
   static buildChannelHandlers(ChannelsJson) {
     const channels = {};
     Object.entries(ChannelsJson).forEach(([chID, chParams]) => {
@@ -102,7 +125,12 @@ class ProjectConfig {
     return channels;
   }
 
-  static buildChIdByName(channels) {
+  /*
+  * This parses imported channels json data and returns an object with
+  * keys equal to channel name, values equal to channel ID.
+  * Returned object is useful for getting channel ID by channel name.
+  */
+  static buildChannelIDByName(channels) {
     const chIdByName = {};
     Object.entries(channels).forEach(([chID, channel]) => {
       chIdByName[channel.name] = chID;
@@ -110,6 +138,14 @@ class ProjectConfig {
     return chIdByName;
   }
 
+  /*
+  * This routes an incoming number (^#) message intended to be routed to a
+  * projectBot. It utilizes the logic in Channel method
+  * botNameFromNumberMsgContent to determine which project bot should
+  * handle the message (trigger words, token ID ranges, etc.).
+  * @param {string} channelID Channel ID the incoming msg has been sent from.
+  * @param msg Incoming discord.js message object
+  */
   routeProjectNumberMsg(channelID, msg) {
     const channel = this.channels[channelID];
     if (!channel) {

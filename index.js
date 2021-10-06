@@ -19,7 +19,6 @@ const handleGiveawayMessage = require('./Utils/giveawayCommands').handleGiveaway
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
-const SERVER = process.env.SERVER;
 const PORT = process.env.PORT || 3000;
 
 // Trade activity Discord channel IDs.

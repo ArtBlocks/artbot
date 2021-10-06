@@ -1,26 +1,26 @@
 {
     "singularityBot": {
         "projectNumber": 8,
-        "mintContract": "V2",
-        "editionNumber": 1024,
+        "coreContract": "V2",
+        "editionSize": 1024,
         "projectName": "Singularity"
     },
     "ignitionBot": {
         "projectNumber": 9,
-        "mintContract": "V2",
-        "editionNumber": 512,
+        "coreContract": "V2",
+        "editionSize": 512,
         "projectName": "Ignition"
     },
     "squiggleBot": {
         "projectNumber": 0,
-        "mintContract": "OG",
-        "editionNumber": 10000,
+        "coreContract": "OG",
+        "editionSize": 10000,
         "projectName": "Chromie Squiggle"
     },
     "ringersBot": {
         "projectNumber": 13,
-        "mintContract": "V2",
-        "editionNumber": 1000,
+        "coreContract": "V2",
+        "editionSize": 1000,
         "projectName": "Ringers",
         "namedMappings": {
             "sets": "ringerSets.json",
@@ -29,80 +29,80 @@
     },
     "genesisBot": {
         "projectNumber": 1,
-        "mintContract": "OG",
-        "editionNumber": 512,
+        "coreContract": "OG",
+        "editionSize": 512,
         "projectName": "Genesis"
     },
     "constructionBot": {
         "projectNumber": 2,
-        "mintContract": "OG",
-        "editionNumber": 500,
+        "coreContract": "OG",
+        "editionSize": 500,
         "projectName": "Construction Token"
     },
     "dynamicSlicesBot": {
         "projectNumber": 4,
-        "mintContract": "V2",
-        "editionNumber": 512,
+        "coreContract": "V2",
+        "editionSize": 512,
         "projectName": "Dynamic Slices"
     },
     "deconstructionsBot": {
         "projectNumber": 7,
-        "mintContract": "V2",
-        "editionNumber": 200,
+        "coreContract": "V2",
+        "editionSize": 200,
         "projectName": "Elevated Deconstructions"
     },
     "nimbudsBot": {
         "projectNumber": 10,
-        "mintContract": "V2",
-        "editionNumber": 400,
+        "coreContract": "V2",
+        "editionSize": 400,
         "projectName": "Nimbuds"
     },
     "hyperhashBot": {
         "projectNumber": 11,
-        "mintContract": "V2",
-        "editionNumber": 369,
+        "coreContract": "V2",
+        "editionSize": 369,
         "projectName": "HyperHash"
     },
     "unigridsBot": {
         "projectNumber": 12,
-        "mintContract": "V2",
-        "editionNumber": 421,
+        "coreContract": "V2",
+        "editionSize": 421,
         "projectName": "Unigrids"
     },
     "27bitBot": {
         "projectNumber": 21,
-        "mintContract": "V2",
-        "editionNumber": 1024,
+        "coreContract": "V2",
+        "editionSize": 1024,
         "projectName": "27-Bit Digital"
     },
     "spectronBot": {
         "projectNumber": 17,
-        "mintContract": "V2",
-        "editionNumber": 400,
+        "coreContract": "V2",
+        "editionSize": 400,
         "projectName": "Spectron"
     },
     "cryptoblotBot": {
         "projectNumber": 3,
-        "mintContract": "V2",
-        "editionNumber": 1921,
+        "coreContract": "V2",
+        "editionSize": 1921,
         "projectName": "Cryptoblots"
     },
     "archetypeBot": {
         "projectNumber": 23,
-        "mintContract": "V2",
-        "editionNumber": 600,
+        "coreContract": "V2",
+        "editionSize": 600,
         "projectName": "Archetype"
     },
     "minutesBot": {
         "projectNumber": 27,
-        "mintContract": "V2",
-        "editionNumber": 720,
+        "coreContract": "V2",
+        "editionSize": 720,
         "projectName": "720 Minutes"
     },
     "apparitionsBot": {
         "projectNumber": 28,
-        "mintContract": "V2",
-        "editionNumber": 1500,
+        "coreContract": "V2",
+        "editionSize": 1500,
         "projectName": "Apparitions",
         "namedMappings": {
             "sets": "apparitionSets.json",
@@ -111,38 +111,38 @@
     },
     "inspiralsBot": {
         "projectNumber": 29,
-        "mintContract": "V2",
-        "editionNumber": 1000,
+        "coreContract": "V2",
+        "editionSize": 1000,
         "projectName": "Inspirals"
     },
     "aerialViewBot": {
         "projectNumber": 35,
-        "mintContract": "V2",
-        "editionNumber": 1000,
+        "coreContract": "V2",
+        "editionSize": 1000,
         "projectName": "Aerial View"
     },
     "synapsesBot": {
         "projectNumber": 39,
-        "mintContract": "V2",
-        "editionNumber": 700,
+        "coreContract": "V2",
+        "editionSize": 700,
         "projectName": "Synapses"
     },
     "algobotsBot": {
         "projectNumber": 40,
-        "mintContract": "V2",
-        "editionNumber": 500,
+        "coreContract": "V2",
+        "editionSize": 500,
         "projectName": "Algobots"
     },
     "elementalsBot": {
         "projectNumber": 41,
-        "mintContract": "V2",
-        "editionNumber": 600,
+        "coreContract": "V2",
+        "editionSize": 600,
         "projectName": "Elementals"
     },
     "subscapesBot": {
         "projectNumber": 53,
-        "mintContract": "V2",
-        "editionNumber": 650,
+        "coreContract": "V2",
+        "editionSize": 650,
         "projectName": "Subscapes",
         "namedMappings": {
             "sets": "subscapeSets.json",
@@ -151,8 +151,8 @@
     },
     "watercolorDreamsBot": {
         "projectNumber": 59,
-        "mintContract": "V2",
-        "editionNumber": 600,
+        "coreContract": "V2",
+        "editionSize": 600,
         "projectName": "Watercolor Dreams",
         "namedMappings": {
             "sets": "watercolorDreamSets.json",
@@ -161,38 +161,38 @@
     },
     "bubbleBlobbyBot": {
         "projectNumber": 62,
-        "mintContract": "V2",
-        "editionNumber": 500,
+        "coreContract": "V2",
+        "editionSize": 500,
         "projectName": "Bubble Blobby"
     },
     "algoRhythmsBot": {
         "projectNumber": 64,
-        "mintContract": "V2",
-        "editionNumber": 1000,
+        "coreContract": "V2",
+        "editionSize": 1000,
         "projectName": "AlgoRhythms"
     },
     "frammentiBot": {
         "projectNumber": 72,
-        "mintContract": "V2",
-        "editionNumber": 555,
+        "coreContract": "V2",
+        "editionSize": 555,
         "projectName": "Frammenti"
     },
     "blocksOfArtBot": {
         "projectNumber": 74,
-        "mintContract": "V2",
-        "editionNumber": 500,
+        "coreContract": "V2",
+        "editionSize": 500,
         "projectName": "The Blocks of Art"
     },
     "fidenzaBot": {
         "projectNumber": 78,
-        "mintContract": "V2",
-        "editionNumber": 999,
+        "coreContract": "V2",
+        "editionSize": 999,
         "projectName": "Fidenza"
     },
     "dreamsBot": {
         "projectNumber": 89,
-        "mintContract": "V2",
-        "editionNumber": 700,
+        "coreContract": "V2",
+        "editionSize": 700,
         "projectName": "Dreams",
         "namedMappings": {
             "sets": "dreamSets.json",
@@ -201,194 +201,194 @@
     },
     "centuryBot": {
         "projectNumber": 100,
-        "mintContract": "V2",
-        "editionNumber": 1000,
+        "coreContract": "V2",
+        "editionSize": 1000,
         "projectName": "Century"
     },
     "glitchBot": {
         "projectNumber": 114,
-        "mintContract": "V2",
-        "editionNumber": 1000,
+        "coreContract": "V2",
+        "editionSize": 1000,
         "projectName": "glitch crystal monsters"
     },
     "endlessBot": {
         "projectNumber": 120,
-        "mintContract": "V2",
-        "editionNumber": 1000,
+        "coreContract": "V2",
+        "editionSize": 1000,
         "projectName": "Endless Nameless"
     },
     "pigmentsBot": {
         "projectNumber": 129,
-        "mintContract": "V2",
-        "editionNumber": 1024,
+        "coreContract": "V2",
+        "editionSize": 1024,
         "projectName": "Pigments"
     },
     "phasesBot": {
         "projectNumber": 143,
-        "mintContract": "V2",
-        "editionNumber": 1024,
+        "coreContract": "V2",
+        "editionSize": 1024,
         "projectName": "Phase"
     },
     "viewCardBot": {
         "projectNumber": 6,
-        "mintContract": "V2",
-        "editionNumber": 41,
+        "coreContract": "V2",
+        "editionSize": 41,
         "projectName": "View Card"
     },
     "colorStudyBot": {
         "projectNumber": 16,
-        "mintContract": "V2",
-        "editionNumber": 2000,
+        "coreContract": "V2",
+        "editionSize": 2000,
         "projectName": "Color Study"
     },
     "rhythmBot": {
         "projectNumber": 57,
-        "mintContract": "V2",
-        "editionNumber": 400,
+        "coreContract": "V2",
+        "editionSize": 400,
         "projectName": "Rhythm"
     },
     "gen2Bot": {
         "projectNumber": 18,
-        "mintContract": "V2",
-        "editionNumber": 256,
+        "coreContract": "V2",
+        "editionSize": 256,
         "projectName": "Gen 2"
     },
     "gen3Bot": {
         "projectNumber": 48,
-        "mintContract": "V2",
-        "editionNumber": 1024,
+        "coreContract": "V2",
+        "editionSize": 1024,
         "projectName": "Gen 3"
     },
     "sentienceBot": {
         "projectNumber": 20,
-        "mintContract": "V2",
-        "editionNumber": 144,
+        "coreContract": "V2",
+        "editionSize": 144,
         "projectName": "Sentience"
     },
     "cyberCitiesBot": {
         "projectNumber": 14,
-        "mintContract": "V2",
-        "editionNumber": 256,
+        "coreContract": "V2",
+        "editionSize": 256,
         "projectName": "Cyber Cities"
     },
     "hieroglyphsBot": {
         "projectNumber": 30,
-        "mintContract": "V2",
-        "editionNumber": 1250,
+        "coreContract": "V2",
+        "editionSize": 1250,
         "projectName": "Hieroglyphs"
     },
     "eternalPumpBot": {
         "projectNumber": 22,
-        "mintContract": "V2",
-        "editionNumber": 50,
+        "coreContract": "V2",
+        "editionSize": 50,
         "projectName": "The Eternal Pump"
     },
     "utopiaBot": {
         "projectNumber": 15,
-        "mintContract": "V2",
-        "editionNumber": 256,
+        "coreContract": "V2",
+        "editionSize": 256,
         "projectName": "Utopia"
     },
     "r3sonanceBot": {
         "projectNumber": 19,
-        "mintContract": "V2",
-        "editionNumber": 512,
+        "coreContract": "V2",
+        "editionSize": 512,
         "projectName": "R3sonance"
     },
     "auroraIvBot": {
         "projectNumber": 56,
-        "mintContract": "V2",
-        "editionNumber": 128,
+        "coreContract": "V2",
+        "editionSize": 128,
         "projectName": "Aurora IV"
     },
     "pixelGlassBot": {
         "projectNumber": 24,
-        "mintContract": "V2",
-        "editionNumber": 256,
+        "coreContract": "V2",
+        "editionSize": 256,
         "projectName": "Pixel Glass"
     },
     "energySculptureBot": {
         "projectNumber": 26,
-        "mintContract": "V2",
-        "editionNumber": 369,
+        "coreContract": "V2",
+        "editionSize": 369,
         "projectName": "EnergySculpture"
     },
     "pathfindersBot": {
         "projectNumber": 25,
-        "mintContract": "V2",
-        "editionNumber": 1000,
+        "coreContract": "V2",
+        "editionSize": 1000,
         "projectName": "Pathfinders"
     },
     "paperArmadaBot": {
         "projectNumber": 37,
-        "mintContract": "V2",
-        "editionNumber": 3000,
+        "coreContract": "V2",
+        "editionSize": 3000,
         "projectName": "Paper Armada"
     },
     "voidBot": {
         "projectNumber": 42,
-        "mintContract": "V2",
-        "editionNumber": 500,
+        "coreContract": "V2",
+        "editionSize": 500,
         "projectName": "Void"
     },
     "messengersBot": {
         "projectNumber": 68,
-        "mintContract": "V2",
-        "editionNumber": 350,
+        "coreContract": "V2",
+        "editionSize": 350,
         "projectName": "Messengers"
     },
     "obiceraBot": {
         "projectNumber": 130,
-        "mintContract": "V2",
-        "editionNumber": 529,
+        "coreContract": "V2",
+        "editionSize": 529,
         "projectName": "Obicera"
     },
     "returnBot": {
         "projectNumber": 77,
-        "mintContract": "V2",
-        "editionNumber": 300,
+        "coreContract": "V2",
+        "editionSize": 300,
         "projectName": "Return"
     },
     "ritualBot": {
         "projectNumber": 172,
-        "mintContract": "V2",
-        "editionNumber": 1000,
+        "coreContract": "V2",
+        "editionSize": 1000,
         "projectName": "Rituals"
     },
     "divisionsBot": {
         "projectNumber": 108,
-        "mintContract": "V2",
-        "editionNumber": 500,
+        "coreContract": "V2",
+        "editionSize": 500,
         "projectName": "Divisions"
     },
     "eccentricsBot": {
         "projectNumber": 104,
-        "mintContract": "V2",
-        "editionNumber": 400,
+        "coreContract": "V2",
+        "editionSize": 400,
         "projectName": "Eccentrics"
     },
     "eccentrics2Bot": {
         "projectNumber": 139,
-        "mintContract": "V2",
-        "editionNumber": 500,
+        "coreContract": "V2",
+        "editionSize": 500,
         "projectName": "Eccentrics 2: Orbits"
     },
     "ecumenopolisBot": {
         "projectNumber": 119,
-        "mintContract": "V2",
-        "editionNumber": 676,
+        "coreContract": "V2",
+        "editionSize": 676,
         "projectName": "Ecumenopolis"
     },
     "rinascitaBot": {
         "projectNumber": 121,
-        "mintContract": "V2",
-        "editionNumber": 1111,
+        "coreContract": "V2",
+        "editionSize": 1111,
         "projectName": "Rinascita"
     },
     "scribbledBot": {
         "projectNumber": 131,
-        "mintContract": "V2",
-        "editionNumber": 1024,
+        "coreContract": "V2",
+        "editionSize": 1024,
         "projectName": "Scribbled Boundaries",
         "namedMappings": {
             "sets": "scribbledSets.json",
@@ -397,14 +397,14 @@
     },
     "octoGardenBot": {
         "projectNumber": 103,
-        "mintContract": "V2",
-        "editionNumber": 333,
+        "coreContract": "V2",
+        "editionSize": 333,
         "projectName": "Octo Garden"
     },
     "geometryRunnersBot": {
         "projectNumber": 138,
-        "mintContract": "V2",
-        "editionNumber": 1000,
+        "coreContract": "V2",
+        "editionSize": 1000,
         "projectName": "Geometry Runners",
         "namedMappings": {
             "sets": "geometryRunnersSets.json",
@@ -413,38 +413,38 @@
     },
     "lightBeamsBot": {
         "projectNumber": 32,
-        "mintContract": "V2",
-        "editionNumber": 150,
+        "coreContract": "V2",
+        "editionSize": 150,
         "projectName": "Light Beams"
     },
     "transitionsBot": {
         "projectNumber": 117,
-        "mintContract": "V2",
-        "editionNumber": 4712,
+        "coreContract": "V2",
+        "editionSize": 4712,
         "projectName": "Transitions"
     },
     "fragmentsBot": {
         "projectNumber": 159,
-        "mintContract": "V2",
-        "editionNumber": 1024,
+        "coreContract": "V2",
+        "editionSize": 1024,
         "projectName": "Fragments"
     },
     "trossetsBot": {
         "projectNumber": 147,
-        "mintContract": "V2",
-        "editionNumber": 1000,
+        "coreContract": "V2",
+        "editionSize": 1000,
         "projectName": "Trossets"
     },
     "phototaxisBot": {
         "projectNumber": 164,
-        "mintContract": "V2",
-        "editionNumber": 1000,
+        "coreContract": "V2",
+        "editionSize": 1000,
         "projectName": "Phototaxis"
     },
     "meridianBot": {
         "projectNumber": 163,
-        "mintContract": "V2",
-        "editionNumber": 1000,
+        "coreContract": "V2",
+        "editionSize": 1000,
         "projectName": "Meridian"
     },
     "portalBot": {

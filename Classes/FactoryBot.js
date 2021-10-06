@@ -19,7 +19,7 @@ const METADATA_REFRESH_INTERVAL_MINUTES = process.env.METADATA_REFRESH_INTERVAL_
 const factoryBotList = [];
 
 class FactoryBot {
-  constructor(projectNumber, mintContract, editionNumber, projectName) {
+  constructor() {
     this.initialize();
     setInterval(this.initialize, METADATA_REFRESH_INTERVAL_MINUTES * 60000);
   }
@@ -34,8 +34,8 @@ class FactoryBot {
         console.log(`Refreshing project cache for Project ${projectList[i]} ${projectData.name}`);
         const newBot = new ProjectBot({
           projectNumber: projectList[i],
-          mintContract: projectConfig.minterContracts.V2,
-          editionNumber: projectData.invocations,
+          coreContract: projectConfig.coreContracts.V2,
+          editionSize: projectData.invocations,
           projectName: projectData.name,
         });
         const nameIndex = projectData.name.toLowerCase().replace(/\s+/g, '');

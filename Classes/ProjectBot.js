@@ -13,10 +13,10 @@ const UNKNOWN_ADDRESS = "unknown";
 const UNKNOWN_USERNAME = "unknown";
 
 class ProjectBot {
-  constructor({ projectNumber, mintContract, editionNumber, projectName, namedMappings }) {
+  constructor({ projectNumber, coreContract, editionSize, projectName, namedMappings }) {
     this.projectNumber = projectNumber;
-    this.mintContract = mintContract;
-    this.editionNumber = editionNumber;
+    this.coreContract = coreContract;
+    this.editionSize = editionSize;
     this.projectName = projectName;
     this.namedMappings = namedMappings ? ProjectBot.getProjectHandlerHelper(namedMappings) : null;
   }
@@ -38,27 +38,27 @@ class ProjectBot {
 
     // decode any mappings
     if (this.namedMappings) {
-      content = this.namedMappings.transform(content)
+      content = this.namedMappings.transform(content);
     }
 
     let detailsRequested = content.toLowerCase().includes("detail");
     let afterTheHash = content.substring(1);
     let pieceNumber;
     if (afterTheHash[0] == "?") {
-      pieceNumber = parseInt(Math.random() * this.editionNumber);
+      pieceNumber = parseInt(Math.random() * this.editionSize);
     } else {
       pieceNumber = parseInt(afterTheHash);
     }
 
-    if (pieceNumber >= this.editionNumber || pieceNumber < 0) {
+    if (pieceNumber >= this.editionSize || pieceNumber < 0) {
       msg.channel.send(
-        `Invalid #, only ${this.editionNumber} pieces minted for ${this.projectName}.`
+        `Invalid #, only ${this.editionSize} pieces minted for ${this.projectName}.`
       );
       return;
     }
 
     let tokenID = pieceNumber + (this.projectNumber * 1e6);
-    let openSeaURL = `https://api.opensea.io/api/v1/asset/${this.mintContract}/${tokenID}/`;
+    let openSeaURL = `https://api.opensea.io/api/v1/asset/${this.coreContract}/${tokenID}/`;
 
     await fetch(
         openSeaURL, {
