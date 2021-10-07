@@ -149,15 +149,16 @@ class ProjectConfig {
   routeProjectNumberMsg(channelID, msg) {
     const channel = this.channels[channelID];
     if (!channel) {
-      // should never occur for anything we are being asked to route
+      // only occurs when # messages sent from channels not being observed
       console.error(`Unknown channel ID: ${channelID}`);
       return;
     }
     const botName =
       channel.botNameFromNumberMsgContent(msg.content.toLowerCase());
     if (botName === null) {
-      // should never occur for anything we are being asked to route
+      // only occurs when # messages are sent in observed channels without project bots
       console.error(`Channel ID: ${channelID} does not have a ProjectBot`);
+      return;
     }
     this.projectBots[botName].handleNumberMessage(msg);
   }
