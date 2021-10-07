@@ -6,17 +6,17 @@ const projectConfig = require('../ProjectConfig/projectConfig').projectConfig;
 
 // Trade activity Discord channel IDs.
 const CHANNEL_SALES_CHAT =
-  projectConfig.chIdByName['general']['block-talk'];
+  projectConfig.chIdByName['block-talk'];
 const CHANNEL_SALES =
-  projectConfig.chIdByName['general']['sales-feed'];
+  projectConfig.chIdByName['sales-feed'];
 const CHANNEL_LISTINGS =
-  projectConfig.chIdByName['general']['listing-feed'];
+  projectConfig.chIdByName['listing-feed'];
 const CHANNEL_SQUIGGLE_SALES =
-  projectConfig.chIdByName['general']['squiggle_square'];
+  projectConfig.chIdByName['squiggle_square'];
 const CHANNEL_SQUIGGLE_LISTINGS =
-  projectConfig.chIdByName['general']['squiggle-listings'];
+  projectConfig.chIdByName['squiggle-listings'];
 const CHANNEL_FIDENZA_SALES =
-  projectConfig.chIdByName['general']['fidenza-sales'];
+  projectConfig.chIdByName['fidenza-sales'];
 
 // Addresses which should be omitted entirely from event feeds.
 const BAN_ADDRESSES = new Set([
