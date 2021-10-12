@@ -91,7 +91,10 @@
         "projectNumber": 23,
         "coreContract": "V2",
         "editionSize": 600,
-        "projectName": "Archetype"
+        "projectName": "Archetype",
+        "namedMappings": {
+            "sets": "archetypeSets.json"
+        }
     },
     "minutesBot": {
         "projectNumber": 27,
