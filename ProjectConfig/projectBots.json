@@ -326,7 +326,11 @@
         "projectNumber": 37,
         "coreContract": "V2",
         "editionSize": 3000,
-        "projectName": "Paper Armada"
+        "projectName": "Paper Armada",
+        "namedMappings": {
+            "sets": "paperArmadaSets.json",
+            "singles": "paperArmadaSingles.json"
+        }
     },
     "voidBot": {
         "projectNumber": 42,
@@ -437,6 +441,12 @@
         "coreContract": "V2",
         "editionSize": 1000,
         "projectName": "Trossets"
+    },
+    "skulptuurBot": {
+        "projectNumber": 173,
+        "coreContract": "V2",
+        "editionSize": 1000,
+        "projectName": "Skulptuur"
     },
     "phototaxisBot": {
         "projectNumber": 164,
