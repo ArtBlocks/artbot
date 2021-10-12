@@ -181,6 +181,8 @@
             "default": "archetypeBot",
             "stringTriggers": {
                 "paperArmadaBot": [
+                    "pa",
+                    "paper",
                     "armada"
                 ]
             }
