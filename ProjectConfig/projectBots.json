@@ -190,7 +190,10 @@
         "projectNumber": 78,
         "coreContract": "V2",
         "editionSize": 999,
-        "projectName": "Fidenza"
+        "projectName": "Fidenza",
+        "namedMappings": {
+            "sets": "fidenzaSets.json"
+        }
     },
     "dreamsBot": {
         "projectNumber": 89,
