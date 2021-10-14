@@ -127,10 +127,10 @@ async function triageActivityMessage(msg, bot) {
 
     // Replace "Owner" with "Seller"
     description = description.replace(/Owner/, 'Seller');
-    
+
     // Replace "Winner" with "Buyer"
     description = description.replace(/Winner/g, 'Buyer');
-    
+
     // Update description with parsed and modified string.
     embed.setDescription(description.trim());
 
@@ -147,7 +147,7 @@ async function triageActivityMessage(msg, bot) {
     // Update to remove author name and to reflect this info in piece name
     // rather than token number as the title and URL field..
     embed.author = null;
-    embed.setTitle(`${artBlocksData.name}`);
+    embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`);
     embed.setURL(openseaURL);
 
     // Only forward sales events and listing events.
