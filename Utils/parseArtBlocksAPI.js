@@ -69,7 +69,7 @@ async function isFactoryProject(id) {
   let isFactory = false;
   // The Art Blocks API tends to fail to respond or drop sockets occasionally, so need to have a timeout and error handling
   try {
-    const response = await fetch(`https://api.artblocks.io/token/${tokenID}`, {timeout: 5000});
+    const response = await fetch(`https://token.artblocks.io/${tokenID}`, {timeout: 5000});
     const json = await response.json();
     if (json.curation_status == 'factory') {
       isFactory = true;

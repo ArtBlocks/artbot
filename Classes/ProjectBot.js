@@ -77,7 +77,7 @@ class ProjectBot {
   }
 
   async sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested) {
-    let artBlocksResponse = await fetch(`https://api.artblocks.io/token/${tokenID}`);
+    let artBlocksResponse = await fetch(`https://token.artblocks.io/${tokenID}`);
     let artBlocksData = await artBlocksResponse.json();
     console.log(artBlocksData, "ARTBLOCKS DATA");
 

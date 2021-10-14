@@ -127,15 +127,15 @@ async function triageActivityMessage(msg, bot) {
 
     // Replace "Owner" with "Seller"
     description = description.replace(/Owner/, 'Seller');
-    
+
     // Replace "Winner" with "Buyer"
     description = description.replace(/Winner/g, 'Buyer');
-    
+
     // Update description with parsed and modified string.
     embed.setDescription(description.trim());
 
     // Get Art Blocks metadata response for the item.
-    const artBlocksResponse = await fetch(`https://api.artblocks.io/token/${tokenID}`);
+    const artBlocksResponse = await fetch(`https://token.artblocks.io/${tokenID}`);
     const artBlocksData = await artBlocksResponse.json();
 
     // Update thumbnail image to use larger variant from Art Blocks API.
