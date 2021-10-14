@@ -203,7 +203,14 @@
     "872722851029999616": {
         "name": "darien-brito",
         "projectBotHandlers": {
-            "default": "pigmentsBot"
+            "default": "pigmentsBot",
+            "stringTriggers": {
+                "hashtractorsbot": [
+                    "hashtractors",
+                    "tractors",
+                    ":tractor:"
+                ]
+            }
         }
     },
     "828516221308895263": {

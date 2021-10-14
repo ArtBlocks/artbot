@@ -477,5 +477,11 @@
         "coreContract": "V2",
         "editionSize": 312,
         "projectName": "Neighborhood"
+    },
+    "hashtractorsbot": {
+        "projectNumber": 90,
+        "coreContract": "V2",
+        "editionsize": 128,
+        "projectName":"Hashtractors"
     }
 }
