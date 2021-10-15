@@ -15,7 +15,10 @@
         "projectNumber": 0,
         "coreContract": "OG",
         "editionSize": 10000,
-        "projectName": "Chromie Squiggle"
+        "projectName": "Chromie Squiggle",
+        "namedMappings": {
+            "sets": "squiggleSets.json"
+        }
     },
     "ringersBot": {
         "projectNumber": 13,
