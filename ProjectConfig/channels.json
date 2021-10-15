@@ -205,10 +205,11 @@
         "projectBotHandlers": {
             "default": "pigmentsBot",
             "stringTriggers": {
-                "hashtractorsbot": [
+                "hashtractorsBot": [
                     "hashtractors",
+                    "hash",
                     "tractors",
-                    ":tractor:"
+                    "🚜"
                 ]
             }
         }
