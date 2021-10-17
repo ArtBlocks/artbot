@@ -20,6 +20,9 @@ const CHANNEL_FIDENZA_SALES =
 
 // Addresses which should be omitted entirely from event feeds.
 const BAN_ADDRESSES = new Set([
+  '0xc7f45f209a925f9ae6af2043cf44e6570be5b21c',
+  '0x9b397d50f662d5d39e88e4b886571581ccf48188',
+  '0xe1770cf5274084db23bca6c921fa51cf62a37eda',
   '0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270',
   '0x7b77ebc4bab939071543243a4909ca4c51c9c1fd',
   '0x45d91f318b2abc6b569b6637c84cdb66486eb9ee',
