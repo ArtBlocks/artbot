@@ -143,7 +143,11 @@
         "projectNumber": 41,
         "coreContract": "V2",
         "editionSize": 600,
-        "projectName": "Elementals"
+        "projectName": "Elementals",
+        "namedMappings": {
+            "sets": "elementalsSets.json",
+            "singles": "elementalsSingles.json"
+        }
     },
     "subscapesBot": {
         "projectNumber": 53,
