@@ -490,5 +490,23 @@
         "coreContract": "V2",
         "editionSize": 128,
         "projectName": "Hashtractors"
+    },
+    "444(4)Bot": {
+        "projectNumber": 191,
+        "coreContract": "V2",
+        "editionSize": 444,
+        "projectName": "444(4)"
+    },
+    "alienInsectsBot": {
+        "projectNumber": 137,
+        "coreContract": "V2",
+        "editionSize": 1000,
+        "projectName": "Alien Insects"
+    },
+    "alienClockBot": {
+        "projectNumber": 112,
+        "coreContract": "V2",
+        "editionSize": 362,
+        "projectName": "Alien Clock"
     }
 }

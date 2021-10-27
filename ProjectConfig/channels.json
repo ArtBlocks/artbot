@@ -342,7 +342,18 @@
     "846619538320785448": {
         "name": "shvembldr",
         "projectBotHandlers": {
-            "default": "blocksOfArtBot"
+            "default": "blocksOfArtBot",
+            "stringTriggers": {
+                "444(4)Bot": [
+                    "444(4)"
+                ],
+                "alienInsectsBot": [
+                    "ai"
+                ],
+                "alienClockBot": [
+                    "ac"
+                ]
+            }
         }
     },
     "844078279338360832": {
