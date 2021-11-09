@@ -426,6 +426,12 @@
         "projectBotHandlers": {
             "default": "skulptuurBot"
         }
+    },  
+    "904783901522804786": {
+        "name": "ben-kovach",
+        "projectBotHandlers": {
+            "default": "edificeBot"
+        }
     },
     "822563871473795073": {
         "name": "factory-projects"

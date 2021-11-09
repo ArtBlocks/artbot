@@ -508,5 +508,11 @@
         "coreContract": "V2",
         "editionSize": 362,
         "projectName": "Alien Clock"
+    },
+    "edificeBot": {
+        "projectNumber": 204,
+        "coreContract": "V2",
+        "editionSize": 976,
+        "projectName": "Edifice"
     }
 }
