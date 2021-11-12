@@ -369,6 +369,12 @@
         "editionSize": 529,
         "projectName": "Obicera"
     },
+    "heuresBot": {
+        "projectNumber": 201,
+        "coreContract": "V2",
+        "editionSize": 500,
+        "projectName": "24 Heures"
+    },
     "returnBot": {
         "projectNumber": 77,
         "coreContract": "V2",

@@ -228,6 +228,14 @@
                 "obiceraBot": [
                     "obicera"
                 ]
+                "heuresBot": [
+                    "heures",
+                    "hours",
+                    "24heures",
+                    "24hours",
+                    "24 heures",
+                    "24 hours"
+                ]
             }
         }
     },
