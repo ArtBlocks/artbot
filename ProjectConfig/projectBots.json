@@ -245,6 +245,12 @@
         "editionSize": 1024,
         "projectName": "Phase"
     },
+    "paradeBot": {
+        "projectNumber": 197,
+        "coreContract": "V2",
+        "editionSize": 1024,
+        "projectName": "Parade"
+    },
     "viewCardBot": {
         "projectNumber": 6,
         "coreContract": "V2",

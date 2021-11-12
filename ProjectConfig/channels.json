@@ -407,6 +407,11 @@
         "name": "loren-bednar",
         "projectBotHandlers": {
             "default": "phasesBot"
+            "stringTriggers": {
+                "paradeBot": [
+                    "parade"
+                ]
+            }
         }
     },
     "882129221659537440": {
