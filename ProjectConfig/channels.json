@@ -227,7 +227,7 @@
                 ],
                 "obiceraBot": [
                     "obicera"
-                ]
+                ],
                 "heuresBot": [
                     "heures",
                     "hours",
@@ -414,7 +414,7 @@
     "877060147619446814": {
         "name": "loren-bednar",
         "projectBotHandlers": {
-            "default": "phasesBot"
+            "default": "phasesBot",
             "stringTriggers": {
                 "paradeBot": [
                     "parade"
