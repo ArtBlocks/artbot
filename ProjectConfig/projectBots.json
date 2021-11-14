@@ -251,6 +251,12 @@
         "editionSize": 1024,
         "projectName": "Parade"
     },
+    "traversalsBot": {
+        "projectNumber": 65,
+        "coreContract": "V2",
+        "editionSize": 150,
+        "projectName": "Traversals"
+    },
     "viewCardBot": {
         "projectNumber": 6,
         "coreContract": "V2",
