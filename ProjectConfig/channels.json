@@ -418,6 +418,9 @@
             "stringTriggers": {
                 "paradeBot": [
                     "parade"
+                ],
+                "traversalsBot": [
+                    "traversals"
                 ]
             }
         }
