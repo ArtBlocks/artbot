@@ -532,5 +532,11 @@
         "coreContract": "V2",
         "editionSize": 976,
         "projectName": "Edifice"
+    },
+    "asemicaBot": {
+        "projectNumber": 206,
+        "coreContract": "V2",
+        "editionSize": 980,
+        "projectName": "Asemica"
     }
 }

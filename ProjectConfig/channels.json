@@ -442,11 +442,17 @@
         "projectBotHandlers": {
             "default": "skulptuurBot"
         }
-    },  
+    },
     "904783901522804786": {
         "name": "ben-kovach",
         "projectBotHandlers": {
             "default": "edificeBot"
+        }
+    },
+    "908416638636920832": {
+        "name": "edelman-x-ofman-x-badr",
+        "projectBotHandlers": {
+            "default": "asemicaBot"
         }
     },
     "822563871473795073": {
