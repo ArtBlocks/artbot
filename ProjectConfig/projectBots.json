@@ -423,6 +423,12 @@
         "editionSize": 1111,
         "projectName": "Rinascita"
     },
+    "saturazioneBot": {
+        "projectNumber": 200,
+        "coreContract": "V2",
+        "editionSize": 444,
+        "projectName": "Saturazione"
+    },
     "scribbledBot": {
         "projectNumber": 131,
         "coreContract": "V2",
@@ -532,5 +538,11 @@
         "coreContract": "V2",
         "editionSize": 976,
         "projectName": "Edifice"
+    },
+    "asemicaBot": {
+        "projectNumber": 206,
+        "coreContract": "V2",
+        "editionSize": 980,
+        "projectName": "Asemica"
     }
 }
