@@ -448,6 +448,12 @@
         "projectBotHandlers": {
             "default": "edificeBot"
         }
+    }, 
+    "910410292205350953": {
+        "name": "steganon",
+        "projectBotHandlers": {
+            "default": "autologyBot"
+        }
     },
     "822563871473795073": {
         "name": "factory-projects"
