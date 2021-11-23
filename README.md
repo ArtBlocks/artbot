@@ -1,6 +1,6 @@
 # ArtBot: The Art Blocks Discord Bot
 
-[![CircleCI](https://circleci.com/gh/ArtBlocks/artbot/tree/master.svg?style=svg)](https://circleci.com/gh/ArtBlocks/artbot/tree/master)
+[![CircleCI](https://circleci.com/gh/ArtBlocks/artbot/tree/main.svg?style=svg)](https://circleci.com/gh/ArtBlocks/artbot/tree/main)
 
 The Discord bot for [ArtBlocks](http://artblocks.io/).
 
