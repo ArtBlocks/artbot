@@ -535,5 +535,11 @@
         "namedMappings": {
           "sets": "edificeSets.json"
         }
+    },
+    "autologyBot": {
+        "projectNumber": 209,
+        "coreContract": "V2",
+        "editionSize": 1024,
+        "projectName": "Autology"
     }
 }
