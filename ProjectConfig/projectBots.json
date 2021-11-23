@@ -531,6 +531,9 @@
         "projectNumber": 204,
         "coreContract": "V2",
         "editionSize": 976,
-        "projectName": "Edifice"
+        "projectName": "Edifice",
+        "namedMappings": {
+          "sets": "edificeSets.json"
+        }
     }
 }
