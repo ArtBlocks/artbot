@@ -197,7 +197,12 @@
     "869449236717121576": {
         "name": "rafael-rozendaal",
         "projectBotHandlers": {
-            "default": "endlessBot"
+            "default": "endlessBot",
+            "stringTriggers": {
+                "diveBot": [
+                    "dive"
+                ]
+            }
         }
     },
     "872722851029999616": {
