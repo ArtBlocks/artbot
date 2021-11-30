@@ -547,5 +547,11 @@
         "coreContract": "V2",
         "editionSize": 1024,
         "projectName": "Autology"
+    },
+    "bentBot": {
+        "projectNumber": 214,
+        "coreContract": "V2",
+        "editionSize": 1023,
+        "projectName": "Bent"
     }
 }

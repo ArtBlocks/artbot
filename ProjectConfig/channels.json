@@ -460,6 +460,12 @@
             "default": "autologyBot"
         }
     },
+    "912771594357714964": {
+        "name": "ippsketch",
+        "projectBotHandlers": {
+            "default": "bentBot"
+        }
+    },
     "822563871473795073": {
         "name": "factory-projects"
     },
