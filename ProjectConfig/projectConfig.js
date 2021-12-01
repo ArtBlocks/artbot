@@ -21,7 +21,7 @@ Object.keys(PROJECT_BOTS).forEach((_bot) => {
 
 // utility class that routes number messages for each channel
 class Channel {
-  constructor({ name, projectBotHandlers }) {
+  constructor({ name, projectBotHandlers}) {
     this.name = name;
     this.hasProjectBotHandler = !!projectBotHandlers;
     if (projectBotHandlers) {
@@ -65,11 +65,14 @@ class Channel {
       if (tokenID) {
         tokenID = parseInt(tokenID[0]);
         tokenIdTriggerLoop:
-        for (const [botName, triggers] of Object.entries(this.tokenIdTriggers)) {
-          if (Channel._inRange(tokenID, ...triggers)) {
-            projectBotName = botName;
-            break tokenIdTriggerLoop;
-          };
+        for (let i = 0; i < this.tokenIdTriggers.length; i++) {
+          const _botTriggerRange = this.tokenIdTriggers[i];
+          for (const [botName, triggers] of Object.entries(_botTriggerRange)) {
+            if (Channel._inRange(tokenID, ...triggers)) {
+              projectBotName = botName;
+              break tokenIdTriggerLoop;
+            };
+          }
         };
       };
     };
