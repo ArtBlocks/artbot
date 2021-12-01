@@ -230,6 +230,12 @@
         "editionSize": 1000,
         "projectName": "Endless Nameless"
     },
+    "diveBot": {
+        "projectNumber": 212,
+        "coreContract": "V2",
+        "editionSize": 333,
+        "projectName": "Dive"
+    },
     "pigmentsBot": {
         "projectNumber": 129,
         "coreContract": "V2",
@@ -541,5 +547,11 @@
         "coreContract": "V2",
         "editionSize": 1024,
         "projectName": "Autology"
+    },
+    "bentBot": {
+        "projectNumber": 214,
+        "coreContract": "V2",
+        "editionSize": 1023,
+        "projectName": "Bent"
     }
 }

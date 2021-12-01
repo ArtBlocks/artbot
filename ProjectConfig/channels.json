@@ -197,7 +197,12 @@
     "869449236717121576": {
         "name": "rafael-rozendaal",
         "projectBotHandlers": {
-            "default": "endlessBot"
+            "default": "endlessBot",
+            "stringTriggers": {
+                "diveBot": [
+                    "dive"
+                ]
+            }
         }
     },
     "872722851029999616": {
@@ -453,6 +458,12 @@
         "name": "steganon",
         "projectBotHandlers": {
             "default": "autologyBot"
+        }
+    },
+    "912771594357714964": {
+        "name": "ippsketch",
+        "projectBotHandlers": {
+            "default": "bentBot"
         }
     },
     "822563871473795073": {
