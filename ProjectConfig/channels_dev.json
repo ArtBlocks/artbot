@@ -14,7 +14,15 @@
                     "eternal",
                     "pump"
                 ]
-            }
+            },
+            "tokenIdTriggers": [
+                {
+                    "squiggleBot": [
+                        1000,
+                        null
+                    ]
+                }
+            ]
         }
     },
     "838422388478836786": {
