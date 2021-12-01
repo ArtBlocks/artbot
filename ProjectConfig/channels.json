@@ -376,6 +376,9 @@
             "stringTriggers": {
                 "rinascitaBot": [
                     "rina"
+                ],
+                "saturazioneBot": [
+                    "saturazione"
                 ]
             },
             "tokenIdTriggers": [
@@ -453,7 +456,13 @@
         "projectBotHandlers": {
             "default": "edificeBot"
         }
-    }, 
+    },
+    "908416638636920832": {
+        "name": "edelman-x-ofman-x-badr",
+        "projectBotHandlers": {
+            "default": "asemicaBot"
+        }
+    },
     "910410292205350953": {
         "name": "steganon",
         "projectBotHandlers": {

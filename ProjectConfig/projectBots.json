@@ -439,6 +439,12 @@
             "singles": "scribbledSingles.json"
         }
     },
+    "saturazioneBot": {
+        "projectNumber": 200,
+        "coreContract": "V2",
+        "editionSize": 444,
+        "projectName": "Saturazione"
+    },
     "octoGardenBot": {
         "projectNumber": 103,
         "coreContract": "V2",
@@ -541,6 +547,12 @@
         "namedMappings": {
           "sets": "edificeSets.json"
         }
+    },
+    "asemicaBot": {
+        "projectNumber": 206,
+        "coreContract": "V2",
+        "editionSize": 980,
+        "projectName": "Asemica"
     },
     "autologyBot": {
         "projectNumber": 209,
