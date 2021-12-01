@@ -564,6 +564,9 @@
         "projectNumber": 214,
         "coreContract": "V2",
         "editionSize": 1023,
-        "projectName": "Bent"
+        "projectName": "Bent",
+        "namedMappings": {
+          "sets": "bentSets.json"
+        }
     }
 }
