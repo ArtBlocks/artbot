@@ -560,7 +560,8 @@
         "editionSize": 1024,
         "projectName": "Autology",
         "namedMappings": {
-          "sets": "autologySets.json"
+          "sets": "autologySets.json",
+          "singles": "autologySingles.json"
         }
     },
     "bentBot": {
