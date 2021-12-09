@@ -475,6 +475,12 @@
             "default": "bentBot"
         }
     },
+    "915365986822144020": {
+        "name": "matt-kane",
+        "projectBotHandlers": {
+            "default": "gazersBot"
+        }
+    },
     "822563871473795073": {
         "name": "factory-projects"
     },
