@@ -83,6 +83,9 @@
                 ],
                 "neighborhoodBot": [
                     "neighborhood"
+                ],
+                "reflectionBot": [
+                    "reflection"
                 ]
             }
         }
