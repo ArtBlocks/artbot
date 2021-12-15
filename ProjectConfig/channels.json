@@ -484,6 +484,12 @@
             "default": "gazersBot"
         }
     },
+    "917905929087905823": {
+        "name": "jen-stark",
+        "projectBotHandlers": {
+            "default": "vortexBot"
+        }
+    },
     "822563871473795073": {
         "name": "factory-projects"
     },

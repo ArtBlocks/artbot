@@ -584,5 +584,10 @@
         "coreContract": "V2",
         "editionSize": 100,
         "projectName": "Reflection"
-    }
+    },
+    "vortexBot": {
+        "projectNumber": 225,
+        "coreContract": "V2",
+        "editionSize": 1000,
+        "projectName": "Vortex"
 }
