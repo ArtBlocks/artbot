@@ -346,7 +346,14 @@
     "849732302975008778": {
         "name": "tyler-hobbs",
         "projectBotHandlers": {
-            "default": "fidenzaBot"
+            "default": "fidenzaBot",
+            "stringTriggers": {
+                "icBot": [
+                    "ic",
+                    "incomplete",
+                    "control"
+                ]
+            }
         }
     },
     "879488624197001293": {
