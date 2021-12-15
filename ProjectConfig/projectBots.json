@@ -596,5 +596,11 @@
         "coreContract": "V2",
         "editionSize": 100,
         "projectName": "Incomplete Control"
+    },
+    "pathsBot": {
+        "projectNumber": 217,
+        "coreContract": "V2",
+        "editionSize": 523,
+        "projectName": "Paths"
     }
 }

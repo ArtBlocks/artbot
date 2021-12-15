@@ -218,6 +218,9 @@
                     "hash",
                     "tractors",
                     "🚜"
+                ],
+                "pathsBot": [
+                    "paths"
                 ]
             }
         }
