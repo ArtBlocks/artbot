@@ -602,5 +602,11 @@
         "coreContract": "V2",
         "editionSize": 523,
         "projectName": "Paths"
+    },
+    "glowBot": {
+        "projectNumber": 230,
+        "coreContract": "V2",
+        "editionSize": 500,
+        "projectName": "Glow"
     }
 }
