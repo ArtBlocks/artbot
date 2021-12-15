@@ -42,6 +42,9 @@
                 "eternalPumpBot": [
                     "eternal",
                     "pump"
+                ],
+                "wraptureBot": [
+                    "wrapture"
                 ]
             }
         }

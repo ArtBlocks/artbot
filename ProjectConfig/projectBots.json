@@ -608,5 +608,11 @@
         "coreContract": "V2",
         "editionSize": 500,
         "projectName": "Glow"
+    },
+    "wraptureBot": {
+        "projectNumber": 234,
+        "coreContract": "V2",
+        "editionSize": 50,
+        "projectName": "Wrapture"
     }
 }
