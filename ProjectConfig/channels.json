@@ -333,6 +333,9 @@
                 "bubbleBlobbyBot": [
                     "bubble",
                     "blobby"
+                ],
+                "glowBot": [
+                    "glow"
                 ]
             }
         }
