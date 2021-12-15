@@ -584,5 +584,11 @@
         "coreContract": "V2",
         "editionSize": 100,
         "projectName": "Reflection"
+    },
+    "glowBot": {
+        "projectNumber": 230,
+        "coreContract": "V2",
+        "editionSize": 500,
+        "projectName": "Glow"
     }
 }
