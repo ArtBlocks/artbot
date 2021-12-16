@@ -42,6 +42,9 @@
                 "eternalPumpBot": [
                     "eternal",
                     "pump"
+                ],
+                "wraptureBot": [
+                    "wrapture"
                 ]
             }
         }
@@ -218,6 +221,9 @@
                     "hash",
                     "tractors",
                     "🚜"
+                ],
+                "pathsBot": [
+                    "paths"
                 ]
             }
         }
@@ -333,6 +339,9 @@
                 "bubbleBlobbyBot": [
                     "bubble",
                     "blobby"
+                ],
+                "glowBot": [
+                    "glow"
                 ]
             }
         }
@@ -346,7 +355,14 @@
     "849732302975008778": {
         "name": "tyler-hobbs",
         "projectBotHandlers": {
-            "default": "fidenzaBot"
+            "default": "fidenzaBot",
+            "stringTriggers": {
+                "icBot": [
+                    "ic",
+                    "incomplete",
+                    "control"
+                ]
+            }
         }
     },
     "879488624197001293": {
@@ -482,6 +498,12 @@
         "name": "matt-kane",
         "projectBotHandlers": {
             "default": "gazersBot"
+        }
+    },
+    "917905929087905823": {
+        "name": "jen-stark",
+        "projectBotHandlers": {
+            "default": "vortexBot"
         }
     },
     "822563871473795073": {
