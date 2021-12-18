@@ -366,9 +366,16 @@
         }
     },
     "879488624197001293": {
-        "name": "Server: Tyler Hobbs (879488624197001287), CH: fidenza",
+        "name": "Server: Tyler Hobbs (879488624197001287), CH: the-place-to-be",
         "projectBotHandlers": {
-            "default": "fidenzaBot"
+            "default": "fidenzaBot",            
+            "stringTriggers": {
+                "icBot": [
+                    "ic",
+                    "incomplete",
+                    "control"
+                ]
+            }
         }
     },
     "846619538320785448": {
