@@ -513,6 +513,12 @@
             "default": "vortexBot"
         }
     },
+    "920399256454594652": {
+        "name": "samsy",
+        "projectBotHandlers": {
+            "default": "jiometoryBot"
+        }
+    },
     "822563871473795073": {
         "name": "factory-projects"
     },
