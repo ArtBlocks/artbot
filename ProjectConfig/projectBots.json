@@ -614,5 +614,11 @@
         "coreContract": "V2",
         "editionSize": 50,
         "projectName": "Wrapture"
+    },
+    "jiometoryBot": {
+        "projectNumber": 232,
+        "coreContract": "V2",
+        "editionSize": 1024,
+        "projectName": "Jiometory No Compute - ジオメトリ ハ ケイサンサレマセン"
     }
 }
