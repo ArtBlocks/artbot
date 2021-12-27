@@ -9,8 +9,6 @@ const getArtBlocksProject = require('../Utils/parseArtBlocksAPI').getArtBlocksPr
 
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545');
 
-const V2_MINTING_CONTRACT_ADDRESS = '0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270';
-
 // Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES = process.env.METADATA_REFRESH_INTERVAL_MINUTES;
 
@@ -49,7 +47,7 @@ class RandomBot {
       if (projectData) {
         const pieceNumber = parseInt(Math.random() * projectData.invocations);
         const tokenID = (projectNumber * 1e6) + pieceNumber;
-        const artBlocksResponse = await fetch(`https://api.artblocks.io/token/${tokenID}`, {timeout: 5000});
+        const artBlocksResponse = await fetch(`https://token.artblocks.io/${tokenID}`, {timeout: 5000});
         const artBlocksData = await artBlocksResponse.json();
 
         const imageContent = new MessageEmbed()

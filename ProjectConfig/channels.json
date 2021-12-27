@@ -1,0 +1,552 @@
+{
+    "793390526765465600": {
+        "name": "hideki-tsukamoto",
+        "projectBotHandlers": {
+            "default": "singularityBot"
+        }
+    },
+    "807346227594919986": {
+        "name": "ge1doot",
+        "projectBotHandlers": {
+            "default": "ignitionBot",
+            "stringTriggers": {
+                "utopiaBot": [
+                    "utopia"
+                ],
+                "r3sonanceBot": [
+                    "r3"
+                ],
+                "auroraIvBot": [
+                    "aurora"
+                ]
+            }
+        }
+    },
+    "781923690349592607": {
+        "name": "snowfro",
+        "projectBotHandlers": {
+            "default": "squiggleBot"
+        }
+    },
+    "830104035100065845": {
+        "name": "squiggle_square",
+        "projectBotHandlers": {
+            "default": "squiggleBot"
+        }
+    },
+    "800763110247628820": {
+        "name": "dmitri-cherniak",
+        "projectBotHandlers": {
+            "default": "ringersBot",
+            "stringTriggers": {
+                "eternalPumpBot": [
+                    "eternal",
+                    "pump"
+                ],
+                "wraptureBot": [
+                    "wrapture"
+                ]
+            }
+        }
+    },
+    "810598817351204894": {
+        "name": "dandan-dca",
+        "projectBotHandlers": {
+            "default": "genesisBot",
+            "stringTriggers": {
+                "gen2Bot": [
+                    "gen2",
+                    "gen 2"
+                ],
+                "gen3Bot": [
+                    "gen3",
+                    "gen 3"
+                ]
+            }
+        }
+    },
+    "807346265851559997": {
+        "name": "jeff-davis",
+        "projectBotHandlers": {
+            "default": "constructionBot",
+            "stringTriggers": {
+                "rhythmBot": [
+                    "rhythm"
+                ],
+                "colorStudyBot": [
+                    "color",
+                    "study"
+                ],
+                "viewCardBot": [
+                    "view",
+                    "card"
+                ],
+                "portalBot": [
+                    "portal"
+                ],
+                "neighborhoodBot": [
+                    "neighborhood"
+                ],
+                "reflectionBot": [
+                    "reflection"
+                ]
+            }
+        }
+    },
+    "854222350454226984": {
+        "name": "joshua-bagley",
+        "projectBotHandlers": {
+            "default": "dreamsBot",
+            "stringTriggers": {
+                "ecumenopolisBot": [
+                    "ecumenopolis"
+                ]
+            }
+        }
+    },
+    "787074645618589696": {
+        "name": "pxlq",
+        "projectBotHandlers": {
+            "default": "dynamicSlicesBot",
+            "stringTriggers": {
+                "cyberCitiesBot": [
+                    "cyber",
+                    "cities"
+                ],
+                "sentienceBot": [
+                    "sentience"
+                ],
+                "hieroglyphsBot": [
+                    "hieroglyphs"
+                ]
+            }
+        }
+    },
+    "814343646010540053": {
+        "name": "luxpris",
+        "projectBotHandlers": {
+            "default": "deconstructionsBot",
+            "stringTriggers": {
+                "pathfindersBot": [
+                    "pathfinder"
+                ]
+            }
+        }
+    },
+    "797929926610911263": {
+        "name": "bryan-brinkman",
+        "projectBotHandlers": {
+            "default": "nimbudsBot"
+        }
+    },
+    "814519454268391445": {
+        "name": "beervangeer",
+        "projectBotHandlers": {
+            "default": "hyperhashBot",
+            "stringTriggers": {
+                "energySculptureBot": [
+                    "energy",
+                    "sculpture"
+                ]
+            }
+        }
+    },
+    "800761846235136020": {
+        "name": "zeblocks",
+        "projectBotHandlers": {
+            "default": "unigridsBot"
+        }
+    },
+    "814008731838316554": {
+        "name": "kai",
+        "projectBotHandlers": {
+            "default": "27bitBot",
+            "stringTriggers": {
+                "pixelGlassBot": [
+                    "pixel",
+                    "glass"
+                ]
+            }
+        }
+    },
+    "808792983503503410": {
+        "name": "simon-de-mai",
+        "projectBotHandlers": {
+            "default": "spectronBot"
+        }
+    },
+    "787363737438519298": {
+        "name": "daim-aggott-honsch",
+        "projectBotHandlers": {
+            "default": "cryptoblotBot"
+        }
+    },
+    "813619514390216724": {
+        "name": "kjetil-golid",
+        "projectBotHandlers": {
+            "default": "archetypeBot",
+            "stringTriggers": {
+                "paperArmadaBot": [
+                    "pa",
+                    "paper",
+                    "armada"
+                ]
+            }
+        }
+    },
+    "864290801638572053": {
+        "name": "alida-sun",
+        "projectBotHandlers": {
+            "default": "glitchBot"
+        }
+    },
+    "869449236717121576": {
+        "name": "rafael-rozendaal",
+        "projectBotHandlers": {
+            "default": "endlessBot",
+            "stringTriggers": {
+                "diveBot": [
+                    "dive"
+                ]
+            }
+        }
+    },
+    "872722851029999616": {
+        "name": "darien-brito",
+        "projectBotHandlers": {
+            "default": "pigmentsBot",
+            "stringTriggers": {
+                "hashtractorsBot": [
+                    "hashtractors",
+                    "hash",
+                    "tractors",
+                    "🚜"
+                ],
+                "pathsBot": [
+                    "paths"
+                ]
+            }
+        }
+    },
+    "828516221308895263": {
+        "name": "alexis-andre",
+        "projectBotHandlers": {
+            "default": "minutesBot",
+            "stringTriggers": {
+                "voidBot": [
+                    "void"
+                ],
+                "messengersBot": [
+                    "messengers"
+                ],
+                "obiceraBot": [
+                    "obicera"
+                ],
+                "heuresBot": [
+                    "heures",
+                    "hours",
+                    "24heures",
+                    "24hours",
+                    "24 heures",
+                    "24 hours"
+                ]
+            }
+        }
+    },
+    "820307788316016700": {
+        "name": "aaron-penne",
+        "projectBotHandlers": {
+            "default": "apparitionsBot",
+            "stringTriggers": {
+                "ritualBot": [
+                    "rituals"
+                ],
+                "returnBot": [
+                    "return"
+                ]
+            }
+        }
+    },
+    "820308326968852511": {
+        "name": "radix",
+        "projectBotHandlers": {
+            "default": "inspiralsBot",
+            "stringTriggers": {
+                "eccentrics2Bot": [
+                    "eccentrics2"
+                ],
+                "eccentricsBot": [
+                    "eccentric"
+                ]
+            }
+        }
+    },
+    "820308609342242866": {
+        "name": "dalenz",
+        "projectBotHandlers": {
+            "default": "aerialViewBot"
+        }
+    },
+    "828009510571343922": {
+        "name": "chaosconstruct",
+        "projectBotHandlers": {
+            "default": "synapsesBot"
+        }
+    },
+    "828009835207196722": {
+        "name": "stina-jones",
+        "projectBotHandlers": {
+            "default": "algobotsBot"
+        }
+    },
+    "828009961991831590": {
+        "name": "michael-connolly",
+        "projectBotHandlers": {
+            "default": "elementalsBot",
+            "stringTriggers": {
+                "divisionsBot": [
+                    "division"
+                ]
+            }
+        }
+    },
+    "833713318107545670": {
+        "name": "matt-deslauriers",
+        "projectBotHandlers": {
+            "default": "subscapesBot",
+            "stringTriggers": {
+                "meridianBot": [
+                    "meridian"
+                ]
+            }
+        }
+    },
+    "836497015927996437": {
+        "name": "numbersinmotion",
+        "projectBotHandlers": {
+            "default": "watercolorDreamsBot"
+        }
+    },
+    "836497127538425886": {
+        "name": "jason-ting",
+        "projectBotHandlers": {
+            "default": "transitionsBot",
+            "stringTriggers": {
+                "lightBeamsBot": [
+                    "light",
+                    "beams"
+                ],
+                "bubbleBlobbyBot": [
+                    "bubble",
+                    "blobby"
+                ],
+                "glowBot": [
+                    "glow"
+                ]
+            }
+        }
+    },
+    "839739823669641227": {
+        "name": "han-x-nicolas-daniel",
+        "projectBotHandlers": {
+            "default": "algoRhythmsBot"
+        }
+    },
+    "849732302975008778": {
+        "name": "tyler-hobbs",
+        "projectBotHandlers": {
+            "default": "fidenzaBot",
+            "stringTriggers": {
+                "icBot": [
+                    "ic",
+                    "incomplete",
+                    "control"
+                ]
+            }
+        }
+    },
+    "879488624197001293": {
+        "name": "Server: Tyler Hobbs (879488624197001287), CH: the-place-to-be",
+        "projectBotHandlers": {
+            "default": "fidenzaBot",            
+            "stringTriggers": {
+                "icBot": [
+                    "ic",
+                    "incomplete",
+                    "control"
+                ]
+            }
+        }
+    },
+    "846619538320785448": {
+        "name": "shvembldr",
+        "projectBotHandlers": {
+            "default": "blocksOfArtBot",
+            "stringTriggers": {
+                "444(4)Bot": [
+                    "444(4)"
+                ],
+                "alienInsectsBot": [
+                    "ai"
+                ],
+                "alienClockBot": [
+                    "ac"
+                ]
+            }
+        }
+    },
+    "844078279338360832": {
+        "name": "stefan-contiero",
+        "projectBotHandlers": {
+            "default": "frammentiBot",
+            "stringTriggers": {
+                "rinascitaBot": [
+                    "rina"
+                ],
+                "saturazioneBot": [
+                    "saturazione"
+                ]
+            },
+            "tokenIdTriggers": [
+                {
+                    "rinascitaBot": [
+                        555,
+                        null
+                    ]
+                }
+            ]
+        }
+    },
+    "872722887054852106": {
+        "name": "wiliam-tan",
+        "projectBotHandlers": {
+            "default": "scribbledBot"
+        }
+    },
+    "879405018279731231": {
+        "name": "rich-lord",
+        "projectBotHandlers": {
+            "default": "geometryRunnersBot",
+            "stringTriggers": {
+                "octoGardenBot": [
+                    "octogarden"
+                ]
+            }
+        }
+    },
+    "854222600742109184": {
+        "name": "casey-reas",
+        "projectBotHandlers": {
+            "default": "phototaxisBot",
+            "stringTriggers": {
+                "centuryBot": [
+                    "century"
+                ]
+            }
+        }
+    },
+    "877060147619446814": {
+        "name": "loren-bednar",
+        "projectBotHandlers": {
+            "default": "phasesBot",
+            "stringTriggers": {
+                "paradeBot": [
+                    "parade"
+                ],
+                "traversalsBot": [
+                    "traversals"
+                ]
+            }
+        }
+    },
+    "882129221659537440": {
+        "name": "anna-carreras",
+        "projectBotHandlers": {
+            "default": "trossetsBot"
+        }
+    },
+    "885032021146099734": {
+        "name": "monica-rizzolli",
+        "projectBotHandlers": {
+            "default": "fragmentsBot"
+        }
+    },
+    "889737089862754344": {
+        "name": "piter-pasma",
+        "projectBotHandlers": {
+            "default": "skulptuurBot"
+        }
+    },  
+    "904783901522804786": {
+        "name": "ben-kovach",
+        "projectBotHandlers": {
+            "default": "edificeBot"
+        }
+    },
+    "908416638636920832": {
+        "name": "edelman-x-ofman-x-badr",
+        "projectBotHandlers": {
+            "default": "asemicaBot"
+        }
+    },
+    "910410292205350953": {
+        "name": "steganon",
+        "projectBotHandlers": {
+            "default": "autologyBot"
+        }
+    },
+    "912771594357714964": {
+        "name": "ippsketch",
+        "projectBotHandlers": {
+            "default": "bentBot"
+        }
+    },
+    "915365986822144020": {
+        "name": "matt-kane",
+        "projectBotHandlers": {
+            "default": "gazersBot"
+        }
+    },
+    "917905929087905823": {
+        "name": "jen-stark",
+        "projectBotHandlers": {
+            "default": "vortexBot"
+        }
+    },
+    "920399256454594652": {
+        "name": "samsy",
+        "projectBotHandlers": {
+            "default": "jiometoryBot"
+        }
+    },
+    "822563871473795073": {
+        "name": "factory-projects"
+    },
+    "880468116226850866": {
+        "name": "ab-art-chat"
+    },
+    "859521842317754369": {
+        "name": "prod_all_activity"
+    },
+    "411959613370400780": {
+        "name": "general"
+    },
+    "815980444905373786": {
+        "name": "help"
+    },
+    "859312767105105941": {
+        "name": "sales-feed"
+    },
+    "830924481627291709": {
+        "name": "block-talk"
+    },
+    "830940204441272369": {
+        "name": "listing-feed"
+    },
+    "859316381517348874": {
+        "name": "squiggle-listings"
+    },
+    "880937060075192320": {
+        "name": "fidenza-sales"
+    }
+}

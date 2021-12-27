@@ -3,6 +3,7 @@ const {
 } = require("discord.js");
 const fetch = require("node-fetch");
 const Web3 = require("web3");
+const { ProjectHandlerHelper } = require("./ProjectHandlerHelper");
 
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 
@@ -12,11 +13,18 @@ const UNKNOWN_ADDRESS = "unknown";
 const UNKNOWN_USERNAME = "unknown";
 
 class ProjectBot {
-  constructor(projectNumber, mintContract, editionNumber, projectName) {
+  constructor({ projectNumber, coreContract, editionSize, projectName, namedMappings }) {
     this.projectNumber = projectNumber;
-    this.mintContract = mintContract;
-    this.editionNumber = editionNumber;
+    this.coreContract = coreContract;
+    this.editionSize = editionSize;
     this.projectName = projectName;
+    this.namedMappings = namedMappings ? ProjectBot.getProjectHandlerHelper(namedMappings) : null;
+  }
+
+  static getProjectHandlerHelper({ singles, sets }) {
+    let singlesMap = singles ? require(`../NamedMappings/${singles}`) : null;
+    let setsMap = sets ? require(`../NamedMappings/${sets}`) : null;
+    return new ProjectHandlerHelper(singlesMap, setsMap);
   }
 
   async handleNumberMessage(msg) {
@@ -28,24 +36,29 @@ class ProjectBot {
       return;
     }
 
+    // decode any mappings
+    if (this.namedMappings) {
+      content = this.namedMappings.transform(content);
+    }
+
     let detailsRequested = content.toLowerCase().includes("detail");
     let afterTheHash = content.substring(1);
     let pieceNumber;
     if (afterTheHash[0] == "?") {
-      pieceNumber = parseInt(Math.random() * this.editionNumber);
+      pieceNumber = parseInt(Math.random() * this.editionSize);
     } else {
       pieceNumber = parseInt(afterTheHash);
     }
 
-    if (pieceNumber >= this.editionNumber || pieceNumber < 0) {
+    if (pieceNumber >= this.editionSize || pieceNumber < 0) {
       msg.channel.send(
-        `Invalid #, only ${this.editionNumber} pieces minted for ${this.projectName}.`
+        `Invalid #, only ${this.editionSize} pieces minted for ${this.projectName}.`
       );
       return;
     }
 
     let tokenID = pieceNumber + (this.projectNumber * 1e6);
-    let openSeaURL = `https://api.opensea.io/api/v1/asset/${this.mintContract}/${tokenID}/`;
+    let openSeaURL = `https://api.opensea.io/api/v1/asset/${this.coreContract}/${tokenID}/`;
 
     await fetch(
         openSeaURL, {
@@ -64,7 +77,7 @@ class ProjectBot {
   }
 
   async sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested) {
-    let artBlocksResponse = await fetch(`https://api.artblocks.io/token/${tokenID}`);
+    let artBlocksResponse = await fetch(`https://token.artblocks.io/${tokenID}`);
     let artBlocksData = await artBlocksResponse.json();
     console.log(artBlocksData, "ARTBLOCKS DATA");
 

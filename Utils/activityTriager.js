@@ -2,18 +2,33 @@ const {
   MessageEmbed,
 } = require('discord.js');
 const fetch = require('node-fetch');
+const projectConfig = require('../ProjectConfig/projectConfig').projectConfig;
 
 // Trade activity Discord channel IDs.
-const CHANNEL_SALES_CHAT = process.env.CHANNEL_SALES_CHAT;
-const CHANNEL_SALES = process.env.CHANNEL_SALES;
-const CHANNEL_LISTINGS = process.env.CHANNEL_LISTINGS;
-const CHANNEL_SQUIGGLE_SALES = process.env.CHANNEL_SQUIGGLE_SALES;
-const CHANNEL_SQUIGGLE_LISTINGS = process.env.CHANNEL_SQUIGGLE_LISTINGS;
-const CHANNEL_FIDENZA_SALES = process.env.CHANNEL_FIDENZA_SALES;
+const CHANNEL_SALES_CHAT =
+  projectConfig.chIdByName['block-talk'];
+const CHANNEL_SALES =
+  projectConfig.chIdByName['sales-feed'];
+const CHANNEL_LISTINGS =
+  projectConfig.chIdByName['listing-feed'];
+const CHANNEL_SQUIGGLE_SALES =
+  projectConfig.chIdByName['squiggle_square'];
+const CHANNEL_SQUIGGLE_LISTINGS =
+  projectConfig.chIdByName['squiggle-listings'];
+const CHANNEL_FIDENZA_SALES =
+  projectConfig.chIdByName['fidenza-sales'];
 
 // Addresses which should be omitted entirely from event feeds.
 const BAN_ADDRESSES = new Set([
+  '0x8cf11506812f224af5c01c5f9dce5431ec3d60fd',
+  '0x2897a0ad0032df254c74e9f17e76b474eec8ed38',
+  '0xc7f45f209a925f9ae6af2043cf44e6570be5b21c',
+  '0x9b397d50f662d5d39e88e4b886571581ccf48188',
+  '0xe1770cf5274084db23bca6c921fa51cf62a37eda',
+  '0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270',
+  '0x7b77ebc4bab939071543243a4909ca4c51c9c1fd',
   '0x45d91f318b2abc6b569b6637c84cdb66486eb9ee',
+  '0x435de9e65aae5c1324d5c2359f23db32e882512c',
   '0x3c3fb7e51d8cfcc9451100dddf59255c6d7fc5c2',
   '0x7058634bc1394af83aa0a3589d6b818e4c35295a',
   '0x8491fc2625aeece9abc897ef29544e825a72d66e',
@@ -57,7 +72,22 @@ const BAN_ADDRESSES = new Set([
   '0x68fc3ec2f29ba49e2a79df34cdaa3c127a207097',
   '0x7de871f520228b7a9b9fe2c718766f07a261c56c',
   '0x7c97af86a0f92beceb712417fa0856188bb6b337',
-  '0xd5a5d0b4566322173b1aea3a669b684129edfc8a'
+  '0xd5a5d0b4566322173b1aea3a669b684129edfc8a',
+  '0x7b77ebc4bab939071543243a4909ca4c51c9c1fd',
+'0x4ef4e75c6b27b6a3f1d8a331894392692633284d',
+'0x0f87d3a46cc9bd339b28020f737e37e0ddd728bf',
+'0xe1770cf5274084db23bca6c921fa51cf62a37eda',
+'0xc7f45f209a925f9ae6af2043cf44e6570be5b21c',
+'0x592a6119e24013e4e7d02259e1c9b7148fec7677',
+'0xaee378ba81e5ccba714c3c455a93abddd956f533', 
+'0xf95323e393b776acc2f9e1de83be1094f22ca703',
+'0x706b5d16ad3027b9120ac270f66992079aacd8b2',
+'0x8d4be76c4113046d9d7ac34a11adecea91b977cd',
+'0x489f2dec2c7482faeae99d851aeda13625ea35ff',
+'0x3656d9a9ced1909981bc3d6feb7b54b9dbd25173',
+'0x872ea485576a569b06861a94946f04c08c510358',
+'0x592a6119e24013e4e7d02259e1c9b7148fec7677',
+'0x9b397d50f662d5d39e88e4b886571581ccf48188'
 ]);
 
 async function triageActivityMessage(msg, bot) {
@@ -118,11 +148,17 @@ async function triageActivityMessage(msg, bot) {
     // Remove (ethereum) from names
     description = description.replace(/\(ethereum\)/g, '');
 
+    // Replace "Owner" with "Seller"
+    description = description.replace(/Owner/, 'Seller');
+
+    // Replace "Winner" with "Buyer"
+    description = description.replace(/Winner/g, 'Buyer');
+
     // Update description with parsed and modified string.
     embed.setDescription(description.trim());
 
     // Get Art Blocks metadata response for the item.
-    const artBlocksResponse = await fetch(`https://api.artblocks.io/token/${tokenID}`);
+    const artBlocksResponse = await fetch(`https://token.artblocks.io/${tokenID}`);
     const artBlocksData = await artBlocksResponse.json();
 
     // Update thumbnail image to use larger variant from Art Blocks API.
@@ -134,7 +170,7 @@ async function triageActivityMessage(msg, bot) {
     // Update to remove author name and to reflect this info in piece name
     // rather than token number as the title and URL field..
     embed.author = null;
-    embed.setTitle(`${artBlocksData.name}`);
+    embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`);
     embed.setURL(openseaURL);
 
     // Only forward sales events and listing events.
