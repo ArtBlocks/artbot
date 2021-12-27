@@ -63,7 +63,7 @@ The core engine of Artbot is built around the discord.js package.  It serves sev
   
 ## Contributing to artbot
   
-  <have purplehat contribute a process here>
+  For now, Artbot development is coordinated informally over Discord.  Please reach out to purplehat.eth#7327 or ryley-o.eth#5272 if you think you might be interested in helping out.
  
 
   
