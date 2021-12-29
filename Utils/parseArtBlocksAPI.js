@@ -35,7 +35,9 @@ const contractProject = gql`
         invocations
         maxInvocations
         curationStatus
-        contract
+        contract {
+          id
+        }
       }
     }
   }
@@ -55,7 +57,9 @@ const contractFactoryProjects = gql`
         invocations
         maxInvocations
         curationStatus
-        contract
+        contract {
+          id
+        }
       }
     }
   }
