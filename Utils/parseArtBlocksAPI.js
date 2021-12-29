@@ -1,86 +1,213 @@
-const parse = require('node-html-parser').parse;
-const fetch = require('node-fetch');
-const fs = require('fs-extra');
+const parse = require("node-html-parser").parse;
+const fetch = require("node-fetch");
+const { createClient, gql } = require("@urql/core");
 
-const promises = [];
-const tokenMax = 1e6;
+const API_URL = "https://api.thegraph.com/subgraphs/name/artblocks/art-blocks";
 
-async function getArtBlocksPlatform() {
-  const platform = {};
-  // The Art Blocks API tends to fail to respond or drop sockets occasionally, so need to have a timeout and error handling
-  try {
-    const response = await fetch(`https://api.artblocks.io/platform`, {timeout: 5000});
-    const html = await response.text();
+// core contract addresses to include during initilization
+const CORE_CONTRACTS = require("../ProjectConfig/coreContracts.json");
 
-    const body = parse(html).querySelector('body');
+const client = createClient({
+  url: API_URL,
+  fetch: fetch,
+  fetchOptions: () => ({
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }),
+});
 
-    body.childNodes.forEach((node, i) => {
-      if (node.tagName === 'pre') return;
-
-	    keyValue = node.text.split(':');
-	    if (keyValue.length >= 2 && keyValue[1]) {
-	        platform[keyValue.shift().split(' ').join('_').toLowerCase()] = keyValue.join(':').trim();
+const contractProjectsMinimal = gql`
+  query getContractProjectsMinimal($id: ID!, $first: Int!, $skip: Int) {
+    contract(id: $id) {
+      projects(first: $first, skip: $skip, orderBy: projectId) {
+        projectId
       }
-    });
-
-    platform.projects_list = platform.projects_list.split(',').map((p) => parseInt(p));
-    return platform.projects_list;
-  } catch (err) {
-    console.error(err);
-    return [];
-  }
-};
-
-async function getArtBlocksProject(id) {
-  const project = {id};
-
-  // The Art Blocks API tends to fail to respond or drop sockets occasionally, so need to have a timeout and error handling
-  try {
-    const response = await fetch(`https://api.artblocks.io/project/${id}`, {timeout: 5000});
-    const html = await response.text();
-
-    const body = parse(html).querySelector('body');
-
-    body.childNodes.forEach((node, i) => {
-      if (node.tagName === 'pre') return;
-
-	    const nodeText = node.text;
-	    keyValue = nodeText.split(':');
-	    keyValue = keyValue.length === 1 ? nodeText.split('?') : keyValue;
-
-	    if (keyValue.length >= 2 && keyValue[1]) {
-	        project[keyValue.shift().split(' ').join('_').toLowerCase()] = keyValue.join(':').trim();
-      }
-    });
-
-    project.token_ids = [];
-    for (let i = 0; i < project.invocations; i++) {
-	    project.token_ids.push(id * tokenMax + i);
     }
+  }
+`;
+
+const contractProject = gql`
+  query getContractProject($id: ID!, $projectId: Int!) {
+    contract(id: $id) {
+      projects(where: { projectId: $projectId }) {
+        name
+        invocations
+        maxInvocations
+        curationStatus
+        contract
+      }
+    }
+  }
+`;
+
+const contractFactoryProjects = gql`
+  query getContractFactoryProjects($id: ID!, $first: Int!, $skip: Int) {
+    contract(id: $id) {
+      projects(
+        where: { curationStatus: "factory" }
+        first: $first
+        skip: $skip
+        orderBy: projectId
+      ) {
+        projectId
+        name
+        invocations
+        maxInvocations
+        curationStatus
+        contract
+      }
+    }
+  }
+`;
+
+/*
+ * helper function to get project count of a single
+ * art blocks contract (uses pagination)
+ */
+async function _getContractProjectCount(contractId) {
+  // max returned projects in a single query
+  const maxProjectsPerQuery = 1000;
+  try {
+    let totalProjects = 0;
+    while (true) {
+      const result = await client
+        .query(contractProjectsMinimal, {
+          id: contractId,
+          first: maxProjectsPerQuery,
+          skip: totalProjects,
+        })
+        .toPromise();
+      const numResults = result.data.contract.projects.length;
+      totalProjects += numResults;
+      if (numResults !== maxProjectsPerQuery) {
+        break;
+      }
+    }
+    return totalProjects;
   } catch (err) {
     console.error(err);
     return undefined;
   }
-  return project;
-};
+}
 
-async function isFactoryProject(id) {
-  const tokenID = id * tokenMax;
-  let isFactory = false;
-  // The Art Blocks API tends to fail to respond or drop sockets occasionally, so need to have a timeout and error handling
+/*
+ * get count of all artblocks projects
+ */
+async function getArtBlocksProjectCount() {
   try {
-    const response = await fetch(`https://token.artblocks.io/${tokenID}`, {timeout: 5000});
-    const json = await response.json();
-    if (json.curation_status == 'factory') {
-      isFactory = true;
-    }
+    const contractsToGet = Object.values(CORE_CONTRACTS);
+    const promises = contractsToGet.map(_getContractProjectCount);
+    const numProjects = await Promise.all(promises);
+    return numProjects.reduce((sum, _projects) => sum + _projects);
   } catch (err) {
     console.error(err);
   }
+  return undefined;
+}
 
-  return isFactory;
+/*
+ * helper function to get project by project number on
+ * an art blocks contract.
+ * Returns null if project doesn't exist on this contract.
+ * Returns undefined if error is encountered.
+ */
+async function _getContractProject(projectId, contractId) {
+  try {
+    const result = await client
+      .query(contractProject, {
+        id: contractId,
+        projectId: projectId,
+      })
+      .toPromise();
+    return result.data.contract.projects.length > 0
+      ? result.data.contract.projects[0]
+      : null;
+  } catch (err) {
+    console.error(err);
+    return undefined;
+  }
+}
+
+/*
+ * get data for a flagship artblocks project
+ * Returns undefined if no project found (errors or DNE).
+ * If project found, returns object with:
+ *   - curationStatus
+ *   - invocations
+ *   - maxInvocations
+ *   - name
+ *   - projectId
+ *   - contract
+ *     - id: string Contract Address
+ */
+async function getArtBlocksProject(projectNumber) {
+  try {
+    const contractsToGet = Object.values(CORE_CONTRACTS);
+    const promises = contractsToGet.map(
+      _getContractProject.bind(null, projectNumber)
+    );
+    const project = await Promise.all(promises);
+    // return the element that is not null and not undefined
+    return project.find((el) => el !== null && el !== undefined);
+  } catch (err) {
+    console.error(err);
+  }
+  return undefined;
+}
+
+/*
+ * helper function to get factory projects of a single
+ * art blocks contract (uses pagination)
+ */
+async function _getContractFactoryProjects(contractId) {
+  // max returned projects in a single query
+  const maxProjectsPerQuery = 1000;
+  try {
+    const factoryProjects = [];
+    while (true) {
+      const result = await client
+        .query(contractFactoryProjects, {
+          id: contractId,
+          first: maxProjectsPerQuery,
+          skip: factoryProjects.length,
+        })
+        .toPromise();
+      factoryProjects.push(...result.data.contract.projects);
+      if (result.data.contract.projects.length !== maxProjectsPerQuery) {
+        break;
+      }
+    }
+    return factoryProjects;
+  } catch (err) {
+    console.error(err);
+    return undefined;
+  }
+}
+
+/*
+ * get data for all flagship artblocks factory projects
+ * Returns undefined if errors encountered while fetching.
+ * If project found, returns array of project objects with:
+ *   - invocations
+ *   - maxInvocations
+ *   - name
+ *   - projectId
+ *   - contract
+ *     - id: string Contract Address
+ */
+async function getArtBlocksFactoryProjects() {
+  try {
+    const contractsToGet = Object.values(CORE_CONTRACTS);
+    const promises = contractsToGet.map(_getContractFactoryProjects);
+    const allArrays = await Promise.all(promises);
+    return [].concat.apply([], allArrays);
+  } catch (err) {
+    console.error(err);
+  }
+  return undefined;
 }
 
 module.exports.getArtBlocksProject = getArtBlocksProject;
-module.exports.isFactoryProject = isFactoryProject;
-module.exports.getArtBlocksPlatform = getArtBlocksPlatform;
+module.exports.getArtBlocksFactoryProjects = getArtBlocksFactoryProjects;
+module.exports.getArtBlocksProjectCount = getArtBlocksProjectCount;
