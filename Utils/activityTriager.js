@@ -17,6 +17,8 @@ const CHANNEL_SQUIGGLE_LISTINGS =
   projectConfig.chIdByName['squiggle-listings'];
 const CHANNEL_FIDENZA_SALES =
   projectConfig.chIdByName['fidenza-sales'];
+const CHANNEL_IC_SALES =
+  projectConfig.chIdByName['ic-sales'];
 
 // Addresses which should be omitted entirely from event feeds.
 const BAN_ADDRESSES = new Set([
@@ -184,6 +186,9 @@ async function triageActivityMessage(msg, bot) {
       if (artBlocksData.collection_name.includes('Fidenza')) {
         bot.channels.cache.get(CHANNEL_FIDENZA_SALES).send(embed);
       }
+      if (artBlocksData.collection_name.includes('Incomplete Control')) {
+        bot.channels.cache.get(CHANNEL_IC_SALES).send(embed);
+      }
     } else if (eventName.includes('Created')) {
       bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
       // Forward all Chromie Squiggles listings on to the DAO.
@@ -192,6 +197,9 @@ async function triageActivityMessage(msg, bot) {
       }
       if (artBlocksData.collection_name.includes('Fidenza')) {
         bot.channels.cache.get(CHANNEL_FIDENZA_SALES).send(embed);
+      }
+      if (artBlocksData.collection_name.includes('Incomplete Control')) {
+        bot.channels.cache.get(CHANNEL_IC_SALES).send(embed);
       }
     }
   }
