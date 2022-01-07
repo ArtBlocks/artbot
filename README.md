@@ -30,11 +30,7 @@ yarn install
 
 Artbot is based on the [discord.js](https://discord.js.org/) package, and is exclusively concerned with processing and sending Discord messages.  If you want to be able to interact with it, joining the Artbot test Discord server is the way to go.  https://discord.gg/W6eYPpEk3a
   
-* Set up .env file to reference relevant Discord channels
-  
-```
-<insert sample .env>
-```
+* Set up `.env` file based on `.env.example`.
 
 * Run the application
 ```
@@ -47,7 +43,13 @@ The core engine of Artbot is built around the discord.js package.  It serves sev
   
 * Project Queries
   
-  One of the most widely used features is Artbot's ability to respond to a #[n] [project_name] query with a link to the appropriate token w/ embedded image.  Currently this is implemented via the ProjectBot class.  For Curated/Playground projects, the ProjectBot class instantiation is hard coded in index.js.  There is special handling for Art Blocks Factory projects in the FactoryBot class which queries the ArtBlocks API to cache any Factory Projects it can find, which is easier to maintain, but less flexible in the syntax we can respond to.  There's a special case in RandomBot which doesn't actually know about any of the projects, but simply responds to a `#?` query by looking for a random project number and mint number.
+  One of the most widely used features is Artbot's ability to respond to a #[n] [project_name] query with a link to the appropriate token w/ embedded image.  Currently this is implemented via the ProjectBot class.  
+  - Curated/Playground projects: 
+    - ProjectBot configurations are defined via json files in the `ProjectConfig/` directory.  
+  - Factory projects:
+    - There is special handling for Art Blocks Factory projects in the FactoryBot class which queries the ArtBlocks hosted subgraph to cache any Factory Projects it can find, which is easier to maintain, but less flexible in the syntax we can respond to.
+  - Random: 
+    - There's a special case in RandomBot which doesn't actually know about any of the projects, but simply responds to a `#?` query by looking for a random project number and mint number.
   
 * OpenSea Activity Feeds
   
