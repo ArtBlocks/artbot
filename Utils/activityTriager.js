@@ -15,8 +15,8 @@ const CHANNEL_SQUIGGLE_SALES =
   projectConfig.chIdByName['squiggle_square'];
 const CHANNEL_SQUIGGLE_LISTINGS =
   projectConfig.chIdByName['squiggle-listings'];
-const CHANNEL_FIDENZA_SALES =
-  projectConfig.chIdByName['fidenza-sales'];
+const CHANNEL_FIDENZA_AND_IC_SALES =
+  projectConfig.chIdByName['fidenza-and-ic-sales'];
 
 // Addresses which should be omitted entirely from event feeds.
 const BAN_ADDRESSES = new Set([
@@ -182,7 +182,10 @@ async function triageActivityMessage(msg, bot) {
         bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
       }
       if (artBlocksData.collection_name.includes('Fidenza')) {
-        bot.channels.cache.get(CHANNEL_FIDENZA_SALES).send(embed);
+        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+      }
+      if (artBlocksData.collection_name.includes('Incomplete Control')) {
+        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
       }
     } else if (eventName.includes('Created')) {
       bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
@@ -191,7 +194,10 @@ async function triageActivityMessage(msg, bot) {
         bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
       }
       if (artBlocksData.collection_name.includes('Fidenza')) {
-        bot.channels.cache.get(CHANNEL_FIDENZA_SALES).send(embed);
+        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+      }
+      if (artBlocksData.collection_name.includes('Incomplete Control')) {
+        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
       }
     }
   }
