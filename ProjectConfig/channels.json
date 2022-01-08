@@ -378,6 +378,32 @@
             }
         }
     },
+    "898335291008487464": {
+        "name": "Server: Tyler Hobbs (879488624197001287), CH: fidenza-owners",
+        "projectBotHandlers": {
+            "default": "fidenzaBot",
+            "stringTriggers": {
+                "icBot": [
+                    "ic",
+                    "incomplete",
+                    "control"
+                ]
+            }
+        }
+    },
+    "929413828968611880": {
+        "name": "Server: Tyler Hobbs (879488624197001287), CH: incomplete-control",
+        "projectBotHandlers": {
+            "default": "fidenzaBot",
+            "stringTriggers": {
+                "icBot": [
+                    "ic",
+                    "incomplete",
+                    "control"
+                ]
+            }
+        }
+    },
     "846619538320785448": {
         "name": "shvembldr",
         "projectBotHandlers": {
@@ -547,6 +573,16 @@
         "name": "squiggle-listings"
     },
     "880937060075192320": {
-        "name": "fidenza-and-ic-sales"
+        "name": "fidenza-and-ic-sales",
+        "projectBotHandlers": {
+            "default": "fidenzaBot",
+            "stringTriggers": {
+                "icBot": [
+                    "ic",
+                    "incomplete",
+                    "control"
+                ]
+            }
+        }
     }
 }
