@@ -63,6 +63,60 @@ The core engine of Artbot is built around the discord.js package.  It serves sev
   
   Artbot can also create giveaways through use of the discord-giveaways package. They currently require Mod privileges to initiate.
   
+
+## Adding qyery support for a project
+**Curated & Playground Projects**
+
+Supported Curated and playground projects are defined via json files in the `ProjectConfig/` directory.
+
+Required Definitions:
+- `ProjectConfig/channels.json`:
+  - key: Discord channel ID
+    - value: object:
+      - key: `"name"`
+        - value: name of Discord channel
+      - key: `"projectBotHandlers"`
+        - value: object:
+          - key: `"default"`
+            - value: ProjectBotName (as defined in `projectBots.json`)
+          - (optional) key: `"stringTriggers"`
+            - value: object:
+              - key: ProjectBotName (as defined in `projectBots.json`)
+                - value: array of strings that trigger artbot to use the project bot
+          - (optional) key: `"tokenIdTriggers"`:
+            - value: object:
+              - key: ProjectBotName (as defined in `projectBots.json`)
+                - value: length-2 array defining range of token IDs that trigger artbot to use the project bot. e.g. [555, null] means all tokens >= 555 should use the project bot defined in key. [100, 200] means all tokens from 100 to 200 should use the project bot bot defined in key.
+- `ProjectConfig/projectBots.json`
+  - key: project bot name
+    - value: object:
+      - key: `"projectNumber"`
+        value: project ID this bot will look up tokens for
+      - key: `"coreContract"`:
+        value: "V2" for current core contract at `0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270`
+      - key: `"editionSize"`:
+        - value: maximum number of invocations allows on project
+      - key: `"projectName"`:
+        - value: Name of project
+      - (optional) key: `"namedMappings"`
+        - value: object:
+          - (optional) key: `"sets"`
+            - value: json file name defining single token labels; located in 'NamedMappings' directory. e.g. `ringerSingles.json`
+          - (optional) key: `"singles"`
+            value: json file name defining sets of token labels; located in 'NamedMappings' directory. e.g. `ringerSets.json`
+
+Optional Definitions
+- `NamedMappings/<projectName>Singles.json`
+  - json file defining trigger names for single tokens. See `ringerSingles.json` for example.
+- `NamedMappings/<projectName>Seets.json`
+  - json file defining trigger names for single tokens. See `ringerSets.json` for example.
+
+**Factory Projects**
+
+Factory projects are automatically handled by artbot and may be queried from the Art Blocks Discord channel titled `factory-projects`. 
+
+An example artbot query for a factory project is: `#146 Pieces of Me`
+
 ## Contributing to artbot
   
   For now, Artbot development is coordinated informally over Discord.  Please reach out to purplehat.eth#7327 or ryley-o.eth#5272 if you think you might be interested in helping out.
