@@ -543,6 +543,12 @@
             "default": "jiometoryBot"
         }
     },
+    "923461105374855188": {
+        "name": "mpkoz",
+        "projectBotHandlers": {
+            "default": "chimeraBot"
+        }
+    },
     "822563871473795073": {
         "name": "factory-projects"
     },
