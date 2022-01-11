@@ -620,5 +620,11 @@
         "coreContract": "V2",
         "editionSize": 1024,
         "projectName": "Jiometory No Compute - ジオメトリ ハ ケイサンサレマセン"
+    },
+    "chimeraBot": {
+        "projectNumber": 233,
+        "coreContract": "V2",
+        "editionSize": 987,
+        "projectName": "Chimera"
     }
 }
