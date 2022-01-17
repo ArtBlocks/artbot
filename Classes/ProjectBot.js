@@ -63,7 +63,9 @@ class ProjectBot {
     await fetch(
         openSeaURL, {
           method: "GET",
-          headers: {},
+          headers: {
+            'X-API-KEY': process.env.OPENSEA_API_KEY
+          },
         }
       )
       .then((response) => response.json())
