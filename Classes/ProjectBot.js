@@ -58,7 +58,7 @@ class ProjectBot {
     }
 
     let tokenID = pieceNumber + (this.projectNumber * 1e6);
-    let openSeaURL = `https://api.opensea.io/api/v1/asset/${this.coreContract}/${tokenID}/`;
+    let openSeaURL = `https://api.opensea.io/api/v1/asset/${this.coreContract}/${tokenID}/?format=json`;
 
     await fetch(
         openSeaURL, {
