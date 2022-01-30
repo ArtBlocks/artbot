@@ -549,6 +549,12 @@
             "default": "chimeraBot"
         }
     },
+    "933419567722664016": {
+        "name": "leo-villareal",
+        "projectBotHandlers": {
+            "default": "cosmicReefBot"
+        }
+    },
     "822563871473795073": {
         "name": "factory-projects"
     },
