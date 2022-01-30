@@ -34,7 +34,7 @@ const ARTBOT_USERNAME = 'artbot';
 const ARTBOT_GREEN = 0x00ff00;
 
 // Returns a random color
-const randomColor = () => {
+function randomColor() {
   return Math.floor(Math.random()*16777215).toString(16);
 }
 
