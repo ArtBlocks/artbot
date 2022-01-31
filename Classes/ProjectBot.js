@@ -100,8 +100,9 @@ class ProjectBot {
     }
 
     // Otherwise, return full metadata for the asset.
-    const assetFeatures = (artBlocksData.features !== null && artBlocksData.features.length) ?
-      `${artBlocksData.features.join("\n")}` :
+    const { features } = artBlocksData;
+    const assetFeatures = (!!features && Object.keys(features).length) ?
+      Object.keys(features).map(key => `${key}: ${features[key]}`).join("\n"):
       "Not yet available.";
     const embedContent = new MessageEmbed()
       // Set the title of the field.
