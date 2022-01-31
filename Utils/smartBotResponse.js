@@ -33,16 +33,15 @@ const ARTBLOCKS_FACTORY_ASSET = 'https://api.opensea.io/api/v1/asset/0xa7d8d9ef8
 const ARTBOT_USERNAME = 'artbot';
 const ARTBOT_GREEN = 0x00ff00;
 
+// Returns a random color
+function randomColor() {
+  return Math.floor(Math.random()*16777215).toString(16);
+}
+
 // Thank you message for people asking the artbot how it is.
 const ARTBOT_HOW_ARE_YOU = new MessageEmbed()
-// Set the title of the field
-    .setTitle('Thank you for caring!')
-// Set the color of the embed
-    .setColor(ARTBOT_GREEN)
 // Set the main content of the embed
-    .setDescription(`I'm doing well! :) Oh, also here is a puzzle piece that Generative Artworks gave me to hold onto.`)
-// Set the image that is displayed
-    .setImage('https://i.imgur.com/oghbL60.jpg');
+    .setDescription(`I'm doing well! :) Heard the puzzle piece Generative Artworks gave me came in handy.`);
 
 // Custom message shown when someone asks why Squiggle minting is paused.
 const SQUIGGLE_PAUSE_MESSAGE = new MessageEmbed()
@@ -242,7 +241,11 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   // Handle how are you messages.
   const mentionedHowAreYou = msgContentLowercase.includes('how are you');
   if (mentionedArtBot && mentionedHowAreYou) {
-    return ARTBOT_HOW_ARE_YOU;
+    return ARTBOT_HOW_ARE_YOU
+      // Set the title of the field and append the message sender
+      .setTitle(`Thank you for caring! ${msgAuthor}`)
+      // Give the response a random color to make it fun
+      .setColor(randomColor());
   }
 
   // Handle application questions.
