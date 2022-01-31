@@ -149,8 +149,8 @@
                     "sculpture"
                 ],
                 "hashCrashBot": [
-                    "hashcrash",
-                ]
+                    "hashcrash"
+                ],
             }
         }
     },
@@ -371,7 +371,7 @@
     "879488624197001293": {
         "name": "Server: Tyler Hobbs (879488624197001287), CH: the-place-to-be",
         "projectBotHandlers": {
-            "default": "fidenzaBot",            
+            "default": "fidenzaBot",
             "stringTriggers": {
                 "icBot": [
                     "ic",
@@ -503,7 +503,7 @@
         "projectBotHandlers": {
             "default": "skulptuurBot"
         }
-    },  
+    },
     "904783901522804786": {
         "name": "ben-kovach",
         "projectBotHandlers": {
