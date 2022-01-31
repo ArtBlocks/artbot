@@ -147,9 +147,6 @@
                 "energySculptureBot": [
                     "energy",
                     "sculpture"
-                ],
-                "hashCrashBot": [
-                    "hashcrash",
                 ]
             }
         }
@@ -550,12 +547,6 @@
         "name": "mpkoz",
         "projectBotHandlers": {
             "default": "chimeraBot"
-        }
-    },
-    "933419567722664016": {
-        "name": "leo-villareal",
-        "projectBotHandlers": {
-            "default": "cosmicReefBot"
         }
     },
     "822563871473795073": {
