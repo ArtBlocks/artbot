@@ -21,7 +21,7 @@ npm -v
 npm install -g yarn
 ```
 
-* Install tbe package dependencies
+* Install the package dependencies
 ```
 yarn install
 ```
@@ -64,7 +64,7 @@ The core engine of Artbot is built around the discord.js package.  It serves sev
   Artbot can also create giveaways through use of the discord-giveaways package. They currently require Mod privileges to initiate.
   
 
-## Adding qyery support for a project
+## Adding query support for a project
 **Curated & Playground Projects**
 
 Supported Curated and playground projects are defined via json files in the `ProjectConfig/` directory.
