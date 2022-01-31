@@ -120,3 +120,6 @@ dist
 
 # Intellij IDEA
 .idea
+
+# Yarn package lock
+package-lock.json
