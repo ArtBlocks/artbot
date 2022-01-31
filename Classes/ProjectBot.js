@@ -68,7 +68,7 @@ class ProjectBot {
           },
         }
       )
-      .then((response) => {throw "test"})
+      .then((response) => response.json())
       .then((openSeaData) => {
         console.log(openSeaData, "OPENSEA DATA");
         this.sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested);
