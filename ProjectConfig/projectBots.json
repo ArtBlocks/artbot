@@ -626,5 +626,17 @@
         "coreContract": "V2",
         "editionSize": 987,
         "projectName": "Chimera"
+    },
+    "cosmicReefBot": {
+        "projectNumber": 250,
+        "coreContract": "V2",
+        "editionSize": 1024,
+        "projectName": "Cosmic Reef"
+    },
+    "hashCrashBot": {
+        "projectNumber": 248,
+        "coreContract": "V2",
+        "editionSize": 369,
+        "projectName": "HashCrash"
     }
 }

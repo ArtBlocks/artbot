@@ -74,7 +74,8 @@ class ProjectBot {
         this.sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested);
       })
       .catch((err) => {
-        console.error(err);
+        console.warn(`MetaData message is being sent in a degraded manner. Is OpenSea's API down? https://status.opensea.io/`);
+        this.sendMetaDataMessage(null, msg, tokenID, detailsRequested);
       });
   }
 
@@ -82,15 +83,17 @@ class ProjectBot {
     let artBlocksResponse = await fetch(`https://token.artblocks.io/${tokenID}`);
     let artBlocksData = await artBlocksResponse.json();
     console.log(artBlocksData, "ARTBLOCKS DATA");
+    // If the OpenSea API is available use their link for the title otherwise use an AB link
+    const titleLink = openSeaData ? openSeaData.permalink : artBlocksData.external_url;
 
     // If user did *not* request full details, return just a large image,
     // along with a link to the OpenSea page and ArtBlocks live script.
     if (!detailsRequested) {
       const imageContent = new MessageEmbed()
         // Set the title of the field.
-        .setTitle(openSeaData.name)
-        // Add link to OpenSea listing.
-        .setURL(openSeaData.permalink)
+        .setTitle(artBlocksData.name)
+        // Add link to title.
+        .setURL(titleLink)
         // Add "Live Script" field.
         .addField("Want More Info?", `Add "details" to your ArtBot command or [view on artblocks.io](${artBlocksData.external_url}).`)
         // Set the full image for embed.
@@ -106,23 +109,31 @@ class ProjectBot {
       "Not yet available.";
     const embedContent = new MessageEmbed()
       // Set the title of the field.
-      .setTitle(openSeaData.name)
-      // Add link to OpenSea listing.
-      .setURL(openSeaData.permalink)
+      .setTitle(artBlocksData.name)
+      // Add link to title.
+      .setURL(titleLink)
       // Set the color of the embed.
       .setColor(EMBED_COLOR)
       // Set the main content of the embed
-      .setThumbnail(openSeaData.image_thumbnail_url)
+      .setThumbnail(artBlocksData.image)
       // Add "Live Script" field.
       .addField("Live Script", `[view on artblocks.io](${artBlocksData.external_url})`)
       // Add "Features" field.
       .addField("Features", assetFeatures)
+
+    // If OpenSea data is available add it otherwise say we are operating in a degraded mode
+    if (openSeaData) {
+      embedContent
       // Add sale number details.
       .addField("Total Sales", this.parseNumSales(openSeaData.num_sales))
       // Add current owner info.
       .addFields(this.parseOwnerInfo(openSeaData.owner))
       // Add sale info.
       .addFields(this.parseSaleInfo(openSeaData.last_sale));
+    } else {
+      embedContent.addField("Sales Info", "It seems there is a problem with the OpenSea API. Check status [here](https://status.opensea.io/).");
+    }
+
     msg.channel.send(embedContent);
   }
 
