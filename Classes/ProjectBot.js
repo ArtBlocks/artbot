@@ -74,6 +74,7 @@ class ProjectBot {
         this.sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested);
       })
       .catch((err) => {
+        console.warn(`MetaData message is being sent in a degraded manner. Is OpenSea's API down? https://status.opensea.io/`);
         this.sendMetaDataMessage(null, msg, tokenID, detailsRequested);
       });
   }
