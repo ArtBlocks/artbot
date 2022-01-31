@@ -82,6 +82,7 @@ class ProjectBot {
     let artBlocksResponse = await fetch(`https://token.artblocks.io/${tokenID}`);
     let artBlocksData = await artBlocksResponse.json();
     console.log(artBlocksData, "ARTBLOCKS DATA");
+    // If the OpenSea API is available use their link for the title otherwise use an AB link
     const titleLink = openSeaData ? openSeaData.permalink : artBlocksData.external_url;
 
     // If user did *not* request full details, return just a large image,
@@ -90,7 +91,7 @@ class ProjectBot {
       const imageContent = new MessageEmbed()
         // Set the title of the field.
         .setTitle(artBlocksData.name)
-        // Add link to OpenSea listing.
+        // Add link to title.
         .setURL(titleLink)
         // Add "Live Script" field.
         .addField("Want More Info?", `Add "details" to your ArtBot command or [view on artblocks.io](${artBlocksData.external_url}).`)
@@ -107,7 +108,7 @@ class ProjectBot {
     const embedContent = new MessageEmbed()
       // Set the title of the field.
       .setTitle(artBlocksData.name)
-      // Add link to OpenSea listing.
+      // Add link to title.
       .setURL(titleLink)
       // Set the color of the embed.
       .setColor(EMBED_COLOR)
@@ -118,7 +119,7 @@ class ProjectBot {
       // Add "Features" field.
       .addField("Features", assetFeatures)
 
-
+    // If OpenSea data is available add it otherwise say we are operating in a degraded mode
     if (openSeaData) {
       embedContent
       // Add sale number details.
