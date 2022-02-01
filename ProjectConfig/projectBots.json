@@ -638,5 +638,11 @@
         "coreContract": "V2",
         "editionSize": 369,
         "projectName": "HashCrash"
+    },
+    "screensBot": {
+        "projectNumber": 255,
+        "coreContract": "V2",
+        "editionSize": 1000,
+        "projectName": "Screens"
     }
 }

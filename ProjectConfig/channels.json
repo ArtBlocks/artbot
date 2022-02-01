@@ -558,6 +558,12 @@
             "default": "cosmicReefBot"
         }
     },
+	"935789872315260948": {
+        "name": "thomas-lin-pedersen",
+        "projectBotHandlers": {
+            "default": "screensBot"
+        }
+    },
     "822563871473795073": {
         "name": "factory-projects"
     },
