@@ -349,7 +349,10 @@
         "projectNumber": 248
     },
     "screensBot": {
-        "projectNumber": 255
+        "projectNumber": 255,
+        "namedMappings": {
+            "singles": "screensSingles.json"
+        }
     },
     "raptureBot": {
         "projectNumber": 141

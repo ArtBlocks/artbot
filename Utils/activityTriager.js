@@ -1,6 +1,4 @@
-const {
-  MessageEmbed,
-} = require('discord.js');
+/* eslint-disable max-len */
 const fetch = require('node-fetch');
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig;
 
@@ -74,22 +72,23 @@ const BAN_ADDRESSES = new Set([
   '0x7c97af86a0f92beceb712417fa0856188bb6b337',
   '0xd5a5d0b4566322173b1aea3a669b684129edfc8a',
   '0x7b77ebc4bab939071543243a4909ca4c51c9c1fd',
-'0x4ef4e75c6b27b6a3f1d8a331894392692633284d',
-'0x0f87d3a46cc9bd339b28020f737e37e0ddd728bf',
-'0xe1770cf5274084db23bca6c921fa51cf62a37eda',
-'0xc7f45f209a925f9ae6af2043cf44e6570be5b21c',
-'0x592a6119e24013e4e7d02259e1c9b7148fec7677',
-'0xaee378ba81e5ccba714c3c455a93abddd956f533', 
-'0xf95323e393b776acc2f9e1de83be1094f22ca703',
-'0x706b5d16ad3027b9120ac270f66992079aacd8b2',
-'0x8d4be76c4113046d9d7ac34a11adecea91b977cd',
-'0x489f2dec2c7482faeae99d851aeda13625ea35ff',
-'0x3656d9a9ced1909981bc3d6feb7b54b9dbd25173',
-'0x872ea485576a569b06861a94946f04c08c510358',
-'0x592a6119e24013e4e7d02259e1c9b7148fec7677',
-'0x9b397d50f662d5d39e88e4b886571581ccf48188'
+  '0x4ef4e75c6b27b6a3f1d8a331894392692633284d',
+  '0x0f87d3a46cc9bd339b28020f737e37e0ddd728bf',
+  '0xe1770cf5274084db23bca6c921fa51cf62a37eda',
+  '0xc7f45f209a925f9ae6af2043cf44e6570be5b21c',
+  '0x592a6119e24013e4e7d02259e1c9b7148fec7677',
+  '0xaee378ba81e5ccba714c3c455a93abddd956f533',
+  '0xf95323e393b776acc2f9e1de83be1094f22ca703',
+  '0x706b5d16ad3027b9120ac270f66992079aacd8b2',
+  '0x8d4be76c4113046d9d7ac34a11adecea91b977cd',
+  '0x489f2dec2c7482faeae99d851aeda13625ea35ff',
+  '0x3656d9a9ced1909981bc3d6feb7b54b9dbd25173',
+  '0x872ea485576a569b06861a94946f04c08c510358',
+  '0x592a6119e24013e4e7d02259e1c9b7148fec7677',
+  '0x9b397d50f662d5d39e88e4b886571581ccf48188',
 ]);
 
+// eslint-disable-next-line require-jsdoc
 async function triageActivityMessage(msg, bot) {
   // Iterate through entire array of embeds, though there should only
   // ever be one at a time per message.
@@ -123,7 +122,7 @@ async function triageActivityMessage(msg, bot) {
 
     // Return early if event is a referral.
     let priceField;
-    for (var i = embed.fields.length - 1; i >= 0; i--) {
+    for (let i = embed.fields.length - 1; i >= 0; i--) {
       const embedField = embed.fields[i];
       if (embedField.name.includes('Referral Reward')) {
         console.log(`Skipping message propagation for referral.`);
@@ -174,30 +173,32 @@ async function triageActivityMessage(msg, bot) {
     embed.setURL(openseaURL);
 
     // Only forward sales events and listing events.
-    if (eventName.includes('Successful')) {
-      bot.channels.cache.get(CHANNEL_SALES).send(embed);
-      bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
-      // Forward all Chromie Squiggles sales on to the DAO.
-      if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
-        bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
-      }
-      if (artBlocksData.collection_name.includes('Fidenza')) {
-        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-      }
-      if (artBlocksData.collection_name.includes('Incomplete Control')) {
-        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-      }
-    } else if (eventName.includes('Created')) {
-      bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
-      // Forward all Chromie Squiggles listings on to the DAO.
-      if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
-        bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
-      }
-      if (artBlocksData.collection_name.includes('Fidenza')) {
-        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-      }
-      if (artBlocksData.collection_name.includes('Incomplete Control')) {
-        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+    if (artBlocksData.collection_name) {
+      if (eventName.includes('Successful')) {
+        bot.channels.cache.get(CHANNEL_SALES).send(embed);
+        bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
+        // Forward all Chromie Squiggles sales on to the DAO.
+        if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
+          bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
+        }
+        if (artBlocksData.collection_name.includes('Fidenza')) {
+          bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+        }
+        if (artBlocksData.collection_name.includes('Incomplete Control')) {
+          bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+        }
+      } else if (eventName.includes('Created')) {
+        bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
+        // Forward all Chromie Squiggles listings on to the DAO.
+        if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
+          bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
+        }
+        if (artBlocksData.collection_name.includes('Fidenza')) {
+          bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+        }
+        if (artBlocksData.collection_name.includes('Incomplete Control')) {
+          bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+        }
       }
     }
   }
