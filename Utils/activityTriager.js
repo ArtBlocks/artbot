@@ -177,27 +177,29 @@ async function triageActivityMessage(msg, bot) {
     if (eventName.includes('Successful')) {
       bot.channels.cache.get(CHANNEL_SALES).send(embed);
       bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
+      if(artBlocksData.collection_name) {
       // Forward all Chromie Squiggles sales on to the DAO.
-      if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
-        bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
-      }
-      if (artBlocksData.collection_name.includes('Fidenza')) {
-        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-      }
-      if (artBlocksData.collection_name.includes('Incomplete Control')) {
-        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-      }
-    } else if (eventName.includes('Created')) {
-      bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
-      // Forward all Chromie Squiggles listings on to the DAO.
-      if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
-        bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
-      }
-      if (artBlocksData.collection_name.includes('Fidenza')) {
-        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-      }
-      if (artBlocksData.collection_name.includes('Incomplete Control')) {
-        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+        if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
+          bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
+        }
+        if (artBlocksData.collection_name.includes('Fidenza')) {
+          bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+        }
+        if (artBlocksData.collection_name.includes('Incomplete Control')) {
+          bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+        }
+      } else if (eventName.includes('Created')) {
+        bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
+        // Forward all Chromie Squiggles listings on to the DAO.
+        if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
+          bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
+        }
+        if (artBlocksData.collection_name.includes('Fidenza')) {
+          bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+        }
+        if (artBlocksData.collection_name.includes('Incomplete Control')) {
+          bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+        }
       }
     }
   }
