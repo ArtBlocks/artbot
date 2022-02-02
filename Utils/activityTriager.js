@@ -174,11 +174,11 @@ async function triageActivityMessage(msg, bot) {
     embed.setURL(openseaURL);
 
     // Only forward sales events and listing events.
-    if (eventName.includes('Successful')) {
-      bot.channels.cache.get(CHANNEL_SALES).send(embed);
-      bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
-      if(artBlocksData.collection_name) {
-      // Forward all Chromie Squiggles sales on to the DAO.
+    if  (artBlocksData.collection_name) {
+      if (eventName.includes('Successful')) {
+        bot.channels.cache.get(CHANNEL_SALES).send(embed);
+        bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
+        // Forward all Chromie Squiggles sales on to the DAO.
         if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
           bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
         }
