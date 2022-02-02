@@ -109,8 +109,8 @@ class ProjectConfig {
     const projectBots = {};
     const projectBotsConfigs = Object.entries(projectBotsJson);
 
-    // This loops through all the bot configs asynchronously, gets
-    // information on the project from the Graph, and initializes the bot.
+    // This loops through all the bot configs asynchronously, gets information
+    // on the project from the Graph, and initializes the project bot.
     await Promise.all(projectBotsConfigs.map(async ([botName, botParams]) => {
       const { projectNumber, namedMappings } = botParams;
       const { invocations, name, contract } = await getArtBlocksProject(projectNumber);
