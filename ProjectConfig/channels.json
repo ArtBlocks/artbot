@@ -561,7 +561,12 @@
 	"935789872315260948": {
         "name": "thomas-lin-pedersen",
         "projectBotHandlers": {
-            "default": "screensBot"
+            "default": "screensBot", 
+            "stringTriggers": {
+                "raptureBot": [
+                    "rapture"
+                ]
+            }
         }
     },
     "822563871473795073": {
