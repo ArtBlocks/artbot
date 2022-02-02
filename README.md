@@ -108,9 +108,9 @@ Required Definitions:
       - (optional) key: `"namedMappings"`
         - value: object:
           - (optional) key: `"sets"`
-            - value: json file name defining single token labels; located in 'NamedMappings' directory. e.g. `ringerSingles.json`
+            - value: json filename defining single token labels; located in 'NamedMappings' directory. e.g. `ringerSingles.json`
           - (optional) key: `"singles"`
-            value: json file name defining sets of token labels; located in 'NamedMappings' directory. e.g. `ringerSets.json`
+            value: json filename defining sets of token labels; located in 'NamedMappings' directory. e.g. `ringerSets.json`
 
 Optional Definitions
 - `NamedMappings/<projectName>Singles.json`
