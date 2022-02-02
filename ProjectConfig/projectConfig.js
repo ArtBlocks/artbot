@@ -109,9 +109,10 @@ class ProjectConfig {
   }
 
   /*
-  * This parses imported projectBots json data and returns an object with
-  * keys equal to botName, values pointing to a new instance of ProjectBot.
-  * Returned object is useful for getting project bot instances by botName.
+  * This parses imported projectBots json data and subgraph data to return 
+  * an object with keys equal to botName and values pointing to a new instance
+  * of ProjectBot. Returned object is useful for getting project bot instances
+  * by botName.
   */
   async buildProjectBots(projectBotsJson) {
     const projectBots = {};
