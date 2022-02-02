@@ -4,6 +4,7 @@ const ARTBOT_IS_PROD = (
   process.env.ARTBOT_IS_PROD.toLowerCase() == 'true'
 );
 console.log('ARTBOT_IS_PROD: ', ARTBOT_IS_PROD);
+// Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES =
   process.env.METADATA_REFRESH_INTERVAL_MINUTES;
 const CHANNELS = ARTBOT_IS_PROD ?
