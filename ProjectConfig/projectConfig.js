@@ -4,6 +4,8 @@ const ARTBOT_IS_PROD = (
   process.env.ARTBOT_IS_PROD.toLowerCase() == 'true'
 );
 console.log('ARTBOT_IS_PROD: ', ARTBOT_IS_PROD);
+const METADATA_REFRESH_INTERVAL_MINUTES =
+  process.env.METADATA_REFRESH_INTERVAL_MINUTES;
 const CHANNELS = ARTBOT_IS_PROD ?
   require('./channels.json') :
   require('./channels_dev.json');
@@ -93,11 +95,16 @@ class ProjectConfig {
     this.channels = ProjectConfig.buildChannelHandlers(CHANNELS);
     this.chIdByName = ProjectConfig.buildChannelIDByName(this.channels);
     this.initialize();
+    setInterval(this.initialize, METADATA_REFRESH_INTERVAL_MINUTES * 60000);
   }
 
   // Initialize async aspects of the ProjectConfig
   async initialize() {
-    this.projectBots = await this.buildProjectBots(PROJECT_BOTS);
+    try {
+      this.projectBots = await this.buildProjectBots(PROJECT_BOTS);
+    } catch(err) {
+      console.error(`Error while initializing ProjectBots: ${err}`);
+    }
   }
 
   /*
@@ -114,6 +121,9 @@ class ProjectConfig {
     const promises = projectBotConfigs.map(async ([botName, botParams]) => {
       const { projectNumber, namedMappings } = botParams;
       const { invocations, name, contract } = await getArtBlocksProject(projectNumber);
+      console.log(
+        `Refreshing project cache for Project ${projectNumber} ${name}`
+      );
       projectBots[botName] = new ProjectBot({
         projectNumber,
         coreContract: contract.id,
