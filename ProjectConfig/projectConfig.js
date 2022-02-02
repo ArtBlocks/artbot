@@ -96,13 +96,13 @@ class ProjectConfig {
     this.channels = ProjectConfig.buildChannelHandlers(CHANNELS);
     this.chIdByName = ProjectConfig.buildChannelIDByName(this.channels);
     this.initialize();
-    setInterval(this.initialize, METADATA_REFRESH_INTERVAL_MINUTES * 60000);
   }
 
   // Initialize async aspects of the ProjectConfig
   async initialize() {
     try {
       this.projectBots = await this.buildProjectBots(PROJECT_BOTS);
+      setInterval(() => this.buildProjectBots(PROJECT_BOTS), METADATA_REFRESH_INTERVAL_MINUTES * 60000);
     } catch(err) {
       console.error(`Error while initializing ProjectBots: ${err}`);
     }
