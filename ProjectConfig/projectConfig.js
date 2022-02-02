@@ -124,7 +124,6 @@ class ProjectConfig {
     });
 
     await Promise.all(promises);
-
     return projectBots;
   }
 
