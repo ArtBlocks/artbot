@@ -10,14 +10,8 @@ const CHANNELS = ARTBOT_IS_PROD ?
 const PROJECT_BOTS = ARTBOT_IS_PROD ?
   require('./projectBots.json') :
   require('./projectBots_dev.json');
-const CORE_CONTRACTS = require('./coreContracts.json');
 const ProjectBot = require('../Classes/ProjectBot').ProjectBot;
-
-// map from core contract label to core contract address
-Object.keys(PROJECT_BOTS).forEach((_bot) => {
-  PROJECT_BOTS[_bot].coreContract =
-    CORE_CONTRACTS[PROJECT_BOTS[_bot].coreContract];
-});
+const { getArtBlocksProject } = require("../Utils/parseArtBlocksAPI");
 
 // utility class that routes number messages for each channel
 class Channel {
@@ -96,10 +90,14 @@ class Channel {
 */
 class ProjectConfig {
   constructor() {
-    this.coreContracts = CORE_CONTRACTS;
-    this.projectBots = ProjectConfig.buildProjectBots(PROJECT_BOTS);
     this.channels = ProjectConfig.buildChannelHandlers(CHANNELS);
     this.chIdByName = ProjectConfig.buildChannelIDByName(this.channels);
+    this.initialize();
+  }
+
+  // Initialize async aspects of the ProjectConfig
+  async initialize() {
+    this.projectBots = await this.buildProjectBots(PROJECT_BOTS);
   }
 
   /*
@@ -107,11 +105,25 @@ class ProjectConfig {
   * keys equal to botName, values pointing to a new instance of ProjectBot.
   * Returned object is useful for getting project bot instances by botName.
   */
-  static buildProjectBots(projectBotsJson) {
+  async buildProjectBots(projectBotsJson) {
     const projectBots = {};
-    Object.entries(projectBotsJson).forEach(([botName, botParams]) => {
-      projectBots[botName] = new ProjectBot(botParams)
-    });
+    const projectBotsConfigs = Object.entries(projectBotsJson);
+
+    // This loops through all the bot configs asynchronously, gets
+    // information on the project from the Graph, and initializes the bot.
+    await Promise.all(projectBotsConfigs.map(async ([botName, botParams]) => {
+      const { projectNumber, namedMappings } = botParams;
+      const { invocations, name, contract } = await getArtBlocksProject(projectNumber);
+      projectBots[botName] = new ProjectBot({
+        projectNumber,
+        coreContract: contract.id,
+        editionSize: invocations,
+        projectName: name,
+        namedMappings
+      });
+    }));
+
+    console.log(projectBots);
     return projectBots;
   }
 

@@ -105,12 +105,6 @@ Required Definitions:
     - value: object:
       - key: `"projectNumber"`
         value: project ID this bot will look up tokens for
-      - key: `"coreContract"`:
-        value: "V2" for current core contract at `0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270`
-      - key: `"editionSize"`:
-        - value: maximum number of invocations allows on project
-      - key: `"projectName"`:
-        - value: Name of project
       - (optional) key: `"namedMappings"`
         - value: object:
           - (optional) key: `"sets"`
