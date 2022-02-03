@@ -4,20 +4,17 @@ const ARTBOT_IS_PROD = (
   process.env.ARTBOT_IS_PROD.toLowerCase() == 'true'
 );
 console.log('ARTBOT_IS_PROD: ', ARTBOT_IS_PROD);
+// Refresh takes around one minute, so recommend setting this to 60 minutes
+const METADATA_REFRESH_INTERVAL_MINUTES =
+  process.env.METADATA_REFRESH_INTERVAL_MINUTES;
 const CHANNELS = ARTBOT_IS_PROD ?
   require('./channels.json') :
   require('./channels_dev.json');
 const PROJECT_BOTS = ARTBOT_IS_PROD ?
   require('./projectBots.json') :
   require('./projectBots_dev.json');
-const CORE_CONTRACTS = require('./coreContracts.json');
 const ProjectBot = require('../Classes/ProjectBot').ProjectBot;
-
-// map from core contract label to core contract address
-Object.keys(PROJECT_BOTS).forEach((_bot) => {
-  PROJECT_BOTS[_bot].coreContract =
-    CORE_CONTRACTS[PROJECT_BOTS[_bot].coreContract];
-});
+const { getArtBlocksProject } = require("../Utils/parseArtBlocksAPI");
 
 // utility class that routes number messages for each channel
 class Channel {
@@ -96,22 +93,49 @@ class Channel {
 */
 class ProjectConfig {
   constructor() {
-    this.coreContracts = CORE_CONTRACTS;
-    this.projectBots = ProjectConfig.buildProjectBots(PROJECT_BOTS);
     this.channels = ProjectConfig.buildChannelHandlers(CHANNELS);
     this.chIdByName = ProjectConfig.buildChannelIDByName(this.channels);
+    this.initialize();
+  }
+
+  // Initialize async aspects of the ProjectConfig
+  async initialize() {
+    try {
+      this.projectBots = await this.buildProjectBots(PROJECT_BOTS);
+      setInterval(() => this.buildProjectBots(PROJECT_BOTS), METADATA_REFRESH_INTERVAL_MINUTES * 60000);
+    } catch(err) {
+      console.error(`Error while initializing ProjectBots: ${err}`);
+    }
   }
 
   /*
-  * This parses imported projectBots json data and returns an object with
-  * keys equal to botName, values pointing to a new instance of ProjectBot.
-  * Returned object is useful for getting project bot instances by botName.
+  * This parses imported projectBots json data and subgraph data to return 
+  * an object with keys equal to botName and values pointing to a new instance
+  * of ProjectBot. Returned object is useful for getting project bot instances
+  * by botName.
   */
-  static buildProjectBots(projectBotsJson) {
+  async buildProjectBots(projectBotsJson) {
     const projectBots = {};
-    Object.entries(projectBotsJson).forEach(([botName, botParams]) => {
-      projectBots[botName] = new ProjectBot(botParams)
+    const projectBotConfigs = Object.entries(projectBotsJson);
+
+    // This loops through all the bot configs asynchronously, gets information
+    // on the project from the subgraph, and initializes the project bot.
+    const promises = projectBotConfigs.map(async ([botName, botParams]) => {
+      const { projectNumber, namedMappings } = botParams;
+      const { invocations, name, contract } = await getArtBlocksProject(projectNumber);
+      console.log(
+        `Refreshing project cache for Project ${projectNumber} ${name}`
+      );
+      projectBots[botName] = new ProjectBot({
+        projectNumber,
+        coreContract: contract.id,
+        editionSize: invocations,
+        projectName: name,
+        namedMappings
+      });
     });
+
+    await Promise.all(promises);
     return projectBots;
   }
 

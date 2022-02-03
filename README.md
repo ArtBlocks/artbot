@@ -10,30 +10,30 @@ ArtBot is a Node.js application.  It uses the [Yarn Package Manager](https://yar
 
 * Verify you have Node.js and npm installed.  If not, you can refer to the [Node.js official page](https://nodejs.org/) to get started.
 
-```
+```bash
 node -v
 npm -v
 ```
 
 * Install Yarn Package Manager.  For detailed instructions, refer to the [Yarn official page](https://yarnpkg.com/getting-started/install).
 
-```
+```bash
 npm install -g yarn
 ```
 
 * Install the package dependencies
-```
+```bash
 yarn install
 ```
 
 * Join the a-t Discord Server
 
-Artbot is based on the [discord.js](https://discord.js.org/) package, and is exclusively concerned with processing and sending Discord messages.  If you want to be able to interact with it, joining the Artbot test Discord server is the way to go.  https://discord.gg/W6eYPpEk3a
+Artbot is based on the [discord.js](https://discord.js.org/) package, and is exclusively concerned with processing and sending Discord messages.  If you want to be able to interact with it, joining the Artbot test Discord server is the way to go.  <https://discord.gg/W6eYPpEk3a>
 
 * Set up `.env` file based on `.env.example`.
 
 * Run the application
-```
+```bash
 yarn start
 ```
 
@@ -41,11 +41,11 @@ yarn start
 
 Please check changes you made by running the linter
 
-```
+```bash
 npm install -g eslint
 eslint <YOUR_FILE.JS>
 ```
-```
+```bash
 npm install -g jsonlint
 jsonlint <YOUR_FILE.JSON>
 ```
@@ -66,7 +66,8 @@ The core engine of Artbot is built around the discord.js package.  It serves sev
 
 * OpenSea Activity Feeds
 
-  Another well known feature of artbot is its ability to parse a feed of OpenSea activity data.  There is a hidden channel in the ArtBlocks Discord that receives a raw feed of all Art Blocks OpenSea Activity data.  Artbot then takes these messages and posts the appropriate events in the correct channel.  This includes several channels on the AB Discord, as well as a few adjacent Discords, like SquiggleDAO.  This logic lives in `Utils/activityTriager.js`
+  Another well known feature of artbot is its ability to parse a feed of OpenSea activity data.  There is a hidden channel in the ArtBlocks Discord that receives a raw feed of all Art Blocks OpenSea Activity data.  Artbot then takes these messages and posts the appropriate events in the correct channel.  
+  This includes several channels on the AB Discord, as well as a few adjacent Discords, like SquiggleDAO.  This logic lives in `Utils/activityTriager.js`
 
 * SmartBot Responses
 
@@ -105,18 +106,12 @@ Required Definitions:
     - value: object:
       - key: `"projectNumber"`
         value: project ID this bot will look up tokens for
-      - key: `"coreContract"`:
-        value: "V2" for current core contract at `0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270`
-      - key: `"editionSize"`:
-        - value: maximum number of invocations allows on project
-      - key: `"projectName"`:
-        - value: Name of project
       - (optional) key: `"namedMappings"`
         - value: object:
           - (optional) key: `"sets"`
-            - value: json file name defining single token labels; located in 'NamedMappings' directory. e.g. `ringerSingles.json`
+            - value: json filename defining single token labels; located in 'NamedMappings' directory. e.g. `ringerSingles.json`
           - (optional) key: `"singles"`
-            value: json file name defining sets of token labels; located in 'NamedMappings' directory. e.g. `ringerSets.json`
+            value: json filename defining sets of token labels; located in 'NamedMappings' directory. e.g. `ringerSets.json`
 
 Optional Definitions
 - `NamedMappings/<projectName>Singles.json`
