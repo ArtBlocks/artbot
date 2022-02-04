@@ -101,8 +101,8 @@ class ProjectConfig {
   // Initialize async aspects of the ProjectConfig
   async initialize() {
     try {
-      this.projectBots = await this.buildProjectBots(PROJECT_BOTS);
-      setInterval(() => this.buildProjectBots(PROJECT_BOTS), METADATA_REFRESH_INTERVAL_MINUTES * 60000);
+      this.projectBots = await this.buildProjectBots(CHANNELS, PROJECT_BOTS);
+      setInterval(() => this.buildProjectBots(CHANNELS, PROJECT_BOTS), METADATA_REFRESH_INTERVAL_MINUTES * 60000);
     } catch(err) {
       console.error(`Error while initializing ProjectBots: ${err}`);
     }
@@ -114,19 +114,38 @@ class ProjectConfig {
   * of ProjectBot. Returned object is useful for getting project bot instances
   * by botName.
   */
-  async buildProjectBots(projectBotsJson) {
+  async buildProjectBots(channelsJson, projectBotsJson) {
     const projectBots = {};
     const projectBotConfigs = Object.entries(projectBotsJson);
 
+    const botsToInstatiate = new Set();
+    Object.keys(channelsJson).forEach((key) => {
+      const projectBotHandlers = channelsJson[key].projectBotHandlers;
+      if (!projectBotHandlers) {
+        return;
+      }
+      botsToInstatiate.add(projectBotHandlers.default);
+      const { stringTriggers = {}, tokenIdTriggers = []} = projectBotHandlers;
+      Object.keys(stringTriggers).forEach((key) => {
+        botsToInstatiate.add(key);
+      });
+      tokenIdTriggers.forEach((tokenTrigger) => {
+        Object.keys(tokenTrigger).forEach((key) => {
+          botsToInstatiate.add(key);
+        });
+      });
+    });
+
     // This loops through all the bot configs asynchronously, gets information
     // on the project from the subgraph, and initializes the project bot.
-    const promises = projectBotConfigs.map(async ([botName, botParams]) => {
-      const { projectNumber, namedMappings } = botParams;
+    const promises = Array.from(botsToInstatiate).map(async botNum => {
+      const namedMappings = projectBotsJson[botNum]?.namedMappings;
+      const projectNumber = parseInt(botNum);
       const { invocations, name, contract } = await getArtBlocksProject(projectNumber);
       console.log(
         `Refreshing project cache for Project ${projectNumber} ${name}`
       );
-      projectBots[botName] = new ProjectBot({
+      projectBots[botNum] = new ProjectBot({
         projectNumber,
         coreContract: contract.id,
         editionSize: invocations,
