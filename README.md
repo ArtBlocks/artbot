@@ -92,19 +92,19 @@ Required Definitions:
       - key: `"projectBotHandlers"`
         - value: object:
           - key: `"default"`
-            - value: project id
+            - value: project ID
           - (optional) key: `"stringTriggers"`
             - value: object:
-              - key: project id
+              - key: project ID
                 - value: array of strings that trigger artbot to use the project bot
           - (optional) key: `"tokenIdTriggers"`:
             - value: object:
-              - key: project id 
+              - key: project ID
                 - value: length-2 array defining range of token IDs that trigger artbot to use the project bot. e.g. [555, null] means all tokens >= 555 should use the project bot defined in key. [100, 200] means all tokens from 100 to 200 should use the project bot bot defined in key.
 
 Optional Definitions
 - `ProjectConfig/projectBots.json`
-  - key: project id
+  - key: project ID
     - value: object:
       - (optional) key: `"namedMappings"`
         - value: object:
