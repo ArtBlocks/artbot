@@ -14,7 +14,6 @@ Please fill out the template below and then delete everything within the #'s her
 For example, this is what it would look like Project 145, Beatboxes by Zeblocks:
 
 - Project Title: "Beatboxes"
-- Project Size: 841
 - Project ID: 145
 - Artist Channel ID: 800761846235136020
 - Project Keyword: "beatbox"
@@ -25,8 +24,7 @@ Also note that Playground projects need a project keyword so that ArtBot knows t
 
 ######################################################################
 
-- Project Title: 
-- Project Size: 
+- Project Title:
 - Project ID:
 - Artist Channel ID:
 - Project Keyword:

@@ -14,7 +14,6 @@ Please fill out the template below and then delete everything within the #'s her
 For example, this is what it would look like Project 143, Phase by Loren Bednar:
 
 - Project Title: "Phase"
-- Project Size: 1024
 - Project ID: 143
 - Artist Channel ID: 877060147619446814
 
@@ -22,7 +21,6 @@ Note: you can find the channel ID for a given channel by right-clicking it in Di
 
 ######################################################################
 
-- Project Title: 
-- Project Size: 
+- Project Title:
 - Project ID:
 - Artist Channel ID:
