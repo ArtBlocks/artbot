@@ -1,97 +1,360 @@
 {
-    "0": {
+    "singularityBot": {
+        "projectNumber": 8
+    },
+    "ignitionBot": {
+        "projectNumber": 9
+    },
+    "squiggleBot": {
+        "projectNumber": 0,
         "namedMappings": {
             "sets": "squiggleSets.json"
         }
     },
-    "13": {
+    "ringersBot": {
+        "projectNumber": 13,
         "namedMappings": {
             "sets": "ringerSets.json",
             "singles": "ringerSingles.json"
         }
     },
-    "23": {
+    "genesisBot": {
+        "projectNumber": 1
+    },
+    "constructionBot": {
+        "projectNumber": 2
+    },
+    "dynamicSlicesBot": {
+        "projectNumber": 4
+    },
+    "deconstructionsBot": {
+        "projectNumber": 7
+    },
+    "nimbudsBot": {
+        "projectNumber": 10
+    },
+    "hyperhashBot": {
+        "projectNumber": 11
+    },
+    "unigridsBot": {
+        "projectNumber": 12
+    },
+    "27bitBot": {
+        "projectNumber": 21
+    },
+    "spectronBot": {
+        "projectNumber": 17
+    },
+    "cryptoblotBot": {
+        "projectNumber": 3
+    },
+    "archetypeBot": {
+        "projectNumber": 23,
         "namedMappings": {
             "sets": "archetypeSets.json"
         }
     },
-    "28": {
+    "minutesBot": {
+        "projectNumber": 27
+    },
+    "apparitionsBot": {
+        "projectNumber": 28,
         "namedMappings": {
             "sets": "apparitionSets.json",
             "singles": "apparitionSingles.json"
         }
     },
-    "41": {
+    "inspiralsBot": {
+        "projectNumber": 29
+    },
+    "aerialViewBot": {
+        "projectNumber": 35
+    },
+    "synapsesBot": {
+        "projectNumber": 39
+    },
+    "algobotsBot": {
+        "projectNumber": 40
+    },
+    "elementalsBot": {
+        "projectNumber": 41,
         "namedMappings": {
             "sets": "elementalsSets.json",
             "singles": "elementalsSingles.json"
         }
     },
-    "53": {
+    "subscapesBot": {
+        "projectNumber": 53,
         "namedMappings": {
             "sets": "subscapeSets.json",
             "singles": "subscapeSingles.json"
         }
     },
-    "59": {
+    "watercolorDreamsBot": {
+        "projectNumber": 59,
         "namedMappings": {
             "sets": "watercolorDreamSets.json",
             "singles": "watercolorDreamSingles.json"
         }
     },
-    "78": {
+    "bubbleBlobbyBot": {
+        "projectNumber": 62
+    },
+    "algoRhythmsBot": {
+        "projectNumber": 64
+    },
+    "frammentiBot": {
+        "projectNumber": 72
+    },
+    "blocksOfArtBot": {
+        "projectNumber": 74
+    },
+    "fidenzaBot": {
+        "projectNumber": 78,
         "namedMappings": {
             "sets": "fidenzaSets.json"
         }
     },
-    "89": {
+    "dreamsBot": {
+        "projectNumber": 89,
         "namedMappings": {
             "sets": "dreamSets.json",
             "singles": "dreamSingles.json"
         }
     },
-    "129": {
+    "centuryBot": {
+        "projectNumber": 100
+    },
+    "glitchBot": {
+        "projectNumber": 114
+    },
+    "endlessBot": {
+        "projectNumber": 120
+    },
+    "diveBot": {
+        "projectNumber": 212
+    },
+    "pigmentsBot": {
+        "projectNumber": 129,
         "namedMappings": {
             "sets": "pigmentsSets.json"
         }
     },
-    "37": {
+    "phasesBot": {
+        "projectNumber": 143
+    },
+    "paradeBot": {
+        "projectNumber": 197
+    },
+    "traversalsBot": {
+        "projectNumber": 65
+    },
+    "viewCardBot": {
+        "projectNumber": 6
+    },
+    "colorStudyBot": {
+        "projectNumber": 16
+    },
+    "rhythmBot": {
+        "projectNumber": 57
+    },
+    "gen2Bot": {
+        "projectNumber": 18
+    },
+    "gen3Bot": {
+        "projectNumber": 48
+    },
+    "sentienceBot": {
+        "projectNumber": 20
+    },
+    "cyberCitiesBot": {
+        "projectNumber": 14
+    },
+    "hieroglyphsBot": {
+        "projectNumber": 30
+    },
+    "eternalPumpBot": {
+        "projectNumber": 22
+    },
+    "utopiaBot": {
+        "projectNumber": 15
+    },
+    "r3sonanceBot": {
+        "projectNumber": 19
+    },
+    "auroraIvBot": {
+        "projectNumber": 56
+    },
+    "pixelGlassBot": {
+        "projectNumber": 24
+    },
+    "energySculptureBot": {
+        "projectNumber": 26
+    },
+    "pathfindersBot": {
+        "projectNumber": 25
+    },
+    "paperArmadaBot": {
+        "projectNumber": 37,
         "namedMappings": {
             "sets": "paperArmadaSets.json",
             "singles": "paperArmadaSingles.json"
         }
     },
-    "131": {
+    "voidBot": {
+        "projectNumber": 42
+    },
+    "messengersBot": {
+        "projectNumber": 68
+    },
+    "obiceraBot": {
+        "projectNumber": 130
+    },
+    "heuresBot": {
+        "projectNumber": 201
+    },
+    "returnBot": {
+        "projectNumber": 77
+    },
+    "ritualBot": {
+        "projectNumber": 172
+    },
+    "divisionsBot": {
+        "projectNumber": 108
+    },
+    "eccentricsBot": {
+        "projectNumber": 104
+    },
+    "eccentrics2Bot": {
+        "projectNumber": 139
+    },
+    "ecumenopolisBot": {
+        "projectNumber": 119
+    },
+    "rinascitaBot": {
+        "projectNumber": 121
+    },
+    "scribbledBot": {
+        "projectNumber": 131,
         "namedMappings": {
             "sets": "scribbledSets.json",
             "singles": "scribbledSingles.json"
         }
     },
-    "138": {
+    "saturazioneBot": {
+        "projectNumber": 200
+    },
+    "octoGardenBot": {
+        "projectNumber": 103
+    },
+    "geometryRunnersBot": {
+        "projectNumber": 138,
         "namedMappings": {
             "sets": "geometryRunnersSets.json",
             "singles": "geometryRunnersSingles.json"
         }
     },
-    "204": {
+    "lightBeamsBot": {
+        "projectNumber": 32
+    },
+    "transitionsBot": {
+        "projectNumber": 117
+    },
+    "fragmentsBot": {
+        "projectNumber": 159
+    },
+    "trossetsBot": {
+        "projectNumber": 147
+    },
+    "skulptuurBot": {
+        "projectNumber": 173
+    },
+    "phototaxisBot": {
+        "projectNumber": 164
+    },
+    "meridianBot": {
+        "projectNumber": 163
+    },
+    "portalBot": {
+        "projectNumber": 94
+    },
+    "neighborhoodBot": {
+        "projectNumber": 146
+    },
+    "hashtractorsBot": {
+        "projectNumber": 90
+    },
+    "444(4)Bot": {
+        "projectNumber": 191
+    },
+    "alienInsectsBot": {
+        "projectNumber": 137
+    },
+    "alienClockBot": {
+        "projectNumber": 112
+    },
+    "edificeBot": {
+        "projectNumber": 204,
         "namedMappings": {
           "sets": "edificeSets.json"
         }
     },
-    "209": {
+    "asemicaBot": {
+        "projectNumber": 206
+    },
+    "autologyBot": {
+        "projectNumber": 209,
         "namedMappings": {
           "sets": "autologySets.json",
           "singles": "autologySingles.json"
         }
     },
-    "214": {
+    "bentBot": {
+        "projectNumber": 214,
         "namedMappings": {
           "sets": "bentSets.json"
         }
     },
-    "255": {
+    "gazersBot": {
+        "projectNumber": 215
+    },
+    "reflectionBot": {
+        "projectNumber": 208
+    },
+    "vortexBot": {
+        "projectNumber": 225
+    },
+    "icBot": {
+        "projectNumber": 228
+    },
+    "pathsBot": {
+        "projectNumber": 217
+    },
+    "glowBot": {
+        "projectNumber": 230
+    },
+    "wraptureBot": {
+        "projectNumber": 234
+    },
+    "jiometoryBot": {
+        "projectNumber": 232
+    },
+    "chimeraBot": {
+        "projectNumber": 233
+    },
+    "cosmicReefBot": {
+        "projectNumber": 250
+    },
+    "hashCrashBot": {
+        "projectNumber": 248
+    },
+    "screensBot": {
+        "projectNumber": 255,
         "namedMappings": {
             "singles": "screensSingles.json"
         }
+    },
+    "raptureBot": {
+        "projectNumber": 141
     }
 }
