@@ -318,8 +318,8 @@
         "projectBotHandlers": {
             "default": "53",
             "stringTriggers": {
-                "meridianBot": [
-                    "163"
+                "163": [
+                    "meridian"
                 ]
             }
         }
@@ -455,8 +455,8 @@
         "projectBotHandlers": {
             "default": "138",
             "stringTriggers": {
-                "octoGardenBot": [
-                    "103"
+                "103": [
+                    "octogarden"
                 ]
             }
         }
@@ -477,8 +477,8 @@
         "projectBotHandlers": {
             "default": "143",
             "stringTriggers": {
-                "paradeBot": [
-                    "197"
+                "197": [
+                    "parade"
                 ],
                 "65": [
                     "traversals"
@@ -488,8 +488,8 @@
     },
     "882129221659537440": {
         "name": "anna-carreras",
-        "147": {
-            "default": "trossetsBot"
+        "projectBotHandlers": {
+            "default": "147"
         }
     },
     "885032021146099734": {
