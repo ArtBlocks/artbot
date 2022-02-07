@@ -83,7 +83,12 @@ The core engine of Artbot is built around the discord.js package.  It serves sev
 
 Supported Curated and playground projects are defined via json files in the `ProjectConfig/` directory.
 
-Required Definitions:
+### Definitions
+
+#### Bot ID
+A bot ID consists of a project ID and contract ID combinded via a `-`. This is used in the config files to identify which bot should be used where or which bot you're configuring. An example of a simple bot ID would be `0` for Chromie Squiggles or `0-DOODLE` for The Family Mooks. Contract IDs are defined in `partnerContracts.json`.
+
+### Required Configuration:
 - `ProjectConfig/channels.json`:
   - key: Discord channel ID
     - value: object:
@@ -92,19 +97,19 @@ Required Definitions:
       - key: `"projectBotHandlers"`
         - value: object:
           - key: `"default"`
-            - value: project ID
+            - value: [Bot ID](#bot-id)
           - (optional) key: `"stringTriggers"`
             - value: object:
-              - key: project ID
+              - key: [Bot ID](#bot-id)
                 - value: array of strings that trigger artbot to use the project bot
           - (optional) key: `"tokenIdTriggers"`:
             - value: object:
-              - key: project ID
+              - key: [Bot ID](#bot-id)
                 - value: length-2 array defining range of token IDs that trigger artbot to use the project bot. e.g. [555, null] means all tokens >= 555 should use the project bot defined in key. [100, 200] means all tokens from 100 to 200 should use the project bot bot defined in key.
 
-Optional Definitions
+### Optional Configuration
 - `ProjectConfig/projectBots.json`
-  - key: project ID
+  - key: [Bot ID](#bot-id)
     - value: object:
       - (optional) key: `"namedMappings"`
         - value: object:
