@@ -1,14 +1,25 @@
 {
-    "13": {
+    "squiggleBot": {
+        "projectNumber": 0
+    },
+    "ringersBot": {
+        "projectNumber": 13,
         "namedMappings": {
             "sets": "ringerSets.json",
             "singles": "ringerSingles.json"
         }
     },
-    "59": {
+    "eternalPumpBot": {
+        "projectNumber": 22
+    },
+    "watercolorDreamsBot": {
+        "projectNumber": 59,
         "namedMappings": {
             "sets": "watercolorDreamSets.json",
             "singles": "watercolorDreamSingles.json"
         }
+    },
+    "autologyBot": {
+        "projectNumber": 209
     }
 }
