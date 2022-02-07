@@ -92,28 +92,26 @@ Required Definitions:
       - key: `"projectBotHandlers"`
         - value: object:
           - key: `"default"`
-            - value: ProjectBotName (as defined in `projectBots.json`)
+            - value: project ID
           - (optional) key: `"stringTriggers"`
             - value: object:
-              - key: ProjectBotName (as defined in `projectBots.json`)
+              - key: project ID
                 - value: array of strings that trigger artbot to use the project bot
           - (optional) key: `"tokenIdTriggers"`:
             - value: object:
-              - key: ProjectBotName (as defined in `projectBots.json`)
+              - key: project ID
                 - value: length-2 array defining range of token IDs that trigger artbot to use the project bot. e.g. [555, null] means all tokens >= 555 should use the project bot defined in key. [100, 200] means all tokens from 100 to 200 should use the project bot bot defined in key.
+
+Optional Definitions
 - `ProjectConfig/projectBots.json`
-  - key: project bot name
+  - key: project ID
     - value: object:
-      - key: `"projectNumber"`
-        value: project ID this bot will look up tokens for
       - (optional) key: `"namedMappings"`
         - value: object:
           - (optional) key: `"sets"`
             - value: json filename defining single token labels; located in 'NamedMappings' directory. e.g. `ringerSingles.json`
           - (optional) key: `"singles"`
             value: json filename defining sets of token labels; located in 'NamedMappings' directory. e.g. `ringerSets.json`
-
-Optional Definitions
 - `NamedMappings/<projectName>Singles.json`
   - json file defining trigger names for single tokens. See `ringerSingles.json` for example.
 - `NamedMappings/<projectName>Seets.json`

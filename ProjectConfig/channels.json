@@ -2,21 +2,21 @@
     "793390526765465600": {
         "name": "hideki-tsukamoto",
         "projectBotHandlers": {
-            "default": "singularityBot"
+            "default": "8"
         }
     },
     "807346227594919986": {
         "name": "ge1doot",
         "projectBotHandlers": {
-            "default": "ignitionBot",
+            "default": "9",
             "stringTriggers": {
-                "utopiaBot": [
+                "15": [
                     "utopia"
                 ],
-                "r3sonanceBot": [
+                "19": [
                     "r3"
                 ],
-                "auroraIvBot": [
+                "56": [
                     "aurora"
                 ]
             }
@@ -25,25 +25,25 @@
     "781923690349592607": {
         "name": "snowfro",
         "projectBotHandlers": {
-            "default": "squiggleBot"
+            "default": "0"
         }
     },
     "830104035100065845": {
         "name": "squiggle_square",
         "projectBotHandlers": {
-            "default": "squiggleBot"
+            "default": "0"
         }
     },
     "800763110247628820": {
         "name": "dmitri-cherniak",
         "projectBotHandlers": {
-            "default": "ringersBot",
+            "default": "13",
             "stringTriggers": {
-                "eternalPumpBot": [
+                "22": [
                     "eternal",
                     "pump"
                 ],
-                "wraptureBot": [
+                "234": [
                     "wrapture"
                 ]
             }
@@ -52,13 +52,13 @@
     "810598817351204894": {
         "name": "dandan-dca",
         "projectBotHandlers": {
-            "default": "genesisBot",
+            "default": "1",
             "stringTriggers": {
-                "gen2Bot": [
+                "18": [
                     "gen2",
                     "gen 2"
                 ],
-                "gen3Bot": [
+                "48": [
                     "gen3",
                     "gen 3"
                 ]
@@ -68,26 +68,26 @@
     "807346265851559997": {
         "name": "jeff-davis",
         "projectBotHandlers": {
-            "default": "constructionBot",
+            "default": "2",
             "stringTriggers": {
-                "rhythmBot": [
+                "57": [
                     "rhythm"
                 ],
-                "colorStudyBot": [
+                "16": [
                     "color",
                     "study"
                 ],
-                "viewCardBot": [
+                "6": [
                     "view",
                     "card"
                 ],
-                "portalBot": [
+                "94": [
                     "portal"
                 ],
-                "neighborhoodBot": [
+                "146": [
                     "neighborhood"
                 ],
-                "reflectionBot": [
+                "208": [
                     "reflection"
                 ]
             }
@@ -96,9 +96,9 @@
     "854222350454226984": {
         "name": "joshua-bagley",
         "projectBotHandlers": {
-            "default": "dreamsBot",
+            "default": "89",
             "stringTriggers": {
-                "ecumenopolisBot": [
+                "119": [
                     "ecumenopolis"
                 ]
             }
@@ -107,16 +107,16 @@
     "787074645618589696": {
         "name": "pxlq",
         "projectBotHandlers": {
-            "default": "dynamicSlicesBot",
+            "default": "4",
             "stringTriggers": {
-                "cyberCitiesBot": [
+                "14": [
                     "cyber",
                     "cities"
                 ],
-                "sentienceBot": [
+                "20": [
                     "sentience"
                 ],
-                "hieroglyphsBot": [
+                "30": [
                     "hieroglyphs"
                 ]
             }
@@ -125,9 +125,9 @@
     "814343646010540053": {
         "name": "luxpris",
         "projectBotHandlers": {
-            "default": "deconstructionsBot",
+            "default": "7",
             "stringTriggers": {
-                "pathfindersBot": [
+                "25": [
                     "pathfinder"
                 ]
             }
@@ -136,19 +136,19 @@
     "797929926610911263": {
         "name": "bryan-brinkman",
         "projectBotHandlers": {
-            "default": "nimbudsBot"
+            "default": "10"
         }
     },
     "814519454268391445": {
         "name": "beervangeer",
         "projectBotHandlers": {
-            "default": "hyperhashBot",
+            "default": "11",
             "stringTriggers": {
-                "energySculptureBot": [
+                "26": [
                     "energy",
                     "sculpture"
                 ],
-                "hashCrashBot": [
+                "248": [
                     "hashcrash"
                 ]
             }
@@ -157,15 +157,15 @@
     "800761846235136020": {
         "name": "zeblocks",
         "projectBotHandlers": {
-            "default": "unigridsBot"
+            "default": "12"
         }
     },
     "814008731838316554": {
         "name": "kai",
         "projectBotHandlers": {
-            "default": "27bitBot",
+            "default": "21",
             "stringTriggers": {
-                "pixelGlassBot": [
+                "24": [
                     "pixel",
                     "glass"
                 ]
@@ -175,21 +175,21 @@
     "808792983503503410": {
         "name": "simon-de-mai",
         "projectBotHandlers": {
-            "default": "spectronBot"
+            "default": "17"
         }
     },
     "787363737438519298": {
         "name": "daim-aggott-honsch",
         "projectBotHandlers": {
-            "default": "cryptoblotBot"
+            "default": "3"
         }
     },
     "813619514390216724": {
         "name": "kjetil-golid",
         "projectBotHandlers": {
-            "default": "archetypeBot",
+            "default": "23",
             "stringTriggers": {
-                "paperArmadaBot": [
+                "37": [
                     "pa",
                     "paper",
                     "armada"
@@ -200,15 +200,15 @@
     "864290801638572053": {
         "name": "alida-sun",
         "projectBotHandlers": {
-            "default": "glitchBot"
+            "default": "114"
         }
     },
     "869449236717121576": {
         "name": "rafael-rozendaal",
         "projectBotHandlers": {
-            "default": "endlessBot",
+            "default": "120",
             "stringTriggers": {
-                "diveBot": [
+                "212": [
                     "dive"
                 ]
             }
@@ -217,15 +217,15 @@
     "872722851029999616": {
         "name": "darien-brito",
         "projectBotHandlers": {
-            "default": "pigmentsBot",
+            "default": "129",
             "stringTriggers": {
-                "hashtractorsBot": [
+                "90": [
                     "hashtractors",
                     "hash",
                     "tractors",
                     "🚜"
                 ],
-                "pathsBot": [
+                "217": [
                     "paths"
                 ]
             }
@@ -234,18 +234,18 @@
     "828516221308895263": {
         "name": "alexis-andre",
         "projectBotHandlers": {
-            "default": "minutesBot",
+            "default": "27",
             "stringTriggers": {
-                "voidBot": [
+                "42": [
                     "void"
                 ],
-                "messengersBot": [
+                "68": [
                     "messengers"
                 ],
-                "obiceraBot": [
+                "130": [
                     "obicera"
                 ],
-                "heuresBot": [
+                "201": [
                     "heures",
                     "hours",
                     "24heures",
@@ -259,12 +259,12 @@
     "820307788316016700": {
         "name": "aaron-penne",
         "projectBotHandlers": {
-            "default": "apparitionsBot",
+            "default": "28",
             "stringTriggers": {
-                "ritualBot": [
+                "172": [
                     "rituals"
                 ],
-                "returnBot": [
+                "77": [
                     "return"
                 ]
             }
@@ -273,12 +273,12 @@
     "820308326968852511": {
         "name": "radix",
         "projectBotHandlers": {
-            "default": "inspiralsBot",
+            "default": "29",
             "stringTriggers": {
-                "eccentrics2Bot": [
+                "139": [
                     "eccentrics2"
                 ],
-                "eccentricsBot": [
+                "104": [
                     "eccentric"
                 ]
             }
@@ -287,27 +287,27 @@
     "820308609342242866": {
         "name": "dalenz",
         "projectBotHandlers": {
-            "default": "aerialViewBot"
+            "default": "35"
         }
     },
     "828009510571343922": {
         "name": "chaosconstruct",
         "projectBotHandlers": {
-            "default": "synapsesBot"
+            "default": "39"
         }
     },
     "828009835207196722": {
         "name": "stina-jones",
         "projectBotHandlers": {
-            "default": "algobotsBot"
+            "default": "40"
         }
     },
     "828009961991831590": {
         "name": "michael-connolly",
         "projectBotHandlers": {
-            "default": "elementalsBot",
+            "default": "41",
             "stringTriggers": {
-                "divisionsBot": [
+                "108": [
                     "division"
                 ]
             }
@@ -316,10 +316,10 @@
     "833713318107545670": {
         "name": "matt-deslauriers",
         "projectBotHandlers": {
-            "default": "subscapesBot",
+            "default": "53",
             "stringTriggers": {
                 "meridianBot": [
-                    "meridian"
+                    "163"
                 ]
             }
         }
@@ -327,23 +327,23 @@
     "836497015927996437": {
         "name": "numbersinmotion",
         "projectBotHandlers": {
-            "default": "watercolorDreamsBot"
+            "default": "59"
         }
     },
     "836497127538425886": {
         "name": "jason-ting",
         "projectBotHandlers": {
-            "default": "transitionsBot",
+            "default": "117",
             "stringTriggers": {
-                "lightBeamsBot": [
+                "32": [
                     "light",
                     "beams"
                 ],
-                "bubbleBlobbyBot": [
+                "62": [
                     "bubble",
                     "blobby"
                 ],
-                "glowBot": [
+                "230": [
                     "glow"
                 ]
             }
@@ -352,15 +352,15 @@
     "839739823669641227": {
         "name": "han-x-nicolas-daniel",
         "projectBotHandlers": {
-            "default": "algoRhythmsBot"
+            "default": "64"
         }
     },
     "849732302975008778": {
         "name": "tyler-hobbs",
         "projectBotHandlers": {
-            "default": "fidenzaBot",
+            "default": "78",
             "stringTriggers": {
-                "icBot": [
+                "228": [
                     "ic",
                     "incomplete",
                     "control"
@@ -371,9 +371,9 @@
     "879488624197001293": {
         "name": "Server: Tyler Hobbs (879488624197001287), CH: the-place-to-be",
         "projectBotHandlers": {
-            "default": "fidenzaBot",
+            "default": "78",
             "stringTriggers": {
-                "icBot": [
+                "228": [
                     "ic",
                     "incomplete",
                     "control"
@@ -384,9 +384,9 @@
     "898335291008487464": {
         "name": "Server: Tyler Hobbs (879488624197001287), CH: fidenza-owners",
         "projectBotHandlers": {
-            "default": "fidenzaBot",
+            "default": "78",
             "stringTriggers": {
-                "icBot": [
+                "228": [
                     "ic",
                     "incomplete",
                     "control"
@@ -397,9 +397,9 @@
     "901180390478340127": {
         "name": "Server: Tyler Hobbs (879488624197001287), CH: incomplete-control",
         "projectBotHandlers": {
-            "default": "icBot",
+            "default": "228",
             "stringTriggers": {
-                "fidenzaBot": [
+                "78": [
                     "fidenza"
                 ]
             }
@@ -408,15 +408,15 @@
     "846619538320785448": {
         "name": "shvembldr",
         "projectBotHandlers": {
-            "default": "blocksOfArtBot",
+            "default": "74",
             "stringTriggers": {
-                "444(4)Bot": [
+                "191": [
                     "444(4)"
                 ],
-                "alienInsectsBot": [
+                "137": [
                     "ai"
                 ],
-                "alienClockBot": [
+                "112": [
                     "ac"
                 ]
             }
@@ -425,18 +425,18 @@
     "844078279338360832": {
         "name": "stefan-contiero",
         "projectBotHandlers": {
-            "default": "frammentiBot",
+            "default": "72",
             "stringTriggers": {
-                "rinascitaBot": [
+                "121": [
                     "rina"
                 ],
-                "saturazioneBot": [
+                "200": [
                     "saturazione"
                 ]
             },
             "tokenIdTriggers": [
                 {
-                    "rinascitaBot": [
+                    "121": [
                         555,
                         null
                     ]
@@ -447,16 +447,16 @@
     "872722887054852106": {
         "name": "wiliam-tan",
         "projectBotHandlers": {
-            "default": "scribbledBot"
+            "default": "131"
         }
     },
     "879405018279731231": {
         "name": "rich-lord",
         "projectBotHandlers": {
-            "default": "geometryRunnersBot",
+            "default": "138",
             "stringTriggers": {
                 "octoGardenBot": [
-                    "octogarden"
+                    "103"
                 ]
             }
         }
@@ -464,9 +464,9 @@
     "854222600742109184": {
         "name": "casey-reas",
         "projectBotHandlers": {
-            "default": "phototaxisBot",
+            "default": "164",
             "stringTriggers": {
-                "centuryBot": [
+                "100": [
                     "century"
                 ]
             }
@@ -475,12 +475,12 @@
     "877060147619446814": {
         "name": "loren-bednar",
         "projectBotHandlers": {
-            "default": "phasesBot",
+            "default": "143",
             "stringTriggers": {
                 "paradeBot": [
-                    "parade"
+                    "197"
                 ],
-                "traversalsBot": [
+                "65": [
                     "traversals"
                 ]
             }
@@ -488,82 +488,82 @@
     },
     "882129221659537440": {
         "name": "anna-carreras",
-        "projectBotHandlers": {
+        "147": {
             "default": "trossetsBot"
         }
     },
     "885032021146099734": {
         "name": "monica-rizzolli",
         "projectBotHandlers": {
-            "default": "fragmentsBot"
+            "default": "159"
         }
     },
     "889737089862754344": {
         "name": "piter-pasma",
         "projectBotHandlers": {
-            "default": "skulptuurBot"
+            "default": "173"
         }
     },
     "904783901522804786": {
         "name": "ben-kovach",
         "projectBotHandlers": {
-            "default": "edificeBot"
+            "default": "204"
         }
     },
     "908416638636920832": {
         "name": "edelman-x-ofman-x-badr",
         "projectBotHandlers": {
-            "default": "asemicaBot"
+            "default": "206"
         }
     },
     "910410292205350953": {
         "name": "steganon",
         "projectBotHandlers": {
-            "default": "autologyBot"
+            "default": "209"
         }
     },
     "912771594357714964": {
         "name": "ippsketch",
         "projectBotHandlers": {
-            "default": "bentBot"
+            "default": "214"
         }
     },
     "915365986822144020": {
         "name": "matt-kane",
         "projectBotHandlers": {
-            "default": "gazersBot"
+            "default": "215"
         }
     },
     "917905929087905823": {
         "name": "jen-stark",
         "projectBotHandlers": {
-            "default": "vortexBot"
+            "default": "225"
         }
     },
     "920399256454594652": {
         "name": "samsy",
         "projectBotHandlers": {
-            "default": "jiometoryBot"
+            "default": "232"
         }
     },
     "923461105374855188": {
         "name": "mpkoz",
         "projectBotHandlers": {
-            "default": "chimeraBot"
+            "default": "233"
         }
     },
     "933419567722664016": {
         "name": "leo-villareal",
         "projectBotHandlers": {
-            "default": "cosmicReefBot"
+            "default": "250"
         }
     },
 	"935789872315260948": {
         "name": "thomas-lin-pedersen",
         "projectBotHandlers": {
-            "default": "screensBot", 
+            "default": "255", 
             "stringTriggers": {
-                "raptureBot": [
+                "141": [
                     "rapture"
                 ]
             }
@@ -599,9 +599,9 @@
     "880937060075192320": {
         "name": "fidenza-and-ic-sales",
         "projectBotHandlers": {
-            "default": "fidenzaBot",
+            "default": "78",
             "stringTriggers": {
-                "icBot": [
+                "228": [
                     "ic",
                     "incomplete",
                     "control"
