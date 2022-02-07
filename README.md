@@ -86,7 +86,7 @@ Supported Curated and playground projects are defined via json files in the `Pro
 ### Definitions
 
 #### Bot ID
-A bot ID consists of a project ID and contract ID combinded via a `-`. This is used in the config files to identify which bot should be used where or which bot you're configuring. An example of a simple bot ID would be `0` for Chromie Squiggles or `0-DOODLE` for The Family Mooks. Contract IDs are defined in `partnerContracts.json`.
+A bot ID consists of a project ID and contract ID concatinated via a `-`. This is used in the config files to identify which bot should be used where or which bot you're configuring. An example of a simple bot ID would be `0` for Chromie Squiggles or `0-DOODLE` for The Family Mooks. Contract IDs are defined in `partnerContracts.json`.
 
 ### Required Configuration:
 - `ProjectConfig/channels.json`:
@@ -117,6 +117,9 @@ A bot ID consists of a project ID and contract ID combinded via a `-`. This is u
             - value: json filename defining single token labels; located in 'NamedMappings' directory. e.g. `ringerSingles.json`
           - (optional) key: `"singles"`
             value: json filename defining sets of token labels; located in 'NamedMappings' directory. e.g. `ringerSets.json`
+- `ProjectConfig/partnerContracts.json`
+  - key: contract ID
+    - value: contract address
 - `NamedMappings/<projectName>Singles.json`
   - json file defining trigger names for single tokens. See `ringerSingles.json` for example.
 - `NamedMappings/<projectName>Seets.json`
