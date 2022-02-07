@@ -86,7 +86,7 @@ Supported Curated and playground projects are defined via json files in the `Pro
 ### Definitions
 
 #### Bot ID
-A bot ID consists of a project ID and contract ID concatinated via a `-`. This is used in the config files to identify which bot should be used where or which bot you're configuring. An example of a simple bot ID would be `0` for Chromie Squiggles or `0-DOODLE` for The Family Mooks. Contract IDs are defined in `partnerContracts.json`.
+A bot ID consists of a project ID and contract ID concatinated via a `-`. This is used in the config files to identify which bot should be used where or which bot you're configuring. For Art Blocks projects the contract ID is optional and as such the `-` is not required. An example of a simple bot ID would be `0` for Chromie Squiggles or `0-DOODLE` for The Family Mooks. Contract IDs are defined in `partnerContracts.json`.
 
 ### Required Configuration:
 - `ProjectConfig/channels.json`:
