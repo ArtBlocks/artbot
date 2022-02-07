@@ -134,10 +134,10 @@ async function _getContractProject(projectId, contractId) {
 }
 
 /*
- * This function takes a projectId and contractId and returns a corrosponding
+ * This function takes a projectId and contractId and returns a corresponding
  * project. If the contractId is null it will default to the Art Blocks
  * contracts otherwise it will use the passed contractId when contacting the
- * subgraph
+ * subgraph.
  */
 async function getContractProject(projectId, contractId) {
   return !contractId ? getArtBlocksProject(projectId) : _getContractProject(projectId, contractId)

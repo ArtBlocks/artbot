@@ -143,11 +143,11 @@ class ProjectConfig {
     // gets the relevant configuration from projectBotsJson, calls the subgraph
     // to get project information, and then initializes the project bot.
     const promises = Array.from(botsToInstatiate).map(async botId => {
-      const [projectId, contractId] = botId.split("-"); 
+      const [projectId, contractName] = botId.split("-"); 
       const namedMappings = projectBotsJson[botId]?.namedMappings;
-      const configContract = PARTNER_CONTRACTS[contractId];
+      const configContract = PARTNER_CONTRACTS[contractName];
       if (contractId && !configContract) {
-        console.warn(`Bot ${botId} had a contractId, but there was no matching contract in partnerContracts.json. Has it been defined?`);
+        console.warn(`Bot ${botId} had a contractName, but there was no matching contract in partnerContracts.json. Has it been defined?`);
       }
       const projectNumber = parseInt(projectId);
       const { invocations, name, contract } = await getContractProject(projectNumber, configContract);
