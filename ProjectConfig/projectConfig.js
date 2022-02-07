@@ -146,7 +146,7 @@ class ProjectConfig {
       const [projectId, contractName] = botId.split("-"); 
       const namedMappings = projectBotsJson[botId]?.namedMappings;
       const configContract = PARTNER_CONTRACTS[contractName];
-      if (contractId && !configContract) {
+      if (contractName && !configContract) {
         console.warn(`Bot ${botId} had a contractName, but there was no matching contract in partnerContracts.json. Has it been defined?`);
       }
       const projectNumber = parseInt(projectId);
