@@ -71,7 +71,7 @@ class ProjectBot {
       .then((response) => response.json())
       .then((openSeaData) => {
         console.log(openSeaData, "OPENSEA DATA");
-        this.sendMetaDataMessage(openSeaData, msg, tokenID, this.coreContract,  detailsRequested);
+        this.sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested);
       })
       .catch((err) => {
         console.warn(`MetaData message is being sent in a degraded manner. Is OpenSea's API down? https://status.opensea.io/`);
@@ -79,8 +79,8 @@ class ProjectBot {
       });
   }
 
-  async sendMetaDataMessage(openSeaData, msg, tokenID, coreContract, detailsRequested) {
-    let artBlocksResponse = await fetch(`https://token.artblocks.io/${coreContract}/${tokenID}`);
+  async sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested) {
+    let artBlocksResponse = await fetch(`https://token.artblocks.io/${this.coreContract}/${tokenID}`);
     let artBlocksData = await artBlocksResponse.json();
     console.log(artBlocksData, "ARTBLOCKS DATA");
     // If the OpenSea API is available use their link for the title otherwise use an AB link

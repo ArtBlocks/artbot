@@ -146,14 +146,14 @@ class ProjectConfig {
       const [projectId, contractId] = botId.split("-"); 
       const namedMappings = projectBotsJson[botId]?.namedMappings;
       const configContract = PARTNER_CONTRACTS[contractId];
-      console.log(configContract);
+      if (contractId && !configContract) {
+        console.warn(`Bot ${botId} had a contractId, but there was no matching contract in partnerContracts.json. Has it been defined?`);
+      }
       const projectNumber = parseInt(projectId);
-      console.log(projectNumber);
       const { invocations, name, contract } = await getContractProject(projectNumber, configContract);
       console.log(
         `Refreshing project cache for Project ${projectNumber} ${name}`
       );
-      console.log(botId, invocations, name, contract);
       projectBots[botId] = new ProjectBot({
         projectNumber,
         coreContract: contract.id,
