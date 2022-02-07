@@ -2,19 +2,19 @@
   "800425629785784352": {
     "name": "snowfro",
     "projectBotHandlers": {
-      "default": "squiggleBot"
+      "default": "0"
     }
   },
   "813431078705561630": {
     "name": "dmitri-cherniak",
     "projectBotHandlers": {
-      "default": "ringersBot",
+      "default": "13",
       "stringTriggers": {
-        "eternalPumpBot": ["eternal", "pump"]
+        "22": ["eternal", "pump"]
       },
       "tokenIdTriggers": [
         {
-          "squiggleBot": [1000, null]
+          "0": [1000, null]
         }
       ]
     }
@@ -22,7 +22,7 @@
   "838422388478836786": {
     "name": "numbersinmotion",
     "projectBotHandlers": {
-      "default": "watercolorDreamsBot"
+      "default": "59"
     }
   },
   "825988122122649621": {
