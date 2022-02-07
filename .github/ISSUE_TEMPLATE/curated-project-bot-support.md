@@ -21,6 +21,6 @@ Note: you can find the channel ID for a given channel by right-clicking it in Di
 
 ######################################################################
 
-- Project Title: 
+- Project Title:
 - Project ID:
 - Artist Channel ID:

@@ -24,7 +24,7 @@ Also note that Playground projects need a project keyword so that ArtBot knows t
 
 ######################################################################
 
-- Project Title: 
+- Project Title:
 - Project ID:
 - Artist Channel ID:
 - Project Keyword:
