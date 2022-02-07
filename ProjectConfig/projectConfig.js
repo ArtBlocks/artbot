@@ -101,32 +101,54 @@ class ProjectConfig {
   // Initialize async aspects of the ProjectConfig
   async initialize() {
     try {
-      this.projectBots = await this.buildProjectBots(PROJECT_BOTS);
-      setInterval(() => this.buildProjectBots(PROJECT_BOTS), METADATA_REFRESH_INTERVAL_MINUTES * 60000);
+      this.projectBots = await this.buildProjectBots(CHANNELS, PROJECT_BOTS);
+      setInterval(() => this.buildProjectBots(CHANNELS, PROJECT_BOTS), METADATA_REFRESH_INTERVAL_MINUTES * 60000);
     } catch(err) {
       console.error(`Error while initializing ProjectBots: ${err}`);
     }
   }
 
   /*
-  * This parses imported projectBots json data and subgraph data to return 
-  * an object with keys equal to botName and values pointing to a new instance
-  * of ProjectBot. Returned object is useful for getting project bot instances
-  * by botName.
+  * This parses imported projectBotsJson, channelsJson, and subgraph data to 
+  * return an object with keys equal to project ID and values pointing to a new
+  * instance of ProjectBot. Returned object is useful for getting project bot
+  * instances by project ID.
   */
-  async buildProjectBots(projectBotsJson) {
+  async buildProjectBots(channelsJson, projectBotsJson) {
     const projectBots = {};
     const projectBotConfigs = Object.entries(projectBotsJson);
 
-    // This loops through all the bot configs asynchronously, gets information
-    // on the project from the subgraph, and initializes the project bot.
-    const promises = projectBotConfigs.map(async ([botName, botParams]) => {
-      const { projectNumber, namedMappings } = botParams;
+    // Loops over channelsJson and adds all project IDs to a set of bots that
+    // need to be instatiated.
+    const botsToInstatiate = new Set();
+    Object.keys(channelsJson).forEach((key) => {
+      const projectBotHandlers = channelsJson[key].projectBotHandlers;
+      if (!projectBotHandlers) {
+        return;
+      }
+      botsToInstatiate.add(projectBotHandlers.default);
+      const { stringTriggers = {}, tokenIdTriggers = []} = projectBotHandlers;
+      Object.keys(stringTriggers).forEach((key) => {
+        botsToInstatiate.add(key);
+      });
+      tokenIdTriggers.forEach((tokenTrigger) => {
+        Object.keys(tokenTrigger).forEach((key) => {
+          botsToInstatiate.add(key);
+        });
+      });
+    });
+
+    // This loops through all bots that need to be instatiated asynchronously,
+    // gets the relevant configuration from projectBotsJson, calls the subgraph
+    // to get project information, and then initializes the project bot.
+    const promises = Array.from(botsToInstatiate).map(async botNum => {
+      const namedMappings = projectBotsJson[botNum]?.namedMappings;
+      const projectNumber = parseInt(botNum);
       const { invocations, name, contract } = await getArtBlocksProject(projectNumber);
       console.log(
         `Refreshing project cache for Project ${projectNumber} ${name}`
       );
-      projectBots[botName] = new ProjectBot({
+      projectBots[botNum] = new ProjectBot({
         projectNumber,
         coreContract: contract.id,
         editionSize: invocations,
