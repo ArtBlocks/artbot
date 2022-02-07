@@ -109,15 +109,17 @@ class ProjectConfig {
   }
 
   /*
-  * This parses imported projectBots json data and subgraph data to return 
-  * an object with keys equal to botName and values pointing to a new instance
-  * of ProjectBot. Returned object is useful for getting project bot instances
-  * by botName.
+  * This parses imported projectBotsJson, channelsJson, and subgraph data to 
+  * return an object with keys equal to project ID and values pointing to a new
+  * instance of ProjectBot. Returned object is useful for getting project bot
+  * instances by project ID.
   */
   async buildProjectBots(channelsJson, projectBotsJson) {
     const projectBots = {};
     const projectBotConfigs = Object.entries(projectBotsJson);
 
+    // Loops over channelsJson and adds all project IDs to a set of bots that
+    // need to be instatiated.
     const botsToInstatiate = new Set();
     Object.keys(channelsJson).forEach((key) => {
       const projectBotHandlers = channelsJson[key].projectBotHandlers;
@@ -136,8 +138,9 @@ class ProjectConfig {
       });
     });
 
-    // This loops through all the bot configs asynchronously, gets information
-    // on the project from the subgraph, and initializes the project bot.
+    // This loops through all bots that need to be instatiated asynchronously,
+    // gets the relevant configuration from projectBotsJson, calls the subgraph
+    // to get project information, and then initializes the project bot.
     const promises = Array.from(botsToInstatiate).map(async botNum => {
       const namedMappings = projectBotsJson[botNum]?.namedMappings;
       const projectNumber = parseInt(botNum);
