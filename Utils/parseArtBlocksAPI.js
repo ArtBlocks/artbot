@@ -134,6 +134,16 @@ async function _getContractProject(projectId, contractId) {
 }
 
 /*
+ * This function takes a projectId and contractId and returns a corrosponding
+ * project. If the contractId is null it will default to the Art Blocks
+ * contracts otherwise it will use the passed contractId when contacting the
+ * subgraph
+ */
+async function getContractProject(projectId, contractId) {
+  return !contractId ? getArtBlocksProject(projectId) : _getContractProject(projectId, contractId)
+}
+
+/*
  * get data for a flagship artblocks project
  * Returns undefined if no project found (errors or DNE).
  * If project found, returns object with:
@@ -215,3 +225,4 @@ async function getArtBlocksFactoryProjects() {
 module.exports.getArtBlocksProject = getArtBlocksProject;
 module.exports.getArtBlocksFactoryProjects = getArtBlocksFactoryProjects;
 module.exports.getArtBlocksProjectCount = getArtBlocksProjectCount;
+module.exports.getContractProject = getContractProject;
