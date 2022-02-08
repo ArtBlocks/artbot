@@ -66,7 +66,7 @@ bot.login(TOKEN);
 
 bot.on('ready', client => {
   console.info(`Logged in as ${bot.user.tag}!`);
-  randomGuy.startSubroutine(bot.channels.cache.get(CHANNEL_ART_CHAT));
+  randomGuy.startRoutine(bot.channels.cache.get(CHANNEL_ART_CHAT));
 });
 
 // Manage Giveaways with Artbot

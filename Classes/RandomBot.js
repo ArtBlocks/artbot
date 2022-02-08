@@ -19,12 +19,12 @@ const RANDOM_ART_INTERVAL_MINUTES = process.env.RANDOM_ART_INTERVAL_MINUTES;
 let projectCount = 0;
 
 class RandomBot {
-  constructor(channel) {
+  constructor() {
     this.initialize();
     setInterval(this.initialize, METADATA_REFRESH_INTERVAL_MINUTES * 60000);
   }
 
-  async startSubroutine(channel) {
+  async startRoutine(channel) {
     setInterval(() => this.sendRandomTokenMessage(channel), RANDOM_ART_INTERVAL_MINUTES * 60000);
   }
 
@@ -55,6 +55,8 @@ class RandomBot {
     sendRandomTokenMessage(msg.channel);
   }
 
+  // This function takes a channel and sends a message containing a random
+  // token from a random project
   async sendRandomTokenMessage(channel) {
     let attempts = 0;
     while (attempts < 10) {
