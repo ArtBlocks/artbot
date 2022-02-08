@@ -64,8 +64,9 @@ app.listen(PORT, function() {
 const bot = new Client();
 bot.login(TOKEN);
 
-bot.on('ready', () => {
+bot.on('ready', client => {
   console.info(`Logged in as ${bot.user.tag}!`);
+  randomGuy.startSubroutine(bot.channels.cache.get(CHANNEL_ART_CHAT));
 });
 
 // Manage Giveaways with Artbot
