@@ -90,7 +90,7 @@ A bot ID consists of a project ID and contract name concatinated via a `-`. This
 
 An example of a simple bot ID would be `0` for Chromie Squiggles or `0-DOODLE` for The Family Mooks. Contract names are defined in `partnerContracts.json`.
 
-#### Contract Names
+##### Contract Names
 
 Here are the currently valid contract names.
 
