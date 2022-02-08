@@ -14,7 +14,8 @@ const PROJECT_BOTS = ARTBOT_IS_PROD ?
   require('./projectBots.json') :
   require('./projectBots_dev.json');
 const ProjectBot = require('../Classes/ProjectBot').ProjectBot;
-const { getArtBlocksProject } = require("../Utils/parseArtBlocksAPI");
+const { getContractProject } = require("../Utils/parseArtBlocksAPI");
+const PARTNER_CONTRACTS = require("../ProjectConfig/partnerContracts.json");
 
 // utility class that routes number messages for each channel
 class Channel {
@@ -141,14 +142,19 @@ class ProjectConfig {
     // This loops through all bots that need to be instatiated asynchronously,
     // gets the relevant configuration from projectBotsJson, calls the subgraph
     // to get project information, and then initializes the project bot.
-    const promises = Array.from(botsToInstatiate).map(async botNum => {
-      const namedMappings = projectBotsJson[botNum]?.namedMappings;
-      const projectNumber = parseInt(botNum);
-      const { invocations, name, contract } = await getArtBlocksProject(projectNumber);
+    const promises = Array.from(botsToInstatiate).map(async botId => {
+      const [projectId, contractName] = botId.split("-"); 
+      const namedMappings = projectBotsJson[botId]?.namedMappings;
+      const configContract = PARTNER_CONTRACTS[contractName];
+      if (contractName && !configContract) {
+        console.warn(`Bot ${botId} had a contractName, but there was no matching contract in partnerContracts.json. Has it been defined?`);
+      }
+      const projectNumber = parseInt(projectId);
+      const { invocations, name, contract } = await getContractProject(projectNumber, configContract);
       console.log(
         `Refreshing project cache for Project ${projectNumber} ${name}`
       );
-      projectBots[botNum] = new ProjectBot({
+      projectBots[botId] = new ProjectBot({
         projectNumber,
         coreContract: contract.id,
         editionSize: invocations,
