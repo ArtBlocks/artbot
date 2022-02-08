@@ -90,6 +90,14 @@ A bot ID consists of a project ID and contract name concatinated via a `-`. This
 
 An example of a simple bot ID would be `0` for Chromie Squiggles or `0-DOODLE` for The Family Mooks. Contract names are defined in `partnerContracts.json`.
 
+#### Contract Names
+
+Here are the currently valid contract names.
+
+| Partner     | Contract Name | Contract Address                           |
+|-------------|---------------|--------------------------------------------|
+| Doodle Labs | DOODLE        | 0x28f2d3805652fb5d359486dffb7d08320d403240 |
+
 ### Required Configuration
 - `ProjectConfig/channels.json`:
   - key: Discord channel ID
