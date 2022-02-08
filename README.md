@@ -83,7 +83,22 @@ The core engine of Artbot is built around the discord.js package.  It serves sev
 
 Supported Curated and playground projects are defined via json files in the `ProjectConfig/` directory.
 
-Required Definitions:
+### Definitions
+
+#### Bot ID
+A bot ID consists of a project ID and contract name concatinated via a `-`. This is used in the config files to identify which bot should be used where or which bot you're configuring. For Art Blocks projects the contract name is optional and as such the `-` is not required.
+
+An example of a simple bot ID would be `0` for Chromie Squiggles or `0-DOODLE` for The Family Mooks. Contract names are defined in `partnerContracts.json`.
+
+##### Contract Names
+
+Here are the currently valid contract names.
+
+| Partner     | Contract Name | Contract Address                           |
+|-------------|---------------|--------------------------------------------|
+| Doodle Labs | DOODLE        | 0x28f2d3805652fb5d359486dffb7d08320d403240 |
+
+### Required Configuration
 - `ProjectConfig/channels.json`:
   - key: Discord channel ID
     - value: object:
@@ -92,19 +107,19 @@ Required Definitions:
       - key: `"projectBotHandlers"`
         - value: object:
           - key: `"default"`
-            - value: project ID
+            - value: [Bot ID](#bot-id)
           - (optional) key: `"stringTriggers"`
             - value: object:
-              - key: project ID
+              - key: [Bot ID](#bot-id)
                 - value: array of strings that trigger artbot to use the project bot
           - (optional) key: `"tokenIdTriggers"`:
             - value: object:
-              - key: project ID
+              - key: [Bot ID](#bot-id)
                 - value: length-2 array defining range of token IDs that trigger artbot to use the project bot. e.g. [555, null] means all tokens >= 555 should use the project bot defined in key. [100, 200] means all tokens from 100 to 200 should use the project bot bot defined in key.
 
-Optional Definitions
+### Optional Configuration
 - `ProjectConfig/projectBots.json`
-  - key: project ID
+  - key: [Bot ID](#bot-id)
     - value: object:
       - (optional) key: `"namedMappings"`
         - value: object:
@@ -112,6 +127,9 @@ Optional Definitions
             - value: json filename defining single token labels; located in 'NamedMappings' directory. e.g. `ringerSingles.json`
           - (optional) key: `"singles"`
             value: json filename defining sets of token labels; located in 'NamedMappings' directory. e.g. `ringerSets.json`
+- `ProjectConfig/partnerContracts.json`
+  - key: contract name
+    - value: contract address
 - `NamedMappings/<projectName>Singles.json`
   - json file defining trigger names for single tokens. See `ringerSingles.json` for example.
 - `NamedMappings/<projectName>Seets.json`
