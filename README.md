@@ -147,10 +147,30 @@ These instructions explain how to configure Art Bot to serve project data in rel
 
 1. Invite ArtBot to your server by clicking [here](https://discord.com/oauth2/authorize?client_id=794646394420854824&scope=bot&permissions=19520).
 2. Create a pull request following the configuration schema in [required configuration](#required-configuration) to set up Art Bot to listen to a relevant channel or channels.
-    * As a PBAB partner you most likely have a contract of your own. To configure this you will have to follow the [optional configuration](#optional-configuration) scheme in `ProjectConfig/partnerContracts.json`.
-3. Please update the [contract names](#contract-names) table in the README if you added a new contract to `partnerContract.json`.
-4. Add Asupkay as a reviewer on the pull request.
-5. Once the pull request goes in you should then be able to query Art Bot for configured projects in the relevant channel(s).
+
+**Example Config**
+```json
+"880280317477404713": {
+    "name": "Doodle Labs - the-lab",
+    "projectBotHandlers": {
+        "default": "0-DOODLE",
+        "stringTriggers": {
+            "1-DOODLE": [
+                "slider"
+            ],
+            "2-DOODLE": [
+                "neo",
+                "neogen"
+            ]
+        }
+    }
+}
+```
+
+3. As a PBAB partner you most likely have a contract of your own. To configure this you will have to follow the [optional configuration](#optional-configuration) scheme in `ProjectConfig/partnerContracts.json`.
+4. Please update the [contract names](#contract-names) table in the README if you added a new contract to `partnerContract.json`.
+5. Add Asupkay as a reviewer on the pull request.
+6. Once the pull request goes in you should then be able to query Art Bot for configured projects in the relevant channel(s).
 
 ## Contributing to artbot
 
