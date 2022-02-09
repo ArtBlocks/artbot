@@ -141,6 +141,46 @@ Factory projects are automatically handled by artbot and may be queried from the
 
 An example artbot query for a factory project is: `#146 Pieces of Me`
 
+## PBAB instructions
+
+These instructions explain how to configure Art Bot to serve project data in relevant channels.
+
+1. Invite ArtBot to your server by clicking [here](https://discord.com/oauth2/authorize?client_id=794646394420854824&scope=bot&permissions=19520). Note that you must have the "Manage Server" permission on the desired server to invite Art Bot.
+2. As a PBAB partner you most likely have a contract of your own. To configure this you will have to follow the [optional configuration](#optional-configuration) scheme in `ProjectConfig/partnerContracts.json` by adding a new entry.
+
+**Example Config**
+
+```json
+{
+    "DOODLE": "0x28f2d3805652fb5d359486dffb7d08320d403240",
+    "<Your contract name>": "<Your contract address>"
+}
+```
+
+3. Create a pull request following the configuration schema in [required configuration](#required-configuration) to set up Art Bot to listen to a relevant channel or channels.
+
+**Example Config**
+```json
+"880280317477404713": {
+    "name": "Doodle Labs - the-lab",
+    "projectBotHandlers": {
+        "default": "0-DOODLE",
+        "stringTriggers": {
+            "1-DOODLE": [
+                "slider"
+            ],
+            "2-DOODLE": [
+                "neo",
+                "neogen"
+            ]
+        }
+    }
+}
+```
+
+4. Please update the [contract names](#contract-names) table in the README if you added a new contract to `partnerContract.json`.
+5. Once the pull request goes in you should then be able to query Art Bot for configured projects in the relevant channel(s).
+
 ## Contributing to artbot
 
   For now, Artbot development is coordinated informally over Discord.  Please reach out to purplehat.eth#7327 or ryley-o.eth#5272 if you think you might be interested in helping out.
