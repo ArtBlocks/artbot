@@ -590,6 +590,30 @@
             }
         }
     },
+    "888929189862977646": {
+        "name": "Generative Artworks - Democracity",
+        "projectBotHandlers": {
+            default: "162"
+        }
+    },
+    "888929212369600572": {
+        "name": "Generative Artworks - Enchiridion",
+        "projectBotHandlers": {
+            default: "101"
+        }
+    },
+    "888929231147499561": {
+        "name": "Generative Artworks - Empyrean",
+        "projectBotHandlers": {
+            default: "33"
+        }
+    },
+    "932737393788850266": {
+        "name": "Generative Artworks - Neogen",
+        "projectBotHandlers": {
+            default: "2-DOODLE"
+        }
+    },
     "822563871473795073": {
         "name": "factory-projects"
     },
