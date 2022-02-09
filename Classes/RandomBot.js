@@ -52,7 +52,7 @@ class RandomBot {
       return;
     }
 
-    sendRandomTokenMessage(msg.channel);
+    this.sendRandomTokenMessage(msg.channel);
   }
 
   // This function takes a channel and sends a message containing a random
