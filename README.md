@@ -146,7 +146,18 @@ An example artbot query for a factory project is: `#146 Pieces of Me`
 These instructions explain how to configure Art Bot to serve project data in relevant channels.
 
 1. Invite ArtBot to your server by clicking [here](https://discord.com/oauth2/authorize?client_id=794646394420854824&scope=bot&permissions=19520).
-2. Create a pull request following the configuration schema in [required configuration](#required-configuration) to set up Art Bot to listen to a relevant channel or channels.
+2. As a PBAB partner you most likely have a contract of your own. To configure this you will have to follow the [optional configuration](#optional-configuration) scheme in `ProjectConfig/partnerContracts.json` by adding a new entry.
+
+**Example Config**
+
+```json
+{
+    "DOODLE": "0x28f2d3805652fb5d359486dffb7d08320d403240",
+    "<Your contract name>": "<Your contract address>"
+}
+```
+
+3. Create a pull request following the configuration schema in [required configuration](#required-configuration) to set up Art Bot to listen to a relevant channel or channels.
 
 **Example Config**
 ```json
@@ -167,7 +178,6 @@ These instructions explain how to configure Art Bot to serve project data in rel
 }
 ```
 
-3. As a PBAB partner you most likely have a contract of your own. To configure this you will have to follow the [optional configuration](#optional-configuration) scheme in `ProjectConfig/partnerContracts.json`.
 4. Please update the [contract names](#contract-names) table in the README if you added a new contract to `partnerContract.json`.
 5. Add Asupkay as a reviewer on the pull request.
 6. Once the pull request goes in you should then be able to query Art Bot for configured projects in the relevant channel(s).
