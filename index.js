@@ -102,6 +102,13 @@ bot.on('message', (msg) => {
   const msgContentLowercase = msgContent.toLowerCase();
   const channelID = msg.channel.id;
 
+  // If there is not a channel ID configured where the message was sent
+  // short-circuit handling the message
+  const channel = projectConfig.channels[channelID];
+  if (!channel) {
+    return;
+  }
+
   /*
      * If the message is in the activity channel, forward the message on
      * To the appropriate sub-channel.

@@ -203,11 +203,6 @@ class ProjectConfig {
   */
   routeProjectNumberMsg(channelID, msg) {
     const channel = this.channels[channelID];
-    if (!channel) {
-      // only occurs when # messages sent from channels not being observed
-      console.error(`Unknown channel ID: ${channelID}`);
-      return;
-    }
     const botName =
       channel.botNameFromNumberMsgContent(msg.content.toLowerCase());
     if (botName === null) {
