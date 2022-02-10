@@ -97,7 +97,6 @@ Here are the currently valid contract names.
 | Partner     | Contract Name | Contract Address                           |
 |-------------|---------------|--------------------------------------------|
 | Doodle Labs | DOODLE        | 0x28f2d3805652fb5d359486dffb7d08320d403240 |
-| Plottables  | PLOTTABLES    | 0xa319C382a702682129fcbF55d514E61a16f97f9c |
 
 ### Required Configuration
 - `ProjectConfig/channels.json`:
@@ -154,7 +153,6 @@ These instructions explain how to configure Art Bot to serve project data in rel
 ```json
 {
     "DOODLE": "0x28f2d3805652fb5d359486dffb7d08320d403240",
-    "PLOTTABLES": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
     "<Your contract name>": "<Your contract address>"
 }
 ```
