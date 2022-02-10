@@ -129,7 +129,7 @@ Here are the currently valid contract names.
             value: json filename defining sets of token labels; located in 'NamedMappings' directory. e.g. `ringerSets.json`
 - `ProjectConfig/partnerContracts.json`
   - key: contract name
-    - value: contract address
+    - value: contract address (lowercase)
 - `NamedMappings/<projectName>Singles.json`
   - json file defining trigger names for single tokens. See `ringerSingles.json` for example.
 - `NamedMappings/<projectName>Seets.json`
