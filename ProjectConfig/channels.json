@@ -591,25 +591,25 @@
         }
     },
     "888929189862977646": {
-        "name": "Generative Artworks - Democracity",
+        "name": "generative-artworks-democracity",
         "projectBotHandlers": {
             "default": "162"
         }
     },
     "888929212369600572": {
-        "name": "Generative Artworks - Enchiridion",
+        "name": "generative-artworks-enchiridion",
         "projectBotHandlers": {
             "default": "101"
         }
     },
     "888929231147499561": {
-        "name": "Generative Artworks - Empyrean",
+        "name": "generative-artworks-empyrean",
         "projectBotHandlers": {
             "default": "33"
         }
     },
     "932737393788850266": {
-        "name": "Generative Artworks - Neogen",
+        "name": "generative-artworks-neogen",
         "projectBotHandlers": {
             "default": "2-DOODLE"
         }
