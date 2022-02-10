@@ -576,7 +576,7 @@
         }
     },
     "880280317477404713": {
-        "name": "Doodle Labs - the-lab",
+        "name": "doodle-labs-the-lab",
         "projectBotHandlers": {
             "default": "0-DOODLE",
             "stringTriggers": {
@@ -588,6 +588,30 @@
                     "neogen"
                 ]
             }
+        }
+    },
+    "888929189862977646": {
+        "name": "generative-artworks-democracity",
+        "projectBotHandlers": {
+            "default": "162"
+        }
+    },
+    "888929212369600572": {
+        "name": "generative-artworks-enchiridion",
+        "projectBotHandlers": {
+            "default": "101"
+        }
+    },
+    "888929231147499561": {
+        "name": "generative-artworks-empyrean",
+        "projectBotHandlers": {
+            "default": "33"
+        }
+    },
+    "932737393788850266": {
+        "name": "generative-artworks-neogen",
+        "projectBotHandlers": {
+            "default": "2-DOODLE"
         }
     },
     "822563871473795073": {

@@ -159,12 +159,12 @@ These instructions explain how to configure Art Bot to serve project data in rel
 }
 ```
 
-3. Create a pull request following the configuration schema in [required configuration](#required-configuration) to set up Art Bot to listen to a relevant channel or channels.
+3. Create a pull request following the configuration schema in [required configuration](#required-configuration) to set up Art Bot to listen to a relevant channel or channels. Note that Art Bot must have the proper permissions to view whatever channel it is listening to.
 
 **Example Config**
 ```json
 "880280317477404713": {
-    "name": "Doodle Labs - the-lab",
+    "name": "doodle-labs-the-lab",
     "projectBotHandlers": {
         "default": "0-DOODLE",
         "stringTriggers": {
