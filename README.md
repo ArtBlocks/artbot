@@ -154,7 +154,7 @@ These instructions explain how to configure Art Bot to serve project data in rel
 ```json
 {
     "DOODLE": "0x28f2d3805652fb5d359486dffb7d08320d403240",
-    "PLOTTABLES": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
+    "PLOTTABLES": "0xa319c382a702682129fcbf55d514e61a16f97f9c",
     "<Your contract name>": "<Your contract address>"
 }
 ```
