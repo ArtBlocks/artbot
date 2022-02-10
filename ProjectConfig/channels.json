@@ -631,7 +631,7 @@
         }
     },
     "919937880288284722": {
-        "name": "numbersinmotion",
+        "name": "plottables-numbersinmotion",
         "projectBotHandlers": {
             "default": "0-PLOTTABLES",
             "stringTriggers": {
@@ -642,7 +642,7 @@
         }
     },
     "919937961632600064": {
-        "name": "generative-artworks",
+        "name": "plottables-generative-artworks",
         "projectBotHandlers": {
             "default": "1-PLOTTABLES",
             "stringTriggers": {
@@ -653,7 +653,7 @@
         }
     },
     "934860865713360976": {
-        "name": "dandan-dca",
+        "name": "plottables-dandan-dca",
         "projectBotHandlers": {
             "default": "2-PLOTTABLES",
             "stringTriggers": {
@@ -666,7 +666,7 @@
         }
     },
     "938856354242773072": {
-        "name": "joshua-schachter",
+        "name": "plottables-joshua-schachter",
         "projectBotHandlers": {
             "default": "3-PLOTTABLES",
             "stringTriggers": {
@@ -677,7 +677,7 @@
         }
     },
     "939205416754217021": {
-        "name": "larswander",
+        "name": "plottables-larswander",
         "projectBotHandlers": {
             "default": "4-PLOTTABLES",
             "stringTriggers": {
