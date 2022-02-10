@@ -162,7 +162,7 @@ These instructions explain how to configure Art Bot to serve project data in rel
 **Example Config**
 ```json
 "880280317477404713": {
-    "name": "Doodle Labs - the-lab",
+    "name": "doodle-labs-the-lab",
     "projectBotHandlers": {
         "default": "0-DOODLE",
         "stringTriggers": {
