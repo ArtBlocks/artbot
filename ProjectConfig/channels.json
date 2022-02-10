@@ -561,7 +561,7 @@
     "935789872315260948": {
         "name": "thomas-lin-pedersen",
         "projectBotHandlers": {
-            "default": "255", 
+            "default": "255",
             "stringTriggers": {
                 "141": [
                     "rapture"
@@ -572,7 +572,7 @@
     "938325342064627712": {
         "name": "matty-marianksy",
         "projectBotHandlers": {
-            "default": "261" 
+            "default": "261"
         }
     },
     "880280317477404713": {
@@ -626,6 +626,64 @@
                     "ic",
                     "incomplete",
                     "control"
+                ]
+            }
+        }
+    },
+    "919937880288284722": {
+        "name": "numbersinmotion",
+        "projectBotHandlers": {
+            "default": "0-PLOTTABLES",
+            "stringTriggers": {
+                "0-PLOTTABLES": [
+                    "streamlines"
+                ]
+            }
+        }
+    },
+    "919937961632600064": {
+        "name": "generative-artworks",
+        "projectBotHandlers": {
+            "default": "1-PLOTTABLES",
+            "stringTriggers": {
+                "1-PLOTTABLES": [
+                    "implosion"
+                ]
+            }
+        }
+    },
+    "934860865713360976": {
+        "name": "dandan-dca",
+        "projectBotHandlers": {
+            "default": "2-PLOTTABLES",
+            "stringTriggers": {
+                "2-PLOTTABLES": [
+                    "really random rock",
+                    "rocks",
+                    "rrr"
+                ]
+            }
+        }
+    },
+    "938856354242773072": {
+        "name": "joshua-schachter",
+        "projectBotHandlers": {
+            "default": "3-PLOTTABLES",
+            "stringTriggers": {
+                "3-PLOTTABLES": [
+                    "diatom"
+                ]
+            }
+        }
+    },
+    "939205416754217021": {
+        "name": "larswander",
+        "projectBotHandlers": {
+            "default": "4-PLOTTABLES",
+            "stringTriggers": {
+                "4-PLOTTABLES": [
+                    "lines walking",
+                    "lines"
                 ]
             }
         }
