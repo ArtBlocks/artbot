@@ -31,7 +31,7 @@ class FactoryBot {
       for (let i = 0; i < factoryProjects.length; i++) {
         const project = factoryProjects[i];
         console.log(
-          `Refreshing project cache for Project ${project.projectId} ${project.name}`
+          `Refreshing project cache for Factory Project ${project.projectId} ${project.name}`
         );
         const newBot = new ProjectBot({
           projectNumber: project.projectId,
@@ -44,6 +44,11 @@ class FactoryBot {
       }
     } catch (err) {
       console.error(`Error while initializing FactoryBots\n${err}`);
+    }
+
+    // for testing
+    if (this.initializeCb) {
+      this.initializeCb()
     }
   }
 
