@@ -236,7 +236,6 @@ async function _getContractNullFactoryProjects(contractId) {
         if (nullProject.projectId in curationStatusCache) {
           return curationStatusCache[nullProject.projectId];
         }
-        // console.log("querying", nullProject.projectId);
 
         const genResponse = await fetch(
           AB_GEN_API_URL + nullProject.projectId * 1e6
@@ -257,10 +256,10 @@ async function _getContractNullFactoryProjects(contractId) {
         return token.curation_status;
       })
     );
-    const factoryProjects = nullProjects.filter(
+    const nullFactoryProjects = nullProjects.filter(
       (_, i) => curationStatus[i] === "factory"
     );
-    return factoryProjects;
+    return nullFactoryProjects;
   } catch (err) {
     console.error(err);
     return undefined;
