@@ -1,5 +1,6 @@
 require("dotenv").config();
 const { MessageEmbed } = require("discord.js");
+const deburr = require("lodash.deburr");
 const fetch = require("node-fetch");
 const Web3 = require("web3");
 const getArtBlocksFactoryProjects =
@@ -13,13 +14,14 @@ const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 const METADATA_REFRESH_INTERVAL_MINUTES =
   process.env.METADATA_REFRESH_INTERVAL_MINUTES;
 
-// This array will hold ProjectBot classes for all the Factory Projects we find
-const factoryBotList = [];
-
 class FactoryBot {
   constructor() {
+    this.projects = {};
     this.initialize();
-    setInterval(this.initialize, METADATA_REFRESH_INTERVAL_MINUTES * 60000);
+    setInterval(
+      () => this.initialize(),
+      METADATA_REFRESH_INTERVAL_MINUTES * 60000
+    );
   }
 
   async initialize() {
@@ -37,8 +39,8 @@ class FactoryBot {
           editionSize: project.invocations,
           projectName: project.name,
         });
-        const nameIndex = project.name.toLowerCase().replace(/\s+/g, "");
-        factoryBotList[nameIndex] = newBot;
+        const projectKey = this.toProjectKey(project.name);
+        this.projects[projectKey] = newBot;
       }
     } catch (err) {
       console.error(`Error while initializing FactoryBots\n${err}`);
@@ -56,15 +58,28 @@ class FactoryBot {
     }
 
     const afterTheHash = content.substring(1);
-    const nameIndex = content
-      .substr(content.indexOf(" ") + 1)
-      .toLowerCase()
-      .replace(/\s+/g, "");
-    console.log(`Searching for project ${nameIndex}`);
-    const projBot = factoryBotList[nameIndex];
+    const projectKey = this.toProjectKey(
+      content.substr(content.indexOf(" ") + 1)
+    );
+
+    console.log(`Searching for project ${projectKey}`);
+    const projBot = this.projects[projectKey];
     if (projBot) {
       projBot.handleNumberMessage(msg);
     }
+  }
+
+  toProjectKey(projectName) {
+    let projectKey = deburr(projectName)
+      .toLowerCase()
+      .replace(/[^a-z0-9]/gi, "");
+
+    // just in case there's a project name with no alphanumerical characters
+    if (projectKey === "") {
+      return deburr(projectName).toLowerCase().replace(/\s+/g, "");
+    }
+
+    return projectKey;
   }
 }
 
