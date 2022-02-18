@@ -52,7 +52,7 @@ const contractProjectsWithCurationStatus = gql`
   ) {
     contract(id: $id) {
       projects(
-        where: { curationStatus: $curationStatus }
+        where: { curationStatus: $curationStatus, active: true }
         first: $first
         skip: $skip
         orderBy: projectId
@@ -210,7 +210,6 @@ async function _getContractFactoryProjects(contractId) {
  * workaround by querying AB api for curation status
  */
 const AB_TOKEN_API_URL = "https://token.artblocks.io/";
-const AB_GEN_API_URL = "https://generator.artblocks.io/";
 const curationStatusCache = {};
 async function _getContractNullFactoryProjects(contractId) {
   // max returned projects in a single query
@@ -235,16 +234,6 @@ async function _getContractNullFactoryProjects(contractId) {
       nullProjects.map(async (nullProject) => {
         if (nullProject.projectId in curationStatusCache) {
           return curationStatusCache[nullProject.projectId];
-        }
-
-        const genResponse = await fetch(
-          AB_GEN_API_URL + nullProject.projectId * 1e6
-        );
-        const isPublic = genResponse.status === 200;
-
-        // non-public projects may become public factory in the future, do not cache
-        if (!isPublic) {
-          return null;
         }
 
         const tokenResponse = await fetch(
