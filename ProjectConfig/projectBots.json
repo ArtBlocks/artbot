@@ -91,6 +91,7 @@
     },
     "255": {
         "namedMappings": {
+            "sets": "screensSets.json",
             "singles": "screensSingles.json"
         }
     }
