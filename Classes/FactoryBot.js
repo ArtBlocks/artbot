@@ -46,7 +46,8 @@ class FactoryBot {
       console.error(`Error while initializing FactoryBots\n${err}`);
     }
 
-    // for testing
+    // for testing with FactoryBot.test.js
+    // TODO: use a testing framework to handle this
     if (this.initializeCb) {
       this.initializeCb()
     }
