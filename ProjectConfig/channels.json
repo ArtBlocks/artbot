@@ -210,6 +210,12 @@
             "stringTriggers": {
                 "212": [
                     "dive"
+                ],
+                "260": [
+                    "non",
+                    "either",
+                    "non either",
+                    "noneither"
                 ]
             }
         }
