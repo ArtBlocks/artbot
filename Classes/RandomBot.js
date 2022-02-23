@@ -13,6 +13,7 @@ const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 // Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES =
   process.env.METADATA_REFRESH_INTERVAL_MINUTES;
+const RANDOM_ART_INTERVAL_MINUTES = process.env.RANDOM_ART_INTERVAL_MINUTES;
 
 // This array will hold ProjectBot classes for all the Factory Projects we find
 let projectCount = 0;
@@ -21,6 +22,10 @@ class RandomBot {
   constructor() {
     this.initialize();
     setInterval(this.initialize, METADATA_REFRESH_INTERVAL_MINUTES * 60000);
+  }
+
+  async startRoutine(channel) {
+    setInterval(() => this.sendRandomTokenMessage(channel), RANDOM_ART_INTERVAL_MINUTES * 60000);
   }
 
   async initialize() {
@@ -47,13 +52,19 @@ class RandomBot {
       return;
     }
 
+    this.sendRandomTokenMessage(msg.channel);
+  }
+
+  // This function takes a channel and sends a message containing a random
+  // token from a random project
+  async sendRandomTokenMessage(channel) {
     let attempts = 0;
     while (attempts < 10) {
-      const projectNumber = parseInt(Math.random() * projectCount);
+      const projectNumber = Math.floor(Math.random() * projectCount);
       console.log(`trying to look for project ${projectNumber}`);
       const projectData = await getArtBlocksProject(projectNumber);
-      if (projectData) {
-        const pieceNumber = parseInt(Math.random() * projectData.invocations);
+      if (projectData && projectData.invocations > 0) {
+        const pieceNumber = Math.floor(Math.random() * projectData.invocations);
         const tokenID = projectNumber * 1e6 + pieceNumber;
         const artBlocksResponse = await fetch(
           `https://token.artblocks.io/${tokenID}`,
@@ -68,7 +79,7 @@ class RandomBot {
           .setURL(artBlocksData.external_url)
           // Set the full image for embed.
           .setImage(artBlocksData.image);
-        msg.channel.send(imageContent);
+        channel.send(imageContent);
         return;
       }
       attempts++;

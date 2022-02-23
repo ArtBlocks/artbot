@@ -80,7 +80,7 @@ class ProjectBot {
   }
 
   async sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested) {
-    let artBlocksResponse = await fetch(`https://token.artblocks.io/${tokenID}`);
+    let artBlocksResponse = await fetch(`https://token.artblocks.io/${this.coreContract}/${tokenID}`);
     let artBlocksData = await artBlocksResponse.json();
     console.log(artBlocksData, "ARTBLOCKS DATA");
     // If the OpenSea API is available use their link for the title otherwise use an AB link

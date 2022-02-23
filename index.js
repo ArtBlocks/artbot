@@ -64,8 +64,9 @@ app.listen(PORT, function() {
 const bot = new Client();
 bot.login(TOKEN);
 
-bot.on('ready', () => {
+bot.on('ready', client => {
   console.info(`Logged in as ${bot.user.tag}!`);
+  randomGuy.startRoutine(bot.channels.cache.get(CHANNEL_ART_CHAT));
 });
 
 // Manage Giveaways with Artbot
@@ -100,6 +101,13 @@ bot.on('message', (msg) => {
   const msgContent = msg.content;
   const msgContentLowercase = msgContent.toLowerCase();
   const channelID = msg.channel.id;
+
+  // If there is not a channel ID configured where the message was sent
+  // short-circuit handling the message
+  const channel = projectConfig.channels[channelID];
+  if (!channel) {
+    return;
+  }
 
   /*
      * If the message is in the activity channel, forward the message on

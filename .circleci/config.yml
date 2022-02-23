@@ -13,6 +13,7 @@ jobs:
       # TOKEN: This ENV variable is defined within Circle CI.
       PROD_CHANNEL_ACTIVITY_ALL: 859521842317754369
       METADATA_REFRESH_INTERVAL_MINUTES: 60
+      RANDOM_ART_INTERVAL_MINUTES: 20
       GOOGLE_AUTH_DETAILS: "{}"
     executor: build-executor
     steps:

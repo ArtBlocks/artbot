@@ -10,7 +10,8 @@
     "projectBotHandlers": {
       "default": "13",
       "stringTriggers": {
-        "22": ["eternal", "pump"]
+        "22": ["eternal", "pump"],
+        "2-DOODLE": ["doodle"]
       },
       "tokenIdTriggers": [
         {
