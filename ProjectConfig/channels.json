@@ -100,6 +100,9 @@
             "stringTriggers": {
                 "119": [
                     "ecumenopolis"
+                ],
+                "256": [
+                    "spotlight"
                 ]
             }
         }
@@ -210,6 +213,12 @@
             "stringTriggers": {
                 "212": [
                     "dive"
+                ],
+                "260": [
+                    "non",
+                    "either",
+                    "non either",
+                    "noneither"
                 ]
             }
         }
