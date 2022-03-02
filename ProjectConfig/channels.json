@@ -726,5 +726,38 @@
                 ]
             }
         }
+    },
+    "941381112280805396": {
+        "name": "plottables-beervangeer",
+        "projectBotHandlers": {
+            "default": "5-PLOTTABLES",
+            "stringTriggers": {
+                "5-PLOTTABLES": [
+                    "coalescence"
+                ]
+            }
+        }
+    },
+    "945430500082851861": {
+        "name": "plottables-greweb",
+        "projectBotHandlers": {
+            "default": "6-PLOTTABLES",
+            "stringTriggers": {
+                "6-PLOTTABLES": [
+                    "shattered"
+                ]
+            }
+        }
+    },
+    "948246487299661824": {
+        "name": "plottables-oppos",
+        "projectBotHandlers": {
+            "default": "8-PLOTTABLES",
+            "stringTriggers": {
+                "8-PLOTTABLES": [
+                    "spectral"
+                ]
+            }
+        }
     }
 }
