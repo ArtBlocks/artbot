@@ -59,7 +59,7 @@ const APPLICATIONS_OPEN_MESSAGE = new MessageEmbed()
 // Set the color of the embed
     .setColor(ARTBOT_GREEN)
 // Set the main content of the embed
-    .setDescription(`It looks like you're wondering about the Art Blocks application process.\n\nInfo on how to apply to Art Blocks can be found in [#applications](https://discord.com/channels/411959613370400778/450278286862450701).\n\nBefore you apply, make sure:\n1) You're ready and able to share your creative history with us.\n2) You can deliver a functioning script (we cannot help you create one).\n3) Your work is original.\n\nIf you can check those boxes, head over to [#applications](https://discord.com/channels/411959613370400778/450278286862450701), read the full statement, and click the link to apply.`);
+    .setDescription(`It looks like you're wondering about the Art Blocks application process.\n\nInfo on how to apply to Art Blocks can be found in [#applications](https://discord.com/channels/411959613370400778/450278286862450701).\n\nBefore you apply, make sure:\n1) You're ready and able to share your creative history with us.\n2) You can deliver a functioning script (we cannot help you create one).\n3) Your work is original.\n\nIf you can check those boxes, head over to [#applications](https://discord.com/channels/411959613370400778/450278286862450701/948624381096099891), read the full statement, and click the link to apply.`);
 const APPLICATIONS_CLOSED_MESSAGE = new MessageEmbed()
 // Set the title of the field
     .setTitle('How do I apply to release my project on Art Blocks?')
@@ -251,7 +251,7 @@ async function smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channe
   // Handle application questions.
   const mentionedApplications = msgContentLowercase.includes('application') || msgContentLowercase.includes('apply');
   if (containsQuestion && mentionedApplications) {
-    return APPLICATIONS_CLOSED_MESSAGE;
+    return APPLICATIONS_OPEN_MESSAGE;
   }
   // Handle metamask high gas questions.
   const mentionedHighGas = msgContentLowercase.includes('gas') && msgContentLowercase.includes('high');
