@@ -46,6 +46,9 @@ class ProjectBot {
     let pieceNumber;
     if (afterTheHash[0] == "?") {
       pieceNumber = parseInt(Math.random() * this.editionSize);
+      if (pieceNumber === 0) {
+        pieceNumber = 1;
+      }
     } else {
       pieceNumber = parseInt(afterTheHash);
     }
