@@ -43,11 +43,16 @@ const contractProject = gql`
   }
 `;
 
-const contractFactoryProjects = gql`
-  query getContractFactoryProjects($id: ID!, $first: Int!, $skip: Int) {
+const contractProjectsWithCurationStatus = gql`
+  query getContractProjectsWithCurationStatus(
+    $id: ID!
+    $first: Int!
+    $skip: Int
+    $curationStatus: String
+  ) {
     contract(id: $id) {
       projects(
-        where: { curationStatus: "factory" }
+        where: { curationStatus: $curationStatus, active: true }
         first: $first
         skip: $skip
         orderBy: projectId
@@ -181,10 +186,11 @@ async function _getContractFactoryProjects(contractId) {
     const factoryProjects = [];
     while (true) {
       const result = await client
-        .query(contractFactoryProjects, {
+        .query(contractProjectsWithCurationStatus, {
           id: contractId,
           first: maxProjectsPerQuery,
           skip: factoryProjects.length,
+          curationStatus: "factory",
         })
         .toPromise();
       factoryProjects.push(...result.data.contract.projects);
@@ -193,6 +199,56 @@ async function _getContractFactoryProjects(contractId) {
       }
     }
     return factoryProjects;
+  } catch (err) {
+    console.error(err);
+    return undefined;
+  }
+}
+
+/*
+ * the AB subgraph curation status is null for recent projects and is slow to update
+ * workaround by querying AB api for curation status
+ */
+const AB_TOKEN_API_URL = "https://token.artblocks.io/";
+const curationStatusCache = {};
+async function _getContractNullFactoryProjects(contractId) {
+  // max returned projects in a single query
+  const maxProjectsPerQuery = 1000;
+  try {
+    const nullProjects = [];
+    while (true) {
+      const result = await client
+        .query(contractProjectsWithCurationStatus, {
+          id: contractId,
+          first: maxProjectsPerQuery,
+          skip: nullProjects.length,
+          curationStatus: null,
+        })
+        .toPromise();
+      nullProjects.push(...result.data.contract.projects);
+      if (result.data.contract.projects.length !== maxProjectsPerQuery) {
+        break;
+      }
+    }
+    const curationStatus = await Promise.all(
+      nullProjects.map(async (nullProject) => {
+        if (nullProject.projectId in curationStatusCache) {
+          return curationStatusCache[nullProject.projectId];
+        }
+
+        const tokenResponse = await fetch(
+          AB_TOKEN_API_URL + nullProject.projectId * 1e6
+        );
+        const token = await tokenResponse.json();
+
+        curationStatusCache[nullProject.projectId] = token.curation_status;
+        return token.curation_status;
+      })
+    );
+    const nullFactoryProjects = nullProjects.filter(
+      (_, i) => curationStatus[i] === "factory"
+    );
+    return nullFactoryProjects;
   } catch (err) {
     console.error(err);
     return undefined;
@@ -213,9 +269,11 @@ async function _getContractFactoryProjects(contractId) {
 async function getArtBlocksFactoryProjects() {
   try {
     const contractsToGet = Object.values(CORE_CONTRACTS);
-    const promises = contractsToGet.map(_getContractFactoryProjects);
-    const allArrays = await Promise.all(promises);
-    return [].concat.apply([], allArrays);
+    const allArrays = await Promise.all([
+      ...contractsToGet.map(_getContractFactoryProjects),
+      ...contractsToGet.map(_getContractNullFactoryProjects),
+    ]);
+    return allArrays.flat();
   } catch (err) {
     console.error(err);
   }
