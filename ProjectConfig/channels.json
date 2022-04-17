@@ -602,6 +602,21 @@
             "default": "284"
         }
     },
+    "963552505860616233": {
+        "name": "owen-moore",
+        "projectBotHandlers": {
+            "default": "296",
+            "stringTriggers": {
+                "183": [
+                    "quarantine"
+                ],
+                "99": [
+                    "spaghettification",
+                    "spaghetti"
+                ]
+            }
+        }
+    },
     "880280317477404713": {
         "name": "doodle-labs-the-lab",
         "projectBotHandlers": {
