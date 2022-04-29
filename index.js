@@ -1,21 +1,32 @@
 require('dotenv').config();
-const {
-  Client,
-  MessageEmbed,
-} = require('discord.js');
+const {Client} = require('discord.js');
 const {GiveawaysManager} = require('discord-giveaways');
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const {
+  OpenSeaStreamClient,
+  EventType,
+} = require('./local-dependencies/opensea-stream-js-sdk');
+const {WebSocket} = require('ws');
+const {triageOpenseaMessage} = require('./Utils/activityTriager');
+const client = new OpenSeaStreamClient({
+  apiUrl: 'wss://stream.openseabeta.com/socket',
+  token: process.env.OPENSEA_API_KEY,
+  connectOptions: {
+    transport: WebSocket,
+  },
+});
 const AddressCollector = require('./Classes/AddressCollector').AddressCollector;
 const FactoryBot = require('./Classes/FactoryBot').FactoryBot;
 const RandomBot = require('./Classes/RandomBot').RandomBot;
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig;
 
 // Special handlers.
-const triageActivityMessage = require('./Utils/activityTriager').triageActivityMessage;
+const triageActivityMessage =
+  require('./Utils/activityTriager').triageActivityMessage;
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse;
-const handleGiveawayMessage = require('./Utils/giveawayCommands').handleGiveawayMessage;
+const handleGiveawayMessage =
+  require('./Utils/giveawayCommands').handleGiveawayMessage;
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
@@ -39,7 +50,11 @@ const app = express();
 app.use(bodyParser.json());
 
 app.post('/update', function(req, res) {
-  console.log('received update with body:\n', JSON.stringify(req.body, null, 2), '\n');
+  console.log(
+      'received update with body:\n',
+      JSON.stringify(req.body, null, 2),
+      '\n',
+  );
 
   res.setHeader('Content-Type', 'application/json');
   res.json({
@@ -64,7 +79,7 @@ app.listen(PORT, function() {
 const bot = new Client();
 bot.login(TOKEN);
 
-bot.on('ready', client => {
+bot.on('ready', (client) => {
   console.info(`Logged in as ${bot.user.tag}!`);
   randomGuy.startRoutine(bot.channels.cache.get(CHANNEL_ART_CHAT));
 });
@@ -79,15 +94,107 @@ bot.giveawaysManager = new GiveawaysManager(bot, {
     reaction: '🎉',
   },
 });
-bot.giveawaysManager.on('giveawayReactionAdded', (giveaway, member, reaction) => {
-  console.log(`${member.user.tag} entered giveaway #${giveaway.messageID} (${reaction.emoji.name})`);
-});
-bot.giveawaysManager.on('giveawayReactionRemoved', (giveaway, member, reaction) => {
-  console.log(`${member.user.tag} unreact to giveaway #${giveaway.messageID} (${reaction.emoji.name})`);
-});
+bot.giveawaysManager.on(
+    'giveawayReactionAdded',
+    (giveaway, member, reaction) => {
+      console.log(
+          `${member.user.tag} entered giveaway #${giveaway.messageID} (${reaction.emoji.name})`,
+      );
+    },
+);
+bot.giveawaysManager.on(
+    'giveawayReactionRemoved',
+    (giveaway, member, reaction) => {
+      console.log(
+          `${member.user.tag} unreact to giveaway #${giveaway.messageID} (${reaction.emoji.name})`,
+      );
+    },
+);
 bot.giveawaysManager.on('giveawayEnded', (giveaway, winners) => {
-  console.log(`Giveaway #${giveaway.messageID} ended! Winners: ${winners.map((member) => member.user.username).join(', ')}`);
+  console.log(
+      `Giveaway #${giveaway.messageID} ended! Winners: ${winners
+          .map((member) => member.user.username)
+          .join(', ')}`,
+  );
 });
+
+client.onItemListed('art-blocks', (event) => {
+  console.log('AB LIST!');
+  console.log(event);
+});
+client.onItemSold('art-blocks', (event) => {
+  console.log('AB SALE!');
+  console.log(event);
+});
+client.onItemListed('art-blocks-factory', (event) => {
+  console.log('AB LIST!');
+  console.log(event);
+});
+client.onItemSold('art-blocks-factory', (event) => {
+  console.log('AB SALE!');
+  console.log(event);
+});
+client.onItemListed('art-blocks-playground', (event) => {
+  console.log('AB LIST!');
+  console.log(event);
+});
+client.onItemSold('art-blocks-playground', (event) => {
+  console.log('AB SALE!');
+  console.log(event);
+});
+client.onEvents(
+    'art-blocks',
+    [EventType.ITEM_LISTED, EventType.ITEM_SOLD],
+    (event) => {
+      triageOpenseaMessage(event, bot);
+    },
+);
+client.onEvents(
+    'art-blocks-factory',
+    [EventType.ITEM_LISTED, EventType.ITEM_SOLD],
+    (event) => {
+      triageOpenseaMessage(event, bot);
+    },
+);
+client.onEvents(
+    'art-blocks-playground',
+    [EventType.ITEM_LISTED, EventType.ITEM_SOLD],
+    (event) => {
+      triageOpenseaMessage(event, bot);
+    },
+);
+client.onEvents(
+    'blockbob-rorschach-by-eboy',
+    [EventType.ITEM_LISTED, EventType.ITEM_SOLD],
+    (event) => {
+      console.log(event);
+      triageOpenseaMessage(event, bot);
+    },
+);
+client.onEvents(
+    'memories-of-qilin-by-emily-xie',
+    [EventType.ITEM_LISTED, EventType.ITEM_SOLD],
+    (event) => {
+      console.log(event);
+      triageOpenseaMessage(event, bot);
+    },
+);
+client.onEvents(
+    'automatism-by-yazid',
+    [EventType.ITEM_LISTED, EventType.ITEM_SOLD],
+    (event) => {
+      console.log(event);
+      triageOpenseaMessage(event, bot);
+    },
+);
+client.onEvents(
+    'anticyclone-by-william-mapan',
+    [EventType.ITEM_LISTED, EventType.ITEM_SOLD],
+    (event) => {
+      console.log(event);
+      triageOpenseaMessage(event, bot);
+    },
+);
 
 const factoryParty = new FactoryBot();
 const randomGuy = new RandomBot();
@@ -110,18 +217,18 @@ bot.on('message', (msg) => {
   }
 
   /*
-     * If the message is in the activity channel, forward the message on
-     * To the appropriate sub-channel.
-     */
+   * If the message is in the activity channel, forward the message on
+   * To the appropriate sub-channel.
+   */
   if (channelID == PROD_CHANNEL_ACTIVITY_ALL) {
     triageActivityMessage(msg, bot);
     return;
   }
 
   /*
-     * If message is in special address collection channel, forward message
-     * To that handler and return early.
-     */
+   * If message is in special address collection channel, forward message
+   * To that handler and return early.
+   */
   if (channelID == CHANNEL_ADDRESS_COLLECTION) {
     addressCollector.addressCollectionHandler(msg);
     return;
@@ -153,14 +260,16 @@ bot.on('message', (msg) => {
 
   // Handle special info questions that ArtBot knows how to answer.
   const artBotID = bot.user.id;
-  smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then((smartResponse) => {
-    if (smartResponse !== null && smartResponse !== undefined) {
-      msg.reply(null, {
-        embed: smartResponse,
-        allowedMentions: {
-          repliedUser: true,
-        },
-      });
-    }
-  });
+  smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
+      (smartResponse) => {
+        if (smartResponse !== null && smartResponse !== undefined) {
+          msg.reply(null, {
+            embed: smartResponse,
+            allowedMentions: {
+              repliedUser: true,
+            },
+          });
+        }
+      },
+  );
 });
