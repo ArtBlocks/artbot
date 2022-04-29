@@ -1,18 +1,13 @@
 /* eslint-disable max-len */
 const fetch = require('node-fetch');
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig;
-
+const {MessageEmbed} = require('discord.js');
 // Trade activity Discord channel IDs.
-const CHANNEL_SALES_CHAT =
-  projectConfig.chIdByName['block-talk'];
-const CHANNEL_SALES =
-  projectConfig.chIdByName['sales-feed'];
-const CHANNEL_LISTINGS =
-  projectConfig.chIdByName['listing-feed'];
-const CHANNEL_SQUIGGLE_SALES =
-  projectConfig.chIdByName['squiggle_square'];
-const CHANNEL_SQUIGGLE_LISTINGS =
-  projectConfig.chIdByName['squiggle-listings'];
+const CHANNEL_SALES_CHAT = projectConfig.chIdByName['block-talk'];
+const CHANNEL_SALES = projectConfig.chIdByName['sales-feed'];
+const CHANNEL_LISTINGS = projectConfig.chIdByName['listing-feed'];
+const CHANNEL_SQUIGGLE_SALES = projectConfig.chIdByName['squiggle_square'];
+const CHANNEL_SQUIGGLE_LISTINGS = projectConfig.chIdByName['squiggle-listings'];
 const CHANNEL_FIDENZA_AND_IC_SALES =
   projectConfig.chIdByName['fidenza-and-ic-sales'];
 
@@ -128,15 +123,18 @@ async function triageActivityMessage(msg, bot) {
         console.log(`Skipping message propagation for referral.`);
         return;
       }
-      if (embedField.name.includes('Fixed Price') ||
-            embedField.name.includes('SOLD for')) {
+      if (
+        embedField.name.includes('Fixed Price') ||
+        embedField.name.includes('SOLD for')
+      ) {
         priceField = embedField;
       }
     }
     embed.fields = [priceField];
 
     // Split off the "Description" text within the description.
-    const descriptionDescriptionIndex = description.indexOf('\n**Description:**');
+    const descriptionDescriptionIndex =
+      description.indexOf('\n**Description:**');
     description = description.substring(0, descriptionDescriptionIndex + 1);
 
     // Assuming that "Name" is the first field, remove it.
@@ -157,14 +155,20 @@ async function triageActivityMessage(msg, bot) {
     embed.setDescription(description.trim());
 
     // Get Art Blocks metadata response for the item.
-    const artBlocksResponse = await fetch(`https://token.artblocks.io/${tokenID}`);
+    const artBlocksResponse = await fetch(
+        `https://token.artblocks.io/${tokenID}`,
+    );
     const artBlocksData = await artBlocksResponse.json();
 
     // Update thumbnail image to use larger variant from Art Blocks API.
     embed.setThumbnail(artBlocksData.image);
 
     // Add inline field for viewing live script on Art Blocks.
-    embed.addField('Live Script', `[view on artblocks.io](${artBlocksData.external_url})`, true);
+    embed.addField(
+        'Live Script',
+        `[view on artblocks.io](${artBlocksData.external_url})`,
+        true,
+    );
 
     // Update to remove author name and to reflect this info in piece name
     // rather than token number as the title and URL field..
@@ -203,5 +207,95 @@ async function triageActivityMessage(msg, bot) {
     }
   }
 }
+// eslint-disable-next-line require-jsdoc
+async function triageLooksRareMessage(msg, bot) {
+  // Create embed we will be sending
+  const embed = new MessageEmbed();
 
+  // console.log(msg);
+  // console.log("TOKEN:");
+
+  // console.log(msg.token);
+  // console.log("ORDER:");
+  // console.log(msg.order);
+  // Parsing Opensea message to get info
+  const tokenID = msg.token.tokenId;
+  const looksRareURL = `https://looksrare.org/collections/${msg.token.collectionAddress}/${tokenID}`;
+
+  // Event_type will either be item_sold or item_listed
+  const eventType = msg.type;
+
+  const owner = msg.from;
+  if (BAN_ADDRESSES.has(owner)) {
+    console.log(`Skipping message propagation for ${owner}`);
+    return;
+  }
+  embed.addField('Seller (LooksRare)', owner);
+
+  let priceText;
+  if (eventType === 'SALE') {
+    // Item sold, add 'Buyer' field
+    embed.addField('Buyer', msg.to);
+    priceText = 'Sale Price';
+  } else {
+    // Item Listed
+    priceText = 'List Price';
+  }
+  const price = msg.order.price;
+  embed.addField(
+      priceText,
+      parseInt(price) / 1000000000000000000 + 'ETH',
+      true,
+  );
+
+  // Get Art Blocks metadata response for the item.
+  const artBlocksResponse = await fetch(
+      `https://token.artblocks.io/${tokenID}`,
+  );
+  const artBlocksData = await artBlocksResponse.json();
+
+  // Update thumbnail image to use larger variant from Art Blocks API.
+  embed.setThumbnail(artBlocksData.image);
+
+  // Add inline field for viewing live script on Art Blocks.
+  embed.addField(
+      'Live Script',
+      `[view on artblocks.io](${artBlocksData.external_url})`,
+      true,
+  );
+  // Update to remove author name and to reflect this info in piece name
+  // rather than token number as the title and URL field..
+  embed.author = null;
+  embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`);
+  embed.setURL(looksRareURL);
+  if (artBlocksData.collection_name) {
+    if (eventType.includes('SALE')) {
+      bot.channels.cache.get(CHANNEL_SALES).send(embed);
+      // bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
+      // // Forward all Chromie Squiggles sales on to the DAO.
+      // if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
+      //   bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
+      // }
+      // if (artBlocksData.collection_name.includes("Fidenza")) {
+      //   bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+      // }
+      // if (artBlocksData.collection_name.includes("Incomplete Control")) {
+      //   bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+      // }
+    } else if (eventType.includes('LIST')) {
+      bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
+      // Forward all Chromie Squiggles listings on to the DAO.
+      // if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
+      //   bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
+      // }
+      // if (artBlocksData.collection_name.includes("Fidenza")) {
+      //   bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+      // }
+      // if (artBlocksData.collection_name.includes("Incomplete Control")) {
+      //   bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+      // }
+    }
+  }
+}
 module.exports.triageActivityMessage = triageActivityMessage;
+module.exports.triageLooksRareMessage = triageLooksRareMessage;

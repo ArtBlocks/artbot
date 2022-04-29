@@ -1,11 +1,9 @@
 require('dotenv').config();
-const {
-  Client,
-  MessageEmbed,
-} = require('discord.js');
+const {Client, MessageEmbed} = require('discord.js');
 const {GiveawaysManager} = require('discord-giveaways');
 const express = require('express');
 const bodyParser = require('body-parser');
+const fetch = require('node-fetch');
 
 const AddressCollector = require('./Classes/AddressCollector').AddressCollector;
 const FactoryBot = require('./Classes/FactoryBot').FactoryBot;
@@ -13,9 +11,14 @@ const RandomBot = require('./Classes/RandomBot').RandomBot;
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig;
 
 // Special handlers.
-const triageActivityMessage = require('./Utils/activityTriager').triageActivityMessage;
+const {
+  triageActivityMessage,
+  triageLooksRareMessage,
+} = require('./Utils/activityTriager');
+
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse;
-const handleGiveawayMessage = require('./Utils/giveawayCommands').handleGiveawayMessage;
+const handleGiveawayMessage =
+  require('./Utils/giveawayCommands').handleGiveawayMessage;
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN;
@@ -39,7 +42,11 @@ const app = express();
 app.use(bodyParser.json());
 
 app.post('/update', function(req, res) {
-  console.log('received update with body:\n', JSON.stringify(req.body, null, 2), '\n');
+  console.log(
+      'received update with body:\n',
+      JSON.stringify(req.body, null, 2),
+      '\n',
+  );
 
   res.setHeader('Content-Type', 'application/json');
   res.json({
@@ -64,7 +71,7 @@ app.listen(PORT, function() {
 const bot = new Client();
 bot.login(TOKEN);
 
-bot.on('ready', client => {
+bot.on('ready', (client) => {
   console.info(`Logged in as ${bot.user.tag}!`);
   randomGuy.startRoutine(bot.channels.cache.get(CHANNEL_ART_CHAT));
 });
@@ -79,14 +86,28 @@ bot.giveawaysManager = new GiveawaysManager(bot, {
     reaction: '🎉',
   },
 });
-bot.giveawaysManager.on('giveawayReactionAdded', (giveaway, member, reaction) => {
-  console.log(`${member.user.tag} entered giveaway #${giveaway.messageID} (${reaction.emoji.name})`);
-});
-bot.giveawaysManager.on('giveawayReactionRemoved', (giveaway, member, reaction) => {
-  console.log(`${member.user.tag} unreact to giveaway #${giveaway.messageID} (${reaction.emoji.name})`);
-});
+bot.giveawaysManager.on(
+    'giveawayReactionAdded',
+    (giveaway, member, reaction) => {
+      console.log(
+          `${member.user.tag} entered giveaway #${giveaway.messageID} (${reaction.emoji.name})`,
+      );
+    },
+);
+bot.giveawaysManager.on(
+    'giveawayReactionRemoved',
+    (giveaway, member, reaction) => {
+      console.log(
+          `${member.user.tag} unreact to giveaway #${giveaway.messageID} (${reaction.emoji.name})`,
+      );
+    },
+);
 bot.giveawaysManager.on('giveawayEnded', (giveaway, winners) => {
-  console.log(`Giveaway #${giveaway.messageID} ended! Winners: ${winners.map((member) => member.user.username).join(', ')}`);
+  console.log(
+      `Giveaway #${giveaway.messageID} ended! Winners: ${winners
+          .map((member) => member.user.username)
+          .join(', ')}`,
+  );
 });
 
 const factoryParty = new FactoryBot();
@@ -110,18 +131,18 @@ bot.on('message', (msg) => {
   }
 
   /*
-     * If the message is in the activity channel, forward the message on
-     * To the appropriate sub-channel.
-     */
+   * If the message is in the activity channel, forward the message on
+   * To the appropriate sub-channel.
+   */
   if (channelID == PROD_CHANNEL_ACTIVITY_ALL) {
     triageActivityMessage(msg, bot);
     return;
   }
 
   /*
-     * If message is in special address collection channel, forward message
-     * To that handler and return early.
-     */
+   * If message is in special address collection channel, forward message
+   * To that handler and return early.
+   */
   if (channelID == CHANNEL_ADDRESS_COLLECTION) {
     addressCollector.addressCollectionHandler(msg);
     return;
@@ -153,14 +174,72 @@ bot.on('message', (msg) => {
 
   // Handle special info questions that ArtBot knows how to answer.
   const artBotID = bot.user.id;
-  smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then((smartResponse) => {
-    if (smartResponse !== null && smartResponse !== undefined) {
-      msg.reply(null, {
-        embed: smartResponse,
-        allowedMentions: {
-          repliedUser: true,
-        },
-      });
-    }
-  });
+  smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
+      (smartResponse) => {
+        if (smartResponse !== null && smartResponse !== undefined) {
+          msg.reply(null, {
+            embed: smartResponse,
+            allowedMentions: {
+              repliedUser: true,
+            },
+          });
+        }
+      },
+  );
 });
+
+const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json');
+
+// Every pollTime ms, poll LooksRare API for latest Listings and Sales
+const pollTime = 1500;
+setInterval(looksRarePoll, pollTime, 'LIST');
+setInterval(looksRarePoll, pollTime, 'SALE');
+
+// Only deal with events that occur after this bot gets turned on
+let latestLooksRareListTime = Date.now();
+let latestLooksRareSaleTime = Date.now();
+async function looksRarePoll(queryType) {
+  const contract = CORE_CONTRACTS.V2;
+  // Get 25 most recent events
+  const amt = 25;
+  const cursor = ''; // `&pagination[cursor]=${c}`;
+  // Construct API url to poll
+  const looksrareURL = `https://api.looksrare.org/api/v1/events?collection=${contract}&type=${queryType}&pagination[first]=${amt}${cursor}`;
+  https: await fetch(looksrareURL, {
+    method: 'GET',
+  })
+      .then((response) => response.json())
+      .then((looksRareData) => {
+        let maxTime = 0;
+        for (const data of looksRareData.data) {
+          const eventTime = Date.parse(data.createdAt);
+
+          // Only deal with event if it is new
+          if (
+            (queryType === 'LIST' && latestLooksRareListTime < eventTime) ||
+          (queryType === 'SALE' && latestLooksRareSaleTime < eventTime)
+          ) {
+            triageLooksRareMessage(data, bot);
+          }
+
+          // Save the time of the latest event from this batch
+          if (maxTime < eventTime) {
+            maxTime = eventTime;
+          }
+        }
+
+        // Update latest time vars if batch has new latest time
+        if (queryType === 'LIST' && maxTime > latestLooksRareListTime) {
+          latestLooksRareListTime = maxTime;
+        } else if (queryType === 'SALE' && maxTime > latestLooksRareSaleTime) {
+          latestLooksRareSaleTime = maxTime;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        console.warn(
+            `MetaData message is being sent in a degraded manner. Is OpenSea's API down? https://status.opensea.io/`,
+        );
+      // this.sendMetaDataMessage(null, msg, tokenID, detailsRequested);
+      });
+}
