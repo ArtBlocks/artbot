@@ -179,30 +179,9 @@ async function triageActivityMessage(msg, bot) {
     // Only forward sales events and listing events.
     if (artBlocksData.collection_name) {
       if (eventName.includes('Successful')) {
-        bot.channels.cache.get(CHANNEL_SALES).send(embed);
-        bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
-        // Forward all Chromie Squiggles sales on to the DAO.
-        if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
-          bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
-        }
-        if (artBlocksData.collection_name.includes('Fidenza')) {
-          bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-        }
-        if (artBlocksData.collection_name.includes('Incomplete Control')) {
-          bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-        }
+        sendEmbedToSaleChannels(bot, embed, artBlocksData);
       } else if (eventName.includes('Created')) {
-        bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
-        // Forward all Chromie Squiggles listings on to the DAO.
-        if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
-          bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
-        }
-        if (artBlocksData.collection_name.includes('Fidenza')) {
-          bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-        }
-        if (artBlocksData.collection_name.includes('Incomplete Control')) {
-          bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-        }
+        sendEmbedToListChannels(bot, embed, artBlocksData);
       }
     }
   }
@@ -273,31 +252,51 @@ async function triageLooksRareMessage(msg, bot) {
   embed.setURL(looksRareURL);
   if (artBlocksData.collection_name) {
     if (eventType.includes('SALE')) {
-      bot.channels.cache.get(CHANNEL_SALES).send(embed);
-      bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
-      // Forward all Chromie Squiggles sales on to the DAO.
-      if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
-        bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
-      }
-      if (artBlocksData.collection_name.includes('Fidenza')) {
-        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-      }
-      if (artBlocksData.collection_name.includes('Incomplete Control')) {
-        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-      }
+      sendEmbedToSaleChannels(bot, embed, artBlocksData);
     } else if (eventType.includes('LIST')) {
-      bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
-      // Forward all Chromie Squiggles listings on to the DAO.
-      if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
-        bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
-      }
-      if (artBlocksData.collection_name.includes('Fidenza')) {
-        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-      }
-      if (artBlocksData.collection_name.includes('Incomplete Control')) {
-        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-      }
+      sendEmbedToListChannels(bot, embed, artBlocksData);
     }
+  }
+}
+
+/**
+ * Helper function to send embed message to all proper sales channels
+ * @param {*} bot
+ * @param {*} embed
+ * @param {*} artBlocksData
+ */
+function sendEmbedToSaleChannels(bot, embed, artBlocksData) {
+  bot.channels.cache.get(CHANNEL_SALES).send(embed);
+  bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
+  // // Forward all Chromie Squiggles sales on to the DAO.
+  if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
+    bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
+  }
+  if (artBlocksData.collection_name.includes('Fidenza')) {
+    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+  }
+  if (artBlocksData.collection_name.includes('Incomplete Control')) {
+    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+  }
+}
+
+/**
+ * Helper function to send embed message to all proper listing channels
+ * @param {*} bot
+ * @param {*} embed
+ * @param {*} artBlocksData
+ */
+function sendEmbedToListChannels(bot, embed, artBlocksData) {
+  bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
+  // Forward all Chromie Squiggles listings on to the DAO.
+  if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
+    bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
+  }
+  if (artBlocksData.collection_name.includes('Fidenza')) {
+    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+  }
+  if (artBlocksData.collection_name.includes('Incomplete Control')) {
+    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
   }
 }
 
