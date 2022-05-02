@@ -207,22 +207,24 @@ async function triageActivityMessage(msg, bot) {
     }
   }
 }
+
+/**
+ * Parses LooksRare data, builds and sends embed in appropriate channel
+ * API Spec: https://looksrare.github.io/api-docs/#/Events/EventController.getEvents
+ * @param {*} msg - Dict of LooksRare event data
+ * @param {*} bot - Discord bot that will be sending message
+ * @return {void}
+ */
 // eslint-disable-next-line require-jsdoc
 async function triageLooksRareMessage(msg, bot) {
   // Create embed we will be sending
   const embed = new MessageEmbed();
 
-  // console.log(msg);
-  // console.log("TOKEN:");
-
-  // console.log(msg.token);
-  // console.log("ORDER:");
-  // console.log(msg.order);
-  // Parsing Opensea message to get info
+  // Parsing LooksRare message to get info
   const tokenID = msg.token.tokenId;
   const looksRareURL = `https://looksrare.org/collections/${msg.token.collectionAddress}/${tokenID}`;
 
-  // Event_type will either be item_sold or item_listed
+  // Event_type will either be SALE or LIST
   const eventType = msg.type;
 
   const owner = msg.from;
@@ -232,6 +234,7 @@ async function triageLooksRareMessage(msg, bot) {
   }
   embed.addField('Seller (LooksRare)', owner);
 
+  // Construct price field (different info/verbiage depending on sale or list)
   let priceText;
   if (eventType === 'SALE') {
     // Item sold, add 'Buyer' field
@@ -271,31 +274,32 @@ async function triageLooksRareMessage(msg, bot) {
   if (artBlocksData.collection_name) {
     if (eventType.includes('SALE')) {
       bot.channels.cache.get(CHANNEL_SALES).send(embed);
-      // bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
-      // // Forward all Chromie Squiggles sales on to the DAO.
-      // if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
-      //   bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
-      // }
-      // if (artBlocksData.collection_name.includes("Fidenza")) {
-      //   bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-      // }
-      // if (artBlocksData.collection_name.includes("Incomplete Control")) {
-      //   bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-      // }
+      bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
+      // Forward all Chromie Squiggles sales on to the DAO.
+      if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
+        bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
+      }
+      if (artBlocksData.collection_name.includes('Fidenza')) {
+        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+      }
+      if (artBlocksData.collection_name.includes('Incomplete Control')) {
+        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+      }
     } else if (eventType.includes('LIST')) {
       bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
       // Forward all Chromie Squiggles listings on to the DAO.
-      // if (artBlocksData.collection_name.includes("Chromie Squiggle")) {
-      //   bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
-      // }
-      // if (artBlocksData.collection_name.includes("Fidenza")) {
-      //   bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-      // }
-      // if (artBlocksData.collection_name.includes("Incomplete Control")) {
-      //   bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
-      // }
+      if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
+        bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
+      }
+      if (artBlocksData.collection_name.includes('Fidenza')) {
+        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+      }
+      if (artBlocksData.collection_name.includes('Incomplete Control')) {
+        bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+      }
     }
   }
 }
+
 module.exports.triageActivityMessage = triageActivityMessage;
 module.exports.triageLooksRareMessage = triageLooksRareMessage;

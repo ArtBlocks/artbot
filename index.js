@@ -1,20 +1,17 @@
 require('dotenv').config();
-const {Client, MessageEmbed} = require('discord.js');
+const {Client} = require('discord.js');
 const {GiveawaysManager} = require('discord-giveaways');
 const express = require('express');
 const bodyParser = require('body-parser');
-const fetch = require('node-fetch');
 
 const AddressCollector = require('./Classes/AddressCollector').AddressCollector;
 const FactoryBot = require('./Classes/FactoryBot').FactoryBot;
 const RandomBot = require('./Classes/RandomBot').RandomBot;
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig;
-
+const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json');
+const {LooksRareApiPollBot} = require('./Classes/ApiPollBot');
 // Special handlers.
-const {
-  triageActivityMessage,
-  triageLooksRareMessage,
-} = require('./Utils/activityTriager');
+const {triageActivityMessage} = require('./Utils/activityTriager');
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse;
 const handleGiveawayMessage =
@@ -188,58 +185,35 @@ bot.on('message', (msg) => {
   );
 });
 
-const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json');
+// Instantiate API Pollers
 
-// Every pollTime ms, poll LooksRare API for latest Listings and Sales
-const pollTime = 1500;
-setInterval(looksRarePoll, pollTime, 'LIST');
-setInterval(looksRarePoll, pollTime, 'SALE');
+// Rate (in ms) to poll below API endpoints
+const pollTime = 20000;
 
-// Only deal with events that occur after this bot gets turned on
-let latestLooksRareListTime = Date.now();
-let latestLooksRareSaleTime = Date.now();
-async function looksRarePoll(queryType) {
-  const contract = CORE_CONTRACTS.V2;
-  // Get 25 most recent events
-  const amt = 25;
-  const cursor = ''; // `&pagination[cursor]=${c}`;
-  // Construct API url to poll
-  const looksrareURL = `https://api.looksrare.org/api/v1/events?collection=${contract}&type=${queryType}&pagination[first]=${amt}${cursor}`;
-  https: await fetch(looksrareURL, {
-    method: 'GET',
-  })
-      .then((response) => response.json())
-      .then((looksRareData) => {
-        let maxTime = 0;
-        for (const data of looksRareData.data) {
-          const eventTime = Date.parse(data.createdAt);
+// LooksRare pollers for V2 Contract
+// List Events
+new LooksRareApiPollBot(
+    `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.V2}&type=LIST&pagination[first]=25`,
+    pollTime,
+    bot,
+);
+// Sale Events
+new LooksRareApiPollBot(
+    `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.V2}&type=SALE&pagination[first]=25`,
+    pollTime,
+    bot,
+);
 
-          // Only deal with event if it is new
-          if (
-            (queryType === 'LIST' && latestLooksRareListTime < eventTime) ||
-          (queryType === 'SALE' && latestLooksRareSaleTime < eventTime)
-          ) {
-            triageLooksRareMessage(data, bot);
-          }
-
-          // Save the time of the latest event from this batch
-          if (maxTime < eventTime) {
-            maxTime = eventTime;
-          }
-        }
-
-        // Update latest time vars if batch has new latest time
-        if (queryType === 'LIST' && maxTime > latestLooksRareListTime) {
-          latestLooksRareListTime = maxTime;
-        } else if (queryType === 'SALE' && maxTime > latestLooksRareSaleTime) {
-          latestLooksRareSaleTime = maxTime;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        console.warn(
-            `MetaData message is being sent in a degraded manner. Is OpenSea's API down? https://status.opensea.io/`,
-        );
-      // this.sendMetaDataMessage(null, msg, tokenID, detailsRequested);
-      });
-}
+// LooksRare pollers for OG Contract
+// List Events
+new LooksRareApiPollBot(
+    `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.OG}&type=LIST&pagination[first]=25`,
+    pollTime,
+    bot,
+);
+// Sale Events
+new LooksRareApiPollBot(
+    `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.OG}&type=SALE&pagination[first]=25`,
+    pollTime,
+    bot,
+);
