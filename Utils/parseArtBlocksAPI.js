@@ -34,8 +34,8 @@ const contractProject = gql`
         name
         invocations
         maxInvocations
-        curationStatus
         active
+        curationStatus
         contract {
           id
         }
