@@ -35,6 +35,7 @@ const contractProject = gql`
         invocations
         maxInvocations
         curationStatus
+        active
         contract {
           id
         }
@@ -145,7 +146,9 @@ async function _getContractProject(projectId, contractId) {
  * subgraph.
  */
 async function getContractProject(projectId, contractId) {
-  return !contractId ? getArtBlocksProject(projectId) : _getContractProject(projectId, contractId)
+  return !contractId
+    ? getArtBlocksProject(projectId)
+    : _getContractProject(projectId, contractId);
 }
 
 /*
