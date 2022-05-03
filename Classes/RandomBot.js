@@ -25,7 +25,10 @@ class RandomBot {
   }
 
   async startRoutine(channel) {
-    setInterval(() => this.sendRandomTokenMessage(channel), RANDOM_ART_INTERVAL_MINUTES * 60000);
+    setInterval(
+      () => this.sendRandomTokenMessage(channel),
+      RANDOM_ART_INTERVAL_MINUTES * 60000
+    );
   }
 
   async initialize() {
@@ -63,7 +66,7 @@ class RandomBot {
       const projectNumber = Math.floor(Math.random() * projectCount);
       console.log(`trying to look for project ${projectNumber}`);
       const projectData = await getArtBlocksProject(projectNumber);
-      if (projectData && projectData.invocations > 1) {
+      if (projectData && projectData.invocations > 1 && projectData.active) {
         const pieceNumber = Math.floor(Math.random() * projectData.invocations);
         const tokenID = projectNumber * 1e6 + pieceNumber;
         const artBlocksResponse = await fetch(
