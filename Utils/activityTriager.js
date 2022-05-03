@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 const fetch = require('node-fetch');
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig;
-const {MessageEmbed} = require('discord.js');
+
 // Trade activity Discord channel IDs.
 const CHANNEL_SALES_CHAT = projectConfig.chIdByName['block-talk'];
 const CHANNEL_SALES = projectConfig.chIdByName['sales-feed'];
@@ -188,78 +188,6 @@ async function triageActivityMessage(msg, bot) {
 }
 
 /**
- * Parses LooksRare data, builds and sends embed in appropriate channel
- * API Spec: https://looksrare.github.io/api-docs/#/Events/EventController.getEvents
- * @param {*} msg - Dict of LooksRare event data
- * @param {*} bot - Discord bot that will be sending message
- * @return {void}
- */
-// eslint-disable-next-line require-jsdoc
-async function triageLooksRareMessage(msg, bot) {
-  // Create embed we will be sending
-  const embed = new MessageEmbed();
-
-  // Parsing LooksRare message to get info
-  const tokenID = msg.token.tokenId;
-  const looksRareURL = `https://looksrare.org/collections/${msg.token.collectionAddress}/${tokenID}`;
-
-  // Event_type will either be SALE or LIST
-  const eventType = msg.type;
-
-  const owner = msg.from;
-  if (BAN_ADDRESSES.has(owner)) {
-    console.log(`Skipping message propagation for ${owner}`);
-    return;
-  }
-  embed.addField('Seller (LooksRare)', owner);
-
-  // Construct price field (different info/verbiage depending on sale or list)
-  let priceText;
-  if (eventType === 'SALE') {
-    // Item sold, add 'Buyer' field
-    embed.addField('Buyer', msg.to);
-    priceText = 'Sale Price';
-  } else {
-    // Item Listed
-    priceText = 'List Price';
-  }
-  const price = msg.order.price;
-  embed.addField(
-      priceText,
-      parseInt(price) / 1000000000000000000 + 'ETH',
-      true,
-  );
-
-  // Get Art Blocks metadata response for the item.
-  const artBlocksResponse = await fetch(
-      `https://token.artblocks.io/${tokenID}`,
-  );
-  const artBlocksData = await artBlocksResponse.json();
-
-  // Update thumbnail image to use larger variant from Art Blocks API.
-  embed.setThumbnail(artBlocksData.image);
-
-  // Add inline field for viewing live script on Art Blocks.
-  embed.addField(
-      'Live Script',
-      `[view on artblocks.io](${artBlocksData.external_url})`,
-      true,
-  );
-  // Update to remove author name and to reflect this info in piece name
-  // rather than token number as the title and URL field..
-  embed.author = null;
-  embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`);
-  embed.setURL(looksRareURL);
-  if (artBlocksData.collection_name) {
-    if (eventType.includes('SALE')) {
-      sendEmbedToSaleChannels(bot, embed, artBlocksData);
-    } else if (eventType.includes('LIST')) {
-      sendEmbedToListChannels(bot, embed, artBlocksData);
-    }
-  }
-}
-
-/**
  * Helper function to send embed message to all proper sales channels
  * @param {*} bot
  * @param {*} embed
@@ -268,7 +196,7 @@ async function triageLooksRareMessage(msg, bot) {
 function sendEmbedToSaleChannels(bot, embed, artBlocksData) {
   bot.channels.cache.get(CHANNEL_SALES).send(embed);
   bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
-  // // Forward all Chromie Squiggles sales on to the DAO.
+  // Forward all Chromie Squiggles sales on to the DAO.
   if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
     bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
   }
@@ -301,4 +229,6 @@ function sendEmbedToListChannels(bot, embed, artBlocksData) {
 }
 
 module.exports.triageActivityMessage = triageActivityMessage;
-module.exports.triageLooksRareMessage = triageLooksRareMessage;
+module.exports.sendEmbedToListChannels = sendEmbedToListChannels;
+module.exports.sendEmbedToSaleChannels = sendEmbedToSaleChannels;
+module.exports.BAN_ADDRESSES = BAN_ADDRESSES;

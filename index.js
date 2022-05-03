@@ -9,7 +9,7 @@ const FactoryBot = require('./Classes/FactoryBot').FactoryBot;
 const RandomBot = require('./Classes/RandomBot').RandomBot;
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig;
 const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json');
-const {LooksRareApiPollBot} = require('./Classes/ApiPollBot');
+const {LooksRareAPIPollBot} = require('./Classes/LooksRareAPIPollBot');
 // Special handlers.
 const {triageActivityMessage} = require('./Utils/activityTriager');
 
@@ -32,6 +32,9 @@ const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat'];
 
 // Special address collection channel.
 const CHANNEL_ADDRESS_COLLECTION = process.env.CHANNEL_ADDRESS_COLLECTION;
+
+// Rate (in ms) to poll API endpoints
+const API_POLL_TIME_MS = 20000;
 
 // App setup.
 const app = express();
@@ -187,33 +190,30 @@ bot.on('message', (msg) => {
 
 // Instantiate API Pollers
 
-// Rate (in ms) to poll below API endpoints
-const pollTime = 20000;
-
 // LooksRare pollers for V2 Contract
 // List Events
-new LooksRareApiPollBot(
+new LooksRareAPIPollBot(
     `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.V2}&type=LIST&pagination[first]=25`,
-    pollTime,
+    API_POLL_TIME_MS,
     bot,
 );
 // Sale Events
-new LooksRareApiPollBot(
+new LooksRareAPIPollBot(
     `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.V2}&type=SALE&pagination[first]=25`,
-    pollTime,
+    API_POLL_TIME_MS,
     bot,
 );
 
 // LooksRare pollers for OG Contract
 // List Events
-new LooksRareApiPollBot(
+new LooksRareAPIPollBot(
     `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.OG}&type=LIST&pagination[first]=25`,
-    pollTime,
+    API_POLL_TIME_MS,
     bot,
 );
 // Sale Events
-new LooksRareApiPollBot(
+new LooksRareAPIPollBot(
     `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.OG}&type=SALE&pagination[first]=25`,
-    pollTime,
+    API_POLL_TIME_MS,
     bot,
 );
