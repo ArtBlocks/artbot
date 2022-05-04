@@ -3,10 +3,10 @@ executors:
   build-executor:
     docker:
       - image: cimg/node:lts
-      
+
 orbs:
   node: circleci/node@4.7.0
-  
+
 jobs:
   build-check:
     environment:
@@ -18,9 +18,12 @@ jobs:
     executor: build-executor
     steps:
       - checkout
-      - run: |
-          npm install
-          timeout 2m npm start || ( [[ $? -eq 124 ]] && echo "WARNING: Timeout reached, but that's OK" )
+      - run:
+          name: Install Dependencies
+          command: npm install
+      - test:
+          name: Run Tests
+          command: npm test
 
 workflows:
   build-workflow:
