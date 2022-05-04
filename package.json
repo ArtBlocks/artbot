@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [
     "artblocks",
@@ -23,6 +23,7 @@
     "dotenv": "^8.2.0",
     "googleapis": "^92.0.0",
     "graphql": "^16.2.0",
+    "jest": "^28.0.3",
     "lodash.deburr": "^4.1.0",
     "ms": "^2.0.0",
     "node-fetch": "^2.6.1",
