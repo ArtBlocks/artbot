@@ -1,25 +1,25 @@
-require("dotenv").config();
+require('dotenv').config();
 const ARTBOT_IS_PROD =
   process.env.ARTBOT_IS_PROD &&
-  process.env.ARTBOT_IS_PROD.toLowerCase() == "true";
-console.log("ARTBOT_IS_PROD: ", ARTBOT_IS_PROD);
+  process.env.ARTBOT_IS_PROD.toLowerCase() == 'true';
+console.log('ARTBOT_IS_PROD: ', ARTBOT_IS_PROD);
 // Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES =
   process.env.METADATA_REFRESH_INTERVAL_MINUTES;
-const CHANNELS = ARTBOT_IS_PROD
-  ? require("./channels.json")
-  : require("./channels_dev.json");
-const PROJECT_BOTS = ARTBOT_IS_PROD
-  ? require("./projectBots.json")
-  : require("./projectBots_dev.json");
-const ProjectBot = require("../Classes/ProjectBot").ProjectBot;
-const { getContractProject } = require("../Utils/parseArtBlocksAPI");
-const PARTNER_CONTRACTS = require("../ProjectConfig/partnerContracts.json");
-const TEST_ENV = process.env.NODE_ENV === "test";
+const CHANNELS = ARTBOT_IS_PROD ?
+  require('./channels.json') :
+  require('./channels_dev.json');
+const PROJECT_BOTS = ARTBOT_IS_PROD ?
+  require('./projectBots.json') :
+  require('./projectBots_dev.json');
+const ProjectBot = require('../Classes/ProjectBot').ProjectBot;
+const {getContractProject} = require('../Utils/parseArtBlocksAPI');
+const PARTNER_CONTRACTS = require('../ProjectConfig/partnerContracts.json');
+const TEST_ENV = process.env.NODE_ENV === 'test';
 
 // utility class that routes number messages for each channel
 class Channel {
-  constructor({ name, projectBotHandlers }) {
+  constructor({name, projectBotHandlers}) {
     this.name = name;
     this.hasProjectBotHandler = !!projectBotHandlers;
     if (projectBotHandlers) {
@@ -48,7 +48,7 @@ class Channel {
     // match with any string triggers
     if (this.stringTriggers) {
       stringTriggerLoop: for (const [botName, triggers] of Object.entries(
-        this.stringTriggers
+          this.stringTriggers,
       )) {
         for (const triggerString of triggers) {
           if (msgContentLowercase.includes(triggerString)) {
@@ -110,8 +110,8 @@ class ProjectConfig {
       this.projectBots = await this.buildProjectBots(CHANNELS, PROJECT_BOTS);
       if (!TEST_ENV) {
         setInterval(
-          () => this.buildProjectBots(CHANNELS, PROJECT_BOTS),
-          METADATA_REFRESH_INTERVAL_MINUTES * 60000
+            () => this.buildProjectBots(CHANNELS, PROJECT_BOTS),
+            METADATA_REFRESH_INTERVAL_MINUTES * 60000,
         );
       }
     } catch (err) {
@@ -138,7 +138,7 @@ class ProjectConfig {
         return;
       }
       botsToInstatiate.add(projectBotHandlers.default);
-      const { stringTriggers = {}, tokenIdTriggers = [] } = projectBotHandlers;
+      const {stringTriggers = {}, tokenIdTriggers = []} = projectBotHandlers;
       Object.keys(stringTriggers).forEach((key) => {
         botsToInstatiate.add(key);
       });
@@ -153,21 +153,21 @@ class ProjectConfig {
     // gets the relevant configuration from projectBotsJson, calls the subgraph
     // to get project information, and then initializes the project bot.
     const promises = Array.from(botsToInstatiate).map(async (botId) => {
-      const [projectId, contractName] = botId.split("-");
+      const [projectId, contractName] = botId.split('-');
       const namedMappings = projectBotsJson[botId]?.namedMappings;
       const configContract = PARTNER_CONTRACTS[contractName];
       if (contractName && !configContract) {
         console.warn(
-          `Bot ${botId} had a contractName, but there was no matching contract in partnerContracts.json. Has it been defined?`
+            `Bot ${botId} had a contractName, but there was no matching contract in partnerContracts.json. Has it been defined?`,
         );
       }
       const projectNumber = parseInt(projectId);
-      const { invocations, name, contract } = await getContractProject(
-        projectNumber,
-        configContract
+      const {invocations, name, contract} = await getContractProject(
+          projectNumber,
+          configContract,
       );
       console.log(
-        `Refreshing project cache for Project ${projectNumber} ${name}`
+          `Refreshing project cache for Project ${projectNumber} ${name}`,
       );
       projectBots[botId] = new ProjectBot({
         projectNumber,
@@ -219,7 +219,7 @@ class ProjectConfig {
   routeProjectNumberMsg(channelID, msg) {
     const channel = this.channels[channelID];
     const botName = channel.botNameFromNumberMsgContent(
-      msg.content.toLowerCase()
+        msg.content.toLowerCase(),
     );
     if (botName === null) {
       // only occurs when # messages are sent in observed channels without project bots
