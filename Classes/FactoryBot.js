@@ -1,18 +1,15 @@
-require("dotenv").config();
-const deburr = require("lodash.deburr");
-const Web3 = require("web3");
+require('dotenv').config();
+const deburr = require('lodash.deburr');
+const Web3 = require('web3');
 const getArtBlocksFactoryProjects =
-  require("../Utils/parseArtBlocksAPI").getArtBlocksFactoryProjects;
-const ProjectBot = require("./ProjectBot").ProjectBot;
+  require('../Utils/parseArtBlocksAPI').getArtBlocksFactoryProjects;
+const ProjectBot = require('./ProjectBot').ProjectBot;
 
-const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545');
 
 // Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES =
   process.env.METADATA_REFRESH_INTERVAL_MINUTES;
-
-// True if running in a test environment
-const TEST_ENV = process.env.NODE_ENV === "test";
 
 class FactoryBot {
   constructor() {
@@ -24,12 +21,9 @@ class FactoryBot {
   async init() {
     await this.buildProjectBots();
 
-    // only set interval if we aren't in a test environment
-    if (!TEST_ENV) {
-      setInterval(async () => {
-        await this.buildProjectBots();
-      }, METADATA_REFRESH_INTERVAL_MINUTES * 60000);
-    }
+    setInterval(async () => {
+      await this.buildProjectBots();
+    }, METADATA_REFRESH_INTERVAL_MINUTES * 60000);
   }
 
   async buildProjectBots() {
@@ -38,7 +32,7 @@ class FactoryBot {
       for (let i = 0; i < factoryProjects.length; i++) {
         const project = factoryProjects[i];
         console.log(
-          `Refreshing project cache for Factory Project ${project.projectId} ${project.name}`
+            `Refreshing project cache for Factory Project ${project.projectId} ${project.name}`,
         );
 
         const newBot = new ProjectBot({
@@ -60,14 +54,14 @@ class FactoryBot {
 
     if (content.length <= 1) {
       msg.channel.send(
-        `Invalid format, enter # followed by the piece number of interest.`
+          `Invalid format, enter # followed by the piece number of interest.`,
       );
       return;
     }
 
     const afterTheHash = content.substring(1);
     const projectKey = this.toProjectKey(
-      content.substr(content.indexOf(" ") + 1)
+        content.substr(content.indexOf(' ') + 1),
     );
 
     console.log(`Searching for project ${projectKey}`);
@@ -79,12 +73,12 @@ class FactoryBot {
 
   toProjectKey(projectName) {
     const projectKey = deburr(projectName)
-      .toLowerCase()
-      .replace(/[^a-z0-9]/gi, "");
+        .toLowerCase()
+        .replace(/[^a-z0-9]/gi, '');
 
     // just in case there's a project name with no alphanumerical characters
-    if (projectKey === "") {
-      return deburr(projectName).toLowerCase().replace(/\s+/g, "");
+    if (projectKey === '') {
+      return deburr(projectName).toLowerCase().replace(/\s+/g, '');
     }
 
     return projectKey;
