@@ -31,7 +31,7 @@ jobs:
           paths:
             - .yarn/cache
             - .yarn/unplugged
-      - test:
+      - run:
           name: Run Tests
           command: yarn test
 
