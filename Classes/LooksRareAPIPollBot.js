@@ -17,7 +17,8 @@ class LooksRareAPIPollBot extends APIPollBot {
 	 */
   constructor(apiEndpoint, refreshRateMs, bot) {
     super(apiEndpoint, refreshRateMs, bot);
-    this.color = '#62DE7C';
+    this.listColor = '#62DE7C';
+    this.saleColor = '#9d77f7';
   }
 
   /**
@@ -56,7 +57,6 @@ class LooksRareAPIPollBot extends APIPollBot {
   async buildDiscordMessage(msg) {
     // Create embed we will be sending
     const embed = new MessageEmbed();
-    embed.setColor(this.color);
 
     // Parsing LooksRare message to get info
     const tokenID = msg.token.tokenId;
@@ -78,9 +78,11 @@ class LooksRareAPIPollBot extends APIPollBot {
       // Item sold, add 'Buyer' field
       embed.addField('Buyer', msg.to);
       priceText = 'Sale Price';
+      embed.setColor(this.saleColor);
     } else {
       // Item Listed
       priceText = 'List Price';
+      embed.setColor(this.listColor);
     }
     const price = msg.order.price;
     embed.addField(
