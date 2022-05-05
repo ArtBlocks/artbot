@@ -50,6 +50,10 @@ npm install -g jsonlint
 jsonlint <YOUR_FILE.JSON>
 ```
 
+* Run unit tests
+```bash
+yarn test
+```
 ## Basic structure of artbot
 
 The core engine of Artbot is built around the discord.js package.  It serves several functions, all of which are based on listening to messages in the ArtBlocks Discord, and responding with other messages.  This core functionality is driven from index.js, and there are several helper Classes and Utility packages that assist with this logic.
@@ -188,3 +192,5 @@ These instructions explain how to configure Art Bot to serve project data in rel
 ## Contributing to artbot
 
   For now, Artbot development is coordinated informally over Discord.  Please reach out to purplehat.eth#7327 or ryley-o.eth#5272 if you think you might be interested in helping out.
+
+  Please write tests for all new features!
