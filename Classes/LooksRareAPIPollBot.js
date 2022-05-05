@@ -11,10 +11,10 @@ const {
 /** API Poller for LooksRare List and Sale events */
 class LooksRareAPIPollBot extends APIPollBot {
   /** Constructor just calls super
-	 * @param {string} apiEndpoint - Endpoint to be hitting
-	 * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
-	 * @param {*} bot - Discord bot that will be sending messages
-	 */
+   * @param {string} apiEndpoint - Endpoint to be hitting
+   * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
+   * @param {*} bot - Discord bot that will be sending messages
+   */
   constructor(apiEndpoint, refreshRateMs, bot) {
     super(apiEndpoint, refreshRateMs, bot);
     this.listColor = '#62DE7C';
@@ -22,11 +22,11 @@ class LooksRareAPIPollBot extends APIPollBot {
   }
 
   /**
-	 * Parses and handles LooksRare API endpoint data
-	 * Only sends events that are new
-	 * Response spec: https://looksrare.github.io/api-docs/#/Events/EventController.getEvents
-	 * @param {*} responseData - Dict parsed from API request json
-	 */
+   * Parses and handles LooksRare API endpoint data
+   * Only sends events that are new
+   * Response spec: https://looksrare.github.io/api-docs/#/Events/EventController.getEvents
+   * @param {*} responseData - Dict parsed from API request json
+   */
   handleAPIResponse(responseData) {
     let maxTime = 0;
     for (const data of responseData.data) {
@@ -50,10 +50,10 @@ class LooksRareAPIPollBot extends APIPollBot {
   }
 
   /**
-	 * Handles constructing and sending Discord embed message
-	 * LooksRare API Spec: https://looksrare.github.io/api-docs/#/Events/EventController.getEvents
-	 * @param {*} msg - Dict of event data from API response
-	 */
+   * Handles constructing and sending Discord embed message
+   * LooksRare API Spec: https://looksrare.github.io/api-docs/#/Events/EventController.getEvents
+   * @param {*} msg - Dict of event data from API response
+   */
   async buildDiscordMessage(msg) {
     // Create embed we will be sending
     const embed = new MessageEmbed();
