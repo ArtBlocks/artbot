@@ -32,6 +32,10 @@ jobs:
             - .yarn/cache
             - .yarn/unplugged
       - run:
+          name: Run application
+          command: |
+            timeout 2m yarn start || ( [[ $? -eq 124 ]] && echo "WARNING: Timeout reached, but that's OK" )
+      - run:
           name: Run Tests
           command: yarn test
 
