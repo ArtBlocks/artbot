@@ -17,6 +17,8 @@ class LooksRareAPIPollBot extends APIPollBot {
    */
   constructor(apiEndpoint, refreshRateMs, bot) {
     super(apiEndpoint, refreshRateMs, bot);
+    this.listColor = '#62DE7C';
+    this.saleColor = '#9d77f7';
   }
 
   /**
@@ -76,9 +78,11 @@ class LooksRareAPIPollBot extends APIPollBot {
       // Item sold, add 'Buyer' field
       embed.addField('Buyer', msg.to);
       priceText = 'Sale Price';
+      embed.setColor(this.saleColor);
     } else {
       // Item Listed
       priceText = 'List Price';
+      embed.setColor(this.listColor);
     }
     const price = msg.order.price;
     embed.addField(
