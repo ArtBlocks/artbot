@@ -219,6 +219,9 @@
                     "either",
                     "non either",
                     "noneither"
+                ],
+                "292": [
+                    "corners"
                 ]
             }
         }
@@ -427,6 +430,10 @@
                 ],
                 "112": [
                     "ac"
+                ],
+                "294": [
+                    "alien",
+                    "dna"
                 ]
             }
         }
