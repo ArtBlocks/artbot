@@ -178,7 +178,12 @@
     "808792983503503410": {
         "name": "simon-de-mai",
         "projectBotHandlers": {
-            "default": "17"
+            "default": "17",
+            "stringTriggers": {
+                "286": [
+                    "drifting"
+                ]
+            }
         }
     },
     "787363737438519298": {
