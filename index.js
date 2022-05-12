@@ -30,7 +30,7 @@ const PROD_CHANNEL_ACTIVITY_ALL = projectConfig.chIdByName['prod_all_activity'];
 const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects'];
 
 // Block Talk
-const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['general'];
+const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk'];
 
 // AB Art Chat
 const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat'];
