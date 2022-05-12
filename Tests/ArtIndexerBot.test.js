@@ -1,8 +1,8 @@
-const {FactoryBot} = require('../Classes/FactoryBot');
+const {ArtIndexerBot} = require('../Classes/ArtIndexerBot');
 
 let bot;
 beforeAll(async () => {
-  bot = new FactoryBot();
+  bot = new ArtIndexerBot();
   await bot.init(true);
 });
 
