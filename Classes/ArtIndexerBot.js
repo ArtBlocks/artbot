@@ -28,11 +28,11 @@ class ArtIndexerBot {
 
   async buildProjectBots() {
     try {
-      const factoryProjects = await this.projectFetch();
-      for (let i = 0; i < factoryProjects.length; i++) {
-        const project = factoryProjects[i];
+      const projects = await this.projectFetch();
+      for (let i = 0; i < projects.length; i++) {
+        const project = projects[i];
         console.log(
-            `Refreshing project cache for Factory Project ${project.projectId} ${project.name}`,
+            `Refreshing project cache for Project ${project.projectId} ${project.name}`,
         );
 
         const newBot = new ProjectBot({
@@ -45,7 +45,7 @@ class ArtIndexerBot {
         this.projects[projectKey] = newBot;
       }
     } catch (err) {
-      console.error(`Error while initializing FactoryBots\n${err}`);
+      console.error(`Error while initializing ArtIndexerBots\n${err}`);
     }
   }
 

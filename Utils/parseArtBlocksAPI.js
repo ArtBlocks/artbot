@@ -27,31 +27,6 @@ const contractProjectsMinimal = gql`
   }
 `;
 
-const contractProjects = gql`
-  query getContractProjects(
-    $id: ID!
-    $first: Int!
-    $skip: Int
-  ) {
-    contract(id: $id) {
-      projects(
-        first: $first
-        skip: $skip
-        orderBy: projectId
-      ) {
-        projectId
-        name
-        invocations
-        maxInvocations
-        curationStatus
-        contract {
-          id
-        }
-      }
-    }
-  }
-`;
-
 const contractProject = gql`
   query getContractProject($id: ID!, $projectId: Int!) {
     contract(id: $id) {
@@ -69,12 +44,11 @@ const contractProject = gql`
   }
 `;
 
-const contractProjectsWithCurationStatus = gql`
-  query getContractProjectsWithCurationStatus(
+const contractProjects = gql`
+  query getContractProjects(
     $id: ID!
     $first: Int!
     $skip: Int
-    $curationStatus: String
   ) {
     contract(id: $id) {
       projects(
@@ -204,40 +178,10 @@ async function getArtBlocksProject(projectNumber) {
 }
 
 /*
- * helper function to get factory projects of a single
- * art blocks contract (uses pagination)
- */
-async function _getContractFactoryProjects(contractId) {
-  // max returned projects in a single query
-  const maxProjectsPerQuery = 1000;
-  try {
-    const factoryProjects = [];
-    while (true) {
-      const result = await client
-        .query(contractProjectsWithCurationStatus, {
-          id: contractId,
-          first: maxProjectsPerQuery,
-          skip: factoryProjects.length,
-          curationStatus: "factory",
-        })
-        .toPromise();
-      factoryProjects.push(...result.data.contract.projects);
-      if (result.data.contract.projects.length !== maxProjectsPerQuery) {
-        break;
-      }
-    }
-    return factoryProjects;
-  } catch (err) {
-    console.error(err);
-    return undefined;
-  }
-}
-
-/*
  * helper function to gets all projects of a single
  * art blocks contract (uses pagination)
  */
-async function _getContractProjects(contractId) {
+async function _getContractProjects(contractId, {curationStatus}) {
   // max returned projects in a single query
   const maxProjectsPerQuery = 1000;
   try {
@@ -248,6 +192,7 @@ async function _getContractProjects(contractId) {
           id: contractId,
           first: maxProjectsPerQuery,
           skip: allProjects.length,
+          curationStatus,
         })
         .toPromise();
       allProjects.push(...result.data.contract.projects);
@@ -275,7 +220,7 @@ async function _getContractNullFactoryProjects(contractId) {
     const nullProjects = [];
     while (true) {
       const result = await client
-        .query(contractProjectsWithCurationStatus, {
+        .query(contractProjects, {
           id: contractId,
           first: maxProjectsPerQuery,
           skip: nullProjects.length,
@@ -327,7 +272,7 @@ async function getArtBlocksFactoryProjects() {
   try {
     const contractsToGet = Object.values(CORE_CONTRACTS);
     const allArrays = await Promise.all([
-      ...contractsToGet.map(_getContractFactoryProjects),
+      ...contractsToGet.map((contract) => _getContractProjects(contract, {curationStatus: "factory"})),
       ...contractsToGet.map(_getContractNullFactoryProjects),
     ]);
     return allArrays.flat();
