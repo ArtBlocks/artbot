@@ -7,7 +7,7 @@ const getArtBlocksFactoryProjects =
   require('./Utils/parseArtBlocksAPI').getArtBlocksFactoryProjects;
 
 const AddressCollector = require('./Classes/AddressCollector').AddressCollector;
-const ArtBot = require('./Classes/ArtBot').ArtBot;
+const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot;
 const RandomBot = require('./Classes/RandomBot').RandomBot;
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig;
 const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json');
@@ -115,8 +115,8 @@ bot.giveawaysManager.on('giveawayEnded', (giveaway, winners) => {
   );
 });
 
-const factoryParty = new ArtBot(getArtBlocksFactoryProjects);
-const artBot = new ArtBot();
+const factoryParty = new ArtIndexerBot(getArtBlocksFactoryProjects);
+const artIndexerBot = new ArtIndexerBot();
 const randomGuy = new RandomBot();
 
 // Special address collector.
@@ -168,7 +168,7 @@ bot.on('message', (msg) => {
         factoryParty.handleNumberMessage(msg);
         break;
       case CHANNEL_BLOCK_TALK:
-        artBot.handleNumberMessage(msg);
+        artIndexerBot.handleNumberMessage(msg);
         break;
       case CHANNEL_ART_CHAT:
         randomGuy.handleRandomMessage(msg);

@@ -28,7 +28,7 @@ const contractProjectsMinimal = gql`
 `;
 
 const contractProjects = gql`
-  query getContractProjectsWithCurationStatus(
+  query getContractProjects(
     $id: ID!
     $first: Int!
     $skip: Int

@@ -10,7 +10,7 @@ const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545');
 const METADATA_REFRESH_INTERVAL_MINUTES =
   process.env.METADATA_REFRESH_INTERVAL_MINUTES;
 
-class ArtBot {
+class ArtIndexerBot {
   constructor(projectFetch = getArtBlocksProjects) {
     this.projectFetch = projectFetch
     this.projects = {};
@@ -85,4 +85,4 @@ class ArtBot {
   }
 }
 
-module.exports.ArtBot = ArtBot;
+module.exports.ArtIndexerBot = ArtIndexerBot;
