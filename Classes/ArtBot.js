@@ -1,9 +1,8 @@
 require('dotenv').config();
 const deburr = require('lodash.deburr');
 const Web3 = require('web3');
-const getArtBlocksFactoryProjects =
-  require('../Utils/parseArtBlocksAPI').getArtBlocksFactoryProjects;
 const ProjectBot = require('./ProjectBot').ProjectBot;
+const getArtBlocksProjects = require('../Utils/parseArtBlocksAPI').getArtBlocksProjects;
 
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545');
 
@@ -11,8 +10,9 @@ const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545');
 const METADATA_REFRESH_INTERVAL_MINUTES =
   process.env.METADATA_REFRESH_INTERVAL_MINUTES;
 
-class FactoryBot {
-  constructor() {
+class ArtBot {
+  constructor(projectFetch = getArtBlocksProjects) {
+    this.projectFetch = projectFetch
     this.projects = {};
     this.init();
   }
@@ -28,7 +28,7 @@ class FactoryBot {
 
   async buildProjectBots() {
     try {
-      const factoryProjects = await getArtBlocksFactoryProjects();
+      const factoryProjects = await this.projectFetch();
       for (let i = 0; i < factoryProjects.length; i++) {
         const project = factoryProjects[i];
         console.log(
@@ -85,4 +85,4 @@ class FactoryBot {
   }
 }
 
-module.exports.FactoryBot = FactoryBot;
+module.exports.ArtBot = ArtBot;
