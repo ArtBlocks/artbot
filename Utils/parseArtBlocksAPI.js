@@ -27,6 +27,31 @@ const contractProjectsMinimal = gql`
   }
 `;
 
+const contractProjects = gql`
+  query getContractProjects(
+    $id: ID!
+    $first: Int!
+    $skip: Int
+  ) {
+    contract(id: $id) {
+      projects(
+        first: $first
+        skip: $skip
+        orderBy: projectId
+      ) {
+        projectId
+        name
+        invocations
+        maxInvocations
+        curationStatus
+        contract {
+          id
+        }
+      }
+    }
+  }
+`;
+
 const contractProject = gql`
   query getContractProject($id: ID!, $projectId: Int!) {
     contract(id: $id) {
@@ -209,6 +234,35 @@ async function _getContractFactoryProjects(contractId) {
 }
 
 /*
+ * helper function to gets all projects of a single
+ * art blocks contract (uses pagination)
+ */
+async function _getContractProjects(contractId) {
+  // max returned projects in a single query
+  const maxProjectsPerQuery = 1000;
+  try {
+    const allProjects = [];
+    while (true) {
+      const result = await client
+        .query(contractProjects, {
+          id: contractId,
+          first: maxProjectsPerQuery,
+          skip: allProjects.length,
+        })
+        .toPromise();
+      allProjects.push(...result.data.contract.projects);
+      if (result.data.contract.projects.length !== maxProjectsPerQuery) {
+        break;
+      }
+    }
+    return allProjects;
+  } catch (err) {
+    console.error(err);
+    return undefined;
+  }
+}
+
+/*
  * the AB subgraph curation status is null for recent projects and is slow to update
  * workaround by querying AB api for curation status
  */
@@ -283,7 +337,32 @@ async function getArtBlocksFactoryProjects() {
   return undefined;
 }
 
+/*
+ * get data for all artblocks projects
+ * Returns undefined if errors encountered while fetching.
+ * If project found, returns array of project objects with:
+ *   - invocations
+ *   - maxInvocations
+ *   - name
+ *   - projectId
+ *   - contract
+ *     - id: string Contract Address
+ */
+async function getArtBlocksProjects() {
+  try {
+    const contractsToGet = Object.values(CORE_CONTRACTS);
+    const allArrays = await Promise.all([
+      ...contractsToGet.map(_getContractProjects),
+    ]);
+    return allArrays.flat();
+  } catch (err) {
+    console.error(err);
+  }
+  return undefined;
+}
+
 module.exports.getArtBlocksProject = getArtBlocksProject;
 module.exports.getArtBlocksFactoryProjects = getArtBlocksFactoryProjects;
+module.exports.getArtBlocksProjects = getArtBlocksProjects;
 module.exports.getArtBlocksProjectCount = getArtBlocksProjectCount;
 module.exports.getContractProject = getContractProject;
