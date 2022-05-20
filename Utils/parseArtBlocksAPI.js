@@ -1,11 +1,11 @@
-const parse = require('node-html-parser').parse;
-const fetch = require('node-fetch');
-const {createClient, gql} = require('@urql/core');
+const parse = require('node-html-parser').parse
+const fetch = require('node-fetch')
+const { createClient, gql } = require('@urql/core')
 
-const API_URL = 'https://api.thegraph.com/subgraphs/name/artblocks/art-blocks';
+const API_URL = 'https://api.thegraph.com/subgraphs/name/artblocks/art-blocks'
 
 // core contract addresses to include during initilization
-const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json');
+const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
 
 const client = createClient({
   url: API_URL,
@@ -15,7 +15,7 @@ const client = createClient({
       'Content-Type': 'application/json',
     },
   }),
-});
+})
 
 const contractProjectsMinimal = gql`
   query getContractProjectsMinimal($id: ID!, $first: Int!, $skip: Int) {
@@ -25,7 +25,7 @@ const contractProjectsMinimal = gql`
       }
     }
   }
-`;
+`
 
 const contractProjects = gql`
   query getContractProjects($id: ID!, $first: Int!, $skip: Int) {
@@ -42,7 +42,7 @@ const contractProjects = gql`
       }
     }
   }
-`;
+`
 
 const contractProject = gql`
   query getContractProject($id: ID!, $projectId: Int!) {
@@ -59,7 +59,7 @@ const contractProject = gql`
       }
     }
   }
-`;
+`
 
 const contractProjectsWithCurationStatus = gql`
   query getContractProjectsWithCurationStatus(
@@ -86,7 +86,7 @@ const contractProjectsWithCurationStatus = gql`
       }
     }
   }
-`;
+`
 
 const getPBABContracts = gql`
   query getPBABContracts($ids: [ID]!) {
@@ -94,7 +94,7 @@ const getPBABContracts = gql`
       id
     }
   }
-`;
+`
 
 /*
  * helper function to get project count of a single
@@ -102,27 +102,27 @@ const getPBABContracts = gql`
  */
 async function _getContractProjectCount(contractId) {
   // max returned projects in a single query
-  const maxProjectsPerQuery = 1000;
+  const maxProjectsPerQuery = 1000
   try {
-    let totalProjects = 0;
+    let totalProjects = 0
     while (true) {
       const result = await client
-          .query(contractProjectsMinimal, {
-            id: contractId,
-            first: maxProjectsPerQuery,
-            skip: totalProjects,
-          })
-          .toPromise();
-      const numResults = result.data.contract.projects.length;
-      totalProjects += numResults;
+        .query(contractProjectsMinimal, {
+          id: contractId,
+          first: maxProjectsPerQuery,
+          skip: totalProjects,
+        })
+        .toPromise()
+      const numResults = result.data.contract.projects.length
+      totalProjects += numResults
       if (numResults !== maxProjectsPerQuery) {
-        break;
+        break
       }
     }
-    return totalProjects;
+    return totalProjects
   } catch (err) {
-    console.error(err);
-    return undefined;
+    console.error(err)
+    return undefined
   }
 }
 
@@ -131,14 +131,14 @@ async function _getContractProjectCount(contractId) {
  */
 async function getArtBlocksProjectCount() {
   try {
-    const contractsToGet = Object.values(CORE_CONTRACTS);
-    const promises = contractsToGet.map(_getContractProjectCount);
-    const numProjects = await Promise.all(promises);
-    return numProjects.reduce((sum, _projects) => sum + _projects);
+    const contractsToGet = Object.values(CORE_CONTRACTS)
+    const promises = contractsToGet.map(_getContractProjectCount)
+    const numProjects = await Promise.all(promises)
+    return numProjects.reduce((sum, _projects) => sum + _projects)
   } catch (err) {
-    console.error(err);
+    console.error(err)
   }
-  return undefined;
+  return undefined
 }
 
 /*
@@ -150,17 +150,17 @@ async function getArtBlocksProjectCount() {
 async function _getContractProject(projectId, contractId) {
   try {
     const result = await client
-        .query(contractProject, {
-          id: contractId,
-          projectId: projectId,
-        })
-        .toPromise();
-    return result.data.contract.projects.length > 0 ?
-      result.data.contract.projects[0] :
-      null;
+      .query(contractProject, {
+        id: contractId,
+        projectId: projectId,
+      })
+      .toPromise()
+    return result.data.contract.projects.length > 0
+      ? result.data.contract.projects[0]
+      : null
   } catch (err) {
-    console.error(err);
-    return undefined;
+    console.error(err)
+    return undefined
   }
 }
 
@@ -171,9 +171,9 @@ async function _getContractProject(projectId, contractId) {
  * subgraph.
  */
 async function getContractProject(projectId, contractId) {
-  return !contractId ?
-    getArtBlocksProject(projectId) :
-    _getContractProject(projectId, contractId);
+  return !contractId
+    ? getArtBlocksProject(projectId)
+    : _getContractProject(projectId, contractId)
 }
 
 /**
@@ -191,17 +191,17 @@ async function getContractProject(projectId, contractId) {
  */
 async function getArtBlocksProject(projectNumber) {
   try {
-    const contractsToGet = Object.values(CORE_CONTRACTS);
+    const contractsToGet = Object.values(CORE_CONTRACTS)
     const promises = contractsToGet.map(
-        _getContractProject.bind(null, projectNumber),
-    );
-    const project = await Promise.all(promises);
+      _getContractProject.bind(null, projectNumber)
+    )
+    const project = await Promise.all(promises)
     // return the element that is not null and not undefined
-    return project.find((el) => el !== null && el !== undefined);
+    return project.find((el) => el !== null && el !== undefined)
   } catch (err) {
-    console.error(err);
+    console.error(err)
   }
-  return undefined;
+  return undefined
 }
 
 /**
@@ -211,27 +211,27 @@ async function getArtBlocksProject(projectNumber) {
  */
 async function _getContractFactoryProjects(contractId) {
   // max returned projects in a single query
-  const maxProjectsPerQuery = 1000;
+  const maxProjectsPerQuery = 1000
   try {
-    const factoryProjects = [];
+    const factoryProjects = []
     while (true) {
       const result = await client
-          .query(contractProjectsWithCurationStatus, {
-            id: contractId,
-            first: maxProjectsPerQuery,
-            skip: factoryProjects.length,
-            curationStatus: 'factory',
-          })
-          .toPromise();
-      factoryProjects.push(...result.data.contract.projects);
+        .query(contractProjectsWithCurationStatus, {
+          id: contractId,
+          first: maxProjectsPerQuery,
+          skip: factoryProjects.length,
+          curationStatus: 'factory',
+        })
+        .toPromise()
+      factoryProjects.push(...result.data.contract.projects)
       if (result.data.contract.projects.length !== maxProjectsPerQuery) {
-        break;
+        break
       }
     }
-    return factoryProjects;
+    return factoryProjects
   } catch (err) {
-    console.error(err);
-    return undefined;
+    console.error(err)
+    return undefined
   }
 }
 
@@ -242,26 +242,26 @@ async function _getContractFactoryProjects(contractId) {
  */
 async function _getContractProjects(contractId) {
   // max returned projects in a single query
-  const maxProjectsPerQuery = 1000;
+  const maxProjectsPerQuery = 1000
   try {
-    const allProjects = [];
+    const allProjects = []
     while (true) {
       const result = await client
-          .query(contractProjects, {
-            id: contractId,
-            first: maxProjectsPerQuery,
-            skip: allProjects.length,
-          })
-          .toPromise();
-      allProjects.push(...result.data.contract.projects);
+        .query(contractProjects, {
+          id: contractId,
+          first: maxProjectsPerQuery,
+          skip: allProjects.length,
+        })
+        .toPromise()
+      allProjects.push(...result.data.contract.projects)
       if (result.data.contract.projects.length !== maxProjectsPerQuery) {
-        break;
+        break
       }
     }
-    return allProjects;
+    return allProjects
   } catch (err) {
-    console.error(err);
-    return undefined;
+    console.error(err)
+    return undefined
   }
 }
 
@@ -269,49 +269,49 @@ async function _getContractProjects(contractId) {
  * the AB subgraph curation status is null for recent projects and is slow to update
  * workaround by querying AB api for curation status
  */
-const AB_TOKEN_API_URL = 'https://token.artblocks.io/';
-const curationStatusCache = {};
+const AB_TOKEN_API_URL = 'https://token.artblocks.io/'
+const curationStatusCache = {}
 async function _getContractNullFactoryProjects(contractId) {
   // max returned projects in a single query
-  const maxProjectsPerQuery = 1000;
+  const maxProjectsPerQuery = 1000
   try {
-    const nullProjects = [];
+    const nullProjects = []
     while (true) {
       const result = await client
-          .query(contractProjectsWithCurationStatus, {
-            id: contractId,
-            first: maxProjectsPerQuery,
-            skip: nullProjects.length,
-            curationStatus: null,
-          })
-          .toPromise();
-      nullProjects.push(...result.data.contract.projects);
+        .query(contractProjectsWithCurationStatus, {
+          id: contractId,
+          first: maxProjectsPerQuery,
+          skip: nullProjects.length,
+          curationStatus: null,
+        })
+        .toPromise()
+      nullProjects.push(...result.data.contract.projects)
       if (result.data.contract.projects.length !== maxProjectsPerQuery) {
-        break;
+        break
       }
     }
     const curationStatus = await Promise.all(
-        nullProjects.map(async (nullProject) => {
-          if (nullProject.projectId in curationStatusCache) {
-            return curationStatusCache[nullProject.projectId];
-          }
+      nullProjects.map(async (nullProject) => {
+        if (nullProject.projectId in curationStatusCache) {
+          return curationStatusCache[nullProject.projectId]
+        }
 
-          const tokenResponse = await fetch(
-              AB_TOKEN_API_URL + nullProject.projectId * 1e6,
-          );
-          const token = await tokenResponse.json();
+        const tokenResponse = await fetch(
+          AB_TOKEN_API_URL + nullProject.projectId * 1e6
+        )
+        const token = await tokenResponse.json()
 
-          curationStatusCache[nullProject.projectId] = token.curation_status;
-          return token.curation_status;
-        }),
-    );
+        curationStatusCache[nullProject.projectId] = token.curation_status
+        return token.curation_status
+      })
+    )
     const nullFactoryProjects = nullProjects.filter(
-        (_, i) => curationStatus[i] === 'factory',
-    );
-    return nullFactoryProjects;
+      (_, i) => curationStatus[i] === 'factory'
+    )
+    return nullFactoryProjects
   } catch (err) {
-    console.error(err);
-    return undefined;
+    console.error(err)
+    return undefined
   }
 }
 
@@ -328,16 +328,16 @@ async function _getContractNullFactoryProjects(contractId) {
  */
 async function getArtBlocksFactoryProjects() {
   try {
-    const contractsToGet = Object.values(CORE_CONTRACTS);
+    const contractsToGet = Object.values(CORE_CONTRACTS)
     const allArrays = await Promise.all([
       ...contractsToGet.map(_getContractFactoryProjects),
       ...contractsToGet.map(_getContractNullFactoryProjects),
-    ]);
-    return allArrays.flat();
+    ])
+    return allArrays.flat()
   } catch (err) {
-    console.error(err);
+    console.error(err)
   }
-  return undefined;
+  return undefined
 }
 
 /**
@@ -353,15 +353,15 @@ async function getArtBlocksFactoryProjects() {
  */
 async function getArtBlocksProjects() {
   try {
-    const contractsToGet = Object.values(CORE_CONTRACTS);
+    const contractsToGet = Object.values(CORE_CONTRACTS)
     const allArrays = await Promise.all([
       ...contractsToGet.map(_getContractProjects),
-    ]);
-    return allArrays.flat();
+    ])
+    return allArrays.flat()
   } catch (err) {
-    console.error(err);
+    console.error(err)
   }
-  return undefined;
+  return undefined
 }
 
 /**
@@ -371,14 +371,14 @@ async function getArtBlocksProjects() {
 async function _getPBABContracts() {
   try {
     const result = await client
-        .query(getPBABContracts, {
-          ids: Object.values(CORE_CONTRACTS),
-        })
-        .toPromise();
-    return result.data.contracts.map(({id}) => id);
+      .query(getPBABContracts, {
+        ids: Object.values(CORE_CONTRACTS),
+      })
+      .toPromise()
+    return result.data.contracts.map(({ id }) => id)
   } catch (err) {
-    console.error(err);
-    return undefined;
+    console.error(err)
+    return undefined
   }
 }
 
@@ -395,20 +395,20 @@ async function _getPBABContracts() {
  */
 async function getPBABProjects() {
   try {
-    const contractsToGet = await _getPBABContracts();
+    const contractsToGet = await _getPBABContracts()
     const allArrays = await Promise.all([
       ...contractsToGet.map(_getContractProjects),
-    ]);
-    return allArrays.flat();
+    ])
+    return allArrays.flat()
   } catch (err) {
-    console.error(err);
+    console.error(err)
   }
-  return undefined;
+  return undefined
 }
 
-module.exports.getArtBlocksProject = getArtBlocksProject;
-module.exports.getArtBlocksFactoryProjects = getArtBlocksFactoryProjects;
-module.exports.getArtBlocksProjects = getArtBlocksProjects;
-module.exports.getPBABProjects = getPBABProjects;
-module.exports.getArtBlocksProjectCount = getArtBlocksProjectCount;
-module.exports.getContractProject = getContractProject;
+module.exports.getArtBlocksProject = getArtBlocksProject
+module.exports.getArtBlocksFactoryProjects = getArtBlocksFactoryProjects
+module.exports.getArtBlocksProjects = getArtBlocksProjects
+module.exports.getPBABProjects = getPBABProjects
+module.exports.getArtBlocksProjectCount = getArtBlocksProjectCount
+module.exports.getContractProject = getContractProject

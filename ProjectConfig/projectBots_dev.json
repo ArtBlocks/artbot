@@ -1,14 +1,14 @@
 {
-    "13": {
-        "namedMappings": {
-            "sets": "ringerSets.json",
-            "singles": "ringerSingles.json"
-        }
-    },
-    "59": {
-        "namedMappings": {
-            "sets": "watercolorDreamSets.json",
-            "singles": "watercolorDreamSingles.json"
-        }
+  "13": {
+    "namedMappings": {
+      "sets": "ringerSets.json",
+      "singles": "ringerSingles.json"
     }
+  },
+  "59": {
+    "namedMappings": {
+      "sets": "watercolorDreamSets.json",
+      "singles": "watercolorDreamSingles.json"
+    }
+  }
 }

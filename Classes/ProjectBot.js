@@ -1,14 +1,14 @@
 /* eslint-disable require-jsdoc */
-const { MessageEmbed } = require('discord.js');
-const fetch = require('node-fetch');
-const Web3 = require('web3');
-const { ProjectHandlerHelper } = require('./ProjectHandlerHelper');
+const { MessageEmbed } = require('discord.js')
+const fetch = require('node-fetch')
+const Web3 = require('web3')
+const { ProjectHandlerHelper } = require('./ProjectHandlerHelper')
 
-const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545');
+const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
 
-const EMBED_COLOR = 0xff0000;
-const UNKNOWN_ADDRESS = 'unknown';
-const UNKNOWN_USERNAME = 'unknown';
+const EMBED_COLOR = 0xff0000
+const UNKNOWN_ADDRESS = 'unknown'
+const UNKNOWN_USERNAME = 'unknown'
 
 /**
  * Bot for handling projects
@@ -21,53 +21,53 @@ class ProjectBot {
     projectName,
     namedMappings,
   }) {
-    this.projectNumber = projectNumber;
-    this.coreContract = coreContract;
-    this.editionSize = editionSize;
-    this.projectName = projectName;
+    this.projectNumber = projectNumber
+    this.coreContract = coreContract
+    this.editionSize = editionSize
+    this.projectName = projectName
     this.namedMappings = namedMappings
       ? ProjectBot.getProjectHandlerHelper(namedMappings)
-      : null;
+      : null
   }
 
   static getProjectHandlerHelper({ singles, sets }) {
-    const singlesMap = singles ? require(`../NamedMappings/${singles}`) : null;
-    const setsMap = sets ? require(`../NamedMappings/${sets}`) : null;
-    return new ProjectHandlerHelper(singlesMap, setsMap);
+    const singlesMap = singles ? require(`../NamedMappings/${singles}`) : null
+    const setsMap = sets ? require(`../NamedMappings/${sets}`) : null
+    return new ProjectHandlerHelper(singlesMap, setsMap)
   }
 
   async handleNumberMessage(msg) {
-    let content = msg.content;
+    let content = msg.content
     if (content.length <= 1) {
       msg.channel.send(
         `Invalid format, enter # followed by the piece number of interest.`
-      );
-      return;
+      )
+      return
     }
 
     // decode any mappings
     if (this.namedMappings) {
-      content = this.namedMappings.transform(content);
+      content = this.namedMappings.transform(content)
     }
 
-    const detailsRequested = content.toLowerCase().includes('detail');
-    const afterTheHash = content.substring(1);
-    let pieceNumber;
+    const detailsRequested = content.toLowerCase().includes('detail')
+    const afterTheHash = content.substring(1)
+    let pieceNumber
     if (afterTheHash[0] == '?') {
-      pieceNumber = parseInt(Math.random() * this.editionSize);
+      pieceNumber = parseInt(Math.random() * this.editionSize)
     } else {
-      pieceNumber = parseInt(afterTheHash);
+      pieceNumber = parseInt(afterTheHash)
     }
 
     if (pieceNumber >= this.editionSize || pieceNumber < 0) {
       msg.channel.send(
         `Invalid #, only ${this.editionSize} pieces minted for ${this.projectName}.`
-      );
-      return;
+      )
+      return
     }
 
-    const tokenID = pieceNumber + this.projectNumber * 1e6;
-    const openSeaURL = `https://api.opensea.io/api/v1/asset/${this.coreContract}/${tokenID}/`;
+    const tokenID = pieceNumber + this.projectNumber * 1e6
+    const openSeaURL = `https://api.opensea.io/api/v1/asset/${this.coreContract}/${tokenID}/`
 
     await fetch(openSeaURL, {
       method: 'GET',
@@ -77,15 +77,15 @@ class ProjectBot {
     })
       .then((response) => response.json())
       .then((openSeaData) => {
-        console.log(openSeaData, 'OPENSEA DATA');
-        this.sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested);
+        console.log(openSeaData, 'OPENSEA DATA')
+        this.sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested)
       })
       .catch((err) => {
         console.warn(
           `MetaData message is being sent in a degraded manner. Is OpenSea's API down? https://status.opensea.io/`
-        );
-        this.sendMetaDataMessage(null, msg, tokenID, detailsRequested);
-      });
+        )
+        this.sendMetaDataMessage(null, msg, tokenID, detailsRequested)
+      })
   }
 
   /**
@@ -98,27 +98,27 @@ class ProjectBot {
   async sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested) {
     const artBlocksResponse = await fetch(
       `https://token.artblocks.io/${this.coreContract}/${tokenID}`
-    );
-    const artBlocksData = await artBlocksResponse.json();
-    console.log(artBlocksData, 'ARTBLOCKS DATA');
+    )
+    const artBlocksData = await artBlocksResponse.json()
+    console.log(artBlocksData, 'ARTBLOCKS DATA')
     // If the OpenSea API is available use their link for the title otherwise use an AB link
     const titleLink = openSeaData
       ? openSeaData.permalink
-      : artBlocksData.external_url;
+      : artBlocksData.external_url
 
-    let title = artBlocksData.name + ' - ' + artBlocksData.artist;
+    let title = artBlocksData.name + ' - ' + artBlocksData.artist
 
     // If PBAB project, add PBAB name to front
     if (
       artBlocksData.platform !== '' &&
       !artBlocksData.platform.includes('Art Blocks')
     ) {
-      title = artBlocksData.platform + ' - ' + title;
+      title = artBlocksData.platform + ' - ' + title
     }
 
-    let moreDetailsText = `Add "?details" to your ArtBot command`;
+    let moreDetailsText = `Add "?details" to your ArtBot command`
     if (artBlocksData.external_url !== '') {
-      moreDetailsText += ` or [view on artblocks.io](${artBlocksData.external_url}).`;
+      moreDetailsText += ` or [view on artblocks.io](${artBlocksData.external_url}).`
     }
     // If user did *not* request full details, return just a large image,
     // along with a link to the OpenSea page and ArtBlocks live script.
@@ -130,19 +130,19 @@ class ProjectBot {
         .setURL(titleLink)
         .addField('Want More Info?', moreDetailsText)
         // Set the full image for embed.
-        .setImage(artBlocksData.image);
-      msg.channel.send(imageContent);
-      return;
+        .setImage(artBlocksData.image)
+      msg.channel.send(imageContent)
+      return
     }
 
     // Otherwise, return full metadata for the asset.
-    const { features } = artBlocksData;
+    const { features } = artBlocksData
     const assetFeatures =
       !!features && Object.keys(features).length
         ? Object.keys(features)
             .map((key) => `${key}: ${features[key]}`)
             .join('\n')
-        : 'Not yet available.';
+        : 'Not yet available.'
     const embedContent = new MessageEmbed()
       // Set the title of the field.
       .setTitle(title)
@@ -158,7 +158,7 @@ class ProjectBot {
         `[view on artblocks.io](${artBlocksData.external_url})`
       )
       // Add "Features" field.
-      .addField('Features', assetFeatures);
+      .addField('Features', assetFeatures)
 
     // If OpenSea data is available add it otherwise say we are operating in a degraded mode
     if (openSeaData) {
@@ -168,54 +168,52 @@ class ProjectBot {
         // Add current owner info.
         .addFields(this.parseOwnerInfo(openSeaData.owner))
         // Add sale info.
-        .addFields(this.parseSaleInfo(openSeaData.last_sale));
+        .addFields(this.parseSaleInfo(openSeaData.last_sale))
     } else {
       embedContent.addField(
         'Sales Info',
         'It seems there is a problem with the OpenSea API. Check status [here](https://status.opensea.io/).'
-      );
+      )
     }
 
-    msg.channel.send(embedContent);
+    msg.channel.send(embedContent)
   }
 
   parseOwnerInfo(ownerAccount) {
-    const address = ownerAccount.address;
+    const address = ownerAccount.address
     const addressPreview =
-      address !== null ? address.slice(0, 8) : UNKNOWN_ADDRESS;
-    const addressOpenSeaURL = `https://opensea.io/accounts/${address}`;
+      address !== null ? address.slice(0, 8) : UNKNOWN_ADDRESS
+    const addressOpenSeaURL = `https://opensea.io/accounts/${address}`
     let ownerUsername =
-      ownerAccount.user !== null
-        ? ownerAccount.user.username
-        : UNKNOWN_USERNAME;
+      ownerAccount.user !== null ? ownerAccount.user.username : UNKNOWN_USERNAME
     if (ownerUsername === null) {
-      ownerUsername = UNKNOWN_USERNAME;
+      ownerUsername = UNKNOWN_USERNAME
     }
 
     return {
       name: 'Owner',
       value: `[${addressPreview}](${addressOpenSeaURL}) (${ownerUsername})`,
       inline: true,
-    };
+    }
   }
 
   parseSaleInfo(saleInfo) {
     if (saleInfo !== null && saleInfo.event_type == 'successful') {
-      const eventDate = new Date(saleInfo.created_date).toLocaleDateString();
-      const sellerAccount = saleInfo.transaction.to_account;
-      let sellerAddress;
-      let sellerAddressPreview;
-      let sellerUsername;
+      const eventDate = new Date(saleInfo.created_date).toLocaleDateString()
+      const sellerAccount = saleInfo.transaction.to_account
+      let sellerAddress
+      let sellerAddressPreview
+      let sellerUsername
       if (sellerAccount !== null) {
-        sellerAddress = sellerAccount.address;
+        sellerAddress = sellerAccount.address
         sellerAddressPreview =
-          sellerAddress !== null ? sellerAddress.slice(0, 8) : UNKNOWN_ADDRESS;
+          sellerAddress !== null ? sellerAddress.slice(0, 8) : UNKNOWN_ADDRESS
         sellerUsername =
           sellerAccount.user !== null
             ? sellerAccount.user.username
-            : UNKNOWN_USERNAME;
+            : UNKNOWN_USERNAME
         if (sellerUsername === null) {
-          sellerUsername = UNKNOWN_USERNAME;
+          sellerUsername = UNKNOWN_USERNAME
         }
       }
 
@@ -226,21 +224,21 @@ class ProjectBot {
           'ether'
         )}Ξ by [${sellerAddressPreview}](https://opensea.io/accounts/${sellerAddress}) (${sellerUsername}) on ${eventDate}`,
         inline: true,
-      };
+      }
     }
     return {
       name: 'Last Sale',
       value: 'N/A',
       inline: true,
-    };
+    }
   }
 
   parseNumSales(numSales) {
     if (numSales == 0) {
-      return 'None';
+      return 'None'
     }
-    return `${numSales}`;
+    return `${numSales}`
   }
 }
 
-module.exports.ProjectBot = ProjectBot;
+module.exports.ProjectBot = ProjectBot

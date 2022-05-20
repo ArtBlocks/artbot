@@ -1,98 +1,98 @@
 {
-    "0": {
-        "namedMappings": {
-            "sets": "squiggleSets.json"
-        }
-    },
-    "13": {
-        "namedMappings": {
-            "sets": "ringerSets.json",
-            "singles": "ringerSingles.json"
-        }
-    },
-    "23": {
-        "namedMappings": {
-            "sets": "archetypeSets.json"
-        }
-    },
-    "28": {
-        "namedMappings": {
-            "sets": "apparitionSets.json",
-            "singles": "apparitionSingles.json"
-        }
-    },
-    "41": {
-        "namedMappings": {
-            "sets": "elementalsSets.json",
-            "singles": "elementalsSingles.json"
-        }
-    },
-    "53": {
-        "namedMappings": {
-            "sets": "subscapeSets.json",
-            "singles": "subscapeSingles.json"
-        }
-    },
-    "59": {
-        "namedMappings": {
-            "sets": "watercolorDreamSets.json",
-            "singles": "watercolorDreamSingles.json"
-        }
-    },
-    "78": {
-        "namedMappings": {
-            "sets": "fidenzaSets.json"
-        }
-    },
-    "89": {
-        "namedMappings": {
-            "sets": "dreamSets.json",
-            "singles": "dreamSingles.json"
-        }
-    },
-    "129": {
-        "namedMappings": {
-            "sets": "pigmentsSets.json"
-        }
-    },
-    "37": {
-        "namedMappings": {
-            "sets": "paperArmadaSets.json",
-            "singles": "paperArmadaSingles.json"
-        }
-    },
-    "131": {
-        "namedMappings": {
-            "sets": "scribbledSets.json",
-            "singles": "scribbledSingles.json"
-        }
-    },
-    "138": {
-        "namedMappings": {
-            "sets": "geometryRunnersSets.json",
-            "singles": "geometryRunnersSingles.json"
-        }
-    },
-    "204": {
-        "namedMappings": {
-          "sets": "edificeSets.json"
-        }
-    },
-    "209": {
-        "namedMappings": {
-          "sets": "autologySets.json",
-          "singles": "autologySingles.json"
-        }
-    },
-    "214": {
-        "namedMappings": {
-          "sets": "bentSets.json"
-        }
-    },
-    "255": {
-        "namedMappings": {
-            "sets": "screensSets.json",
-            "singles": "screensSingles.json"
-        }
+  "0": {
+    "namedMappings": {
+      "sets": "squiggleSets.json"
     }
+  },
+  "13": {
+    "namedMappings": {
+      "sets": "ringerSets.json",
+      "singles": "ringerSingles.json"
+    }
+  },
+  "23": {
+    "namedMappings": {
+      "sets": "archetypeSets.json"
+    }
+  },
+  "28": {
+    "namedMappings": {
+      "sets": "apparitionSets.json",
+      "singles": "apparitionSingles.json"
+    }
+  },
+  "41": {
+    "namedMappings": {
+      "sets": "elementalsSets.json",
+      "singles": "elementalsSingles.json"
+    }
+  },
+  "53": {
+    "namedMappings": {
+      "sets": "subscapeSets.json",
+      "singles": "subscapeSingles.json"
+    }
+  },
+  "59": {
+    "namedMappings": {
+      "sets": "watercolorDreamSets.json",
+      "singles": "watercolorDreamSingles.json"
+    }
+  },
+  "78": {
+    "namedMappings": {
+      "sets": "fidenzaSets.json"
+    }
+  },
+  "89": {
+    "namedMappings": {
+      "sets": "dreamSets.json",
+      "singles": "dreamSingles.json"
+    }
+  },
+  "129": {
+    "namedMappings": {
+      "sets": "pigmentsSets.json"
+    }
+  },
+  "37": {
+    "namedMappings": {
+      "sets": "paperArmadaSets.json",
+      "singles": "paperArmadaSingles.json"
+    }
+  },
+  "131": {
+    "namedMappings": {
+      "sets": "scribbledSets.json",
+      "singles": "scribbledSingles.json"
+    }
+  },
+  "138": {
+    "namedMappings": {
+      "sets": "geometryRunnersSets.json",
+      "singles": "geometryRunnersSingles.json"
+    }
+  },
+  "204": {
+    "namedMappings": {
+      "sets": "edificeSets.json"
+    }
+  },
+  "209": {
+    "namedMappings": {
+      "sets": "autologySets.json",
+      "singles": "autologySingles.json"
+    }
+  },
+  "214": {
+    "namedMappings": {
+      "sets": "bentSets.json"
+    }
+  },
+  "255": {
+    "namedMappings": {
+      "sets": "screensSets.json",
+      "singles": "screensSingles.json"
+    }
+  }
 }

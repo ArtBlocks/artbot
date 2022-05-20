@@ -1,15 +1,15 @@
 /* eslint-disable max-len */
-const fetch = require('node-fetch');
-const projectConfig = require('../ProjectConfig/projectConfig').projectConfig;
+const fetch = require('node-fetch')
+const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 
 // Trade activity Discord channel IDs.
-const CHANNEL_SALES_CHAT = projectConfig.chIdByName['block-talk'];
-const CHANNEL_SALES = projectConfig.chIdByName['sales-feed'];
-const CHANNEL_LISTINGS = projectConfig.chIdByName['listing-feed'];
-const CHANNEL_SQUIGGLE_SALES = projectConfig.chIdByName['squiggle_square'];
-const CHANNEL_SQUIGGLE_LISTINGS = projectConfig.chIdByName['squiggle-listings'];
+const CHANNEL_SALES_CHAT = projectConfig.chIdByName['block-talk']
+const CHANNEL_SALES = projectConfig.chIdByName['sales-feed']
+const CHANNEL_LISTINGS = projectConfig.chIdByName['listing-feed']
+const CHANNEL_SQUIGGLE_SALES = projectConfig.chIdByName['squiggle_square']
+const CHANNEL_SQUIGGLE_LISTINGS = projectConfig.chIdByName['squiggle-listings']
 const CHANNEL_FIDENZA_AND_IC_SALES =
-  projectConfig.chIdByName['fidenza-and-ic-sales'];
+  projectConfig.chIdByName['fidenza-and-ic-sales']
 
 // Addresses which should be omitted entirely from event feeds.
 const BAN_ADDRESSES = new Set([
@@ -81,107 +81,107 @@ const BAN_ADDRESSES = new Set([
   '0x872ea485576a569b06861a94946f04c08c510358',
   '0x592a6119e24013e4e7d02259e1c9b7148fec7677',
   '0x9b397d50f662d5d39e88e4b886571581ccf48188',
-]);
+])
 
 // eslint-disable-next-line require-jsdoc
 async function triageActivityMessage(msg, bot) {
   // Iterate through entire array of embeds, though there should only
   // ever be one at a time per message.
-  const embeds = msg.embeds;
+  const embeds = msg.embeds
   for (i = 0; i < embeds.length; i++) {
-    const embed = embeds[i];
+    const embed = embeds[i]
 
     if (embed.author == null) {
-      return;
+      return
     }
 
     // Determine the item that the event is associated with.
-    const openseaURL = embed.author.url;
-    const urlComponents = openseaURL.split('/');
-    const tokenID = urlComponents[urlComponents.length - 1];
+    const openseaURL = embed.author.url
+    const urlComponents = openseaURL.split('/')
+    const tokenID = urlComponents[urlComponents.length - 1]
 
     // Extract out the "author name".
-    const authorName = embed.author.name;
-    const eventName = authorName.split(':')[0];
+    const authorName = embed.author.name
+    const eventName = authorName.split(':')[0]
 
     // Get current description.
-    let description = embed.description;
-    const re = /.*Owner\:\*\*\s+(.*)\s+\(.*/;
-    const owner = description.match(re)[0].split(' ')[2].trim();
+    let description = embed.description
+    const re = /.*Owner\:\*\*\s+(.*)\s+\(.*/
+    const owner = description.match(re)[0].split(' ')[2].trim()
 
     // Return early if description includes bot-banned user.
     if (BAN_ADDRESSES.has(owner)) {
-      console.log(`Skipping message propagation for ${owner}`);
-      return;
+      console.log(`Skipping message propagation for ${owner}`)
+      return
     }
 
     // Return early if event is a referral.
-    let priceField;
+    let priceField
     for (let i = embed.fields.length - 1; i >= 0; i--) {
-      const embedField = embed.fields[i];
+      const embedField = embed.fields[i]
       if (embedField.name.includes('Referral Reward')) {
-        console.log(`Skipping message propagation for referral.`);
-        return;
+        console.log(`Skipping message propagation for referral.`)
+        return
       }
       if (
         embedField.name.includes('Fixed Price') ||
         embedField.name.includes('SOLD for')
       ) {
-        priceField = embedField;
+        priceField = embedField
       }
     }
-    embed.fields = [priceField];
+    embed.fields = [priceField]
 
     // Split off the "Description" text within the description.
     const descriptionDescriptionIndex =
-      description.indexOf('\n**Description:**');
-    description = description.substring(0, descriptionDescriptionIndex + 1);
+      description.indexOf('\n**Description:**')
+    description = description.substring(0, descriptionDescriptionIndex + 1)
 
     // Assuming that "Name" is the first field, remove it.
-    const nameLineBreakIndex = description.indexOf('\n');
-    const lastIndex = description.length - 1;
-    description = description.substring(nameLineBreakIndex, lastIndex);
+    const nameLineBreakIndex = description.indexOf('\n')
+    const lastIndex = description.length - 1
+    description = description.substring(nameLineBreakIndex, lastIndex)
 
     // Remove (ethereum) from names
-    description = description.replace(/\(identifier: ethereum\)/g, '');
+    description = description.replace(/\(identifier: ethereum\)/g, '')
 
     // Replace "Owner" with "Seller"
-    description = description.replace(/Owner/, 'Seller');
+    description = description.replace(/Owner/, 'Seller')
 
     // Replace "Winner" with "Buyer"
-    description = description.replace(/Winner/g, 'Buyer');
+    description = description.replace(/Winner/g, 'Buyer')
 
     // Update description with parsed and modified string.
-    embed.setDescription(description.trim());
+    embed.setDescription(description.trim())
 
     // Get Art Blocks metadata response for the item.
     const artBlocksResponse = await fetch(
-        `https://token.artblocks.io/${tokenID}`,
-    );
-    const artBlocksData = await artBlocksResponse.json();
+      `https://token.artblocks.io/${tokenID}`
+    )
+    const artBlocksData = await artBlocksResponse.json()
 
     // Update thumbnail image to use larger variant from Art Blocks API.
-    embed.setThumbnail(artBlocksData.image);
+    embed.setThumbnail(artBlocksData.image)
 
     // Add inline field for viewing live script on Art Blocks.
     embed.addField(
-        'Live Script',
-        `[view on artblocks.io](${artBlocksData.external_url})`,
-        true,
-    );
+      'Live Script',
+      `[view on artblocks.io](${artBlocksData.external_url})`,
+      true
+    )
 
     // Update to remove author name and to reflect this info in piece name
     // rather than token number as the title and URL field..
-    embed.author = null;
-    embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`);
-    embed.setURL(openseaURL);
+    embed.author = null
+    embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`)
+    embed.setURL(openseaURL)
 
     // Only forward sales events and listing events.
     if (artBlocksData.collection_name) {
       if (eventName.includes('Successful')) {
-        sendEmbedToSaleChannels(bot, embed, artBlocksData);
+        sendEmbedToSaleChannels(bot, embed, artBlocksData)
       } else if (eventName.includes('Created')) {
-        sendEmbedToListChannels(bot, embed, artBlocksData);
+        sendEmbedToListChannels(bot, embed, artBlocksData)
       }
     }
   }
@@ -194,17 +194,17 @@ async function triageActivityMessage(msg, bot) {
  * @param {*} artBlocksData
  */
 function sendEmbedToSaleChannels(bot, embed, artBlocksData) {
-  bot.channels.cache.get(CHANNEL_SALES).send(embed);
-  bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed);
+  bot.channels.cache.get(CHANNEL_SALES).send(embed)
+  bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed)
   // Forward all Chromie Squiggles sales on to the DAO.
   if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
-    bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed);
+    bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed)
   }
   if (artBlocksData.collection_name.includes('Fidenza')) {
-    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed)
   }
   if (artBlocksData.collection_name.includes('Incomplete Control')) {
-    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed)
   }
 }
 
@@ -215,20 +215,20 @@ function sendEmbedToSaleChannels(bot, embed, artBlocksData) {
  * @param {*} artBlocksData
  */
 function sendEmbedToListChannels(bot, embed, artBlocksData) {
-  bot.channels.cache.get(CHANNEL_LISTINGS).send(embed);
+  bot.channels.cache.get(CHANNEL_LISTINGS).send(embed)
   // Forward all Chromie Squiggles listings on to the DAO.
   if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
-    bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed);
+    bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed)
   }
   if (artBlocksData.collection_name.includes('Fidenza')) {
-    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed)
   }
   if (artBlocksData.collection_name.includes('Incomplete Control')) {
-    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed);
+    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed)
   }
 }
 
-module.exports.triageActivityMessage = triageActivityMessage;
-module.exports.sendEmbedToListChannels = sendEmbedToListChannels;
-module.exports.sendEmbedToSaleChannels = sendEmbedToSaleChannels;
-module.exports.BAN_ADDRESSES = BAN_ADDRESSES;
+module.exports.triageActivityMessage = triageActivityMessage
+module.exports.sendEmbedToListChannels = sendEmbedToListChannels
+module.exports.sendEmbedToSaleChannels = sendEmbedToSaleChannels
+module.exports.BAN_ADDRESSES = BAN_ADDRESSES
