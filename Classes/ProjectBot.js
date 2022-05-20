@@ -1,4 +1,3 @@
-/* eslint-disable require-jsdoc */
 const { MessageEmbed } = require('discord.js')
 const fetch = require('node-fetch')
 const Web3 = require('web3')

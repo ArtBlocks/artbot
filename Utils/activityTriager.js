@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 const fetch = require('node-fetch')
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 
@@ -83,7 +82,6 @@ const BAN_ADDRESSES = new Set([
   '0x9b397d50f662d5d39e88e4b886571581ccf48188',
 ])
 
-// eslint-disable-next-line require-jsdoc
 async function triageActivityMessage(msg, bot) {
   // Iterate through entire array of embeds, though there should only
   // ever be one at a time per message.

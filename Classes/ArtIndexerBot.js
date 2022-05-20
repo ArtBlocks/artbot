@@ -1,4 +1,3 @@
-/* eslint-disable require-jsdoc */
 require('dotenv').config()
 const deburr = require('lodash.deburr')
 const Web3 = require('web3')
