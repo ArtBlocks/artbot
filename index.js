@@ -14,6 +14,7 @@ const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json');
 const {LooksRareAPIPollBot} = require('./Classes/LooksRareAPIPollBot');
 // Special handlers.
 const {triageActivityMessage} = require('./Utils/activityTriager');
+const {getPBABProjects} = require('./Utils/parseArtBlocksAPI');
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse;
 const handleGiveawayMessage =
@@ -117,6 +118,8 @@ bot.giveawaysManager.on('giveawayEnded', (giveaway, winners) => {
 
 const factoryParty = new ArtIndexerBot(getArtBlocksFactoryProjects);
 const artIndexerBot = new ArtIndexerBot();
+// TODO: uncomment once PBAB-block-talk channel created
+// const pbabIndexerBot = new ArtIndexerBot(getPBABProjects);
 const randomGuy = new RandomBot();
 
 // Special address collector.
@@ -170,6 +173,10 @@ bot.on('message', (msg) => {
       case CHANNEL_BLOCK_TALK:
         artIndexerBot.handleNumberMessage(msg);
         break;
+      // TODO: Uncomment once PBAB Channel available
+      // case CHANNEL_PBAB_TALK:
+      //   pbabIndexerBot.handleNumberMessage(msg);
+      //   break;
       case CHANNEL_ART_CHAT:
         randomGuy.handleRandomMessage(msg);
         break;
