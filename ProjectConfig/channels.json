@@ -528,7 +528,13 @@
     "904783901522804786": {
         "name": "ben-kovach",
         "projectBotHandlers": {
-            "default": "204"
+            "default": "204",
+            "stringTriggers": {
+              "310": [
+                  "100 print",
+                  "print"
+              ]
+            }
         }
     },
     "908416638636920832": {
