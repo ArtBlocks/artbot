@@ -1,829 +1,650 @@
 {
-    "793390526765465600": {
-        "name": "hideki-tsukamoto",
-        "projectBotHandlers": {
-            "default": "8"
-        }
-    },
-    "807346227594919986": {
-        "name": "ge1doot",
-        "projectBotHandlers": {
-            "default": "9",
-            "stringTriggers": {
-                "15": [
-                    "utopia"
-                ],
-                "19": [
-                    "r3"
-                ],
-                "56": [
-                    "aurora"
-                ]
-            }
-        }
-    },
-    "781923690349592607": {
-        "name": "snowfro",
-        "projectBotHandlers": {
-            "default": "0"
-        }
-    },
-    "830104035100065845": {
-        "name": "squiggle_square",
-        "projectBotHandlers": {
-            "default": "0"
-        }
-    },
-    "800763110247628820": {
-        "name": "dmitri-cherniak",
-        "projectBotHandlers": {
-            "default": "13",
-            "stringTriggers": {
-                "22": [
-                    "eternal",
-                    "pump"
-                ],
-                "234": [
-                    "wrapture"
-                ]
-            }
-        }
-    },
-    "810598817351204894": {
-        "name": "dandan-dca",
-        "projectBotHandlers": {
-            "default": "1",
-            "stringTriggers": {
-                "18": [
-                    "gen2",
-                    "gen 2"
-                ],
-                "48": [
-                    "gen3",
-                    "gen 3"
-                ]
-            }
-        }
-    },
-    "807346265851559997": {
-        "name": "jeff-davis",
-        "projectBotHandlers": {
-            "default": "2",
-            "stringTriggers": {
-                "57": [
-                    "rhythm"
-                ],
-                "16": [
-                    "color",
-                    "study"
-                ],
-                "6": [
-                    "view",
-                    "card"
-                ],
-                "94": [
-                    "portal"
-                ],
-                "146": [
-                    "neighborhood"
-                ],
-                "208": [
-                    "reflection"
-                ]
-            }
-        }
-    },
-    "854222350454226984": {
-        "name": "joshua-bagley",
-        "projectBotHandlers": {
-            "default": "89",
-            "stringTriggers": {
-                "119": [
-                    "ecumenopolis"
-                ],
-                "256": [
-                    "spotlight"
-                ]
-            }
-        }
-    },
-    "787074645618589696": {
-        "name": "pxlq",
-        "projectBotHandlers": {
-            "default": "4",
-            "stringTriggers": {
-                "14": [
-                    "cyber",
-                    "cities"
-                ],
-                "20": [
-                    "sentience"
-                ],
-                "30": [
-                    "hieroglyphs"
-                ]
-            }
-        }
-    },
-    "814343646010540053": {
-        "name": "luxpris",
-        "projectBotHandlers": {
-            "default": "7",
-            "stringTriggers": {
-                "25": [
-                    "pathfinder"
-                ]
-            }
-        }
-    },
-    "797929926610911263": {
-        "name": "bryan-brinkman",
-        "projectBotHandlers": {
-            "default": "10"
-        }
-    },
-    "814519454268391445": {
-        "name": "beervangeer",
-        "projectBotHandlers": {
-            "default": "11",
-            "stringTriggers": {
-                "26": [
-                    "energy",
-                    "sculpture"
-                ],
-                "248": [
-                    "hashcrash"
-                ]
-            }
-        }
-    },
-    "800761846235136020": {
-        "name": "zeblocks",
-        "projectBotHandlers": {
-            "default": "12"
-        }
-    },
-    "814008731838316554": {
-        "name": "kai",
-        "projectBotHandlers": {
-            "default": "21",
-            "stringTriggers": {
-                "24": [
-                    "pixel",
-                    "glass"
-                ]
-            }
-        }
-    },
-    "808792983503503410": {
-        "name": "simon-de-mai",
-        "projectBotHandlers": {
-            "default": "17",
-            "stringTriggers": {
-                "286": [
-                    "drifting"
-                ]
-            }
-        }
-    },
-    "787363737438519298": {
-        "name": "daim-aggott-honsch",
-        "projectBotHandlers": {
-            "default": "3"
-        }
-    },
-    "813619514390216724": {
-        "name": "kjetil-golid",
-        "projectBotHandlers": {
-            "default": "23",
-            "stringTriggers": {
-                "37": [
-                    "pa",
-                    "paper",
-                    "armada"
-                ]
-            }
-        }
-    },
-    "864290801638572053": {
-        "name": "alida-sun",
-        "projectBotHandlers": {
-            "default": "114"
-        }
-    },
-    "869449236717121576": {
-        "name": "rafael-rozendaal",
-        "projectBotHandlers": {
-            "default": "120",
-            "stringTriggers": {
-                "212": [
-                    "dive"
-                ],
-                "260": [
-                    "non",
-                    "either",
-                    "non either",
-                    "noneither"
-                ],
-                "292": [
-                    "corners"
-                ]
-            }
-        }
-    },
-    "872722851029999616": {
-        "name": "darien-brito",
-        "projectBotHandlers": {
-            "default": "129",
-            "stringTriggers": {
-                "90": [
-                    "hashtractors",
-                    "hash",
-                    "tractors",
-                    "🚜"
-                ],
-                "217": [
-                    "paths"
-                ]
-            }
-        }
-    },
-    "828516221308895263": {
-        "name": "alexis-andre",
-        "projectBotHandlers": {
-            "default": "27",
-            "stringTriggers": {
-                "42": [
-                    "void"
-                ],
-                "68": [
-                    "messengers"
-                ],
-                "130": [
-                    "obicera"
-                ],
-                "201": [
-                    "heures",
-                    "hours",
-                    "24heures",
-                    "24hours",
-                    "24 heures",
-                    "24 hours"
-                ]
-            }
-        }
-    },
-    "820307788316016700": {
-        "name": "aaron-penne",
-        "projectBotHandlers": {
-            "default": "28",
-            "stringTriggers": {
-                "172": [
-                    "rituals"
-                ],
-                "77": [
-                    "return"
-                ]
-            }
-        }
-    },
-    "820308326968852511": {
-        "name": "radix",
-        "projectBotHandlers": {
-            "default": "29",
-            "stringTriggers": {
-                "139": [
-                    "eccentrics2"
-                ],
-                "104": [
-                    "eccentric"
-                ]
-            }
-        }
-    },
-    "820308609342242866": {
-        "name": "dalenz",
-        "projectBotHandlers": {
-            "default": "35"
-        }
-    },
-    "828009510571343922": {
-        "name": "chaosconstruct",
-        "projectBotHandlers": {
-            "default": "39"
-        }
-    },
-    "828009835207196722": {
-        "name": "stina-jones",
-        "projectBotHandlers": {
-            "default": "40"
-        }
-    },
-    "828009961991831590": {
-        "name": "michael-connolly",
-        "projectBotHandlers": {
-            "default": "41",
-            "stringTriggers": {
-                "108": [
-                    "division"
-                ]
-            }
-        }
-    },
-    "833713318107545670": {
-        "name": "matt-deslauriers",
-        "projectBotHandlers": {
-            "default": "53",
-            "stringTriggers": {
-                "163": [
-                    "meridian"
-                ]
-            }
-        }
-    },
-    "836497015927996437": {
-        "name": "numbersinmotion",
-        "projectBotHandlers": {
-            "default": "59"
-        }
-    },
-    "836497127538425886": {
-        "name": "jason-ting",
-        "projectBotHandlers": {
-            "default": "117",
-            "stringTriggers": {
-                "32": [
-                    "light",
-                    "beams"
-                ],
-                "62": [
-                    "bubble",
-                    "blobby"
-                ],
-                "230": [
-                    "glow"
-                ]
-            }
-        }
-    },
-    "839739823669641227": {
-        "name": "han-x-nicolas-daniel",
-        "projectBotHandlers": {
-            "default": "64"
-        }
-    },
-    "849732302975008778": {
-        "name": "tyler-hobbs",
-        "projectBotHandlers": {
-            "default": "78",
-            "stringTriggers": {
-                "228": [
-                    "ic",
-                    "incomplete",
-                    "control"
-                ]
-            }
-        }
-    },
-    "879488624197001293": {
-        "name": "Server: Tyler Hobbs (879488624197001287), CH: the-place-to-be",
-        "projectBotHandlers": {
-            "default": "78",
-            "stringTriggers": {
-                "228": [
-                    "ic",
-                    "incomplete",
-                    "control"
-                ]
-            }
-        }
-    },
-    "898335291008487464": {
-        "name": "Server: Tyler Hobbs (879488624197001287), CH: fidenza-owners",
-        "projectBotHandlers": {
-            "default": "78",
-            "stringTriggers": {
-                "228": [
-                    "ic",
-                    "incomplete",
-                    "control"
-                ]
-            }
-        }
-    },
-    "901180390478340127": {
-        "name": "Server: Tyler Hobbs (879488624197001287), CH: incomplete-control",
-        "projectBotHandlers": {
-            "default": "228",
-            "stringTriggers": {
-                "78": [
-                    "fidenza"
-                ]
-            }
-        }
-    },
-    "846619538320785448": {
-        "name": "shvembldr",
-        "projectBotHandlers": {
-            "default": "74",
-            "stringTriggers": {
-                "191": [
-                    "444(4)"
-                ],
-                "137": [
-                    "ai"
-                ],
-                "112": [
-                    "ac"
-                ],
-                "294": [
-                    "alien",
-                    "dna"
-                ]
-            }
-        }
-    },
-    "844078279338360832": {
-        "name": "stefan-contiero",
-        "projectBotHandlers": {
-            "default": "72",
-            "stringTriggers": {
-                "121": [
-                    "rina"
-                ],
-                "200": [
-                    "saturazione"
-                ]
-            },
-            "tokenIdTriggers": [
-                {
-                    "121": [
-                        555,
-                        null
-                    ]
-                }
-            ]
-        }
-    },
-    "872722887054852106": {
-        "name": "wiliam-tan",
-        "projectBotHandlers": {
-            "default": "131"
-        }
-    },
-    "879405018279731231": {
-        "name": "rich-lord",
-        "projectBotHandlers": {
-            "default": "138",
-            "stringTriggers": {
-                "103": [
-                    "octogarden"
-                ]
-            }
-        }
-    },
-    "854222600742109184": {
-        "name": "casey-reas",
-        "projectBotHandlers": {
-            "default": "164",
-            "stringTriggers": {
-                "100": [
-                    "century"
-                ]
-            }
-        }
-    },
-    "877060147619446814": {
-        "name": "loren-bednar",
-        "projectBotHandlers": {
-            "default": "143",
-            "stringTriggers": {
-                "197": [
-                    "parade"
-                ],
-                "65": [
-                    "traversals"
-                ]
-            }
-        }
-    },
-    "882129221659537440": {
-        "name": "anna-carreras",
-        "projectBotHandlers": {
-            "default": "147"
-        }
-    },
-    "885032021146099734": {
-        "name": "monica-rizzolli",
-        "projectBotHandlers": {
-            "default": "159"
-        }
-    },
-    "889737089862754344": {
-        "name": "piter-pasma",
-        "projectBotHandlers": {
-            "default": "173"
-        }
-    },
-    "904783901522804786": {
-        "name": "ben-kovach",
-        "projectBotHandlers": {
-            "default": "204",
-            "stringTriggers": {
-              "310": [
-                  "100 print",
-                  "print"
-              ]
-            }
-        }
-    },
-    "908416638636920832": {
-        "name": "edelman-x-ofman-x-badr",
-        "projectBotHandlers": {
-            "default": "206"
-        }
-    },
-    "910410292205350953": {
-        "name": "steganon",
-        "projectBotHandlers": {
-            "default": "209"
-        }
-    },
-    "912771594357714964": {
-        "name": "ippsketch",
-        "projectBotHandlers": {
-            "default": "214"
-        }
-    },
-    "915365986822144020": {
-        "name": "matt-kane",
-        "projectBotHandlers": {
-            "default": "215"
-        }
-    },
-    "917905929087905823": {
-        "name": "jen-stark",
-        "projectBotHandlers": {
-            "default": "225"
-        }
-    },
-    "920399256454594652": {
-        "name": "samsy",
-        "projectBotHandlers": {
-            "default": "232"
-        }
-    },
-    "923461105374855188": {
-        "name": "mpkoz",
-        "projectBotHandlers": {
-            "default": "233"
-        }
-    },
-    "933419567722664016": {
-        "name": "leo-villareal",
-        "projectBotHandlers": {
-            "default": "250"
-        }
-    },
-    "941216187222753320": {
-        "name": "marcelo-soria-rodríguez",
-        "projectBotHandlers": {
-            "default": "267"
-        }
-    },
-    "935789872315260948": {
-        "name": "thomas-lin-pedersen",
-        "projectBotHandlers": {
-            "default": "255",
-            "stringTriggers": {
-                "141": [
-                    "rapture"
-                ]
-            }
-        }
-    },
-    "938325342064627712": {
-        "name": "matty-marianksy",
-        "projectBotHandlers": {
-            "default": "261"
-        }
-    },
-    "953539389764562985": {
-        "name": "emily-xie",
-        "projectBotHandlers": {
-            "default": "282"
-        }
-    },
-    "956435766492409857": {
-        "name": "robert-hodgin",
-        "projectBotHandlers": {
-            "default": "284"
-        }
-    },
-    "963552505860616233": {
-        "name": "owen-moore",
-        "projectBotHandlers": {
-            "default": "296",
-            "stringTriggers": {
-                "183": [
-                    "quarantine"
-                ],
-                "99": [
-                    "spaghettification",
-                    "spaghetti"
-                ]
-            }
-        }
-    },
-    "967162555569172511": {
-        "name": "william-mapan",
-        "projectBotHandlers": {
-            "default": "304"
-        }
-    },
-    "976926776569778176": {
-        "name": "tabor-robak",
-        "projectBotHandlers": {
-            "default": "309"
-        }
-    },
-    "880280317477404713": {
-        "name": "doodle-labs-the-lab",
-        "projectBotHandlers": {
-            "default": "0-DOODLE",
-            "stringTriggers": {
-                "1-DOODLE": [
-                    "slider"
-                ],
-                "2-DOODLE": [
-                    "neo",
-                    "neogen"
-                ]
-            }
-        }
-    },
-    "888929189862977646": {
-        "name": "generative-artworks-democracity",
-        "projectBotHandlers": {
-            "default": "162"
-        }
-    },
-    "888929212369600572": {
-        "name": "generative-artworks-enchiridion",
-        "projectBotHandlers": {
-            "default": "101"
-        }
-    },
-    "888929231147499561": {
-        "name": "generative-artworks-empyrean",
-        "projectBotHandlers": {
-            "default": "33"
-        }
-    },
-    "932737393788850266": {
-        "name": "generative-artworks-neogen",
-        "projectBotHandlers": {
-            "default": "2-DOODLE"
-        }
-    },
-    "822563871473795073": {
-        "name": "factory-projects"
-    },
-    "880468116226850866": {
-        "name": "ab-art-chat"
-    },
-    "859521842317754369": {
-        "name": "prod_all_activity"
-    },
-    "411959613370400780": {
-        "name": "general"
-    },
-    "815980444905373786": {
-        "name": "help"
-    },
-    "859312767105105941": {
-        "name": "sales-feed"
-    },
-    "830924481627291709": {
-        "name": "block-talk"
-    },
-    "976944919757348965": {
-        "name": "pbab-chat"
-    },
-    "830940204441272369": {
-        "name": "listing-feed"
-    },
-    "859316381517348874": {
-        "name": "squiggle-listings"
-    },
-    "874066035618250752": {
-        "name": "trade-swaps"
-    },
-    "782644400084877315": {
-        "name": "for-sale-listings"
-    },
-    "880937060075192320": {
-        "name": "fidenza-and-ic-sales",
-        "projectBotHandlers": {
-            "default": "78",
-            "stringTriggers": {
-                "228": [
-                    "ic",
-                    "incomplete",
-                    "control"
-                ]
-            }
-        }
-    },
-    "919937880288284722": {
-        "name": "plottables-numbersinmotion",
-        "projectBotHandlers": {
-            "default": "0-PLOTTABLES",
-            "stringTriggers": {
-                "0-PLOTTABLES": [
-                    "streamlines"
-                ]
-            }
-        }
-    },
-    "919937961632600064": {
-        "name": "plottables-generative-artworks",
-        "projectBotHandlers": {
-            "default": "1-PLOTTABLES",
-            "stringTriggers": {
-                "1-PLOTTABLES": [
-                    "implosion"
-                ]
-            }
-        }
-    },
-    "934860865713360976": {
-        "name": "plottables-dandan-dca",
-        "projectBotHandlers": {
-            "default": "2-PLOTTABLES",
-            "stringTriggers": {
-                "2-PLOTTABLES": [
-                    "really random rock",
-                    "rocks",
-                    "rrr"
-                ]
-            }
-        }
-    },
-    "938856354242773072": {
-        "name": "plottables-joshua-schachter",
-        "projectBotHandlers": {
-            "default": "3-PLOTTABLES",
-            "stringTriggers": {
-                "3-PLOTTABLES": [
-                    "diatom"
-                ]
-            }
-        }
-    },
-    "939205416754217021": {
-        "name": "plottables-larswander",
-        "projectBotHandlers": {
-            "default": "4-PLOTTABLES",
-            "stringTriggers": {
-                "4-PLOTTABLES": [
-                    "lines walking",
-                    "lines"
-                ]
-            }
-        }
-    },
-    "941381112280805396": {
-        "name": "plottables-beervangeer",
-        "projectBotHandlers": {
-            "default": "5-PLOTTABLES",
-            "stringTriggers": {
-                "5-PLOTTABLES": [
-                    "coalescence"
-                ]
-            }
-        }
-    },
-    "945430500082851861": {
-        "name": "plottables-greweb",
-        "projectBotHandlers": {
-            "default": "6-PLOTTABLES",
-            "stringTriggers": {
-                "6-PLOTTABLES": [
-                    "shattered"
-                ]
-            }
-        }
-    },
-    "948246487299661824": {
-        "name": "plottables-oppos",
-        "projectBotHandlers": {
-            "default": "8-PLOTTABLES",
-            "stringTriggers": {
-                "8-PLOTTABLES": [
-                    "spectral"
-                ]
-            }
-        }
+  "793390526765465600": {
+    "name": "hideki-tsukamoto",
+    "projectBotHandlers": {
+      "default": "8"
     }
+  },
+  "807346227594919986": {
+    "name": "ge1doot",
+    "projectBotHandlers": {
+      "default": "9",
+      "stringTriggers": {
+        "15": ["utopia"],
+        "19": ["r3"],
+        "56": ["aurora"]
+      }
+    }
+  },
+  "781923690349592607": {
+    "name": "snowfro",
+    "projectBotHandlers": {
+      "default": "0"
+    }
+  },
+  "830104035100065845": {
+    "name": "squiggle_square",
+    "projectBotHandlers": {
+      "default": "0"
+    }
+  },
+  "800763110247628820": {
+    "name": "dmitri-cherniak",
+    "projectBotHandlers": {
+      "default": "13",
+      "stringTriggers": {
+        "22": ["eternal", "pump"],
+        "234": ["wrapture"]
+      }
+    }
+  },
+  "810598817351204894": {
+    "name": "dandan-dca",
+    "projectBotHandlers": {
+      "default": "1",
+      "stringTriggers": {
+        "18": ["gen2", "gen 2"],
+        "48": ["gen3", "gen 3"]
+      }
+    }
+  },
+  "807346265851559997": {
+    "name": "jeff-davis",
+    "projectBotHandlers": {
+      "default": "2",
+      "stringTriggers": {
+        "57": ["rhythm"],
+        "16": ["color", "study"],
+        "6": ["view", "card"],
+        "94": ["portal"],
+        "146": ["neighborhood"],
+        "208": ["reflection"]
+      }
+    }
+  },
+  "854222350454226984": {
+    "name": "joshua-bagley",
+    "projectBotHandlers": {
+      "default": "89",
+      "stringTriggers": {
+        "119": ["ecumenopolis"],
+        "256": ["spotlight"]
+      }
+    }
+  },
+  "787074645618589696": {
+    "name": "pxlq",
+    "projectBotHandlers": {
+      "default": "4",
+      "stringTriggers": {
+        "14": ["cyber", "cities"],
+        "20": ["sentience"],
+        "30": ["hieroglyphs"]
+      }
+    }
+  },
+  "814343646010540053": {
+    "name": "luxpris",
+    "projectBotHandlers": {
+      "default": "7",
+      "stringTriggers": {
+        "25": ["pathfinder"]
+      }
+    }
+  },
+  "797929926610911263": {
+    "name": "bryan-brinkman",
+    "projectBotHandlers": {
+      "default": "10"
+    }
+  },
+  "814519454268391445": {
+    "name": "beervangeer",
+    "projectBotHandlers": {
+      "default": "11",
+      "stringTriggers": {
+        "26": ["energy", "sculpture"],
+        "248": ["hashcrash"]
+      }
+    }
+  },
+  "800761846235136020": {
+    "name": "zeblocks",
+    "projectBotHandlers": {
+      "default": "12"
+    }
+  },
+  "814008731838316554": {
+    "name": "kai",
+    "projectBotHandlers": {
+      "default": "21",
+      "stringTriggers": {
+        "24": ["pixel", "glass"]
+      }
+    }
+  },
+  "808792983503503410": {
+    "name": "simon-de-mai",
+    "projectBotHandlers": {
+      "default": "17",
+      "stringTriggers": {
+        "286": ["drifting"]
+      }
+    }
+  },
+  "787363737438519298": {
+    "name": "daim-aggott-honsch",
+    "projectBotHandlers": {
+      "default": "3"
+    }
+  },
+  "813619514390216724": {
+    "name": "kjetil-golid",
+    "projectBotHandlers": {
+      "default": "23",
+      "stringTriggers": {
+        "37": ["pa", "paper", "armada"]
+      }
+    }
+  },
+  "864290801638572053": {
+    "name": "alida-sun",
+    "projectBotHandlers": {
+      "default": "114"
+    }
+  },
+  "869449236717121576": {
+    "name": "rafael-rozendaal",
+    "projectBotHandlers": {
+      "default": "120",
+      "stringTriggers": {
+        "212": ["dive"],
+        "260": ["non", "either", "non either", "noneither"],
+        "292": ["corners"]
+      }
+    }
+  },
+  "872722851029999616": {
+    "name": "darien-brito",
+    "projectBotHandlers": {
+      "default": "129",
+      "stringTriggers": {
+        "90": ["hashtractors", "hash", "tractors", "🚜"],
+        "217": ["paths"]
+      }
+    }
+  },
+  "828516221308895263": {
+    "name": "alexis-andre",
+    "projectBotHandlers": {
+      "default": "27",
+      "stringTriggers": {
+        "42": ["void"],
+        "68": ["messengers"],
+        "130": ["obicera"],
+        "201": [
+          "heures",
+          "hours",
+          "24heures",
+          "24hours",
+          "24 heures",
+          "24 hours"
+        ]
+      }
+    }
+  },
+  "820307788316016700": {
+    "name": "aaron-penne",
+    "projectBotHandlers": {
+      "default": "28",
+      "stringTriggers": {
+        "172": ["rituals"],
+        "77": ["return"]
+      }
+    }
+  },
+  "820308326968852511": {
+    "name": "radix",
+    "projectBotHandlers": {
+      "default": "29",
+      "stringTriggers": {
+        "139": ["eccentrics2"],
+        "104": ["eccentric"]
+      }
+    }
+  },
+  "820308609342242866": {
+    "name": "dalenz",
+    "projectBotHandlers": {
+      "default": "35"
+    }
+  },
+  "828009510571343922": {
+    "name": "chaosconstruct",
+    "projectBotHandlers": {
+      "default": "39"
+    }
+  },
+  "828009835207196722": {
+    "name": "stina-jones",
+    "projectBotHandlers": {
+      "default": "40"
+    }
+  },
+  "828009961991831590": {
+    "name": "michael-connolly",
+    "projectBotHandlers": {
+      "default": "41",
+      "stringTriggers": {
+        "108": ["division"]
+      }
+    }
+  },
+  "833713318107545670": {
+    "name": "matt-deslauriers",
+    "projectBotHandlers": {
+      "default": "53",
+      "stringTriggers": {
+        "163": ["meridian"]
+      }
+    }
+  },
+  "836497015927996437": {
+    "name": "numbersinmotion",
+    "projectBotHandlers": {
+      "default": "59"
+    }
+  },
+  "836497127538425886": {
+    "name": "jason-ting",
+    "projectBotHandlers": {
+      "default": "117",
+      "stringTriggers": {
+        "32": ["light", "beams"],
+        "62": ["bubble", "blobby"],
+        "230": ["glow"]
+      }
+    }
+  },
+  "839739823669641227": {
+    "name": "han-x-nicolas-daniel",
+    "projectBotHandlers": {
+      "default": "64"
+    }
+  },
+  "849732302975008778": {
+    "name": "tyler-hobbs",
+    "projectBotHandlers": {
+      "default": "78",
+      "stringTriggers": {
+        "228": ["ic", "incomplete", "control"]
+      }
+    }
+  },
+  "879488624197001293": {
+    "name": "Server: Tyler Hobbs (879488624197001287), CH: the-place-to-be",
+    "projectBotHandlers": {
+      "default": "78",
+      "stringTriggers": {
+        "228": ["ic", "incomplete", "control"]
+      }
+    }
+  },
+  "898335291008487464": {
+    "name": "Server: Tyler Hobbs (879488624197001287), CH: fidenza-owners",
+    "projectBotHandlers": {
+      "default": "78",
+      "stringTriggers": {
+        "228": ["ic", "incomplete", "control"]
+      }
+    }
+  },
+  "901180390478340127": {
+    "name": "Server: Tyler Hobbs (879488624197001287), CH: incomplete-control",
+    "projectBotHandlers": {
+      "default": "228",
+      "stringTriggers": {
+        "78": ["fidenza"]
+      }
+    }
+  },
+  "846619538320785448": {
+    "name": "shvembldr",
+    "projectBotHandlers": {
+      "default": "74",
+      "stringTriggers": {
+        "191": ["444(4)"],
+        "137": ["ai"],
+        "112": ["ac"],
+        "294": ["alien", "dna"]
+      }
+    }
+  },
+  "844078279338360832": {
+    "name": "stefan-contiero",
+    "projectBotHandlers": {
+      "default": "72",
+      "stringTriggers": {
+        "121": ["rina"],
+        "200": ["saturazione"]
+      },
+      "tokenIdTriggers": [
+        {
+          "121": [555, null]
+        }
+      ]
+    }
+  },
+  "872722887054852106": {
+    "name": "wiliam-tan",
+    "projectBotHandlers": {
+      "default": "131"
+    }
+  },
+  "879405018279731231": {
+    "name": "rich-lord",
+    "projectBotHandlers": {
+      "default": "138",
+      "stringTriggers": {
+        "103": ["octogarden"]
+      }
+    }
+  },
+  "854222600742109184": {
+    "name": "casey-reas",
+    "projectBotHandlers": {
+      "default": "164",
+      "stringTriggers": {
+        "100": ["century"]
+      }
+    }
+  },
+  "877060147619446814": {
+    "name": "loren-bednar",
+    "projectBotHandlers": {
+      "default": "143",
+      "stringTriggers": {
+        "197": ["parade"],
+        "65": ["traversals"]
+      }
+    }
+  },
+  "882129221659537440": {
+    "name": "anna-carreras",
+    "projectBotHandlers": {
+      "default": "147"
+    }
+  },
+  "885032021146099734": {
+    "name": "monica-rizzolli",
+    "projectBotHandlers": {
+      "default": "159"
+    }
+  },
+  "889737089862754344": {
+    "name": "piter-pasma",
+    "projectBotHandlers": {
+      "default": "173"
+    }
+  },
+  "904783901522804786": {
+    "name": "ben-kovach",
+    "projectBotHandlers": {
+      "default": "204",
+      "stringTriggers": {
+        "310": ["100 print", "print"]
+      }
+    }
+  },
+  "908416638636920832": {
+    "name": "edelman-x-ofman-x-badr",
+    "projectBotHandlers": {
+      "default": "206"
+    }
+  },
+  "910410292205350953": {
+    "name": "steganon",
+    "projectBotHandlers": {
+      "default": "209"
+    }
+  },
+  "912771594357714964": {
+    "name": "ippsketch",
+    "projectBotHandlers": {
+      "default": "214"
+    }
+  },
+  "915365986822144020": {
+    "name": "matt-kane",
+    "projectBotHandlers": {
+      "default": "215"
+    }
+  },
+  "917905929087905823": {
+    "name": "jen-stark",
+    "projectBotHandlers": {
+      "default": "225"
+    }
+  },
+  "920399256454594652": {
+    "name": "samsy",
+    "projectBotHandlers": {
+      "default": "232"
+    }
+  },
+  "923461105374855188": {
+    "name": "mpkoz",
+    "projectBotHandlers": {
+      "default": "233"
+    }
+  },
+  "933419567722664016": {
+    "name": "leo-villareal",
+    "projectBotHandlers": {
+      "default": "250"
+    }
+  },
+  "941216187222753320": {
+    "name": "marcelo-soria-rodríguez",
+    "projectBotHandlers": {
+      "default": "267"
+    }
+  },
+  "935789872315260948": {
+    "name": "thomas-lin-pedersen",
+    "projectBotHandlers": {
+      "default": "255",
+      "stringTriggers": {
+        "141": ["rapture"]
+      }
+    }
+  },
+  "938325342064627712": {
+    "name": "matty-marianksy",
+    "projectBotHandlers": {
+      "default": "261"
+    }
+  },
+  "953539389764562985": {
+    "name": "emily-xie",
+    "projectBotHandlers": {
+      "default": "282"
+    }
+  },
+  "956435766492409857": {
+    "name": "robert-hodgin",
+    "projectBotHandlers": {
+      "default": "284"
+    }
+  },
+  "963552505860616233": {
+    "name": "owen-moore",
+    "projectBotHandlers": {
+      "default": "296",
+      "stringTriggers": {
+        "183": ["quarantine"],
+        "99": ["spaghettification", "spaghetti"]
+      }
+    }
+  },
+  "967162555569172511": {
+    "name": "william-mapan",
+    "projectBotHandlers": {
+      "default": "304"
+    }
+  },
+  "976926776569778176": {
+    "name": "tabor-robak",
+    "projectBotHandlers": {
+      "default": "309"
+    }
+  },
+  "880280317477404713": {
+    "name": "doodle-labs-the-lab",
+    "projectBotHandlers": {
+      "default": "0-DOODLE",
+      "stringTriggers": {
+        "1-DOODLE": ["slider"],
+        "2-DOODLE": ["neo", "neogen"]
+      }
+    }
+  },
+  "888929189862977646": {
+    "name": "generative-artworks-democracity",
+    "projectBotHandlers": {
+      "default": "162"
+    }
+  },
+  "888929212369600572": {
+    "name": "generative-artworks-enchiridion",
+    "projectBotHandlers": {
+      "default": "101"
+    }
+  },
+  "888929231147499561": {
+    "name": "generative-artworks-empyrean",
+    "projectBotHandlers": {
+      "default": "33"
+    }
+  },
+  "932737393788850266": {
+    "name": "generative-artworks-neogen",
+    "projectBotHandlers": {
+      "default": "2-DOODLE"
+    }
+  },
+  "822563871473795073": {
+    "name": "factory-projects"
+  },
+  "880468116226850866": {
+    "name": "ab-art-chat"
+  },
+  "859521842317754369": {
+    "name": "prod_all_activity"
+  },
+  "411959613370400780": {
+    "name": "general"
+  },
+  "815980444905373786": {
+    "name": "help"
+  },
+  "859312767105105941": {
+    "name": "sales-feed"
+  },
+  "830924481627291709": {
+    "name": "block-talk"
+  },
+  "830940204441272369": {
+    "name": "listing-feed"
+  },
+  "859316381517348874": {
+    "name": "squiggle-listings"
+  },
+  "874066035618250752": {
+    "name": "trade-swaps"
+  },
+  "782644400084877315": {
+    "name": "for-sale-listings"
+  },
+  "880937060075192320": {
+    "name": "fidenza-and-ic-sales",
+    "projectBotHandlers": {
+      "default": "78",
+      "stringTriggers": {
+        "228": ["ic", "incomplete", "control"]
+      }
+    }
+  },
+  "919937880288284722": {
+    "name": "plottables-numbersinmotion",
+    "projectBotHandlers": {
+      "default": "0-PLOTTABLES",
+      "stringTriggers": {
+        "0-PLOTTABLES": ["streamlines"]
+      }
+    }
+  },
+  "919937961632600064": {
+    "name": "plottables-generative-artworks",
+    "projectBotHandlers": {
+      "default": "1-PLOTTABLES",
+      "stringTriggers": {
+        "1-PLOTTABLES": ["implosion"]
+      }
+    }
+  },
+  "934860865713360976": {
+    "name": "plottables-dandan-dca",
+    "projectBotHandlers": {
+      "default": "2-PLOTTABLES",
+      "stringTriggers": {
+        "2-PLOTTABLES": ["really random rock", "rocks", "rrr"]
+      }
+    }
+  },
+  "938856354242773072": {
+    "name": "plottables-joshua-schachter",
+    "projectBotHandlers": {
+      "default": "3-PLOTTABLES",
+      "stringTriggers": {
+        "3-PLOTTABLES": ["diatom"]
+      }
+    }
+  },
+  "939205416754217021": {
+    "name": "plottables-larswander",
+    "projectBotHandlers": {
+      "default": "4-PLOTTABLES",
+      "stringTriggers": {
+        "4-PLOTTABLES": ["lines walking", "lines"]
+      }
+    }
+  },
+  "941381112280805396": {
+    "name": "plottables-beervangeer",
+    "projectBotHandlers": {
+      "default": "5-PLOTTABLES",
+      "stringTriggers": {
+        "5-PLOTTABLES": ["coalescence"]
+      }
+    }
+  },
+  "945430500082851861": {
+    "name": "plottables-greweb",
+    "projectBotHandlers": {
+      "default": "6-PLOTTABLES",
+      "stringTriggers": {
+        "6-PLOTTABLES": ["shattered"]
+      }
+    }
+  },
+  "948246487299661824": {
+    "name": "plottables-oppos",
+    "projectBotHandlers": {
+      "default": "8-PLOTTABLES",
+      "stringTriggers": {
+        "8-PLOTTABLES": ["spectral"]
+      }
+    }
+  }
 }
