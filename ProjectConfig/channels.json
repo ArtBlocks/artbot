@@ -390,7 +390,10 @@
   "904783901522804786": {
     "name": "ben-kovach",
     "projectBotHandlers": {
-      "default": "204"
+      "default": "204",
+      "stringTriggers": {
+        "310": ["100 print", "print"]
+      }
     }
   },
   "908416638636920832": {
@@ -488,6 +491,12 @@
     "name": "william-mapan",
     "projectBotHandlers": {
       "default": "304"
+    }
+  },
+  "976926776569778176": {
+    "name": "tabor-robak",
+    "projectBotHandlers": {
+      "default": "309"
     }
   },
   "880280317477404713": {
