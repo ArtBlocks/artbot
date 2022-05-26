@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const fetch = require('node-fetch')
 
 /** Abstract parent class for all API Poll Bots */
 class APIPollBot {
@@ -10,17 +10,17 @@ class APIPollBot {
    * @param {*} headers - Optional: any headers to supply (namely, API tokens)
    */
   constructor(apiEndpoint, refreshRateMs, bot, headers = {}) {
-    this.apiEndpoint = apiEndpoint;
-    this.refreshRateMs = refreshRateMs;
-    this.bot = bot;
-    this.headers = headers;
+    this.apiEndpoint = apiEndpoint
+    this.refreshRateMs = refreshRateMs
+    this.bot = bot
+    this.headers = headers
 
     // Only send events that occur after this bot gets initialized
-    this.lastUpdatedTime = Date.now();
+    this.lastUpdatedTime = Date.now()
 
     // Poll the specified API every refreshRateMS millis
     // (the .bind is needed for some JS weirdness with setInterval and 'this')
-    setInterval(this.pollApi.bind(this), this.refreshRateMs);
+    setInterval(this.pollApi.bind(this), this.refreshRateMs)
   }
 
   /**
@@ -31,16 +31,16 @@ class APIPollBot {
       method: 'GET',
       headers: this.headers,
     })
-        .then((response) => response.json())
-        .then((responseData) => {
-          this.handleAPIResponse(responseData);
-        })
-        .catch((err) => {
-          console.log(err);
-          console.warn(
-              `Error encountered when polling endpoint: ${this.apiEndpoint}`,
-          );
-        });
+      .then((response) => response.json())
+      .then((responseData) => {
+        this.handleAPIResponse(responseData)
+      })
+      .catch((err) => {
+        console.log(err)
+        console.warn(
+          `Error encountered when polling endpoint: ${this.apiEndpoint}`
+        )
+      })
   }
 
   /**
@@ -49,7 +49,7 @@ class APIPollBot {
    * @param {*} responseData - Dict parsed from API request json
    */
   handleAPIResponse(responseData) {
-    console.warn('handleAPIResponse function not implemented!');
+    console.warn('handleAPIResponse function not implemented!')
   }
 
   /**
@@ -58,8 +58,8 @@ class APIPollBot {
    * @param {*} msg - Event info dict
    */
   async buildDiscordMessage(msg) {
-    console.warn('buildDiscordMessage function not implemented!');
+    console.warn('buildDiscordMessage function not implemented!')
   }
 }
 
-module.exports.APIPollBot = APIPollBot;
+module.exports.APIPollBot = APIPollBot
