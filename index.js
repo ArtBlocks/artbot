@@ -3,15 +3,18 @@ const {Client} = require('discord.js');
 const {GiveawaysManager} = require('discord-giveaways');
 const express = require('express');
 const bodyParser = require('body-parser');
+const getArtBlocksFactoryProjects =
+  require('./Utils/parseArtBlocksAPI').getArtBlocksFactoryProjects;
 
 const AddressCollector = require('./Classes/AddressCollector').AddressCollector;
-const FactoryBot = require('./Classes/FactoryBot').FactoryBot;
+const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot;
 const RandomBot = require('./Classes/RandomBot').RandomBot;
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig;
 const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json');
 const {LooksRareAPIPollBot} = require('./Classes/LooksRareAPIPollBot');
 // Special handlers.
 const {triageActivityMessage} = require('./Utils/activityTriager');
+const {getPBABProjects} = require('./Utils/parseArtBlocksAPI');
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse;
 const handleGiveawayMessage =
@@ -26,6 +29,9 @@ const PROD_CHANNEL_ACTIVITY_ALL = projectConfig.chIdByName['prod_all_activity'];
 
 // Factory Channel
 const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects'];
+
+// Block Talk
+const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk'];
 
 // AB Art Chat
 const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat'];
@@ -110,7 +116,10 @@ bot.giveawaysManager.on('giveawayEnded', (giveaway, winners) => {
   );
 });
 
-const factoryParty = new FactoryBot();
+const factoryParty = new ArtIndexerBot(getArtBlocksFactoryProjects);
+const artIndexerBot = new ArtIndexerBot();
+// TODO: uncomment once PBAB-block-talk channel created
+// const pbabIndexerBot = new ArtIndexerBot(getPBABProjects);
 const randomGuy = new RandomBot();
 
 // Special address collector.
@@ -161,6 +170,13 @@ bot.on('message', (msg) => {
       case CHANNEL_FACTORY:
         factoryParty.handleNumberMessage(msg);
         break;
+      case CHANNEL_BLOCK_TALK:
+        artIndexerBot.handleNumberMessage(msg);
+        break;
+      // TODO: Uncomment once PBAB Channel available
+      // case CHANNEL_PBAB_TALK:
+      //   pbabIndexerBot.handleNumberMessage(msg);
+      //   break;
       case CHANNEL_ART_CHAT:
         randomGuy.handleRandomMessage(msg);
         break;
