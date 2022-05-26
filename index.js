@@ -1,6 +1,6 @@
 require('dotenv').config();
-const {Client} = require('discord.js');
-const {GiveawaysManager} = require('discord-giveaways');
+const { Client } = require('discord.js');
+const { GiveawaysManager } = require('discord-giveaways');
 const express = require('express');
 const bodyParser = require('body-parser');
 const getArtBlocksFactoryProjects =
@@ -11,10 +11,10 @@ const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot;
 const RandomBot = require('./Classes/RandomBot').RandomBot;
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig;
 const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json');
-const {LooksRareAPIPollBot} = require('./Classes/LooksRareAPIPollBot');
+const { LooksRareAPIPollBot } = require('./Classes/LooksRareAPIPollBot');
 // Special handlers.
-const {triageActivityMessage} = require('./Utils/activityTriager');
-const {getPBABProjects} = require('./Utils/parseArtBlocksAPI');
+const { triageActivityMessage } = require('./Utils/activityTriager');
+const { getPBABProjects } = require('./Utils/parseArtBlocksAPI');
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse;
 const handleGiveawayMessage =
@@ -33,6 +33,9 @@ const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects'];
 // Block Talk
 const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk'];
 
+// Block Talk
+const CHANNEL_PBAB_CHAT = projectConfig.chIdByName['pbab-chat'];
+
 // AB Art Chat
 const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat'];
 
@@ -47,11 +50,11 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.post('/update', function(req, res) {
+app.post('/update', function (req, res) {
   console.log(
-      'received update with body:\n',
-      JSON.stringify(req.body, null, 2),
-      '\n',
+    'received update with body:\n',
+    JSON.stringify(req.body, null, 2),
+    '\n'
   );
 
   res.setHeader('Content-Type', 'application/json');
@@ -60,7 +63,7 @@ app.post('/update', function(req, res) {
   });
 });
 
-app.get('/update', function(req, res) {
+app.get('/update', function (req, res) {
   console.log('received get with body:\n', req.body, '\n');
 
   res.setHeader('Content-Type', 'application/json');
@@ -69,7 +72,7 @@ app.get('/update', function(req, res) {
   });
 });
 
-app.listen(PORT, function() {
+app.listen(PORT, function () {
   console.log('Server is listening on port ', PORT);
 });
 
@@ -93,33 +96,32 @@ bot.giveawaysManager = new GiveawaysManager(bot, {
   },
 });
 bot.giveawaysManager.on(
-    'giveawayReactionAdded',
-    (giveaway, member, reaction) => {
-      console.log(
-          `${member.user.tag} entered giveaway #${giveaway.messageID} (${reaction.emoji.name})`,
-      );
-    },
+  'giveawayReactionAdded',
+  (giveaway, member, reaction) => {
+    console.log(
+      `${member.user.tag} entered giveaway #${giveaway.messageID} (${reaction.emoji.name})`
+    );
+  }
 );
 bot.giveawaysManager.on(
-    'giveawayReactionRemoved',
-    (giveaway, member, reaction) => {
-      console.log(
-          `${member.user.tag} unreact to giveaway #${giveaway.messageID} (${reaction.emoji.name})`,
-      );
-    },
+  'giveawayReactionRemoved',
+  (giveaway, member, reaction) => {
+    console.log(
+      `${member.user.tag} unreact to giveaway #${giveaway.messageID} (${reaction.emoji.name})`
+    );
+  }
 );
 bot.giveawaysManager.on('giveawayEnded', (giveaway, winners) => {
   console.log(
-      `Giveaway #${giveaway.messageID} ended! Winners: ${winners
-          .map((member) => member.user.username)
-          .join(', ')}`,
+    `Giveaway #${giveaway.messageID} ended! Winners: ${winners
+      .map((member) => member.user.username)
+      .join(', ')}`
   );
 });
 
 const factoryParty = new ArtIndexerBot(getArtBlocksFactoryProjects);
 const artIndexerBot = new ArtIndexerBot();
-// TODO: uncomment once PBAB-block-talk channel created
-// const pbabIndexerBot = new ArtIndexerBot(getPBABProjects);
+const pbabIndexerBot = new ArtIndexerBot(getPBABProjects);
 const randomGuy = new RandomBot();
 
 // Special address collector.
@@ -173,10 +175,9 @@ bot.on('message', (msg) => {
       case CHANNEL_BLOCK_TALK:
         artIndexerBot.handleNumberMessage(msg);
         break;
-      // TODO: Uncomment once PBAB Channel available
-      // case CHANNEL_PBAB_TALK:
-      //   pbabIndexerBot.handleNumberMessage(msg);
-      //   break;
+      case CHANNEL_PBAB_CHAT:
+        pbabIndexerBot.handleNumberMessage(msg);
+        break;
       case CHANNEL_ART_CHAT:
         randomGuy.handleRandomMessage(msg);
         break;
@@ -191,16 +192,16 @@ bot.on('message', (msg) => {
   // Handle special info questions that ArtBot knows how to answer.
   const artBotID = bot.user.id;
   smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
-      (smartResponse) => {
-        if (smartResponse !== null && smartResponse !== undefined) {
-          msg.reply(null, {
-            embed: smartResponse,
-            allowedMentions: {
-              repliedUser: true,
-            },
-          });
-        }
-      },
+    (smartResponse) => {
+      if (smartResponse !== null && smartResponse !== undefined) {
+        msg.reply(null, {
+          embed: smartResponse,
+          allowedMentions: {
+            repliedUser: true,
+          },
+        });
+      }
+    }
   );
 });
 
@@ -209,27 +210,27 @@ bot.on('message', (msg) => {
 // LooksRare pollers for V2 Contract
 // List Events
 new LooksRareAPIPollBot(
-    `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.V2}&type=LIST&pagination[first]=25`,
-    API_POLL_TIME_MS,
-    bot,
+  `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.V2}&type=LIST&pagination[first]=25`,
+  API_POLL_TIME_MS,
+  bot
 );
 // Sale Events
 new LooksRareAPIPollBot(
-    `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.V2}&type=SALE&pagination[first]=25`,
-    API_POLL_TIME_MS,
-    bot,
+  `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.V2}&type=SALE&pagination[first]=25`,
+  API_POLL_TIME_MS,
+  bot
 );
 
 // LooksRare pollers for OG Contract
 // List Events
 new LooksRareAPIPollBot(
-    `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.OG}&type=LIST&pagination[first]=25`,
-    API_POLL_TIME_MS,
-    bot,
+  `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.OG}&type=LIST&pagination[first]=25`,
+  API_POLL_TIME_MS,
+  bot
 );
 // Sale Events
 new LooksRareAPIPollBot(
-    `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.OG}&type=SALE&pagination[first]=25`,
-    API_POLL_TIME_MS,
-    bot,
+  `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.OG}&type=SALE&pagination[first]=25`,
+  API_POLL_TIME_MS,
+  bot
 );
