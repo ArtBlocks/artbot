@@ -8,7 +8,6 @@ const getArtBlocksFactoryProjects =
 
 const AddressCollector = require('./Classes/AddressCollector').AddressCollector
 const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot
-const RandomBot = require('./Classes/RandomBot').RandomBot
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json')
 const { LooksRareAPIPollBot } = require('./Classes/LooksRareAPIPollBot')
@@ -32,9 +31,8 @@ const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects']
 
 // Block Talk
 const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
-const CHANNEL_PBAB_TALK = projectConfig.chIdByName['general']
 
-// Block Talk
+// PBAB Chat
 const CHANNEL_PBAB_CHAT = projectConfig.chIdByName['pbab-chat']
 
 // AB Art Chat
@@ -83,7 +81,7 @@ bot.login(TOKEN)
 
 bot.on('ready', (client) => {
   console.info(`Logged in as ${bot.user.tag}!`)
-  randomGuy.startRoutine(bot.channels.cache.get(CHANNEL_ART_CHAT))
+  artIndexerBot.startRandomRoutine(bot.channels.cache.get(CHANNEL_ART_CHAT))
 })
 
 // Manage Giveaways with Artbot
@@ -123,7 +121,6 @@ bot.giveawaysManager.on('giveawayEnded', (giveaway, winners) => {
 const factoryParty = new ArtIndexerBot(getArtBlocksFactoryProjects)
 const artIndexerBot = new ArtIndexerBot()
 const pbabIndexerBot = new ArtIndexerBot(getPBABProjects)
-const randomGuy = new RandomBot()
 
 // Special address collector.
 const addressCollector = new AddressCollector()
@@ -180,7 +177,7 @@ bot.on('message', (msg) => {
         pbabIndexerBot.handleNumberMessage(msg)
         break
       case CHANNEL_ART_CHAT:
-        randomGuy.handleRandomMessage(msg)
+        artIndexerBot.handleNumberMessage(msg)
         break
       // Fall-back - expect a project bot to handle
       default:
