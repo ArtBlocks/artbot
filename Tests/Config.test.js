@@ -15,6 +15,7 @@ const NON_BOT_CHANNELS = [
   'squiggle-listings',
   'for-sale-listings',
   'trade-swaps',
+  'pbab-chat',
 ]
 
 describe('testing config files', () => {

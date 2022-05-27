@@ -34,6 +34,9 @@ const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects']
 const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 const CHANNEL_PBAB_TALK = projectConfig.chIdByName['general']
 
+// Block Talk
+const CHANNEL_PBAB_CHAT = projectConfig.chIdByName['pbab-chat']
+
 // AB Art Chat
 const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat']
 
@@ -119,7 +122,6 @@ bot.giveawaysManager.on('giveawayEnded', (giveaway, winners) => {
 
 const factoryParty = new ArtIndexerBot(getArtBlocksFactoryProjects)
 const artIndexerBot = new ArtIndexerBot()
-// TODO: uncomment once PBAB-block-talk channel created
 const pbabIndexerBot = new ArtIndexerBot(getPBABProjects)
 const randomGuy = new RandomBot()
 
@@ -174,8 +176,7 @@ bot.on('message', (msg) => {
       case CHANNEL_BLOCK_TALK:
         artIndexerBot.handleNumberMessage(msg)
         break
-      // TODO: Uncomment once PBAB Channel available
-      case CHANNEL_PBAB_TALK:
+      case CHANNEL_PBAB_CHAT:
         pbabIndexerBot.handleNumberMessage(msg)
         break
       case CHANNEL_ART_CHAT:
