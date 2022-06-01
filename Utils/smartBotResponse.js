@@ -186,7 +186,7 @@ const GENART_MESSAGE = new MessageEmbed()
   .setColor(ARTBOT_GREEN)
   // Set the main content of the embed
   .setDescription(
-    `Generative artists create a set of rules that automate art creation within a predefined framework. By introducing randomness to those systems, artists are able to explore and iterate on ideas through varied outputs. In a contemporary sense, this means writing code-based rules used to create a collection of generative works. These algorithms are capable of generating hundreds, or even thousands, of compelling works of art that express a range of possibilities within a single algorithm.`
+    `Generative artists create a set of rules that automate art creation within a predefined framework. By introducing randomness to those systems, artists are able to explore and iterate on ideas through varied outputs. In a contemporary sense, this means writing code-based rules to create a collection of generative works. These algorithms are capable of generating hundreds, or even thousands, of compelling works of art that express a range of possibilities within a single algorithm.`
   )
 
 // Custom message shown when someone asks about safety
