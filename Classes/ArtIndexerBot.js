@@ -10,6 +10,7 @@ const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
 // Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES =
   process.env.METADATA_REFRESH_INTERVAL_MINUTES
+const RANDOM_ART_INTERVAL_MINUTES = process.env.RANDOM_ART_INTERVAL_MINUTES
 
 class ArtIndexerBot {
   constructor(projectFetch = getArtBlocksProjects) {
@@ -37,12 +38,12 @@ class ArtIndexerBot {
         console.log(
           `Refreshing project cache for Project ${project.projectId} ${project.name}`
         )
-
         const newBot = new ProjectBot({
           projectNumber: project.projectId,
           coreContract: project.contract.id,
           editionSize: project.invocations,
           projectName: project.name,
+          projectActive: project.active,
         })
         const projectKey = this.toProjectKey(project.name)
         this.projects[projectKey] = newBot
@@ -67,14 +68,13 @@ class ArtIndexerBot {
     )
 
     // if '#?' message, get random project
-    // TODO: merge functionality with RandomBot
     if (projectKey === '#?') {
-      const keys = Object.keys(this.projects)
-      projectKey = keys[Math.floor(Math.random() * keys.length)]
+      return this.sendRandomProjectRandomTokenMessage(msg)
     }
 
     console.log(`Searching for project ${projectKey}`)
     const projBot = this.projects[projectKey]
+    // TODO: handle PBAB projects (e.g. #? Plottables)
     if (projBot) {
       projBot.handleNumberMessage(msg)
     }
@@ -91,6 +91,31 @@ class ArtIndexerBot {
     }
 
     return projectKey
+  }
+
+  async startRandomRoutine(channel) {
+    let msg = {}
+    msg.content = '#?'
+    msg.channel = channel
+    setInterval(
+      () => this.sendRandomProjectRandomTokenMessage(msg),
+      RANDOM_ART_INTERVAL_MINUTES * 60000
+    )
+  }
+
+  // This function takes a channel and sends a message containing a random
+  // token from a random project
+  async sendRandomProjectRandomTokenMessage(msg) {
+    let attempts = 0
+    while (attempts < 10) {
+      const keys = Object.keys(this.projects)
+      let projectKey = keys[Math.floor(Math.random() * keys.length)]
+      let projBot = this.projects[projectKey]
+      if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
+        return projBot.handleNumberMessage(msg)
+      }
+      attempts++
+    }
   }
 }
 
