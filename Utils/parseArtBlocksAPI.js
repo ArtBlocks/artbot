@@ -36,6 +36,7 @@ const contractProjects = gql`
         invocations
         maxInvocations
         curationStatus
+        active
         contract {
           id
         }
@@ -79,6 +80,7 @@ const contractProjectsWithCurationStatus = gql`
         name
         invocations
         maxInvocations
+        active
         curationStatus
         contract {
           id
@@ -183,6 +185,7 @@ async function getContractProject(projectId, contractId) {
  *   - curationStatus
  *   - invocations
  *   - maxInvocations
+ *   - active
  *   - name
  *   - projectId
  *   - contract
@@ -321,6 +324,7 @@ async function _getContractNullFactoryProjects(contractId) {
  * If project found, returns array of project objects with:
  *   - invocations
  *   - maxInvocations
+ *   - active
  *   - name
  *   - projectId
  *   - contract
@@ -346,6 +350,7 @@ async function getArtBlocksFactoryProjects() {
  * If project found, returns array of project objects with:
  *   - invocations
  *   - maxInvocations
+ *   - active
  *   - name
  *   - projectId
  *   - contract
@@ -388,6 +393,7 @@ async function _getPBABContracts() {
  * If project found, returns array of project objects with:
  *   - invocations
  *   - maxInvocations
+ *   - active
  *   - name
  *   - projectId
  *   - contract
