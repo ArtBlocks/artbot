@@ -154,7 +154,39 @@ const HELP_MESSAGE = new MessageEmbed()
   .setColor(ARTBOT_GREEN)
   // Set the main content of the embed
   .setDescription(
-    `These are the things you can ask me:\n\n**squiggle paused?**: An explanation of why Chromie Squiggle minting is paused.\n**drop?**: Where to find information about the next drop.\n**playground?** (or **curated?** or **factory?**): Information about the different types of Art Blocks projects.\n**opensea?**: Links to the three different Art Blocks collections on OpenSea (Curated, Playground, and Factory).\n**metrics?**: The latest Art Blocks platform metrics.\n**applications?**: An explanation of the current state of the Art Blocks application process.\n**gas?**: An explanation of what gas is and why you should **never** modify the gas limit.\n**staysafe?**: Tips on avoiding scams`
+    `These are the things you can ask me:\n
+    **artblocks?**: What is Art Blocks?
+    **genart?**: What is generative art?
+    **squiggle paused?**: An explanation of why Chromie Squiggle minting is paused.
+    **drop?**: Where to find information about the next drop.
+    **playground?** (or **curated?** or **factory?**): Information about the different types of Art Blocks projects.
+    **opensea?**: Links to the three different Art Blocks collections on OpenSea (Curated, Playground, and Factory).
+    **metrics?**: The latest Art Blocks platform metrics.
+    **applications?**: An explanation of the current state of the Art Blocks application process.
+    **gas?**: An explanation of what gas is and why you should **never** modify the gas limit.
+    **staysafe?**: Tips on avoiding scams
+    `
+  )
+// Custom message shown when someone asks about ArtBlocks
+const ARTBLOCKS_MESSAGE = new MessageEmbed()
+  // Set the title of the field
+  .setTitle('What is Art Blocks?')
+  // Set the color of the embed
+  .setColor(ARTBOT_GREEN)
+  // Set the main content of the embed
+  .setDescription(
+    `Art Blocks is leading a new generation of art. Hosting projects from today’s most innovative digital artists, our platform combines creative coding with blockchain technology to establish a new paradigm for the creation and ownership of art. Collectors actively participate in realizing an artist’s vision by generating unique algorithmic artworks. This symbiotic relationship and shared experience form the basis of our dynamic community. We invite you to join us as we build a home for the future of generative art.`
+  )
+
+// Custom message shown when someone asks about gen art
+const GENART_MESSAGE = new MessageEmbed()
+  // Set the title of the field
+  .setTitle('What is generative art?')
+  // Set the color of the embed
+  .setColor(ARTBOT_GREEN)
+  // Set the main content of the embed
+  .setDescription(
+    `Generative artists create a set of rules that automate art creation within a predefined framework. By introducing randomness to those systems, artists are able to explore and iterate on ideas through varied outputs. In a contemporary sense, this means writing code-based rules to create a collection of generative works. These algorithms are capable of generating hundreds, or even thousands, of compelling works of art that express a range of possibilities within a single algorithm.`
   )
 
 // Custom message shown when someone asks about safety
@@ -272,6 +304,22 @@ async function smartBotResponse(
     return HELP_MESSAGE
   }
 
+  // Handle requests for ArtBlocks info!
+  const mentionsArtBlocks =
+    msgContentLowercase.includes('artblocks') ||
+    msgContentLowercase.includes('art blocks')
+  if (containsQuestion && mentionsArtBlocks) {
+    return ARTBLOCKS_MESSAGE
+  }
+
+  // Handle requests for GenArt info!
+  const mentionsGenArt =
+    msgContentLowercase.includes('genart') ||
+    msgContentLowercase.includes('gen art')
+  if (containsQuestion && mentionsGenArt) {
+    return GENART_MESSAGE
+  }
+
   // Handle requests for safety tips!
   const mentionsSafety =
     msgContentLowercase.includes('staysafe') ||
@@ -279,6 +327,7 @@ async function smartBotResponse(
   if (containsQuestion && mentionsSafety) {
     return SAFETY_MESSAGE
   }
+
   // Handle drop questions.
   const mentionsDrop = msgContentLowercase.includes('drop')
   if (containsQuestion && mentionsDrop) {
