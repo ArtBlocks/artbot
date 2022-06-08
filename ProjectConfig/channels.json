@@ -405,7 +405,10 @@
   "910410292205350953": {
     "name": "steganon",
     "projectBotHandlers": {
-      "default": "209"
+      "default": "209",
+      "stringTriggers": {
+        "319": ["ap"]
+      }
     }
   },
   "912771594357714964": {
