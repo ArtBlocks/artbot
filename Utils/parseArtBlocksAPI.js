@@ -6,7 +6,7 @@ const API_URL = 'https://api.thegraph.com/subgraphs/name/artblocks/art-blocks'
 
 // core contract addresses to include during initilization
 const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
-const PARTNER_CONTRACTS = require('../ProjectConfig/partnerContracts.json')
+const COLLAB_CONTRACTS = require('../ProjectConfig/collaborationContracts.json')
 
 const client = createClient({
   url: API_URL,
@@ -398,7 +398,7 @@ async function getArtBlocksProjects() {
  *     - id: string Contract Address
  */
 async function getArtBlocksXPaceProjects() {
-  return await getContractsProjects([PARTNER_CONTRACTS.AB_X_PACE])
+  return await getContractsProjects([COLLAB_CONTRACTS.AB_X_PACE])
 }
 
 /**
@@ -406,8 +406,9 @@ async function getArtBlocksXPaceProjects() {
  *
  */
 async function _getPBABContracts() {
-  const nonPBABContracts = Object.values(CORE_CONTRACTS)
-  nonPBABContracts.push(PARTNER_CONTRACTS.AB_X_PACE)
+  const nonPBABContracts = Object.values(CORE_CONTRACTS).concat(
+    Object.values(COLLAB_CONTRACTS)
+  )
   try {
     const result = await client
       .query(getPBABContracts, {
