@@ -6,6 +6,7 @@ const API_URL = 'https://api.thegraph.com/subgraphs/name/artblocks/art-blocks'
 
 // core contract addresses to include during initilization
 const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
+const PARTNER_CONTRACTS = require('../ProjectConfig/partnerContracts.json')
 
 const client = createClient({
   url: API_URL,
@@ -345,6 +346,30 @@ async function getArtBlocksFactoryProjects() {
 }
 
 /**
+ * get data for all projects in specified contracts
+ * Returns undefined if errors encountered while fetching.
+ * If project found, returns array of project objects with:
+ *   - invocations
+ *   - maxInvocations
+ *   - active
+ *   - name
+ *   - projectId
+ *   - contract
+ *     - id: string Contract Address
+ */
+async function getContractsProjects(contractsToGet) {
+  try {
+    const allArrays = await Promise.all([
+      ...contractsToGet.map(_getContractProjects),
+    ])
+    return allArrays.flat()
+  } catch (err) {
+    console.error(err)
+  }
+  return undefined
+}
+
+/**
  * get data for all artblocks projects
  * Returns undefined if errors encountered while fetching.
  * If project found, returns array of project objects with:
@@ -357,16 +382,23 @@ async function getArtBlocksFactoryProjects() {
  *     - id: string Contract Address
  */
 async function getArtBlocksProjects() {
-  try {
-    const contractsToGet = Object.values(CORE_CONTRACTS)
-    const allArrays = await Promise.all([
-      ...contractsToGet.map(_getContractProjects),
-    ])
-    return allArrays.flat()
-  } catch (err) {
-    console.error(err)
-  }
-  return undefined
+  return await getContractsProjects(Object.values(CORE_CONTRACTS))
+}
+
+/**
+ * get data for all AB x Pace projects
+ * Returns undefined if errors encountered while fetching.
+ * If project found, returns array of project objects with:
+ *   - invocations
+ *   - maxInvocations
+ *   - active
+ *   - name
+ *   - projectId
+ *   - contract
+ *     - id: string Contract Address
+ */
+async function getArtBlocksXPaceProjects() {
+  return await getContractsProjects([PARTNER_CONTRACTS.AB_X_PACE])
 }
 
 /**
@@ -374,10 +406,12 @@ async function getArtBlocksProjects() {
  *
  */
 async function _getPBABContracts() {
+  const nonPBABContracts = Object.values(CORE_CONTRACTS)
+  nonPBABContracts.push(PARTNER_CONTRACTS.AB_X_PACE)
   try {
     const result = await client
       .query(getPBABContracts, {
-        ids: Object.values(CORE_CONTRACTS),
+        ids: nonPBABContracts,
       })
       .toPromise()
     return result.data.contracts.map(({ id }) => id)
@@ -400,21 +434,14 @@ async function _getPBABContracts() {
  *     - id: string Contract Address
  */
 async function getPBABProjects() {
-  try {
-    const contractsToGet = await _getPBABContracts()
-    const allArrays = await Promise.all([
-      ...contractsToGet.map(_getContractProjects),
-    ])
-    return allArrays.flat()
-  } catch (err) {
-    console.error(err)
-  }
-  return undefined
+  const contractsToGet = await _getPBABContracts()
+  return getContractsProjects(contractsToGet)
 }
 
 module.exports.getArtBlocksProject = getArtBlocksProject
 module.exports.getArtBlocksFactoryProjects = getArtBlocksFactoryProjects
 module.exports.getArtBlocksProjects = getArtBlocksProjects
 module.exports.getPBABProjects = getPBABProjects
+module.exports.getArtBlocksXPaceProjects = getArtBlocksXPaceProjects
 module.exports.getArtBlocksProjectCount = getArtBlocksProjectCount
 module.exports.getContractProject = getContractProject
