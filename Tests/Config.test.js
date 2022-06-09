@@ -16,6 +16,7 @@ const NON_BOT_CHANNELS = [
   'for-sale-listings',
   'trade-swaps',
   'pbab-chat',
+  'art-blocks-x-pace',
 ]
 
 describe('testing config files', () => {

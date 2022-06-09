@@ -13,7 +13,10 @@ const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json')
 const { LooksRareAPIPollBot } = require('./Classes/LooksRareAPIPollBot')
 // Special handlers.
 const { triageActivityMessage } = require('./Utils/activityTriager')
-const { getPBABProjects } = require('./Utils/parseArtBlocksAPI')
+const {
+  getPBABProjects,
+  getArtBlocksXPaceProjects,
+} = require('./Utils/parseArtBlocksAPI')
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 const handleGiveawayMessage =
@@ -34,6 +37,9 @@ const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 
 // PBAB Chat
 const CHANNEL_PBAB_CHAT = projectConfig.chIdByName['pbab-chat']
+
+// AB x Pace
+const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
 
 // AB Art Chat
 const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat']
@@ -121,6 +127,7 @@ bot.giveawaysManager.on('giveawayEnded', (giveaway, winners) => {
 const factoryParty = new ArtIndexerBot(getArtBlocksFactoryProjects)
 const artIndexerBot = new ArtIndexerBot()
 const pbabIndexerBot = new ArtIndexerBot(getPBABProjects)
+const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
 
 // Special address collector.
 const addressCollector = new AddressCollector()
@@ -175,6 +182,9 @@ bot.on('message', (msg) => {
         break
       case CHANNEL_PBAB_CHAT:
         pbabIndexerBot.handleNumberMessage(msg)
+        break
+      case CHANNEL_AB_X_PACE:
+        abXpaceIndexerBot.handleNumberMessage(msg)
         break
       case CHANNEL_ART_CHAT:
         artIndexerBot.handleNumberMessage(msg)
