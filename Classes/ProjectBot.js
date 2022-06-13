@@ -109,6 +109,7 @@ class ProjectBot {
 
     // If PBAB project, add PBAB name to front
     if (
+      artBlocksData.platform &&
       artBlocksData.platform !== '' &&
       !artBlocksData.platform.includes('Art Blocks')
     ) {
