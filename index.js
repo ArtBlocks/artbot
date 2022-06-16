@@ -11,6 +11,7 @@ const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json')
 const { LooksRareAPIPollBot } = require('./Classes/LooksRareAPIPollBot')
+const { ArchipelagoBot } = require('./Classes/ArchipelagoBot')
 // Special handlers.
 const { triageActivityMessage } = require('./Utils/activityTriager')
 const {
@@ -242,3 +243,6 @@ new LooksRareAPIPollBot(
   API_POLL_TIME_MS,
   bot
 )
+
+const archipelagoBot = new ArchipelagoBot(bot)
+archipelagoBot.activate()
