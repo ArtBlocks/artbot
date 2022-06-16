@@ -9,6 +9,8 @@ const {
 } = require('../Utils/activityTriager')
 
 const WEB_SOCKET_URL = 'wss://api.archipelago.art/ws'
+const COLLECTIONS_API = 'https://api.archipelago.art/v1/market/collections'
+const ONE_MILLION = 1000000
 const ASK_COLOR = '#CD8A1C'
 
 class ArchipelagoBot {
@@ -29,9 +31,7 @@ class ArchipelagoBot {
 
   async refreshCollections() {
     this.slugToCollections = new Map()
-    const collectionsResponse = await fetch(
-      'https://api.archipelago.art/v1/market/collections'
-    )
+    const collectionsResponse = await fetch(COLLECTIONS_API)
     const collections = await collectionsResponse.json()
     for (const collection of collections) {
       this.slugToCollections.set(collection.slug, collection)
@@ -55,7 +55,7 @@ class ArchipelagoBot {
     if (collection == null) {
       return null
     }
-    const offset = collection.artblocksProjectIndex * 1000000
+    const offset = collection.artblocksProjectIndex * ONE_MILLION
     const tokenId = offset + tokenIndex
     const artBlocksResponse = await fetch(
       `https://token.artblocks.io/${tokenId}`
