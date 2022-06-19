@@ -10,6 +10,7 @@ const {
 
 const WEB_SOCKET_URL = 'wss://api.archipelago.art/ws'
 const COLLECTIONS_API = 'https://api.archipelago.art/v1/market/collections'
+const HEADERS = { 'User-Agent': 'artbot/1.0' }
 const ONE_MILLION = 1000000
 const ASK_COLOR = '#CD8A1C'
 
@@ -31,7 +32,9 @@ class ArchipelagoBot {
 
   async refreshCollections() {
     this.slugToCollections = new Map()
-    const collectionsResponse = await fetch(COLLECTIONS_API)
+    const collectionsResponse = await fetch(COLLECTIONS_API, {
+      headers: HEADERS,
+    })
     const collections = await collectionsResponse.json()
     for (const collection of collections) {
       this.slugToCollections.set(collection.slug, collection)
