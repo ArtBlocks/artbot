@@ -13,6 +13,7 @@ const COLLECTIONS_API = 'https://api.archipelago.art/v1/market/collections'
 const HEADERS = { 'User-Agent': 'artbot/1.0' }
 const ONE_MILLION = 1000000
 const ASK_COLOR = '#CD8A1C'
+const TRADE_COLOR = '#4072A7'
 
 class ArchipelagoBot {
   constructor(discordClient) {
@@ -70,7 +71,7 @@ class ArchipelagoBot {
     return artBlocksData
   }
 
-  async sendAskEmbed(seller, price, slug, tokenIndex) {
+  async sendAskEmbed({ asker: seller, price, slug, tokenIndex }) {
     const artBlocksData = await this.getArtBlocksData(slug, tokenIndex)
     if (artBlocksData == null) {
       console.warn(`Unable to get ArtBlocks data for ${slug} #${tokenIndex}`)
@@ -98,6 +99,40 @@ class ArchipelagoBot {
     sendEmbedToListChannels(this.discordClient, embed, artBlocksData)
   }
 
+  async sendTradeEmbed({ buyer, seller, price, slug, tokenIndex }) {
+    const artBlocksData = await this.getArtBlocksData(slug, tokenIndex)
+    if (artBlocksData == null) {
+      console.warn(`Unable to get ArtBlocks data for ${slug} #${tokenIndex}`)
+      return
+    }
+    if (BAN_ADDRESSES.has(seller)) {
+      console.log(`Skipping banned seller ${seller} for ${slug} #${tokenIndex}`)
+      return
+    }
+    if (BAN_ADDRESSES.has(buyer)) {
+      console.log(`Skipping banned buyer ${buyer} for ${slug} #${tokenIndex}`)
+      return
+    }
+    const archipelagoUrl = `https://archipelago.art/collections/${slug}/${tokenIndex}`
+    const embed = new MessageEmbed()
+    const sellerUrl = `https://archipelago.art/address/${seller}`
+    embed.addField('Seller (Archipelago)', `[${seller}](${sellerUrl})`)
+    const buyerUrl = `https://archipelago.art/address/${buyer}`
+    embed.addField('Buyer', `[${buyer}](${buyerUrl})`)
+    embed.addField('Price', priceToString(price) + ' ETH')
+    embed.setColor(TRADE_COLOR)
+    embed.setThumbnail(artBlocksData.image)
+    embed.addField(
+      'Live Script',
+      `[view on artblocks.io](${artBlocksData.external_url})`,
+      true
+    )
+    embed.author = null
+    embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`)
+    embed.setURL(archipelagoUrl)
+    sendEmbedToSaleChannels(this.discordClient, embed, artBlocksData)
+  }
+
   onMessage(msg) {
     const message = JSON.parse(msg)
     switch (message.type) {
@@ -105,11 +140,16 @@ class ArchipelagoBot {
         if (message.data.venue !== 'ARCHIPELAGO') {
           break // we include opensea data, redundant for artbot
         }
-        const { asker, price, tokenId, slug, tokenIndex } = message.data
-        this.sendAskEmbed(asker, price, slug, tokenIndex)
+        this.sendAskEmbed(message.data)
         break
       case 'TOKEN_TRADED':
-        // sales not yet supported.
+        if (
+          message.data.venue != null &&
+          message.data.venue !== 'ARCHIPELAGO'
+        ) {
+          break // if venue specified, must be archipelago
+        }
+        this.sendTradeEmbed(message.data)
         break
       default:
         break
