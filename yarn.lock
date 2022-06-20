@@ -3828,6 +3828,11 @@
     "string_decoder" "^1.1.1"
     "util-deprecate" "^1.0.1"
 
+"reconnecting-websocket@^4.4.0":
+  "integrity" "sha512-D2E33ceRPga0NvTDhJmphEgJ7FUYF0v4lr1ki0csq06OdlxKfugGzN0dSkxM/NfqCxYELK4KcaTOUOjTV6Dcng=="
+  "resolved" "https://registry.npmjs.org/reconnecting-websocket/-/reconnecting-websocket-4.4.0.tgz"
+  "version" "4.4.0"
+
 "regexp.prototype.flags@^1.4.1", "regexp.prototype.flags@^1.4.3":
   "resolved" "https://registry.npmjs.org/regexp.prototype.flags/-/regexp.prototype.flags-1.4.3.tgz"
   "version" "1.4.3"

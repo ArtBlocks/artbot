@@ -34,6 +34,7 @@
     "node-fetch": "^2.6.1",
     "node-html-parser": "^3.2.0",
     "prettier": "^2.6.2",
+    "reconnecting-websocket": "^4.4.0",
     "timeago.js": "^4.0.2",
     "web3": "^1.7.0",
     "ws": "^8.8.0"

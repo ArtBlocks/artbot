@@ -1,5 +1,6 @@
 const fetch = require('node-fetch')
-const WebSocket = require('ws')
+const ReconnectingWebsocket = require('reconnecting-websocket')
+const WS = require('ws')
 const { MessageEmbed } = require('discord.js')
 
 const {
@@ -22,13 +23,15 @@ class ArchipelagoBot {
 
   async activate() {
     await this.refreshCollections()
-    this.client = new WebSocket(WEB_SOCKET_URL)
+    this.client = new ReconnectingWebsocket(WEB_SOCKET_URL, [], {
+      WebSocket: WS,
+    })
     const subscribe = () =>
       this.client.send(
         JSON.stringify({ type: 'SUBSCRIBE_TOPIC', topic: 'ALL_COLLECTIONS' })
       )
-    this.client.on('open', () => subscribe())
-    this.client.on('message', (message) => this.onMessage(message))
+    this.client.addEventListener('open', () => subscribe())
+    this.client.addEventListener('message', (ev) => this.onMessage(ev.data))
   }
 
   async refreshCollections() {
