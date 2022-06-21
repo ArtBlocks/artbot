@@ -20,6 +20,8 @@ class OpenseaAPIPollBot extends APIPollBot {
       apiEndpoint + '&occurred_after=' + (Date.now() / 1000).toFixed()
     super(apiEndpoint, refreshRateMs, bot, headers)
     this.contract = contract
+    this.listColor = '#407FDB'
+    this.saleColor = '#62DE7C'
   }
 
   /**
@@ -73,30 +75,39 @@ class OpenseaAPIPollBot extends APIPollBot {
     let priceText, price, owner, ownerName
     if (eventType === 'successful') {
       // Item sold, add 'Buyer' field
-      embed.addField(
-        'Buyer',
+      const buyerText =
         msg.winner_account.address +
-          ' (' +
-          msg.winner_account.user.username +
-          ')'
-      )
+        (msg.winner_account.user && msg.winner_account.user.username
+          ? ' (' + msg.winner_account.user.username + ')'
+          : '')
+
+      embed.addField('Buyer', buyerText)
       priceText = 'Sale Price'
       price = msg.total_price
       owner = msg.seller.address
-      ownerName = msg.seller.user ? msg.seller.user.username : ''
+      ownerName =
+        msg.seller.user && msg.seller.user.username
+          ? msg.seller.user.username
+          : ''
+      embed.setColor(this.saleColor)
     } else {
       // Item Listed
       priceText = 'List Price'
       price = msg.ending_price
       owner = msg.from_account.address
-      ownerName = msg.from_account.user ? msg.from_account.user.username : ''
+      ownerName =
+        msg.from_account.user && msg.seller.user.username
+          ? msg.from_account.user.username
+          : ''
+      embed.setColor(this.listColor)
     }
 
     if (BAN_ADDRESSES.has(owner)) {
       console.log(`Skipping message propagation for ${owner}`)
       return
     }
-    embed.addField('Seller (Opensea)', owner + ' (' + ownerName + ')')
+    const sellerText = owner + (ownerName !== '' ? ' (' + ownerName + ')' : '')
+    embed.addField('Seller (Opensea)', sellerText)
     embed.addField(
       priceText,
       parseInt(price) / 1000000000000000000 + 'ETH',
