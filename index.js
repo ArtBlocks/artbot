@@ -18,7 +18,8 @@ const {
   getPBABProjects,
   getArtBlocksXPaceProjects,
 } = require('./Utils/parseArtBlocksAPI')
-
+const { OpenseaAPIPollBot } = require('./Classes/OpenseaAPIPollBot')
+const COLLAB_CONTRACTS = require('./ProjectConfig/collaborationContracts.json')
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 const handleGiveawayMessage =
   require('./Utils/giveawayCommands').handleGiveawayMessage
@@ -246,3 +247,29 @@ new LooksRareAPIPollBot(
 
 const archipelagoBot = new ArchipelagoBot(bot)
 archipelagoBot.activate()
+
+// Temp hack to get these sales/listings working
+// TODO: come back and use reservoir / new OS API for more robust solution
+
+const paceSlug = 'petro-national-by-john-gerrard'
+new OpenseaAPIPollBot(
+  `https://api.opensea.io/api/v1/events?collection_slug=${paceSlug}&event_type=successful`,
+  API_POLL_TIME_MS,
+  bot,
+  {
+    Accept: 'application/json',
+    'X-API-KEY': process.env.OPENSEA_API_KEY,
+  },
+  COLLAB_CONTRACTS.AB_X_PACE
+)
+
+new OpenseaAPIPollBot(
+  `https://api.opensea.io/api/v1/events?collection_slug=${paceSlug}&event_type=created`,
+  API_POLL_TIME_MS,
+  bot,
+  {
+    Accept: 'application/json',
+    'X-API-KEY': process.env.OPENSEA_API_KEY,
+  },
+  COLLAB_CONTRACTS.AB_X_PACE
+)
