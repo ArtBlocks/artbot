@@ -13,8 +13,7 @@ const WEB_SOCKET_URL = 'wss://api.archipelago.art/ws'
 const COLLECTIONS_API = 'https://api.archipelago.art/v1/market/collections'
 const HEADERS = { 'User-Agent': 'artbot/1.0' }
 const ONE_MILLION = 1000000
-const ASK_COLOR = '#CD8A1C'
-const TRADE_COLOR = '#4072A7'
+const ARCHIPELAGO_GOLD = '#9C814B'
 
 class ArchipelagoBot {
   constructor(discordClient) {
@@ -89,7 +88,7 @@ class ArchipelagoBot {
     const sellerUrl = `https://archipelago.art/address/${seller}`
     embed.addField('Seller (Archipelago)', `[${seller}](${sellerUrl})`)
     embed.addField('List Price', priceToString(price) + ' ETH')
-    embed.setColor(ASK_COLOR)
+    embed.setColor(ARCHIPELAGO_GOLD)
     embed.setThumbnail(artBlocksData.image)
     embed.addField(
       'Live Script',
@@ -123,7 +122,7 @@ class ArchipelagoBot {
     const buyerUrl = `https://archipelago.art/address/${buyer}`
     embed.addField('Buyer', `[${buyer}](${buyerUrl})`)
     embed.addField('Price', priceToString(price) + ' ETH')
-    embed.setColor(TRADE_COLOR)
+    embed.setColor(ARCHIPELAGO_GOLD)
     embed.setThumbnail(artBlocksData.image)
     embed.addField(
       'Live Script',
