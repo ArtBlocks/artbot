@@ -94,5 +94,10 @@
       "sets": "screensSets.json",
       "singles": "screensSingles.json"
     }
+  },
+  "282": {
+    "namedMappings": {
+      "singles": "qilinSingles.json"
+    }
   }
 }
