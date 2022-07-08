@@ -127,12 +127,19 @@ const OPENSEA_CURATED_MESSAGE = new MessageEmbed()
  */
 const PLAYGROUND_CURATED_FACTORY_MESSAGE = new MessageEmbed()
   // Set the title of the field
-  .setTitle('How are "Curated", "Playground", and "Factory" different?')
+  .setTitle(
+    'How are "Curated", "Playground", "Factory", and "Collaborations" different?'
+  )
   // Set the color of the embed
   .setColor(ARTBOT_GREEN)
   // Set the main content of the embed
   .setDescription(
-    `It looks like you're wondering about the different types of Art Blocks projects.\n\n**Art Blocks' Curated Collection** includes projects selected by the curation board representing our vision of cutting-edge generative artwork. These highly innovative releases by renowned artists reflect both astounding beauty and technical pioneering.\n\n**Art Blocks Playground** is where artists who have previously been approved for a curated drop are encouraged to play and be innovative. Like all Art Blocks releases, these projects must meet a quality standard, but experimentation is encouraged in the Playground.\n\n**Art Blocks Factory** was created for artists that do not wish to wait for approval by the curation board or are not selected. While the requirements are more relaxed compared to our Curated Series, Factory projects reflect the innovation, creativity, and artistic beauty associated with Art Blocks.\n\nCheck out [artblocks.io/learn](https://artblocks.io/learn) for a full explanation!`
+    `It looks like you're wondering about the different types of Art Blocks projects.\n
+    **Art Blocks Curated Collection** includes projects selected by the curation board representing our vision of cutting-edge generative artwork. These highly innovative releases by renowned artists reflect both astounding beauty and technical pioneering.\n
+    **Art Blocks Playground** is where artists who have previously been approved for a curated drop are encouraged to play and be innovative. Like all Art Blocks releases, these projects must meet a quality standard, but experimentation is encouraged in the Playground.\n
+    **Art Blocks Factory** was created for artists that do not wish to wait for approval by the curation board or are not selected. While the requirements are more relaxed compared to our Curated Series, Factory projects reflect the innovation, creativity, and artistic beauty associated with Art Blocks.\n
+    **Art Blocks x Collaborations** are with select partners and organized into a new vertical of co-branded collections. Because partner projects live directly in the Art Blocks ecosystem, they will be subject to the same quality review and scheduling as any other Art Blocks project. These collections represent true collaborations between Art Blocks and our partners to shape the program of offerings. \n
+    Check out [artblocks.io/learn](https://artblocks.io/learn) for a full explanation!`
   )
 
 // Custom message shown when someone asks for the OpenSea links.
@@ -159,7 +166,7 @@ const HELP_MESSAGE = new MessageEmbed()
     **genart?**: What is generative art?
     **squiggle paused?**: An explanation of why Chromie Squiggle minting is paused.
     **drop?**: Where to find information about the next drop.
-    **playground?** (or **curated?** or **factory?**): Information about the different types of Art Blocks projects.
+    **playground?** (or **curated?** or **factory?** or **collaborations?**): Information about the different types of Art Blocks projects.
     **opensea?**: Links to the three different Art Blocks collections on OpenSea (Curated, Playground, and Factory).
     **metrics?**: The latest Art Blocks platform metrics.
     **applications?**: An explanation of the current state of the Art Blocks application process.
@@ -201,7 +208,12 @@ const SAFETY_MESSAGE = new MessageEmbed()
         **Avoid clicking links when possible.** Instead, use the official links provided by the platform’s verified Social accounts/Discord and navigate to the page/item you are trading.\n
         **Never** screen share with anyone even if they claim they’re from an official “support” team.\n
         **Never** share your seed phrase or private keys with **anyone.**\n
-        **If something seems too good to be true, it is!**`
+        **If something seems too good to be true, it is!**\n
+        **Official Art Blocks Links:**
+        https://www.artblocks.io/
+        https://twitter.com/artblocks_io
+        https://www.instagram.com/artblocks_io/
+        `
   )
 // Returns a message containing information about the current gas prices.
 async function generateGasPriceMessage() {
@@ -344,7 +356,8 @@ async function smartBotResponse(
   const mentionedCuratedPlaygroundFactory =
     msgContentLowercase.includes('curated') ||
     msgContentLowercase.includes('playground') ||
-    msgContentLowercase.includes('factory')
+    msgContentLowercase.includes('factory') ||
+    msgContentLowercase.includes('collaborations')
   if (containsQuestion && mentionedCuratedPlaygroundFactory) {
     return PLAYGROUND_CURATED_FACTORY_MESSAGE
   }

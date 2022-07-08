@@ -72,16 +72,15 @@ class OpenseaAPIPollBot extends APIPollBot {
     const eventType = msg.event_type
 
     // Construct price field (different info/verbiage depending on sale or list)
-    let priceText, price, owner, ownerName
+    let priceText, price, owner, ownerName, buyerText
     if (eventType === 'successful') {
       // Item sold, add 'Buyer' field
-      const buyerText =
+       buyerText =
         msg.winner_account.address +
         (msg.winner_account.user && msg.winner_account.user.username
           ? ' (' + msg.winner_account.user.username + ')'
           : '')
 
-      embed.addField('Buyer', buyerText)
       priceText = 'Sale Price'
       price = msg.total_price
       owner = msg.seller.address
@@ -108,6 +107,7 @@ class OpenseaAPIPollBot extends APIPollBot {
     }
     const sellerText = owner + (ownerName !== '' ? ' (' + ownerName + ')' : '')
     embed.addField('Seller (Opensea)', sellerText)
+    embed.addField('Buyer', buyerText)
     embed.addField(
       priceText,
       parseInt(price) / 1000000000000000000 + 'ETH',
