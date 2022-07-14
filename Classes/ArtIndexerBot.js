@@ -4,7 +4,8 @@ const Web3 = require('web3')
 const ProjectBot = require('./ProjectBot').ProjectBot
 const getArtBlocksProjects =
   require('../Utils/parseArtBlocksAPI').getArtBlocksProjects
-
+const getArtBlocksOpenProjects =
+  require('../Utils/parseArtBlocksAPI').getArtBlocksOpenProjects
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
 
 // Refresh takes around one minute, so recommend setting this to 60 minutes
@@ -70,6 +71,8 @@ class ArtIndexerBot {
     // if '#?' message, get random project
     if (projectKey === '#?') {
       return this.sendRandomProjectRandomTokenMessage(msg)
+    } else if (projectKey === 'open') {
+      return this.sendRandomOpenProjectRandomTokenMessage(msg)
     }
 
     console.log(`Searching for project ${projectKey}`)
@@ -111,6 +114,24 @@ class ArtIndexerBot {
       const keys = Object.keys(this.projects)
       let projectKey = keys[Math.floor(Math.random() * keys.length)]
       let projBot = this.projects[projectKey]
+      if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
+        return projBot.handleNumberMessage(msg)
+      }
+      attempts++
+    }
+  }
+
+  // This function takes a channel and sends a message containing a random
+  // token from a random open project
+  async sendRandomOpenProjectRandomTokenMessage(msg) {
+    let attempts = 0
+    while (attempts < 10) {
+      const openProjects = await getArtBlocksOpenProjects()
+
+      let project =
+        openProjects[Math.floor(Math.random() * openProjects.length)]
+
+      let projBot = this.projects[this.toProjectKey(project.name)]
       if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
         return projBot.handleNumberMessage(msg)
       }
