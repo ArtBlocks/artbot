@@ -2,6 +2,8 @@ const fetch = require('node-fetch')
 const ReconnectingWebsocket = require('reconnecting-websocket')
 const WS = require('ws')
 const { MessageEmbed } = require('discord.js')
+const ethers = require('ethers')
+const { lookupAddress } = require('../Utils/ens')
 
 const {
   sendEmbedToSaleChannels,
@@ -18,6 +20,12 @@ const ARCHIPELAGO_GOLD = '#9C814B'
 class ArchipelagoBot {
   constructor(discordClient) {
     this.discordClient = discordClient
+    this.provider = new ethers.providers.AlchemyProvider('homestead')
+  }
+
+  async ensOrAddress(address) {
+    const ens = await lookupAddress(this.provider, address)
+    return ens || address
   }
 
   async activate() {
@@ -86,7 +94,8 @@ class ArchipelagoBot {
     const archipelagoUrl = `https://archipelago.art/collections/${slug}/${tokenIndex}`
     const embed = new MessageEmbed()
     const sellerUrl = `https://archipelago.art/address/${seller}`
-    embed.addField('Seller (Archipelago)', `[${seller}](${sellerUrl})`)
+    const sellerDisplay = await this.ensOrAddress(seller)
+    embed.addField('Seller (Archipelago)', `[${sellerDisplay}](${sellerUrl})`)
     embed.addField('List Price', priceToString(price) + ' ETH')
     embed.setColor(ARCHIPELAGO_GOLD)
     embed.setThumbnail(artBlocksData.image)
@@ -117,10 +126,12 @@ class ArchipelagoBot {
     }
     const archipelagoUrl = `https://archipelago.art/collections/${slug}/${tokenIndex}`
     const embed = new MessageEmbed()
+    const sellerDisplay = await this.ensOrAddress(seller)
     const sellerUrl = `https://archipelago.art/address/${seller}`
-    embed.addField('Seller (Archipelago)', `[${seller}](${sellerUrl})`)
+    embed.addField('Seller (Archipelago)', `[${sellerDisplay}](${sellerUrl})`)
     const buyerUrl = `https://archipelago.art/address/${buyer}`
-    embed.addField('Buyer', `[${buyer}](${buyerUrl})`)
+    const buyerDisplay = await this.ensOrAddress(buyer)
+    embed.addField('Buyer', `[${buyerDisplay}](${buyerUrl})`)
     embed.addField('Price', priceToString(price) + ' ETH')
     embed.setColor(ARCHIPELAGO_GOLD)
     embed.setThumbnail(artBlocksData.image)

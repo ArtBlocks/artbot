@@ -17,6 +17,7 @@
   "author": "duggan roberts",
   "license": "MIT",
   "dependencies": {
+    "@ensdomains/eth-ens-namehash": "^2.0.15",
     "@urql/core": "^2.3.6",
     "body-parser": "^1.15.2",
     "discord-giveaways": "^4.5.1",
@@ -26,6 +27,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "ethers": "^5.6.9",
     "googleapis": "^92.0.0",
     "graphql": "^16.2.0",
     "jest": "^28.0.3",
