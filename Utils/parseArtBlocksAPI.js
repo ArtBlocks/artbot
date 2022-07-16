@@ -46,6 +46,29 @@ const contractProjects = gql`
   }
 `
 
+const contractOpenProjects = gql`
+  query getContractOpenProjects($id: ID!, $first: Int!, $skip: Int) {
+    contract(id: $id) {
+      projects(
+        first: $first
+        skip: $skip
+        orderBy: projectId
+        where: { paused: false, active: true, complete: false }
+      ) {
+        projectId
+        name
+        invocations
+        maxInvocations
+        curationStatus
+        active
+        contract {
+          id
+        }
+      }
+    }
+  }
+`
+
 const contractProject = gql`
   query getContractProject($id: ID!, $projectId: Int!) {
     contract(id: $id) {
@@ -269,6 +292,31 @@ async function _getContractProjects(contractId) {
   }
 }
 
+async function _getContractOpenProjects(contractId) {
+  // max returned projects in a single query
+  const maxProjectsPerQuery = 1000
+  try {
+    const allProjects = []
+    while (true) {
+      const result = await client
+        .query(contractOpenProjects, {
+          id: contractId,
+          first: maxProjectsPerQuery,
+          skip: allProjects.length,
+        })
+        .toPromise()
+      allProjects.push(...result.data.contract.projects)
+      if (result.data.contract.projects.length !== maxProjectsPerQuery) {
+        break
+      }
+    }
+    return allProjects
+  } catch (err) {
+    console.error(err)
+    return undefined
+  }
+}
+
 /*
  * the AB subgraph curation status is null for recent projects and is slow to update
  * workaround by querying AB api for curation status
@@ -369,6 +417,18 @@ async function getContractsProjects(contractsToGet) {
   return undefined
 }
 
+async function getContractsOpenProjects(contractsToGet) {
+  try {
+    const allArrays = await Promise.all([
+      ...contractsToGet.map(_getContractOpenProjects),
+    ])
+    return allArrays.flat()
+  } catch (err) {
+    console.error(err)
+  }
+  return undefined
+}
+
 /**
  * get data for all artblocks projects
  * Returns undefined if errors encountered while fetching.
@@ -383,6 +443,10 @@ async function getContractsProjects(contractsToGet) {
  */
 async function getArtBlocksProjects() {
   return await getContractsProjects(Object.values(CORE_CONTRACTS))
+}
+
+async function getArtBlocksOpenProjects() {
+  return await getContractsOpenProjects(Object.values(CORE_CONTRACTS))
 }
 
 /**
@@ -442,6 +506,7 @@ async function getPBABProjects() {
 module.exports.getArtBlocksProject = getArtBlocksProject
 module.exports.getArtBlocksFactoryProjects = getArtBlocksFactoryProjects
 module.exports.getArtBlocksProjects = getArtBlocksProjects
+module.exports.getArtBlocksOpenProjects = getArtBlocksOpenProjects
 module.exports.getPBABProjects = getPBABProjects
 module.exports.getArtBlocksXPaceProjects = getArtBlocksXPaceProjects
 module.exports.getArtBlocksProjectCount = getArtBlocksProjectCount
