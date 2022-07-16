@@ -2,6 +2,7 @@ const fetch = require('node-fetch')
 const ReconnectingWebsocket = require('reconnecting-websocket')
 const WS = require('ws')
 const { MessageEmbed } = require('discord.js')
+const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
 
 const {
   sendEmbedToSaleChannels,
@@ -11,8 +12,6 @@ const {
 
 const WEB_SOCKET_URL = 'wss://api.archipelago.art/ws'
 const COLLECTIONS_API = 'https://api.archipelago.art/v1/market/collections'
-const AB_LEGACY_CONTRACT = '0x059EDD72Cd353dF5106D2B9cC5ab83a52287aC3a'
-const AB_STANDARD_CONTRACT = '0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270'
 const HEADERS = { 'User-Agent': 'artbot/1.0' }
 const ONE_MILLION = 1000000
 const ARCHIPELAGO_GOLD = '#9C814B'
@@ -64,8 +63,8 @@ class ArchipelagoBot {
       return null
     }
     if (
-      collection.tokenContract !== AB_STANDARD_CONTRACT &&
-      collection.tokenContract !== AB_LEGACY_CONTRACT
+      collection.tokenContract.toLowerCase() !== CORE_CONTRACTS.OG &&
+      collection.tokenContract.toLowerCase() !== CORE_CONTRACTS.V2
     ) {
       return null
     }
