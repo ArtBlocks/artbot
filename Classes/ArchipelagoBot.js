@@ -2,6 +2,7 @@ const fetch = require('node-fetch')
 const ReconnectingWebsocket = require('reconnecting-websocket')
 const WS = require('ws')
 const { MessageEmbed } = require('discord.js')
+const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
 
 const {
   sendEmbedToSaleChannels,
@@ -61,6 +62,12 @@ class ArchipelagoBot {
     if (collection == null) {
       return null
     }
+    if (
+      collection.tokenContract.toLowerCase() !== CORE_CONTRACTS.OG &&
+      collection.tokenContract.toLowerCase() !== CORE_CONTRACTS.V2
+    ) {
+      return null
+    }
     const offset = collection.artblocksProjectIndex * ONE_MILLION
     const tokenId = offset + tokenIndex
     const artBlocksResponse = await fetch(
@@ -76,7 +83,7 @@ class ArchipelagoBot {
   async sendAskEmbed({ asker: seller, price, slug, tokenIndex }) {
     const artBlocksData = await this.getArtBlocksData(slug, tokenIndex)
     if (artBlocksData == null) {
-      console.warn(`Unable to get ArtBlocks data for ${slug} #${tokenIndex}`)
+      console.log(`Unable to get ArtBlocks data for ${slug} #${tokenIndex}`)
       return
     }
     if (BAN_ADDRESSES.has(seller)) {
