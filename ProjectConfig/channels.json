@@ -477,7 +477,10 @@
   "956435766492409857": {
     "name": "robert-hodgin",
     "projectBotHandlers": {
-      "default": "284"
+      "default": "284",
+      "stringTriggers": {
+        "329": ["latent spirits", "latent spirit", "latent", "spirits"] 
+      }
     }
   },
   "963552505860616233": {
