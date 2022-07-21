@@ -14,7 +14,7 @@ For example, this is what it would look like for Project 282, Memories of Qilin:
 
 - Project Title: "Memories of Qilin"
 - Project ID: 282
-- New Singles: 
+- New Singles:
 
 "leviathan": 102,
 "uncoiling-dragon": 134,

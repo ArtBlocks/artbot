@@ -14,7 +14,7 @@ For example, this is what it would look like for Project 23, Archetype
 
 - Project Title: "Archetype"
 - Project ID: 23
-- New Set(s): 
+- New Set(s):
 
 "cube": [122, 213, 216, 250, 327, 397, 457, 471, 582, 596]
 
