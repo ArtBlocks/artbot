@@ -20,6 +20,6 @@ For example, this is what it would look like for Project 23, Archetype
 
 ######################################################################
 
-- Project Title: 
-- Project ID: 
-- New Set(s): 
+- Project Title:
+- Project ID:
+- New Set(s):

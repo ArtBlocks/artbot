@@ -20,8 +20,8 @@ For example, this is what it would look like for the "staysafe?" command:
 
 ######################################################################
 
-- Command word(s): 
+- Command word(s):
 - Question or Trigger:
-- Message: 
-- Valid channels: 
-- "help?" menu text (if any): 
+- Message:
+- Valid channels:
+- "help?" menu text (if any):

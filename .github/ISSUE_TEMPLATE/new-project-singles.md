@@ -24,6 +24,6 @@ For example, this is what it would look like for Project 282, Memories of Qilin:
 
 ######################################################################
 
-- Project Title: 
-- Project ID: 
-- New Singles: 
+- Project Title:
+- Project ID:
+- New Singles:
