@@ -2,13 +2,14 @@ const fetch = require('node-fetch')
 const ReconnectingWebsocket = require('reconnecting-websocket')
 const WS = require('ws')
 const { MessageEmbed } = require('discord.js')
-const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
+const CORE_CONTRACTS = require('../../ProjectConfig/coreContracts.json')
+const { ensOrAddress } = require('./utils')
 
 const {
   sendEmbedToSaleChannels,
   sendEmbedToListChannels,
   BAN_ADDRESSES,
-} = require('../Utils/activityTriager')
+} = require('../../Utils/activityTriager')
 
 const WEB_SOCKET_URL = 'wss://api.archipelago.art/ws'
 const COLLECTIONS_API = 'https://api.archipelago.art/v1/market/collections'
@@ -90,10 +91,11 @@ class ArchipelagoBot {
       console.log(`Skipping banned seller ${seller} for ${slug} #${tokenIndex}`)
       return
     }
+    let sellerText = await ensOrAddress(seller)
     const archipelagoUrl = `https://archipelago.art/collections/${slug}/${tokenIndex}`
     const embed = new MessageEmbed()
     const sellerUrl = `https://archipelago.art/address/${seller}`
-    embed.addField('Seller (Archipelago)', `[${seller}](${sellerUrl})`)
+    embed.addField('Seller (Archipelago)', `[${sellerText}](${sellerUrl})`)
     embed.addField('List Price', priceToString(price) + ' ETH')
     embed.setColor(ARCHIPELAGO_GOLD)
     embed.setThumbnail(artBlocksData.image)
@@ -124,10 +126,14 @@ class ArchipelagoBot {
     }
     const archipelagoUrl = `https://archipelago.art/collections/${slug}/${tokenIndex}`
     const embed = new MessageEmbed()
+
+    const sellerText = await ensOrAddress(seller)
+    const buyerText = await ensOrAddress(buyer)
+
     const sellerUrl = `https://archipelago.art/address/${seller}`
-    embed.addField('Seller (Archipelago)', `[${seller}](${sellerUrl})`)
+    embed.addField('Seller (Archipelago)', `[${sellerText}](${sellerUrl})`)
     const buyerUrl = `https://archipelago.art/address/${buyer}`
-    embed.addField('Buyer', `[${buyer}](${buyerUrl})`)
+    embed.addField('Buyer', `[${buyerText}](${buyerUrl})`)
     embed.addField('Price', priceToString(price) + ' ETH')
     embed.setColor(ARCHIPELAGO_GOLD)
     embed.setThumbnail(artBlocksData.image)

@@ -4,7 +4,11 @@
   // "editor.formatOnSave": false,
   "editor.tabSize": 2,
   "scss.validate": false,
-  "editor.quickSuggestions": true,
+  "editor.quickSuggestions": {
+    "comments": "on",
+    "strings": "on",
+    "other": "on"
+  },
   "editor.autoClosingQuotes": "always",
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",

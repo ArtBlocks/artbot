@@ -1,4 +1,5 @@
 const fetch = require('node-fetch')
+const { ensOrAddress } = require('./utils')
 
 /** Abstract parent class for all API Poll Bots */
 class APIPollBot {
@@ -14,6 +15,8 @@ class APIPollBot {
     this.refreshRateMs = refreshRateMs
     this.bot = bot
     this.headers = headers
+    this.listColor = '#407FDB'
+    this.saleColor = '#62DE7C'
 
     // Only send events that occur after this bot gets initialized
     this.lastUpdatedTime = Date.now()
@@ -59,6 +62,20 @@ class APIPollBot {
    */
   async buildDiscordMessage(msg) {
     console.warn('buildDiscordMessage function not implemented!')
+  }
+
+  async ensOrAddress(address) {
+    return await ensOrAddress(address)
+  }
+
+  buildOpenseaURL(contractAddr, tokenId) {
+    return `https://opensea.io/assets/ethereum/${contractAddr}/${tokenId}`
+  }
+  buildLooksRareURL(contractAddr, tokenId) {
+    return `https://looksrare.org/collections/${contractAddr}/${tokenId}`
+  }
+  buildX2Y2URL(contractAddr, tokenId) {
+    return `https://x2y2.io/eth/${contractAddr}/${tokenId}`
   }
 }
 

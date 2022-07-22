@@ -6,32 +6,32 @@ const {
   sendEmbedToSaleChannels,
   sendEmbedToListChannels,
   BAN_ADDRESSES,
-} = require('../Utils/activityTriager')
+} = require('../../Utils/activityTriager')
 
-/** API Poller for LooksRare List and Sale events */
-class LooksRareAPIPollBot extends APIPollBot {
+/** API Poller for Opensea List and Sale events */
+class OpenseaAPIPollBot extends APIPollBot {
   /** Constructor just calls super
    * @param {string} apiEndpoint - Endpoint to be hitting
    * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
    * @param {*} bot - Discord bot that will be sending messages
    */
-  constructor(apiEndpoint, refreshRateMs, bot) {
-    super(apiEndpoint, refreshRateMs, bot)
-    this.listColor = '#62DE7C'
-    this.saleColor = '#9d77f7'
+  constructor(apiEndpoint, refreshRateMs, bot, headers, contract = '') {
+    apiEndpoint =
+      apiEndpoint + '&occurred_after=' + (Date.now() / 1000).toFixed()
+    super(apiEndpoint, refreshRateMs, bot, headers)
+    this.contract = contract
   }
 
   /**
-   * Parses and handles LooksRare API endpoint data
+   * Parses and handles Opensea API endpoint data
    * Only sends events that are new
-   * Response spec: https://looksrare.github.io/api-docs/#/Events/EventController.getEvents
+   * Response spec: https://docs.opensea.io/reference/retrieving-asset-events
    * @param {*} responseData - Dict parsed from API request json
    */
   handleAPIResponse(responseData) {
     let maxTime = 0
-    for (const data of responseData.data) {
-      const eventTime = Date.parse(data.createdAt)
-
+    for (const data of responseData.asset_events) {
+      const eventTime = Date.parse(data.event_timestamp)
       // Only deal with event if it is new
       if (this.lastUpdatedTime < eventTime) {
         this.buildDiscordMessage(data)
@@ -46,45 +46,66 @@ class LooksRareAPIPollBot extends APIPollBot {
     // Update latest time vars if batch has new latest time
     if (maxTime > this.lastUpdatedTime) {
       this.lastUpdatedTime = maxTime
+
+      this.apiEndpoint.split('&occurred_after=')[0] +
+        '&occurred_after=' +
+        this.lastUpdatedTime / 1000
     }
   }
 
   /**
    * Handles constructing and sending Discord embed message
-   * LooksRare API Spec: https://looksrare.github.io/api-docs/#/Events/EventController.getEvents
+   * OS API Spec: https://docs.opensea.io/reference/retrieving-asset-events
    * @param {*} msg - Dict of event data from API response
    */
   async buildDiscordMessage(msg) {
     // Create embed we will be sending
     const embed = new MessageEmbed()
 
-    // Parsing LooksRare message to get info
-    const tokenID = msg.token.tokenId
-    const looksRareURL = `https://looksrare.org/collections/${msg.token.collectionAddress}/${tokenID}`
+    // Parsing Opensea message to get info
+    const tokenID = msg.asset.token_id
+    const openseaURL = msg.asset.permalink
 
     // Event_type will either be SALE or LIST
-    const eventType = msg.type
-
-    const owner = msg.from
-    if (BAN_ADDRESSES.has(owner)) {
-      console.log(`Skipping message propagation for ${owner}`)
-      return
-    }
-    embed.addField('Seller (LooksRare)', owner)
+    const eventType = msg.event_type
 
     // Construct price field (different info/verbiage depending on sale or list)
-    let priceText
-    if (eventType === 'SALE') {
+    let priceText, price, owner, ownerName, buyerText
+    if (eventType === 'successful') {
       // Item sold, add 'Buyer' field
-      embed.addField('Buyer', msg.to)
+      buyerText =
+        msg.winner_account.address +
+        (msg.winner_account.user && msg.winner_account.user.username
+          ? ' (' + msg.winner_account.user.username + ')'
+          : '')
+
       priceText = 'Sale Price'
+      price = msg.total_price
+      owner = msg.seller.address
+      ownerName =
+        msg.seller.user && msg.seller.user.username
+          ? msg.seller.user.username
+          : ''
       embed.setColor(this.saleColor)
     } else {
       // Item Listed
       priceText = 'List Price'
+      price = msg.ending_price
+      owner = msg.from_account.address
+      ownerName =
+        msg.from_account.user && msg.seller.user.username
+          ? msg.from_account.user.username
+          : ''
       embed.setColor(this.listColor)
     }
-    const price = msg.order.price
+
+    if (BAN_ADDRESSES.has(owner)) {
+      console.log(`Skipping message propagation for ${owner}`)
+      return
+    }
+    const sellerText = owner + (ownerName !== '' ? ' (' + ownerName + ')' : '')
+    embed.addField('Seller (Opensea)', sellerText)
+    embed.addField('Buyer', buyerText)
     embed.addField(
       priceText,
       parseInt(price) / 1000000000000000000 + 'ETH',
@@ -92,9 +113,11 @@ class LooksRareAPIPollBot extends APIPollBot {
     )
 
     // Get Art Blocks metadata response for the item.
-    const artBlocksResponse = await fetch(
-      `https://token.artblocks.io/${tokenID}`
-    )
+    const tokenUrl =
+      this.contract === ''
+        ? `https://token.artblocks.io/${tokenID}`
+        : `https://token.artblocks.io/${this.contract}/${tokenID}`
+    const artBlocksResponse = await fetch(tokenUrl)
     const artBlocksData = await artBlocksResponse.json()
 
     // Update thumbnail image to use larger variant from Art Blocks API.
@@ -110,15 +133,17 @@ class LooksRareAPIPollBot extends APIPollBot {
     // rather than token number as the title and URL field..
     embed.author = null
     embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`)
-    embed.setURL(looksRareURL)
+    embed.setURL(openseaURL)
     if (artBlocksData.collection_name) {
-      if (eventType.includes('SALE')) {
+      if (eventType.includes('successful')) {
+        console.log(artBlocksData.name + ' SALE')
         sendEmbedToSaleChannels(this.bot, embed, artBlocksData)
-      } else if (eventType.includes('LIST')) {
+      } else if (eventType.includes('created')) {
+        console.log(artBlocksData.name + ' LIST')
         sendEmbedToListChannels(this.bot, embed, artBlocksData)
       }
     }
   }
 }
 
-module.exports.LooksRareAPIPollBot = LooksRareAPIPollBot
+module.exports.OpenseaAPIPollBot = OpenseaAPIPollBot
