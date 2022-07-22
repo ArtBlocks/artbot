@@ -1,4 +1,5 @@
 const fetch = require('node-fetch')
+const { ensOrAddress } = require('./utils')
 
 /** Abstract parent class for all API Poll Bots */
 class APIPollBot {
@@ -61,6 +62,10 @@ class APIPollBot {
    */
   async buildDiscordMessage(msg) {
     console.warn('buildDiscordMessage function not implemented!')
+  }
+
+  async ensOrAddress(address) {
+    return await ensOrAddress(address)
   }
 
   buildOpenseaURL(contractAddr, tokenId) {

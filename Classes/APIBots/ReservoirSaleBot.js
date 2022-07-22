@@ -14,11 +14,11 @@ class ReservoirSaleBot extends APIPollBot {
    * @param {*} bot - Discord bot that will be sending messages
    */
   constructor(apiEndpoint, refreshRateMs, bot, headers, contract = '') {
-    // apiEndpoint =
-    //   apiEndpoint + '&startTimestamp=' + (Date.now() / 1000).toFixed()
+    apiEndpoint =
+      apiEndpoint + '&startTimestamp=' + (Date.now() / 1000).toFixed()
     super(apiEndpoint, refreshRateMs, bot, headers)
     this.contract = contract
-    this.lastUpdatedTime = Math.floor(this.lastUpdatedTime / 1000)
+    this.lastUpdatedTime = (this.lastUpdatedTime / 1000).toFixed()
   }
 
   /**
@@ -77,10 +77,9 @@ class ReservoirSaleBot extends APIPollBot {
       console.log(`Skipping message propagation for ${owner}`)
       return
     }
-    let ownerENS = await getENSName(owner)
-    let buyerENS = await getENSName(msg.to)
-    const sellerText = ownerENS !== '' ? ownerENS : owner
-    const buyerText = buyerENS !== '' ? buyerENS : msg.to
+
+    const sellerText = await this.ensOrAddress(msg.from)
+    const buyerText = await this.ensOrAddress(msg.to)
     const baseABProfile = 'https://www.artblocks.io/user/'
     const sellerProfile = baseABProfile + owner
     const buyerProfile = baseABProfile + msg.to

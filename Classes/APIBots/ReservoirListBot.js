@@ -5,7 +5,6 @@ const {
   sendEmbedToListChannels,
   BAN_ADDRESSES,
 } = require('../../Utils/activityTriager')
-const { getENSName } = require('./utils')
 
 /** API Poller for Reservoir Sale events */
 class ReservoirListBot extends APIPollBot {
@@ -15,13 +14,11 @@ class ReservoirListBot extends APIPollBot {
    * @param {*} bot - Discord bot that will be sending messages
    */
   constructor(apiEndpoint, refreshRateMs, bot, headers, contract = '') {
-    // apiEndpoint =
-    //   apiEndpoint + '&startTimestamp=' + (Date.now() / 1000).toFixed()
     super(apiEndpoint, refreshRateMs, bot, headers)
     this.contract = contract
     this.listColor = '#407FDB'
     this.saleColor = '#62DE7C'
-    this.lastUpdatedTime = Math.floor(this.lastUpdatedTime / 1000) - 1e5
+    this.lastUpdatedTime = (this.lastUpdatedTime / 1000).toFixed()
   }
 
   /**
@@ -48,16 +45,12 @@ class ReservoirListBot extends APIPollBot {
     // Update latest time vars if batch has new latest time
     if (maxTime > this.lastUpdatedTime) {
       this.lastUpdatedTime = maxTime
-
-      // this.apiEndpoint.split('&startTimestamp=')[0] +
-      //   '&startTimestamp=' +
-      //   this.lastUpdatedTime
     }
   }
 
   /**
    * Handles constructing and sending Discord embed message
-   * OS API Spec: https://docs.opensea.io/reference/retrieving-asset-events
+   * Reservoir API Spec: https://docs.reservoir.tools/reference/getordersasksv2
    * @param {*} msg - Dict of event data from API response
    */
   async buildDiscordMessage(msg) {
@@ -79,8 +72,7 @@ class ReservoirListBot extends APIPollBot {
       console.log(`Skipping message propagation for ${owner}`)
       return
     }
-    let ownerENS = await getENSName(owner)
-    const sellerText = ownerENS !== '' ? ownerENS : owner
+    const sellerText = await this.ensOrAddress(msg.maker)
     const baseABProfile = 'https://www.artblocks.io/user/'
     const sellerProfile = baseABProfile + owner
     embed.addField(`Seller (${platform})`, `[${sellerText}](${sellerProfile})`)
@@ -104,7 +96,7 @@ class ReservoirListBot extends APIPollBot {
       `[view on artblocks.io](${artBlocksData.external_url})`,
       true
     )
-    embed.setFooter('\u2800'.repeat(10 /*any big number works too*/) + '|')
+
     // Update to remove author name and to reflect this info in piece name
     // rather than token number as the title and URL field..
     embed.author = null

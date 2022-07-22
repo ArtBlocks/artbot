@@ -53,6 +53,8 @@ const CHANNEL_ADDRESS_COLLECTION = process.env.CHANNEL_ADDRESS_COLLECTION
 // Rate (in ms) to poll API endpoints
 const API_POLL_TIME_MS = 10000
 
+const TEST_MODE = process.env.TEST_MODE ?? false
+
 // App setup.
 const app = express()
 
@@ -217,62 +219,64 @@ bot.on('message', (msg) => {
   )
 })
 
-// Instantiate API Pollers
-new ReservoirListBot(
-  `https://api.reservoir.tools/orders/asks/v2?contracts=${CORE_CONTRACTS.OG}&contracts=${CORE_CONTRACTS.V2}&sortBy=createdAt&limit=50`,
-  API_POLL_TIME_MS,
-  bot,
-  {
-    Accept: '*/*',
-    'x-api-key': process.env.RESERVOIR_API_KEY,
-  }
-)
+// Instantiate API Pollers (if not in test mode)
+if (!TEST_MODE) {
+  new ReservoirListBot(
+    `https://api.reservoir.tools/orders/asks/v2?contracts=${CORE_CONTRACTS.OG}&contracts=${CORE_CONTRACTS.V2}&sortBy=createdAt&limit=50`,
+    API_POLL_TIME_MS,
+    bot,
+    {
+      Accept: '*/*',
+      'x-api-key': process.env.RESERVOIR_API_KEY,
+    }
+  )
 
-new ReservoirSaleBot(
-  `https://api.reservoir.tools/sales/bulk/v1?contract=${CORE_CONTRACTS.V2}&limit=100`,
-  API_POLL_TIME_MS,
-  bot,
-  {
-    Accept: '*/*',
-    'x-api-key': process.env.RESERVOIR_API_KEY,
-  }
-)
+  new ReservoirSaleBot(
+    `https://api.reservoir.tools/sales/bulk/v1?contract=${CORE_CONTRACTS.V2}&limit=100`,
+    API_POLL_TIME_MS,
+    bot,
+    {
+      Accept: '*/*',
+      'x-api-key': process.env.RESERVOIR_API_KEY,
+    }
+  )
 
-new ReservoirSaleBot(
-  `https://api.reservoir.tools/sales/bulk/v1?contract=${CORE_CONTRACTS.OG}&limit=100`,
-  API_POLL_TIME_MS,
-  bot,
-  {
-    Accept: '*/*',
-    'x-api-key': process.env.RESERVOIR_API_KEY,
-  }
-)
+  new ReservoirSaleBot(
+    `https://api.reservoir.tools/sales/bulk/v1?contract=${CORE_CONTRACTS.OG}&limit=100`,
+    API_POLL_TIME_MS,
+    bot,
+    {
+      Accept: '*/*',
+      'x-api-key': process.env.RESERVOIR_API_KEY,
+    }
+  )
 
-const archipelagoBot = new ArchipelagoBot(bot)
-archipelagoBot.activate()
+  const archipelagoBot = new ArchipelagoBot(bot)
+  archipelagoBot.activate()
 
-// Temp hack to get these sales/listings working
-// TODO: come back and use reservoir / new OS API for more robust solution
+  // Temp hack to get these sales/listings working
+  // TODO: come back and use reservoir / new OS API for more robust solution
 
-const paceSlug = 'petro-national-by-john-gerrard'
-new OpenseaAPIPollBot(
-  `https://api.opensea.io/api/v1/events?collection_slug=${paceSlug}&event_type=successful`,
-  API_POLL_TIME_MS,
-  bot,
-  {
-    Accept: 'application/json',
-    'X-API-KEY': process.env.OPENSEA_API_KEY,
-  },
-  COLLAB_CONTRACTS.AB_X_PACE
-)
+  const paceSlug = 'petro-national-by-john-gerrard'
+  new OpenseaAPIPollBot(
+    `https://api.opensea.io/api/v1/events?collection_slug=${paceSlug}&event_type=successful`,
+    API_POLL_TIME_MS,
+    bot,
+    {
+      Accept: 'application/json',
+      'X-API-KEY': process.env.OPENSEA_API_KEY,
+    },
+    COLLAB_CONTRACTS.AB_X_PACE
+  )
 
-new OpenseaAPIPollBot(
-  `https://api.opensea.io/api/v1/events?collection_slug=${paceSlug}&event_type=created`,
-  API_POLL_TIME_MS,
-  bot,
-  {
-    Accept: 'application/json',
-    'X-API-KEY': process.env.OPENSEA_API_KEY,
-  },
-  COLLAB_CONTRACTS.AB_X_PACE
-)
+  new OpenseaAPIPollBot(
+    `https://api.opensea.io/api/v1/events?collection_slug=${paceSlug}&event_type=created`,
+    API_POLL_TIME_MS,
+    bot,
+    {
+      Accept: 'application/json',
+      'X-API-KEY': process.env.OPENSEA_API_KEY,
+    },
+    COLLAB_CONTRACTS.AB_X_PACE
+  )
+}

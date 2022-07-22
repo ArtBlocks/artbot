@@ -17,4 +17,9 @@ async function getENSName(address) {
   return name
 }
 
-module.exports.getENSName = getENSName
+async function ensOrAddress(address) {
+  let ens = await getENSName(address)
+  return ens !== '' ? ens : address
+}
+
+module.exports.ensOrAddress = ensOrAddress
