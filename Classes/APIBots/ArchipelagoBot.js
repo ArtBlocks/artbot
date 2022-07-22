@@ -2,13 +2,13 @@ const fetch = require('node-fetch')
 const ReconnectingWebsocket = require('reconnecting-websocket')
 const WS = require('ws')
 const { MessageEmbed } = require('discord.js')
-const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
+const CORE_CONTRACTS = require('../../ProjectConfig/coreContracts.json')
 
 const {
   sendEmbedToSaleChannels,
   sendEmbedToListChannels,
   BAN_ADDRESSES,
-} = require('../Utils/activityTriager')
+} = require('../../Utils/activityTriager')
 
 const WEB_SOCKET_URL = 'wss://api.archipelago.art/ws'
 const COLLECTIONS_API = 'https://api.archipelago.art/v1/market/collections'

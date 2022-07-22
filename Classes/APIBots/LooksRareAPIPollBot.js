@@ -6,7 +6,7 @@ const {
   sendEmbedToSaleChannels,
   sendEmbedToListChannels,
   BAN_ADDRESSES,
-} = require('../Utils/activityTriager')
+} = require('../../Utils/activityTriager')
 
 /** API Poller for LooksRare List and Sale events */
 class LooksRareAPIPollBot extends APIPollBot {

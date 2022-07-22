@@ -1,39 +1,36 @@
 const { APIPollBot } = require('./ApiPollBot')
 const { MessageEmbed } = require('discord.js')
 const fetch = require('node-fetch')
-
 const {
   sendEmbedToSaleChannels,
-  sendEmbedToListChannels,
   BAN_ADDRESSES,
-} = require('../Utils/activityTriager')
-
-/** API Poller for Opensea List and Sale events */
-class OpenseaAPIPollBot extends APIPollBot {
+} = require('../../Utils/activityTriager')
+const { getENSName } = require('./utils')
+/** API Poller for Reservoir Sale events */
+class ReservoirSaleBot extends APIPollBot {
   /** Constructor just calls super
    * @param {string} apiEndpoint - Endpoint to be hitting
    * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
    * @param {*} bot - Discord bot that will be sending messages
    */
   constructor(apiEndpoint, refreshRateMs, bot, headers, contract = '') {
-    apiEndpoint =
-      apiEndpoint + '&occurred_after=' + (Date.now() / 1000).toFixed()
+    // apiEndpoint =
+    //   apiEndpoint + '&startTimestamp=' + (Date.now() / 1000).toFixed()
     super(apiEndpoint, refreshRateMs, bot, headers)
     this.contract = contract
-    this.listColor = '#407FDB'
-    this.saleColor = '#62DE7C'
+    this.lastUpdatedTime = Math.floor(this.lastUpdatedTime / 1000)
   }
 
   /**
    * Parses and handles Opensea API endpoint data
    * Only sends events that are new
-   * Response spec: https://docs.opensea.io/reference/retrieving-asset-events
+   * Response spec: https://docs.reservoir.tools/reference/getsalesbulkv1
    * @param {*} responseData - Dict parsed from API request json
    */
   handleAPIResponse(responseData) {
     let maxTime = 0
-    for (const data of responseData.asset_events) {
-      const eventTime = Date.parse(data.event_timestamp)
+    for (const data of responseData.sales) {
+      const eventTime = data.timestamp
       // Only deal with event if it is new
       if (this.lastUpdatedTime < eventTime) {
         this.buildDiscordMessage(data)
@@ -49,9 +46,9 @@ class OpenseaAPIPollBot extends APIPollBot {
     if (maxTime > this.lastUpdatedTime) {
       this.lastUpdatedTime = maxTime
 
-      this.apiEndpoint.split('&occurred_after=')[0] +
-        '&occurred_after=' +
-        this.lastUpdatedTime / 1000
+      this.apiEndpoint.split('&startTimestamp=')[0] +
+        '&startTimestamp=' +
+        this.lastUpdatedTime
     }
   }
 
@@ -63,56 +60,33 @@ class OpenseaAPIPollBot extends APIPollBot {
   async buildDiscordMessage(msg) {
     // Create embed we will be sending
     const embed = new MessageEmbed()
-
     // Parsing Opensea message to get info
-    const tokenID = msg.asset.token_id
-    const openseaURL = msg.asset.permalink
+    const tokenID = msg.token.tokenId
+    // const openseaURL = msg.asset.permalink
 
     // Event_type will either be SALE or LIST
-    const eventType = msg.event_type
+    const eventType = 'successful'
 
-    // Construct price field (different info/verbiage depending on sale or list)
-    let priceText, price, owner, ownerName, buyerText
-    if (eventType === 'successful') {
-      // Item sold, add 'Buyer' field
-       buyerText =
-        msg.winner_account.address +
-        (msg.winner_account.user && msg.winner_account.user.username
-          ? ' (' + msg.winner_account.user.username + ')'
-          : '')
-
-      priceText = 'Sale Price'
-      price = msg.total_price
-      owner = msg.seller.address
-      ownerName =
-        msg.seller.user && msg.seller.user.username
-          ? msg.seller.user.username
-          : ''
-      embed.setColor(this.saleColor)
-    } else {
-      // Item Listed
-      priceText = 'List Price'
-      price = msg.ending_price
-      owner = msg.from_account.address
-      ownerName =
-        msg.from_account.user && msg.seller.user.username
-          ? msg.from_account.user.username
-          : ''
-      embed.setColor(this.listColor)
-    }
+    let priceText = 'Sale Price'
+    let price = msg.price
+    let owner = msg.from
+    let platform = msg.orderSource
+    embed.setColor(this.saleColor)
 
     if (BAN_ADDRESSES.has(owner)) {
       console.log(`Skipping message propagation for ${owner}`)
       return
     }
-    const sellerText = owner + (ownerName !== '' ? ' (' + ownerName + ')' : '')
-    embed.addField('Seller (Opensea)', sellerText)
-    embed.addField('Buyer', buyerText)
-    embed.addField(
-      priceText,
-      parseInt(price) / 1000000000000000000 + 'ETH',
-      true
-    )
+    let ownerENS = await getENSName(owner)
+    let buyerENS = await getENSName(msg.to)
+    const sellerText = ownerENS !== '' ? ownerENS : owner
+    const buyerText = buyerENS !== '' ? buyerENS : msg.to
+    const baseABProfile = 'https://www.artblocks.io/user/'
+    const sellerProfile = baseABProfile + owner
+    const buyerProfile = baseABProfile + msg.to
+    embed.addField(`Seller (${platform})`, `[${sellerText}](${sellerProfile})`)
+    embed.addField('Buyer', `[${buyerText}](${buyerProfile})`)
+    embed.addField(priceText, price + 'ETH', true)
 
     // Get Art Blocks metadata response for the item.
     const tokenUrl =
@@ -121,6 +95,28 @@ class OpenseaAPIPollBot extends APIPollBot {
         : `https://token.artblocks.io/${this.contract}/${tokenID}`
     const artBlocksResponse = await fetch(tokenUrl)
     const artBlocksData = await artBlocksResponse.json()
+
+    let platformUrl = ''
+    switch (platform.toLowerCase()) {
+      case 'opensea':
+        platformUrl = this.buildOpenseaURL(
+          msg.token.contract,
+          msg.token.tokenId
+        )
+        break
+      case 'looksrare':
+        platformUrl = this.buildLooksRareURL(
+          msg.token.contract,
+          msg.token.tokenId
+        )
+        break
+      case 'x2y2':
+        platformUrl = this.buildX2Y2URL(msg.token.contract, msg.token.tokenId)
+        break
+      default:
+        platformUrl = artBlocksData.external_url
+        break
+    }
 
     // Update thumbnail image to use larger variant from Art Blocks API.
     embed.setThumbnail(artBlocksData.image)
@@ -135,17 +131,12 @@ class OpenseaAPIPollBot extends APIPollBot {
     // rather than token number as the title and URL field..
     embed.author = null
     embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`)
-    embed.setURL(openseaURL)
+    embed.setURL(platformUrl)
     if (artBlocksData.collection_name) {
-      if (eventType.includes('successful')) {
-        console.log(artBlocksData.name + ' SALE')
-        sendEmbedToSaleChannels(this.bot, embed, artBlocksData)
-      } else if (eventType.includes('created')) {
-        console.log(artBlocksData.name + ' LIST')
-        sendEmbedToListChannels(this.bot, embed, artBlocksData)
-      }
+      console.log(artBlocksData.name + ' SALE')
+      sendEmbedToSaleChannels(this.bot, embed, artBlocksData)
     }
   }
 }
 
-module.exports.OpenseaAPIPollBot = OpenseaAPIPollBot
+module.exports.ReservoirSaleBot = ReservoirSaleBot

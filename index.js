@@ -10,15 +10,16 @@ const AddressCollector = require('./Classes/AddressCollector').AddressCollector
 const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json')
-const { LooksRareAPIPollBot } = require('./Classes/LooksRareAPIPollBot')
-const { ArchipelagoBot } = require('./Classes/ArchipelagoBot')
+const { ReservoirSaleBot } = require('./Classes/APIBots/ReservoirSaleBot')
+const { ReservoirListBot } = require('./Classes/APIBots/ReservoirListBot')
+const { ArchipelagoBot } = require('./Classes/APIBots/ArchipelagoBot')
 // Special handlers.
 const { triageActivityMessage } = require('./Utils/activityTriager')
 const {
   getPBABProjects,
   getArtBlocksXPaceProjects,
 } = require('./Utils/parseArtBlocksAPI')
-const { OpenseaAPIPollBot } = require('./Classes/OpenseaAPIPollBot')
+const { OpenseaAPIPollBot } = require('./Classes/APIBots/OpenseaAPIPollBot')
 const COLLAB_CONTRACTS = require('./ProjectConfig/collaborationContracts.json')
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 const handleGiveawayMessage =
@@ -50,7 +51,7 @@ const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat']
 const CHANNEL_ADDRESS_COLLECTION = process.env.CHANNEL_ADDRESS_COLLECTION
 
 // Rate (in ms) to poll API endpoints
-const API_POLL_TIME_MS = 20000
+const API_POLL_TIME_MS = 10000
 
 // App setup.
 const app = express()
@@ -153,7 +154,8 @@ bot.on('message', (msg) => {
    * To the appropriate sub-channel.
    */
   if (channelID == PROD_CHANNEL_ACTIVITY_ALL) {
-    triageActivityMessage(msg, bot)
+    // Just commenting this out for now in case we need it back in emergency
+    // triageActivityMessage(msg, bot)
     return
   }
 
@@ -216,33 +218,34 @@ bot.on('message', (msg) => {
 })
 
 // Instantiate API Pollers
-
-// LooksRare pollers for V2 Contract
-// List Events
-new LooksRareAPIPollBot(
-  `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.V2}&type=LIST&pagination[first]=25`,
+new ReservoirListBot(
+  `https://api.reservoir.tools/orders/asks/v2?contracts=${CORE_CONTRACTS.OG}&contracts=${CORE_CONTRACTS.V2}&sortBy=createdAt&limit=50`,
   API_POLL_TIME_MS,
-  bot
-)
-// Sale Events
-new LooksRareAPIPollBot(
-  `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.V2}&type=SALE&pagination[first]=25`,
-  API_POLL_TIME_MS,
-  bot
+  bot,
+  {
+    Accept: '*/*',
+    'x-api-key': process.env.RESERVOIR_API_KEY,
+  }
 )
 
-// LooksRare pollers for OG Contract
-// List Events
-new LooksRareAPIPollBot(
-  `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.OG}&type=LIST&pagination[first]=25`,
+new ReservoirSaleBot(
+  `https://api.reservoir.tools/sales/bulk/v1?contract=${CORE_CONTRACTS.V2}&limit=100`,
   API_POLL_TIME_MS,
-  bot
+  bot,
+  {
+    Accept: '*/*',
+    'x-api-key': process.env.RESERVOIR_API_KEY,
+  }
 )
-// Sale Events
-new LooksRareAPIPollBot(
-  `https://api.looksrare.org/api/v1/events?collection=${CORE_CONTRACTS.OG}&type=SALE&pagination[first]=25`,
+
+new ReservoirSaleBot(
+  `https://api.reservoir.tools/sales/bulk/v1?contract=${CORE_CONTRACTS.OG}&limit=100`,
   API_POLL_TIME_MS,
-  bot
+  bot,
+  {
+    Accept: '*/*',
+    'x-api-key': process.env.RESERVOIR_API_KEY,
+  }
 )
 
 const archipelagoBot = new ArchipelagoBot(bot)
