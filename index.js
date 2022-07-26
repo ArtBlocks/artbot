@@ -19,7 +19,6 @@ const {
   getPBABProjects,
   getArtBlocksXPaceProjects,
 } = require('./Utils/parseArtBlocksAPI')
-const { OpenseaAPIPollBot } = require('./Classes/APIBots/OpenseaAPIPollBot')
 const COLLAB_CONTRACTS = require('./ProjectConfig/collaborationContracts.json')
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 const handleGiveawayMessage =
@@ -254,28 +253,25 @@ if (!TEST_MODE) {
   const archipelagoBot = new ArchipelagoBot(bot)
   archipelagoBot.activate()
 
-  // Temp hack to get these sales/listings working
-  // TODO: come back and use reservoir / new OS API for more robust solution
-
-  const paceSlug = 'petro-national-by-john-gerrard'
-  new OpenseaAPIPollBot(
-    `https://api.opensea.io/api/v1/events?collection_slug=${paceSlug}&event_type=successful`,
+  // Listing/Sales bots for Pace collab contract
+  new ReservoirListBot(
+    `https://api.reservoir.tools/orders/asks/v2?contracts=${COLLAB_CONTRACTS.AB_X_PACE}&sortBy=createdAt&limit=50`,
     API_POLL_TIME_MS,
     bot,
     {
-      Accept: 'application/json',
-      'X-API-KEY': process.env.OPENSEA_API_KEY,
+      Accept: '*/*',
+      'x-api-key': process.env.RESERVOIR_API_KEY,
     },
     COLLAB_CONTRACTS.AB_X_PACE
   )
 
-  new OpenseaAPIPollBot(
-    `https://api.opensea.io/api/v1/events?collection_slug=${paceSlug}&event_type=created`,
+  new ReservoirSaleBot(
+    `https://api.reservoir.tools/sales/bulk/v1?contract=${COLLAB_CONTRACTS.AB_X_PACE}&limit=100`,
     API_POLL_TIME_MS,
     bot,
     {
-      Accept: 'application/json',
-      'X-API-KEY': process.env.OPENSEA_API_KEY,
+      Accept: '*/*',
+      'x-api-key': process.env.RESERVOIR_API_KEY,
     },
     COLLAB_CONTRACTS.AB_X_PACE
   )

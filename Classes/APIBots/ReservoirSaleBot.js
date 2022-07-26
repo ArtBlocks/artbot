@@ -80,17 +80,6 @@ class ReservoirSaleBot extends APIPollBot {
 
     let sellerText = await this.ensOrAddress(msg.from)
     let buyerText = await this.ensOrAddress(msg.to)
-    if (platform.toLowerCase() === 'opensea') {
-      if (!sellerText.includes('.eth')) {
-        const sellerOS = await this.osName(msg.from)
-        sellerText =
-          sellerOS === '' ? sellerText : `${sellerText} (OS: ${sellerOS})`
-      }
-      if (!buyerText.includes('.eth')) {
-        const buyerOS = await this.osName(msg.to)
-        buyerText = buyerOS === '' ? buyerText : `${buyerText} (OS: ${buyerOS})`
-      }
-    }
 
     const baseABProfile = 'https://www.artblocks.io/user/'
     const sellerProfile = baseABProfile + owner
