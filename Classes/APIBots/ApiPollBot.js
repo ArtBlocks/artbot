@@ -1,3 +1,4 @@
+const fetch = require('node-fetch')
 const { ensOrAddress } = require('./utils')
 
 /** Abstract parent class for all API Poll Bots */

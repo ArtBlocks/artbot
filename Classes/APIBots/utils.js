@@ -1,5 +1,4 @@
 const ethers = require('ethers')
-const fetch = require('node-fetch')
 
 let provider = new ethers.providers.AlchemyProvider('homestead')
 
