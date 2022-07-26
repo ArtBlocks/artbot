@@ -99,7 +99,7 @@ class ReservoirSaleBot extends APIPollBot {
     embed.addField('Buyer', `[${buyerText}](${buyerProfile})`)
 
     const currency = msg.orderSide === 'bid' ? 'WETH' : 'ETH'
-    embed.addField(priceText, price + currency, true)
+    embed.addField(priceText, `${price} ${currency}`, true)
 
     // Get Art Blocks metadata response for the item.
     const tokenUrl =
