@@ -256,7 +256,7 @@ if (!TEST_MODE) {
   // Listing/Sales bots for Pace collab contract
   new ReservoirListBot(
     `https://api.reservoir.tools/orders/asks/v2?contracts=${COLLAB_CONTRACTS.AB_X_PACE}&sortBy=createdAt&limit=50`,
-    API_POLL_TIME_MS,
+    API_POLL_TIME_MS * 2,
     bot,
     {
       Accept: '*/*',
@@ -267,7 +267,7 @@ if (!TEST_MODE) {
 
   new ReservoirSaleBot(
     `https://api.reservoir.tools/sales/bulk/v1?contract=${COLLAB_CONTRACTS.AB_X_PACE}&limit=100`,
-    API_POLL_TIME_MS,
+    API_POLL_TIME_MS * 2,
     bot,
     {
       Accept: '*/*',
