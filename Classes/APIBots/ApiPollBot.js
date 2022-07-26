@@ -1,5 +1,4 @@
-const fetch = require('node-fetch')
-const { ensOrAddress, getOSName } = require('./utils')
+const { ensOrAddress } = require('./utils')
 
 /** Abstract parent class for all API Poll Bots */
 class APIPollBot {
@@ -66,10 +65,6 @@ class APIPollBot {
 
   async ensOrAddress(address) {
     return await ensOrAddress(address)
-  }
-
-  async osName(address) {
-    return await getOSName(address)
   }
 
   buildOpenseaURL(contractAddr, tokenId) {
