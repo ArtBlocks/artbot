@@ -51,6 +51,8 @@ const CHANNEL_ADDRESS_COLLECTION = process.env.CHANNEL_ADDRESS_COLLECTION
 
 // Rate (in ms) to poll API endpoints
 const API_POLL_TIME_MS = 10000
+const reservoirListLimit = 50
+const reservoirSaleLimit = 100
 
 const TEST_MODE = process.env.TEST_MODE ?? false
 
@@ -221,7 +223,7 @@ bot.on('message', (msg) => {
 // Instantiate API Pollers (if not in test mode)
 if (!TEST_MODE) {
   new ReservoirListBot(
-    `https://api.reservoir.tools/orders/asks/v2?contracts=${CORE_CONTRACTS.OG}&contracts=${CORE_CONTRACTS.V2}&sortBy=createdAt&limit=50`,
+    `https://api.reservoir.tools/orders/asks/v2?contracts=${CORE_CONTRACTS.OG}&contracts=${CORE_CONTRACTS.V2}&sortBy=createdAt&limit=${reservoirListLimit}`,
     API_POLL_TIME_MS,
     bot,
     {
@@ -231,7 +233,7 @@ if (!TEST_MODE) {
   )
 
   new ReservoirSaleBot(
-    `https://api.reservoir.tools/sales/bulk/v1?contract=${CORE_CONTRACTS.V2}&limit=100`,
+    `https://api.reservoir.tools/sales/bulk/v1?contract=${CORE_CONTRACTS.V2}&limit=${reservoirSaleLimit}`,
     API_POLL_TIME_MS,
     bot,
     {
@@ -241,7 +243,7 @@ if (!TEST_MODE) {
   )
 
   new ReservoirSaleBot(
-    `https://api.reservoir.tools/sales/bulk/v1?contract=${CORE_CONTRACTS.OG}&limit=100`,
+    `https://api.reservoir.tools/sales/bulk/v1?contract=${CORE_CONTRACTS.OG}&limit=${reservoirSaleLimit}`,
     API_POLL_TIME_MS,
     bot,
     {
@@ -255,7 +257,7 @@ if (!TEST_MODE) {
 
   // Listing/Sales bots for Pace collab contract
   new ReservoirListBot(
-    `https://api.reservoir.tools/orders/asks/v2?contracts=${COLLAB_CONTRACTS.AB_X_PACE}&sortBy=createdAt&limit=50`,
+    `https://api.reservoir.tools/orders/asks/v2?contracts=${COLLAB_CONTRACTS.AB_X_PACE}&sortBy=createdAt&limit=${reservoirListLimit}`,
     API_POLL_TIME_MS * 2,
     bot,
     {
@@ -266,7 +268,7 @@ if (!TEST_MODE) {
   )
 
   new ReservoirSaleBot(
-    `https://api.reservoir.tools/sales/bulk/v1?contract=${COLLAB_CONTRACTS.AB_X_PACE}&limit=100`,
+    `https://api.reservoir.tools/sales/bulk/v1?contract=${COLLAB_CONTRACTS.AB_X_PACE}&limit=${reservoirSaleLimit}`,
     API_POLL_TIME_MS * 2,
     bot,
     {
