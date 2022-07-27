@@ -80,6 +80,17 @@ class ReservoirSaleBot extends APIPollBot {
 
     let sellerText = await this.ensOrAddress(msg.from)
     let buyerText = await this.ensOrAddress(msg.to)
+    if (platform.toLowerCase() === 'opensea') {
+      if (!sellerText.includes('.eth')) {
+        const sellerOS = await this.osName(msg.from)
+        sellerText =
+          sellerOS === '' ? sellerText : `${sellerText} (OS: ${sellerOS})`
+      }
+      if (!buyerText.includes('.eth')) {
+        const buyerOS = await this.osName(msg.to)
+        buyerText = buyerOS === '' ? buyerText : `${buyerText} (OS: ${buyerOS})`
+      }
+    }
 
     const baseABProfile = 'https://www.artblocks.io/user/'
     const sellerProfile = baseABProfile + owner
@@ -88,7 +99,7 @@ class ReservoirSaleBot extends APIPollBot {
     embed.addField('Buyer', `[${buyerText}](${buyerProfile})`)
 
     const currency = msg.orderSide === 'bid' ? 'WETH' : 'ETH'
-    embed.addField(priceText, price + currency, true)
+    embed.addField(priceText, `${price} ${currency}`, true)
 
     // Get Art Blocks metadata response for the item.
     const tokenUrl =
