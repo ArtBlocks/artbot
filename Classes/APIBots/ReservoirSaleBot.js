@@ -19,6 +19,7 @@ class ReservoirSaleBot extends APIPollBot {
     super(apiEndpoint, refreshRateMs, bot, headers)
     this.contract = contract
     this.lastUpdatedTime = (this.lastUpdatedTime / 1000).toFixed()
+    this.saleIds = new Set()
   }
 
   /**
@@ -31,9 +32,10 @@ class ReservoirSaleBot extends APIPollBot {
     let maxTime = 0
     for (const data of responseData.sales) {
       const eventTime = data.timestamp
-      // Only deal with event if it is new
-      if (this.lastUpdatedTime < eventTime) {
+      // Only deal with event if it is new and unique saleId
+      if (this.lastUpdatedTime < eventTime && !this.saleIds.has(data.saleId)) {
         this.buildDiscordMessage(data)
+        this.saleIds.add(data.saleId)
       }
 
       // Save the time of the latest event from this batch
