@@ -18,7 +18,7 @@ class ReservoirListBot extends APIPollBot {
     this.contract = contract
     this.listColor = '#407FDB'
     this.saleColor = '#62DE7C'
-    this.lastUpdatedTime = (this.lastUpdatedTime / 1000).toFixed()
+    this.lastUpdatedTime = this.lastUpdatedTime.toFixed()
   }
 
   /**
