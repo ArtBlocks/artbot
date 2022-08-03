@@ -59,12 +59,11 @@ class ReservoirListBot extends APIPollBot {
 
     // Parsing message to get info
     const tokenID = msg.tokenSetId.split(':')[2]
-
+    const contract = msg.contract
     let priceText = 'List Price'
     let price = msg.price
     let owner = msg.maker
     let platform = msg.source.name
-    let listingUrl = msg.source.url
 
     embed.setColor(this.listColor)
 
@@ -97,11 +96,25 @@ class ReservoirListBot extends APIPollBot {
       true
     )
 
-    // Update to remove author name and to reflect this info in piece name
-    // rather than token number as the title and URL field..
+    let platformUrl = ''
+    switch (platform.toLowerCase()) {
+      case 'opensea':
+        platformUrl = this.buildOpenseaURL(contract, tokenID)
+        break
+      case 'looksrare':
+        platformUrl = this.buildLooksRareURL(contract, tokenID)
+        break
+      case 'x2y2':
+        platformUrl = this.buildX2Y2URL(contract, tokenID)
+        break
+      default:
+        platformUrl = artBlocksData.external_url
+        break
+    }
+
     embed.author = null
     embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`)
-    embed.setURL(listingUrl)
+    embed.setURL(platformUrl)
     if (artBlocksData.collection_name) {
       console.log(artBlocksData.name + ' LIST')
       sendEmbedToListChannels(this.bot, embed, artBlocksData)
