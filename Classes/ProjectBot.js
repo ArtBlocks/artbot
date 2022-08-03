@@ -100,10 +100,8 @@ class ProjectBot {
       `https://token.artblocks.io/${this.coreContract}/${tokenID}`
     )
     const artBlocksData = await artBlocksResponse.json()
-    // If the OpenSea API is available use their link for the title otherwise use an AB link
-    const titleLink = openSeaData
-      ? openSeaData.permalink
-      : artBlocksData.external_url
+
+    const titleLink = artBlocksData.external_url
 
     let title = artBlocksData.name + ' - ' + artBlocksData.artist
 
@@ -116,10 +114,8 @@ class ProjectBot {
       title = artBlocksData.platform + ' - ' + title
     }
 
-    let moreDetailsText = `Add "?details" to your ArtBot command`
-    if (artBlocksData.external_url !== '') {
-      moreDetailsText += ` or [view on artblocks.io](${artBlocksData.external_url}).`
-    }
+    let moreDetailsText = `Add "?details" to your ArtBot command!`
+
     // If user did *not* request full details, return just a large image,
     // along with a link to the OpenSea page and ArtBlocks live script.
     if (!detailsRequested) {
