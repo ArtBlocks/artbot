@@ -77,7 +77,7 @@ class ArtIndexerBot {
 
     // if '#?' message, get random project
     if (projectKey === '#?') {
-      return this.sendRandomProjectRandomTokenMessage(msg)
+      return this.sendRandomProjectRandomTokenMessage(msg, 1)
     } else if (projectKey === 'open') {
       return this.sendRandomOpenProjectRandomTokenMessage(msg)
     }
@@ -108,32 +108,29 @@ class ArtIndexerBot {
     msg.content = '#?'
     msg.channel = channel
     // Try to message(s) in #ab-art-chat every minute
-    setInterval(() => this.sendRandomProjectRandomTokenMessage(msg), 1 * 60000)
+    setInterval(() => {
+      let now = new Date()
+      // Only send message if hour and minute match up with specified time
+      if (
+        now.getHours() !== RANDOM_ART_TIME.getHours() ||
+        now.getMinutes() !== RANDOM_ART_TIME.getMinutes()
+      ) {
+        return
+      }
+      this.sendRandomProjectRandomTokenMessage(msg, RANDOM_ART_AMOUNT)
+    }, 1 * 60000)
   }
 
   // This function takes a channel and sends a message containing a random
   // token from a random project
-  async sendRandomProjectRandomTokenMessage(msg) {
-    let now = new Date()
-    // Only send message if hour and minute match up with specified time
-    if (
-      now.getHours() !== RANDOM_ART_TIME.getHours() ||
-      now.getMinutes() !== RANDOM_ART_TIME.getMinutes()
-    ) {
-      return
-    }
-
+  async sendRandomProjectRandomTokenMessage(msg, numMessages) {
     let attempts = 0
     while (attempts < 10) {
       const keys = Object.keys(this.projects)
       let projectKey = keys[Math.floor(Math.random() * keys.length)]
       let projBot = this.projects[projectKey]
       if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
-        console.log(
-          `Sending ${RANDOM_ART_AMOUNT} random pieces for ${projectKey}!`
-        )
-
-        for (let i = 0; i < RANDOM_ART_AMOUNT; i++) {
+        for (let i = 0; i < numMessages; i++) {
           projBot.handleNumberMessage(msg)
         }
         return
