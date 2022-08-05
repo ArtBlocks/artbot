@@ -101,7 +101,10 @@ class ProjectBot {
     )
     const artBlocksData = await artBlocksResponse.json()
 
-    const titleLink = artBlocksData.external_url
+    const titleLink =
+      artBlocksData.external_url !== ''
+        ? artBlocksData.external_url
+        : openSeaData.permalink
 
     let title = artBlocksData.name + ' - ' + artBlocksData.artist
 
