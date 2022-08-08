@@ -24,9 +24,9 @@ RANDOM_ART_TIME.setMinutes(0)
 RANDOM_ART_TIME.setSeconds(0)
 RANDOM_ART_TIME.setMilliseconds(0)
 
-// Time for birthday check (UTC) - 12pm EST
+// Time for birthday check (UTC) - 10am EST
 const BIRTHDAY_CHECK_TIME = new Date()
-BIRTHDAY_CHECK_TIME.setHours(16)
+BIRTHDAY_CHECK_TIME.setHours(14)
 BIRTHDAY_CHECK_TIME.setMinutes(0)
 BIRTHDAY_CHECK_TIME.setSeconds(0)
 BIRTHDAY_CHECK_TIME.setMilliseconds(0)
