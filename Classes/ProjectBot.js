@@ -4,10 +4,13 @@ const Web3 = require('web3')
 const { ProjectHandlerHelper } = require('./ProjectHandlerHelper')
 
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
+const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 
 const EMBED_COLOR = 0xff0000
 const UNKNOWN_ADDRESS = 'unknown'
 const UNKNOWN_USERNAME = 'unknown'
+
+const ONE_MILLION = 1e6
 
 /**
  * Bot for handling projects
@@ -20,6 +23,7 @@ class ProjectBot {
     projectName,
     projectActive,
     namedMappings,
+    startTime = null,
   }) {
     this.projectNumber = projectNumber
     this.coreContract = coreContract
@@ -29,6 +33,7 @@ class ProjectBot {
     this.namedMappings = namedMappings
       ? ProjectBot.getProjectHandlerHelper(namedMappings)
       : null
+    this.startTime = startTime
   }
 
   static getProjectHandlerHelper({ singles, sets }) {
@@ -237,6 +242,63 @@ class ProjectBot {
       return 'None'
     }
     return `${numSales}`
+  }
+
+  async sendBirthdayMessage(channels) {
+    try {
+      console.log('sending birthday message(s) for:', this.projectName)
+
+      let msg = {}
+      const artBlocksResponse = await fetch(
+        `https://token.artblocks.io/${this.coreContract}/${
+          this.projectNumber * ONE_MILLION
+        }`
+      )
+      const artBlocksData = await artBlocksResponse.json()
+
+      let title = `:tada:  Happy Birthday to ${artBlocksData.collection_name}!  :tada:`
+
+      const embedContent = new MessageEmbed()
+        .setColor('#9370DB')
+        .setTitle(title)
+        .setImage(artBlocksData.image)
+        .setDescription(
+          `${
+            this.projectName
+          } was released on this day in ${this.startTime.getFullYear()}! 
+        
+        What are your favorite outputs from ${this.projectName}?
+
+        [Explore the full project here](${artBlocksData.external_url})
+        `
+        )
+        .setFooter(`${artBlocksData.name}`)
+
+      // Send all birthdays to #block-talk
+      msg.channel = channels.get(projectConfig.chIdByName['block-talk'])
+      msg.channel.send(embedContent)
+
+      if (projectConfig.projectToChannel[this.projectNumber]) {
+        // Send in artist channel if one exists
+        msg.channel = channels.get(
+          projectConfig.projectToChannel[this.projectNumber]
+        )
+        msg.channel.send(embedContent)
+      } else {
+        // Otherwise send in #factory-projects
+        msg.channel = channels.get(
+          projectConfig.projectToChannel['factory-projects']
+        )
+        msg.channel.send(embedContent)
+      }
+    } catch (err) {
+      console.error(
+        'Error sending birthday message for:',
+        this.projectName,
+        error
+      )
+    }
+    return
   }
 }
 

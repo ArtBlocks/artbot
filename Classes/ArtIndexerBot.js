@@ -6,6 +6,9 @@ const getArtBlocksProjects =
   require('../Utils/parseArtBlocksAPI').getArtBlocksProjects
 const getArtBlocksOpenProjects =
   require('../Utils/parseArtBlocksAPI').getArtBlocksOpenProjects
+const getProjectsBirthdays =
+  require('../Utils/parseArtBlocksAPI').getProjectsBirthdays
+
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
 
 // Refresh takes around one minute, so recommend setting this to 60 minutes
@@ -14,16 +17,25 @@ const METADATA_REFRESH_INTERVAL_MINUTES =
 
 // RandomBot Stuff
 const RANDOM_ART_AMOUNT = 10
+// Time for random art (UTC) - 8am EST
 const RANDOM_ART_TIME = new Date()
-RANDOM_ART_TIME.setHours(8)
+RANDOM_ART_TIME.setHours(12)
 RANDOM_ART_TIME.setMinutes(0)
 RANDOM_ART_TIME.setSeconds(0)
 RANDOM_ART_TIME.setMilliseconds(0)
+
+// Time for birthday check (UTC) - 12pm EST
+const BIRTHDAY_CHECK_TIME = new Date()
+BIRTHDAY_CHECK_TIME.setHours(16)
+BIRTHDAY_CHECK_TIME.setMinutes(0)
+BIRTHDAY_CHECK_TIME.setSeconds(0)
+BIRTHDAY_CHECK_TIME.setMilliseconds(0)
 
 class ArtIndexerBot {
   constructor(projectFetch = getArtBlocksProjects) {
     this.projectFetch = projectFetch
     this.projects = {}
+    this.birthdays = {}
     this.init()
   }
 
@@ -41,20 +53,29 @@ class ArtIndexerBot {
   async buildProjectBots() {
     try {
       const projects = await this.projectFetch()
+      const bdays = await getProjectsBirthdays()
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i]
         console.log(
           `Refreshing project cache for Project ${project.projectId} ${project.name}`
         )
+        let bday = bdays[`${project.contract.id}-${project.projectId}`]
         const newBot = new ProjectBot({
           projectNumber: project.projectId,
           coreContract: project.contract.id,
           editionSize: project.invocations,
           projectName: project.name,
           projectActive: project.active,
+          startTime: bday ? new Date(bday) : null,
         })
         const projectKey = this.toProjectKey(project.name)
         this.projects[projectKey] = newBot
+        if (bday) {
+          const [year, month, day] = bday.split('T')[0].split('-')
+          bday = month + '-' + day
+          this.birthdays[bday] = this.birthdays[bday] ?? []
+          this.birthdays[bday].push(newBot)
+        }
       }
     } catch (err) {
       console.error(`Error while initializing ArtIndexerBots\n${err}`)
@@ -118,6 +139,30 @@ class ArtIndexerBot {
         return
       }
       this.sendRandomProjectRandomTokenMessage(msg, RANDOM_ART_AMOUNT)
+    }, 1 * 60000)
+  }
+
+  async startBirthdayRoutine(channels) {
+    setInterval(() => {
+      let now = new Date()
+      // Only send message if hour and minute match up with specified time
+      if (
+        now.getHours() !== BIRTHDAY_CHECK_TIME.getHours() ||
+        now.getMinutes() !== BIRTHDAY_CHECK_TIME.getMinutes()
+      ) {
+        return
+      }
+      const [year, month, day] = now.toISOString().split('T')[0].split('-')
+      if (this.birthdays[`${month}-${day}`]) {
+        this.birthdays[`${month}-${day}`].forEach((projBot) => {
+          if (
+            projBot.startTime &&
+            projBot.startTime.getFullYear().toString() !== year
+          ) {
+            projBot.sendBirthdayMessage(channels)
+          }
+        })
+      }
     }, 1 * 60000)
   }
 

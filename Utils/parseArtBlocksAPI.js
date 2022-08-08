@@ -1,3 +1,4 @@
+require('dotenv').config()
 const parse = require('node-html-parser').parse
 const fetch = require('node-fetch')
 const { createClient, gql } = require('@urql/core')
@@ -17,6 +18,15 @@ const client = createClient({
     },
   }),
 })
+
+const projectsStartTimes = gql`
+  query getProjectStartTimes($first: Int!, $skip: Int) {
+    projects_metadata(limit: $first, offset: $skip) {
+      id
+      start_datetime
+    }
+  }
+`
 
 const contractProjectsMinimal = gql`
   query getContractProjectsMinimal($id: ID!, $first: Int!, $skip: Int) {
@@ -487,6 +497,48 @@ async function _getPBABContracts() {
 }
 
 /**
+ * Queries Hasura to get start_datetime of all projects
+ * @returns Map of "contractAddr-projectId"->start_datetime
+ * Returns empty dict on error (namely, if Hasura not configured)
+ */
+async function getProjectsBirthdays() {
+  const maxProjectsPerQuery = 1000
+  try {
+    const hasuraClient = createClient({
+      url: process.env.HASURA_GRAPHQL_ENDPOINT,
+      fetch: fetch,
+      fetchOptions: () => ({
+        headers: {
+          'x-hasura-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET,
+        },
+      }),
+    })
+    const allProjects = []
+    while (true) {
+      const result = await hasuraClient
+        .query(projectsStartTimes, {
+          first: maxProjectsPerQuery,
+          skip: allProjects.length,
+        })
+        .toPromise()
+
+      allProjects.push(...result.data.projects_metadata)
+      if (result.data.projects_metadata.length !== maxProjectsPerQuery) {
+        break
+      }
+    }
+    const bdayMapping = {}
+    allProjects.forEach((proj) => {
+      bdayMapping[proj.id] = proj.start_datetime
+    })
+    return bdayMapping
+  } catch (err) {
+    console.error(err)
+    return {}
+  }
+}
+
+/**
  * get data for all PBAB Projects
  * Returns undefined if errors encountered while fetching.
  * If project found, returns array of project objects with:
@@ -511,3 +563,4 @@ module.exports.getPBABProjects = getPBABProjects
 module.exports.getArtBlocksXPaceProjects = getArtBlocksXPaceProjects
 module.exports.getArtBlocksProjectCount = getArtBlocksProjectCount
 module.exports.getContractProject = getContractProject
+module.exports.getProjectsBirthdays = getProjectsBirthdays

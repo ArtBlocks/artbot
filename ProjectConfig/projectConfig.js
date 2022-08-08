@@ -100,6 +100,7 @@ class ProjectConfig {
   constructor() {
     this.channels = ProjectConfig.buildChannelHandlers(CHANNELS)
     this.chIdByName = ProjectConfig.buildChannelIDByName(this.channels)
+    this.projectToChannel = {}
     this.initialize()
   }
 
@@ -129,19 +130,24 @@ class ProjectConfig {
     // Loops over channelsJson and adds all project IDs to a set of bots that
     // need to be instatiated.
     const botsToInstatiate = new Set()
-    Object.keys(channelsJson).forEach((key) => {
-      const projectBotHandlers = channelsJson[key].projectBotHandlers
+    Object.keys(channelsJson).forEach((channel) => {
+      const projectBotHandlers = channelsJson[channel].projectBotHandlers
       if (!projectBotHandlers) {
         return
       }
       botsToInstatiate.add(projectBotHandlers.default)
+      this.projectToChannel[projectBotHandlers.default] = channel
+
       const { stringTriggers = {}, tokenIdTriggers = [] } = projectBotHandlers
       Object.keys(stringTriggers).forEach((key) => {
         botsToInstatiate.add(key)
+        this.projectToChannel[key] = channel
       })
+
       tokenIdTriggers.forEach((tokenTrigger) => {
         Object.keys(tokenTrigger).forEach((key) => {
           botsToInstatiate.add(key)
+          this.projectToChannel[key] = channel
         })
       })
     })
