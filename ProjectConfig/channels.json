@@ -479,7 +479,7 @@
     "projectBotHandlers": {
       "default": "284",
       "stringTriggers": {
-        "329": ["latent spirits", "latent spirit", "latent", "spirits"] 
+        "329": ["latent spirits", "latent spirit", "latent", "spirits"]
       }
     }
   },
@@ -521,6 +521,18 @@
     "name": "fahad-karim",
     "projectBotHandlers": {
       "default": "333"
+    }
+  },
+  "994689275033567232": {
+    "name": "licia-he",
+    "projectBotHandlers": {
+      "default": "334"
+    }
+  },
+  "1004821404329455656":{
+    "name": "maya-man",
+    "projectBotHandlers": {
+      "default": "337"
     }
   },
   "880280317477404713": {
