@@ -285,16 +285,14 @@ class ProjectBot {
         msg.channel.send(embedContent)
       } else {
         // Otherwise send in #factory-projects
-        msg.channel = channels.get(
-          projectConfig.projectToChannel['factory-projects']
-        )
+        msg.channel = channels.get(projectConfig.chIdByName['factory-projects'])
         msg.channel.send(embedContent)
       }
     } catch (err) {
       console.error(
         'Error sending birthday message for:',
         this.projectName,
-        error
+        err
       )
     }
     return
