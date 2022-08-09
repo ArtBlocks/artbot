@@ -94,7 +94,7 @@ bot.login(TOKEN)
 bot.on('ready', (client) => {
   console.info(`Logged in as ${bot.user.tag}!`)
   artIndexerBot.startRandomRoutine(bot.channels.cache.get(CHANNEL_ART_CHAT))
-  artIndexerBot.startBirthdayRoutine(bot.channels.cache)
+  artIndexerBot.startBirthdayRoutine(bot.channels.cache, projectConfig)
 })
 
 // Manage Giveaways with Artbot
