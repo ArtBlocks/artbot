@@ -4,7 +4,6 @@ const Web3 = require('web3')
 const { ProjectHandlerHelper } = require('./ProjectHandlerHelper')
 
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
-const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 
 const EMBED_COLOR = 0xff0000
 const UNKNOWN_ADDRESS = 'unknown'
@@ -244,7 +243,7 @@ class ProjectBot {
     return `${numSales}`
   }
 
-  async sendBirthdayMessage(channels) {
+  async sendBirthdayMessage(channels, projectConfig) {
     try {
       console.log('sending birthday message(s) for:', this.projectName)
 
@@ -286,16 +285,14 @@ class ProjectBot {
         msg.channel.send(embedContent)
       } else {
         // Otherwise send in #factory-projects
-        msg.channel = channels.get(
-          projectConfig.projectToChannel['factory-projects']
-        )
+        msg.channel = channels.get(projectConfig.chIdByName['factory-projects'])
         msg.channel.send(embedContent)
       }
     } catch (err) {
       console.error(
         'Error sending birthday message for:',
         this.projectName,
-        error
+        err
       )
     }
     return
