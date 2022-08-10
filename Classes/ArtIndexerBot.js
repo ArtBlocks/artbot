@@ -142,7 +142,7 @@ class ArtIndexerBot {
     }, 1 * 60000)
   }
 
-  async startBirthdayRoutine(channels) {
+  async startBirthdayRoutine(channels, projectConfig) {
     setInterval(() => {
       let now = new Date()
       // Only send message if hour and minute match up with specified time
@@ -159,7 +159,7 @@ class ArtIndexerBot {
             projBot.startTime &&
             projBot.startTime.getFullYear().toString() !== year
           ) {
-            projBot.sendBirthdayMessage(channels)
+            projBot.sendBirthdayMessage(channels, projectConfig)
           }
         })
       }
