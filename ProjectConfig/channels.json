@@ -170,7 +170,8 @@
       "default": "129",
       "stringTriggers": {
         "90": ["hashtractors", "hash", "tractors", "🚜"],
-        "217": ["paths"]
+        "217": ["paths"],
+		"340": ["vahria"]
       }
     }
   },
