@@ -22,6 +22,7 @@ class ProjectBot {
     projectName,
     projectActive,
     namedMappings,
+    curationStatus = null,
     startTime = null,
   }) {
     this.projectNumber = projectNumber
@@ -32,6 +33,7 @@ class ProjectBot {
     this.namedMappings = namedMappings
       ? ProjectBot.getProjectHandlerHelper(namedMappings)
       : null
+    this.curationStatus = curationStatus
     this.startTime = startTime
   }
 
