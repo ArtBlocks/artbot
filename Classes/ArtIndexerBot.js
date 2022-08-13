@@ -8,6 +8,8 @@ const getArtBlocksOpenProjects =
   require('../Utils/parseArtBlocksAPI').getArtBlocksOpenProjects
 const getProjectsBirthdays =
   require('../Utils/parseArtBlocksAPI').getProjectsBirthdays
+const getProjectsCurationStatus =
+  require('../Utils/parseArtBlocksAPI').getProjectsCurationStatus
 
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
 
@@ -36,6 +38,7 @@ class ArtIndexerBot {
     this.projectFetch = projectFetch
     this.projects = {}
     this.birthdays = {}
+    this.curationMapping = {}
     this.init()
   }
 
@@ -54,18 +57,23 @@ class ArtIndexerBot {
     try {
       const projects = await this.projectFetch()
       const bdays = await getProjectsBirthdays()
+      const curationStatuses = await getProjectsCurationStatus()
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i]
         console.log(
           `Refreshing project cache for Project ${project.projectId} ${project.name}`
         )
         let bday = bdays[`${project.contract.id}-${project.projectId}`]
+        const curationStatus =
+          curationStatuses[`${project.contract.id}-${project.projectId}`]
+
         const newBot = new ProjectBot({
           projectNumber: project.projectId,
           coreContract: project.contract.id,
           editionSize: project.invocations,
           projectName: project.name,
           projectActive: project.active,
+          curationStatus: curationStatus ?? null,
           startTime: bday ? new Date(bday) : null,
         })
         const projectKey = this.toProjectKey(project.name)
@@ -76,6 +84,10 @@ class ArtIndexerBot {
           this.birthdays[bday] = this.birthdays[bday] ?? []
           this.birthdays[bday].push(newBot)
         }
+
+        this.curationMapping[curationStatus] =
+          this.curationMapping[curationStatus] ?? []
+        this.curationMapping[curationStatus].push(newBot)
       }
     } catch (err) {
       console.error(`Error while initializing ArtIndexerBots\n${err}`)
@@ -101,6 +113,12 @@ class ArtIndexerBot {
       return this.sendRandomProjectRandomTokenMessage(msg, 1)
     } else if (projectKey === 'open') {
       return this.sendRandomOpenProjectRandomTokenMessage(msg)
+    } else if (
+      projectKey === 'curated' ||
+      projectKey === 'factory' ||
+      projectKey === 'playground'
+    ) {
+      return this.sendCurationStatusRandomTokenMessage(msg, projectKey)
     }
 
     console.log(`Searching for project ${projectKey}`)
@@ -195,6 +213,29 @@ class ArtIndexerBot {
         openProjects[Math.floor(Math.random() * openProjects.length)]
 
       let projBot = this.projects[this.toProjectKey(project.name)]
+      if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
+        return projBot.handleNumberMessage(msg)
+      }
+      attempts++
+    }
+  }
+
+  async sendCurationStatusRandomTokenMessage(msg, curationStatus) {
+    let attempts = 0
+    if (
+      !this.curationMapping[curationStatus] ||
+      this.curationMapping[curationStatus].length === 0
+    ) {
+      return
+    }
+    while (attempts < 10) {
+      let projBot =
+        this.curationMapping[curationStatus][
+          Math.floor(
+            Math.random() * this.curationMapping[curationStatus].length
+          )
+        ]
+
       if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
         return projBot.handleNumberMessage(msg)
       }
