@@ -180,7 +180,7 @@ class ArtIndexerBot {
             !this.sentBirthdays[projBot.projectName]
           ) {
             projBot.sendBirthdayMessage(channels, projectConfig)
-            this.sentBirthdays[projBot.projectNumber] = true
+            this.sentBirthdays[projBot.projectName] = true
           }
         })
       }
