@@ -39,6 +39,7 @@ class ArtIndexerBot {
     this.projects = {}
     this.birthdays = {}
     this.curationMapping = {}
+    this.sentBirthdays = {}
     this.init()
   }
 
@@ -175,9 +176,11 @@ class ArtIndexerBot {
         this.birthdays[`${month}-${day}`].forEach((projBot) => {
           if (
             projBot.startTime &&
-            projBot.startTime.getFullYear().toString() !== year
+            projBot.startTime.getFullYear().toString() !== year &&
+            !this.sentBirthdays[projBot.projectName]
           ) {
             projBot.sendBirthdayMessage(channels, projectConfig)
+            this.sentBirthdays[projBot.projectName] = true
           }
         })
       }
