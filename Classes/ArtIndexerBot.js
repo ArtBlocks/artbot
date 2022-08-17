@@ -177,10 +177,10 @@ class ArtIndexerBot {
           if (
             projBot.startTime &&
             projBot.startTime.getFullYear().toString() !== year &&
-            !this.sentBirthdays[projBot.projectName]
+            !this.sentBirthdays[projBot.projectNumber]
           ) {
             projBot.sendBirthdayMessage(channels, projectConfig)
-            this.sentBirthdays[projBot.projectName] = true
+            this.sentBirthdays[projBot.projectNumber] = true
           }
         })
       }

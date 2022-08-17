@@ -256,7 +256,14 @@ class ProjectBot {
         }`
       )
       const artBlocksData = await artBlocksResponse.json()
-
+      if (
+        !artBlocksData ||
+        !artBlocksData.image ||
+        !artBlocksData.collection_name ||
+        !artBlocksData.artist
+      ) {
+        return
+      }
       let title = `:tada:  Happy Birthday to ${artBlocksData.collection_name}!  :tada:`
 
       const embedContent = new MessageEmbed()
