@@ -12,6 +12,7 @@ const getProjectsCurationStatus =
   require('../Utils/parseArtBlocksAPI').getProjectsCurationStatus
 
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
+const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
 
 // Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES =
@@ -108,6 +109,10 @@ class ArtIndexerBot {
     let projectKey = this.toProjectKey(
       content.substr(content.indexOf(' ') + 1).replace('?details', '')
     )
+
+    if (PROJECT_ALIASES[projectKey]) {
+      projectKey = this.toProjectKey(PROJECT_ALIASES[projectKey])
+    }
 
     // if '#?' message, get random project
     if (projectKey === '#?') {
