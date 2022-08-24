@@ -537,6 +537,15 @@
       "default": "337"
     }
   },
+  "1009952305170350201":{
+    "name": "legowelt-x-rafael-rozendaal",
+    "projectBotHandlers": {
+      "default": "336",
+      "stringTriggers": {
+        "336": ["polychrome music", "polychromemusic", "polychrome"]
+      }
+    }
+  },
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
     "projectBotHandlers": {
