@@ -76,11 +76,12 @@ class ReservoirSaleBot extends APIPollBot {
     let platform = msg.orderSource
     embed.setColor(this.saleColor)
 
+    if (msg.orderKind === 'mint') {
+      return // Don't send mint events
+    }
+
     if (BAN_ADDRESSES.has(owner)) {
       console.log(`Skipping message propagation for ${owner}`)
-      return
-    }
-    if (msg.from === ethers.ZERO_ADDRESS) {
       return
     }
 
