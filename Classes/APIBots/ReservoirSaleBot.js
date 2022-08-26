@@ -6,6 +6,7 @@ const {
   BAN_ADDRESSES,
 } = require('../../Utils/activityTriager')
 const { getENSName } = require('./utils')
+const { ethers } = require('ethers')
 /** API Poller for Reservoir Sale events */
 class ReservoirSaleBot extends APIPollBot {
   /** Constructor just calls super
@@ -77,6 +78,9 @@ class ReservoirSaleBot extends APIPollBot {
 
     if (BAN_ADDRESSES.has(owner)) {
       console.log(`Skipping message propagation for ${owner}`)
+      return
+    }
+    if (msg.from === ethers.ZERO_ADDRESS) {
       return
     }
 
