@@ -294,12 +294,24 @@ class ArtIndexerBot {
         )
         return
       }
-      let token = tokens[Math.floor(Math.random() * tokens.length)]
 
-      let projBot = this.projects[this.toProjectKey(token.project.name)]
+      let attempts = 0
+      while (attempts < 10) {
+        let token = tokens[Math.floor(Math.random() * tokens.length)]
 
-      msg.content = `#${token.invocation}`
-      return projBot.handleNumberMessage(msg)
+        console.log(`looking for wallet project: ${token.project.name}`)
+        let projBot = this.projects[this.toProjectKey(token.project.name)]
+        if (projBot) {
+          msg.content = `#${token.invocation}`
+          return projBot.handleNumberMessage(msg)
+        } else {
+          attempts++
+        }
+      }
+      msg.channel.send(
+        `Sorry, I had trouble finding an Art Blocks token in that wallet: ${wallet}`
+      )
+      return
     } catch (err) {
       console.log(`Error when getting wallet tokens: ${err}`)
       msg.channel.send(
