@@ -302,6 +302,9 @@ class ArtIndexerBot {
       return projBot.handleNumberMessage(msg)
     } catch (err) {
       console.log(`Error when getting wallet tokens: ${err}`)
+      msg.channel.send(
+        `Sorry, something unexpected went wrong - pester Grant about it til he fixes it :)`
+      )
     }
   }
 }
