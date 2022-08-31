@@ -142,8 +142,17 @@ const getPBABContracts = gql`
 `
 
 const getWalletTokens = gql`
-  query getWalletTokens($wallet: String!, $first: Int!, $skip: Int) {
-    tokens(first: $first, skip: $skip, where: { owner: $wallet }) {
+  query getWalletTokens(
+    $wallet: String!
+    $contracts: [ID!]!
+    $first: Int!
+    $skip: Int
+  ) {
+    tokens(
+      first: $first
+      skip: $skip
+      where: { owner: $wallet, contract_in: $contracts }
+    ) {
       invocation
       project {
         name
@@ -620,6 +629,7 @@ async function getAllWalletTokens(walletAddress) {
       const result = await client
         .query(getWalletTokens, {
           wallet: walletAddress,
+          contracts: Object.values(CORE_CONTRACTS),
           first: maxTokensPerQuery,
           skip: allTokens.length,
         })
