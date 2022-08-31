@@ -5,6 +5,7 @@ let provider = new ethers.providers.AlchemyProvider('homestead')
 
 // Runtime ENS cache just to limit queries
 let ensAddressMap = {}
+let ensResolvedMap = {}
 let osAddressMap = {}
 
 async function getENSName(address) {
@@ -15,8 +16,20 @@ async function getENSName(address) {
     let ens = await provider.lookupAddress(address)
     name = ens ?? ''
     ensAddressMap[address] = name
+    ensResolvedMap[name] = address
   }
   return name
+}
+
+async function resolveEnsName(ensName) {
+  let wallet = ''
+  if (ensResolvedMap[ensName]) {
+    wallet = ensResolvedMap[ensName]
+  } else {
+    wallet = await provider.resolveName(ensName)
+    ensResolvedMap[ensName] = wallet
+  }
+  return wallet
 }
 
 async function ensOrAddress(address) {
@@ -56,3 +69,4 @@ async function getOSName(address) {
 
 module.exports.ensOrAddress = ensOrAddress
 module.exports.getOSName = getOSName
+module.exports.resolveEnsName = resolveEnsName
