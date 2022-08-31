@@ -141,6 +141,17 @@ const getPBABContracts = gql`
   }
 `
 
+const getWalletTokens = gql`
+  query getWalletTokens($wallet: String!, $first: Int!, $skip: Int) {
+    tokens(first: $first, skip: $skip, where: { owner: $wallet }) {
+      invocation
+      project {
+        name
+      }
+    }
+  }
+`
+
 /*
  * helper function to get project count of a single
  * art blocks contract (uses pagination)
@@ -601,6 +612,31 @@ async function getPBABProjects() {
   return getContractsProjects(contractsToGet)
 }
 
+async function getAllWalletTokens(walletAddress) {
+  const maxTokensPerQuery = 1000
+  try {
+    const allTokens = []
+    while (true) {
+      const result = await client
+        .query(getWalletTokens, {
+          wallet: walletAddress,
+          first: maxTokensPerQuery,
+          skip: allTokens.length,
+        })
+        .toPromise()
+
+      allTokens.push(...result.data.tokens)
+      if (result.data.tokens.length !== maxTokensPerQuery) {
+        break
+      }
+    }
+    return allTokens
+  } catch (err) {
+    console.error(err)
+    return undefined
+  }
+}
+
 module.exports.getArtBlocksProject = getArtBlocksProject
 module.exports.getArtBlocksFactoryProjects = getArtBlocksFactoryProjects
 module.exports.getArtBlocksProjects = getArtBlocksProjects
@@ -611,3 +647,4 @@ module.exports.getArtBlocksProjectCount = getArtBlocksProjectCount
 module.exports.getContractProject = getContractProject
 module.exports.getProjectsBirthdays = getProjectsBirthdays
 module.exports.getProjectsCurationStatus = getProjectsCurationStatus
+module.exports.getAllWalletTokens = getAllWalletTokens

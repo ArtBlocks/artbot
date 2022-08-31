@@ -10,6 +10,9 @@ const getProjectsBirthdays =
   require('../Utils/parseArtBlocksAPI').getProjectsBirthdays
 const getProjectsCurationStatus =
   require('../Utils/parseArtBlocksAPI').getProjectsCurationStatus
+const getAllWalletTokens =
+  require('../Utils/parseArtBlocksAPI').getAllWalletTokens
+const resolveEnsName = require('./APIBots/utils').resolveEnsName
 
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
 const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
@@ -41,6 +44,7 @@ class ArtIndexerBot {
     this.birthdays = {}
     this.curationMapping = {}
     this.sentBirthdays = {}
+    this.walletTokens = {}
     this.init()
   }
 
@@ -125,6 +129,11 @@ class ArtIndexerBot {
       projectKey === 'playground'
     ) {
       return this.sendCurationStatusRandomTokenMessage(msg, projectKey)
+    } else if (
+      (projectKey.startsWith('0x') || projectKey.endsWith('eth')) &&
+      !this.projects[projectKey]
+    ) {
+      return this.sendRandomWalletTokenMessage(msg, projectKey)
     }
 
     console.log(`Searching for project ${projectKey}`)
@@ -248,6 +257,51 @@ class ArtIndexerBot {
         return projBot.handleNumberMessage(msg)
       }
       attempts++
+    }
+  }
+
+  // Sends a random token from this wallet's collection
+  async sendRandomWalletTokenMessage(msg, wallet) {
+    console.log(`Getting random token for wallet ${wallet}`)
+    try {
+      // Resolve ENS name if ends in .eth
+      if (wallet.endsWith('eth')) {
+        let ensName = wallet.replace('eth', '.eth')
+
+        wallet = await resolveEnsName(ensName)
+
+        if (!wallet || wallet === '') {
+          msg.channel.send(
+            `Sorry, I wasn't able to resolve ENS name ${ensName}`
+          )
+          return
+        }
+      }
+
+      wallet = wallet.toLowerCase()
+
+      let tokens = []
+      if (this.walletTokens[wallet]) {
+        tokens = this.walletTokens[wallet]
+      } else {
+        tokens = await getAllWalletTokens(wallet)
+        this.walletTokens[wallet] = tokens
+      }
+
+      if (tokens.length === 0) {
+        msg.channel.send(
+          `Sorry, I wasn't able to find any Art Blocks tokens in that wallet: ${wallet}`
+        )
+        return
+      }
+      let token = tokens[Math.floor(Math.random() * tokens.length)]
+
+      let projBot = this.projects[this.toProjectKey(token.project.name)]
+
+      msg.content = `#${token.invocation}`
+      return projBot.handleNumberMessage(msg)
+    } catch (err) {
+      console.log(`Error when getting wallet tokens: ${err}`)
     }
   }
 }
