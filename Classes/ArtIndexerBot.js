@@ -110,9 +110,11 @@ class ArtIndexerBot {
       return
     }
 
-    let projectKey = this.toProjectKey(
-      content.substr(content.indexOf(' ') + 1).replace('?details', '')
-    )
+    let afterTheHash = content
+      .substr(content.indexOf(' ') + 1)
+      .replace('?details', '')
+
+    let projectKey = this.toProjectKey(afterTheHash)
 
     if (PROJECT_ALIASES[projectKey]) {
       projectKey = this.toProjectKey(PROJECT_ALIASES[projectKey])
@@ -133,7 +135,7 @@ class ArtIndexerBot {
       (projectKey.startsWith('0x') || projectKey.endsWith('eth')) &&
       !this.projects[projectKey]
     ) {
-      return this.sendRandomWalletTokenMessage(msg, projectKey)
+      return this.sendRandomWalletTokenMessage(msg, afterTheHash)
     }
 
     console.log(`Searching for project ${projectKey}`)
@@ -265,8 +267,8 @@ class ArtIndexerBot {
     console.log(`Getting random token for wallet ${wallet}`)
     try {
       // Resolve ENS name if ends in .eth
-      if (wallet.endsWith('eth')) {
-        let ensName = wallet.replace('eth', '.eth')
+      if (wallet.toLowerCase().endsWith('.eth')) {
+        let ensName = wallet
 
         wallet = await resolveEnsName(ensName)
 
