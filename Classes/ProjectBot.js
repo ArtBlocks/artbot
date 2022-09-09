@@ -166,7 +166,10 @@ class ProjectBot {
       .addField('Features', assetFeatures)
 
     // If OpenSea data is available add it otherwise say we are operating in a degraded mode
-    if (openSeaData) {
+    try {
+      if (!openSeaData) {
+        throw new Error('OpenSea data is not available')
+      }
       embedContent
         // Add sale number details.
         .addField('Total Sales', this.parseNumSales(openSeaData.num_sales))
@@ -174,7 +177,7 @@ class ProjectBot {
         .addFields(this.parseOwnerInfo(openSeaData.owner))
         // Add sale info.
         .addFields(this.parseSaleInfo(openSeaData.last_sale))
-    } else {
+    } catch (e) {
       embedContent.addField(
         'Sales Info',
         'It seems there is a problem with the OpenSea API. Check status [here](https://status.opensea.io/).'
