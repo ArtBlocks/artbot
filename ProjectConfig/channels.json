@@ -329,7 +329,8 @@
       "default": "72",
       "stringTriggers": {
         "121": ["rina"],
-        "200": ["saturazione"]
+        "200": ["saturazione"],
+        "356": ["essenza"]
       },
       "tokenIdTriggers": [
         {
