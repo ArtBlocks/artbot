@@ -544,6 +544,12 @@
       "default": "336"
     }
   },
+  "1014944262007291944":{
+    "name": "itsgalo",
+    "projectBotHandlers": {
+      "default": "341"
+    }
+  },
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
     "projectBotHandlers": {
