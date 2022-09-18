@@ -15,6 +15,9 @@ const CHANNEL_HELP = projectConfig.chIdByName['help']
 const CHANNEL_SNOWFRO = projectConfig.chIdByName['snowfro']
 const GASSTATION_API_KEY = process.env.GASSTATION_API_KEY
 
+const CHANNEL_FOR_SALE_LISTINGS = projectConfig.chIdByName['for-sale-listings']
+const CHANNEL_TRADE_SWAPS = projectConfig.chIdByName['trade-swaps']
+
 /*
  * Specific OpenSea assets for fetching project stats for "ArtBlocks Curated"
  * and "Artist Playground".
@@ -32,6 +35,7 @@ const ARTBLOCKS_FACTORY_ASSET =
 // ArtBot details..
 const ARTBOT_USERNAME = 'artbot'
 const ARTBOT_GREEN = 0x00ff00
+const ARTBOT_WARNING = 0xffff00
 
 // Returns a random color
 function randomColor() {
@@ -215,6 +219,19 @@ const SAFETY_MESSAGE = new MessageEmbed()
         https://www.instagram.com/artblocks_io/
         `
   )
+
+const OTC_MESSAGE = new MessageEmbed()
+  // Set the title of the field
+  .setTitle('Warning: OTC trades can be dangerous')
+  // Set the color of the embed
+  .setColor(ARTBOT_WARNING)
+  // Set the main content of the embed
+  .setDescription(
+    `If participating in an OTC trade, please take extra caution to ensure a safe transaction! We have a few trusted options pinned in the <#874066035618250752> channel.
+    
+    For an OTC sale, we also encourage sending the Artist and Art Blocks royalties. More info can be found [on this post](https://discord.com/channels/411959613370400778/797930335874449408/1004904448583278712) in <#797930335874449408>`
+  )
+
 // Returns a message containing information about the current gas prices.
 async function generateGasPriceMessage() {
   const gasStationResponse = await fetch(
@@ -302,6 +319,15 @@ async function smartBotResponse(
   ) {
     return SQUIGGLE_PAUSE_MESSAGE
   }
+
+  if (
+    (channelID == CHANNEL_FOR_SALE_LISTINGS ||
+      channelID == CHANNEL_TRADE_SWAPS) &&
+    msgContentLowercase.includes('otc')
+  ) {
+    return OTC_MESSAGE
+  }
+
   /*
    * Only answer the following questions if ArtBlot is pinged directly
    * Or the message was sent in #general.

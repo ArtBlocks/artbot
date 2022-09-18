@@ -28,6 +28,15 @@ const projectsStartTimes = gql`
   }
 `
 
+const getAllProjectsCurationStatus = gql`
+  query getAllProjectsCurationStatus($first: Int!, $skip: Int) {
+    projects_metadata(limit: $first, offset: $skip) {
+      id
+      curation_status_display
+    }
+  }
+`
+
 const contractProjectsMinimal = gql`
   query getContractProjectsMinimal($id: ID!, $first: Int!, $skip: Int) {
     contract(id: $id) {
@@ -128,6 +137,26 @@ const getPBABContracts = gql`
   query getPBABContracts($ids: [ID]!) {
     contracts(where: { id_not_in: $ids }) {
       id
+    }
+  }
+`
+
+const getWalletTokens = gql`
+  query getWalletTokens(
+    $wallet: String!
+    $contracts: [ID!]!
+    $first: Int!
+    $skip: Int
+  ) {
+    tokens(
+      first: $first
+      skip: $skip
+      where: { owner: $wallet, contract_in: $contracts }
+    ) {
+      invocation
+      project {
+        name
+      }
     }
   }
 `
@@ -538,6 +567,43 @@ async function getProjectsBirthdays() {
   }
 }
 
+async function getProjectsCurationStatus() {
+  const maxProjectsPerQuery = 1000
+  try {
+    const hasuraClient = createClient({
+      url: process.env.HASURA_GRAPHQL_ENDPOINT,
+      fetch: fetch,
+      fetchOptions: () => ({
+        headers: {
+          'x-hasura-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET,
+        },
+      }),
+    })
+    const allProjects = []
+    while (true) {
+      const result = await hasuraClient
+        .query(getAllProjectsCurationStatus, {
+          first: maxProjectsPerQuery,
+          skip: allProjects.length,
+        })
+        .toPromise()
+
+      allProjects.push(...result.data.projects_metadata)
+      if (result.data.projects_metadata.length !== maxProjectsPerQuery) {
+        break
+      }
+    }
+    const curationMapping = {}
+    allProjects.forEach((proj) => {
+      curationMapping[proj.id] = proj.curation_status_display.toLowerCase()
+    })
+    return curationMapping
+  } catch (err) {
+    console.error(err)
+    return {}
+  }
+}
+
 /**
  * get data for all PBAB Projects
  * Returns undefined if errors encountered while fetching.
@@ -555,6 +621,32 @@ async function getPBABProjects() {
   return getContractsProjects(contractsToGet)
 }
 
+async function getAllWalletTokens(walletAddress) {
+  const maxTokensPerQuery = 1000
+  try {
+    const allTokens = []
+    while (true) {
+      const result = await client
+        .query(getWalletTokens, {
+          wallet: walletAddress,
+          contracts: Object.values(CORE_CONTRACTS),
+          first: maxTokensPerQuery,
+          skip: allTokens.length,
+        })
+        .toPromise()
+
+      allTokens.push(...result.data.tokens)
+      if (result.data.tokens.length !== maxTokensPerQuery) {
+        break
+      }
+    }
+    return allTokens
+  } catch (err) {
+    console.error(err)
+    return undefined
+  }
+}
+
 module.exports.getArtBlocksProject = getArtBlocksProject
 module.exports.getArtBlocksFactoryProjects = getArtBlocksFactoryProjects
 module.exports.getArtBlocksProjects = getArtBlocksProjects
@@ -564,3 +656,5 @@ module.exports.getArtBlocksXPaceProjects = getArtBlocksXPaceProjects
 module.exports.getArtBlocksProjectCount = getArtBlocksProjectCount
 module.exports.getContractProject = getContractProject
 module.exports.getProjectsBirthdays = getProjectsBirthdays
+module.exports.getProjectsCurationStatus = getProjectsCurationStatus
+module.exports.getAllWalletTokens = getAllWalletTokens

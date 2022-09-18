@@ -160,7 +160,8 @@
       "stringTriggers": {
         "212": ["dive"],
         "260": ["non", "either", "non either", "noneither"],
-        "292": ["corners"]
+        "292": ["corners"],
+        "336": ["polychrome music", "polychromemusic", "polychrome"]
       }
     }
   },
@@ -535,6 +536,12 @@
     "name": "maya-man",
     "projectBotHandlers": {
       "default": "337"
+    }
+  },
+  "1009952305170350201":{
+    "name": "legowelt-x-rafael-rozendaal",
+    "projectBotHandlers": {
+      "default": "336"
     }
   },
   "880280317477404713": {

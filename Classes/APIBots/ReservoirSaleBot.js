@@ -6,6 +6,7 @@ const {
   BAN_ADDRESSES,
 } = require('../../Utils/activityTriager')
 const { getENSName } = require('./utils')
+const { ethers } = require('ethers')
 /** API Poller for Reservoir Sale events */
 class ReservoirSaleBot extends APIPollBot {
   /** Constructor just calls super
@@ -75,6 +76,10 @@ class ReservoirSaleBot extends APIPollBot {
     let platform = msg.orderSource
     embed.setColor(this.saleColor)
 
+    if (msg.orderKind === 'mint') {
+      return // Don't send mint events
+    }
+
     if (BAN_ADDRESSES.has(owner)) {
       console.log(`Skipping message propagation for ${owner}`)
       return
@@ -126,7 +131,9 @@ class ReservoirSaleBot extends APIPollBot {
         )
         break
       case 'x2y2':
-        platformUrl = this.buildX2Y2URL(msg.token.contract, msg.token.tokenId)
+        // NOTE: While X2Y2 doesn't support our royalities, we won't show sales/listings for em
+        return
+        //platformUrl = this.buildX2Y2URL(msg.token.contract, msg.token.tokenId)
         break
       default:
         platformUrl = artBlocksData.external_url

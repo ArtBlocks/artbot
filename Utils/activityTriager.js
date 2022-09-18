@@ -194,22 +194,25 @@ async function triageActivityMessage(msg, bot) {
  * @param {*} artBlocksData
  */
 function sendEmbedToSaleChannels(bot, embed, artBlocksData) {
-  bot.channels.cache.get(CHANNEL_SALES).send(embed)
-  bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed)
-  // Forward all Chromie Squiggles sales on to the DAO.
-  if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
-    bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed)
-  }
-  if (artBlocksData.collection_name.includes('Fidenza')) {
-    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed)
-  }
-  if (artBlocksData.collection_name.includes('Incomplete Control')) {
-    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed)
-  }
-
-  // Send Pace sales to AB x Pace channel
-  if (artBlocksData.platform.includes('Art Blocks x Pace')) {
-    bot.channels.cache.get(CHANNEL_AB_X_PACE).send(embed)
+  try {
+    bot.channels.cache.get(CHANNEL_SALES).send(embed)
+    bot.channels.cache.get(CHANNEL_SALES_CHAT).send(embed)
+    // Forward all Chromie Squiggles sales on to the DAO.
+    if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
+      bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send(embed)
+    }
+    if (artBlocksData.collection_name.includes('Fidenza')) {
+      bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed)
+    }
+    if (artBlocksData.collection_name.includes('Incomplete Control')) {
+      bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed)
+    }
+    // Send Pace sales to AB x Pace channel
+    if (artBlocksData.platform.includes('Art Blocks x Pace')) {
+      bot.channels.cache.get(CHANNEL_AB_X_PACE).send(embed)
+    }
+  } catch (e) {
+    console.warn(e)
   }
 }
 
@@ -220,16 +223,20 @@ function sendEmbedToSaleChannels(bot, embed, artBlocksData) {
  * @param {*} artBlocksData
  */
 function sendEmbedToListChannels(bot, embed, artBlocksData) {
-  bot.channels.cache.get(CHANNEL_LISTINGS).send(embed)
-  // Forward all Chromie Squiggles listings on to the DAO.
-  if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
-    bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed)
-  }
-  if (artBlocksData.collection_name.includes('Fidenza')) {
-    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed)
-  }
-  if (artBlocksData.collection_name.includes('Incomplete Control')) {
-    bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed)
+  try {
+    bot.channels.cache.get(CHANNEL_LISTINGS).send(embed)
+    // Forward all Chromie Squiggles listings on to the DAO.
+    if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
+      bot.channels.cache.get(CHANNEL_SQUIGGLE_LISTINGS).send(embed)
+    }
+    if (artBlocksData.collection_name.includes('Fidenza')) {
+      bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed)
+    }
+    if (artBlocksData.collection_name.includes('Incomplete Control')) {
+      bot.channels.cache.get(CHANNEL_FIDENZA_AND_IC_SALES).send(embed)
+    }
+  } catch (e) {
+    console.warn(e)
   }
 }
 

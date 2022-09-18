@@ -15,6 +15,7 @@ const WEB_SOCKET_URL = 'wss://api.archipelago.art/ws'
 const COLLECTIONS_API = 'https://api.archipelago.art/v1/market/collections'
 const HEADERS = { 'User-Agent': 'artbot/1.0' }
 const ONE_MILLION = 1000000
+const MIN_TRADE_PRICE = 10n ** 16n // 0.01 ETH
 const ARCHIPELAGO_GOLD = '#9C814B'
 
 class ArchipelagoBot {
@@ -163,6 +164,9 @@ class ArchipelagoBot {
           message.data.venue !== 'ARCHIPELAGO'
         ) {
           break // if venue specified, must be archipelago
+        }
+        if (BigInt(message.data.price) < MIN_TRADE_PRICE) {
+          break // don't report negligible trades (likely to be testing)
         }
         this.sendTradeEmbed(message.data)
         break

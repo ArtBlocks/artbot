@@ -8,8 +8,14 @@ const getArtBlocksOpenProjects =
   require('../Utils/parseArtBlocksAPI').getArtBlocksOpenProjects
 const getProjectsBirthdays =
   require('../Utils/parseArtBlocksAPI').getProjectsBirthdays
+const getProjectsCurationStatus =
+  require('../Utils/parseArtBlocksAPI').getProjectsCurationStatus
+const getAllWalletTokens =
+  require('../Utils/parseArtBlocksAPI').getAllWalletTokens
+const resolveEnsName = require('./APIBots/utils').resolveEnsName
 
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
+const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
 
 // Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES =
@@ -36,6 +42,9 @@ class ArtIndexerBot {
     this.projectFetch = projectFetch
     this.projects = {}
     this.birthdays = {}
+    this.curationMapping = {}
+    this.sentBirthdays = {}
+    this.walletTokens = {}
     this.init()
   }
 
@@ -54,18 +63,23 @@ class ArtIndexerBot {
     try {
       const projects = await this.projectFetch()
       const bdays = await getProjectsBirthdays()
+      const curationStatuses = await getProjectsCurationStatus()
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i]
         console.log(
           `Refreshing project cache for Project ${project.projectId} ${project.name}`
         )
         let bday = bdays[`${project.contract.id}-${project.projectId}`]
+        const curationStatus =
+          curationStatuses[`${project.contract.id}-${project.projectId}`]
+
         const newBot = new ProjectBot({
           projectNumber: project.projectId,
           coreContract: project.contract.id,
           editionSize: project.invocations,
           projectName: project.name,
           projectActive: project.active,
+          curationStatus: curationStatus ?? null,
           startTime: bday ? new Date(bday) : null,
         })
         const projectKey = this.toProjectKey(project.name)
@@ -76,6 +90,10 @@ class ArtIndexerBot {
           this.birthdays[bday] = this.birthdays[bday] ?? []
           this.birthdays[bday].push(newBot)
         }
+
+        this.curationMapping[curationStatus] =
+          this.curationMapping[curationStatus] ?? []
+        this.curationMapping[curationStatus].push(newBot)
       }
     } catch (err) {
       console.error(`Error while initializing ArtIndexerBots\n${err}`)
@@ -92,15 +110,32 @@ class ArtIndexerBot {
       return
     }
 
-    let projectKey = this.toProjectKey(
-      content.substr(content.indexOf(' ') + 1).replace('?details', '')
-    )
+    let afterTheHash = content
+      .substr(content.indexOf(' ') + 1)
+      .replace('?details', '')
+
+    let projectKey = this.toProjectKey(afterTheHash)
+
+    if (PROJECT_ALIASES[projectKey]) {
+      projectKey = this.toProjectKey(PROJECT_ALIASES[projectKey])
+    }
 
     // if '#?' message, get random project
     if (projectKey === '#?') {
       return this.sendRandomProjectRandomTokenMessage(msg, 1)
     } else if (projectKey === 'open') {
       return this.sendRandomOpenProjectRandomTokenMessage(msg)
+    } else if (
+      projectKey === 'curated' ||
+      projectKey === 'factory' ||
+      projectKey === 'playground'
+    ) {
+      return this.sendCurationStatusRandomTokenMessage(msg, projectKey)
+    } else if (
+      (projectKey.startsWith('0x') || projectKey.endsWith('eth')) &&
+      !this.projects[projectKey]
+    ) {
+      return this.sendRandomWalletTokenMessage(msg, afterTheHash)
     }
 
     console.log(`Searching for project ${projectKey}`)
@@ -157,9 +192,11 @@ class ArtIndexerBot {
         this.birthdays[`${month}-${day}`].forEach((projBot) => {
           if (
             projBot.startTime &&
-            projBot.startTime.getFullYear().toString() !== year
+            projBot.startTime.getFullYear().toString() !== year &&
+            !this.sentBirthdays[projBot.projectNumber]
           ) {
             projBot.sendBirthdayMessage(channels, projectConfig)
+            this.sentBirthdays[projBot.projectNumber] = true
           }
         })
       }
@@ -199,6 +236,89 @@ class ArtIndexerBot {
         return projBot.handleNumberMessage(msg)
       }
       attempts++
+    }
+  }
+
+  async sendCurationStatusRandomTokenMessage(msg, curationStatus) {
+    let attempts = 0
+    if (
+      !this.curationMapping[curationStatus] ||
+      this.curationMapping[curationStatus].length === 0
+    ) {
+      return
+    }
+    while (attempts < 10) {
+      let projBot =
+        this.curationMapping[curationStatus][
+          Math.floor(
+            Math.random() * this.curationMapping[curationStatus].length
+          )
+        ]
+
+      if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
+        return projBot.handleNumberMessage(msg)
+      }
+      attempts++
+    }
+  }
+
+  // Sends a random token from this wallet's collection
+  async sendRandomWalletTokenMessage(msg, wallet) {
+    console.log(`Getting random token for wallet ${wallet}`)
+    try {
+      // Resolve ENS name if ends in .eth
+      if (wallet.toLowerCase().endsWith('.eth')) {
+        let ensName = wallet
+
+        wallet = await resolveEnsName(ensName)
+
+        if (!wallet || wallet === '') {
+          msg.channel.send(
+            `Sorry, I wasn't able to resolve ENS name ${ensName}`
+          )
+          return
+        }
+      }
+
+      wallet = wallet.toLowerCase()
+
+      let tokens = []
+      if (this.walletTokens[wallet]) {
+        tokens = this.walletTokens[wallet]
+      } else {
+        tokens = await getAllWalletTokens(wallet)
+        this.walletTokens[wallet] = tokens
+      }
+
+      if (tokens.length === 0) {
+        msg.channel.send(
+          `Sorry, I wasn't able to find any Art Blocks tokens in that wallet: ${wallet}`
+        )
+        return
+      }
+
+      let attempts = 0
+      while (attempts < 10) {
+        let token = tokens[Math.floor(Math.random() * tokens.length)]
+
+        console.log(`looking for wallet project: ${token.project.name}`)
+        let projBot = this.projects[this.toProjectKey(token.project.name)]
+        if (projBot) {
+          msg.content = `#${token.invocation}`
+          return projBot.handleNumberMessage(msg)
+        } else {
+          attempts++
+        }
+      }
+      msg.channel.send(
+        `Sorry, I had trouble finding an Art Blocks token in that wallet: ${wallet}`
+      )
+      return
+    } catch (err) {
+      console.log(`Error when getting wallet tokens: ${err}`)
+      msg.channel.send(
+        `Sorry, something unexpected went wrong - pester Grant about it til he fixes it :)`
+      )
     }
   }
 }
