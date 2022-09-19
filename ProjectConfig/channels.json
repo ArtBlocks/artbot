@@ -329,7 +329,8 @@
       "default": "72",
       "stringTriggers": {
         "121": ["rina"],
-        "200": ["saturazione"]
+        "200": ["saturazione"],
+        "356": ["essenza"]
       },
       "tokenIdTriggers": [
         {
@@ -542,6 +543,12 @@
     "name": "legowelt-x-rafael-rozendaal",
     "projectBotHandlers": {
       "default": "336"
+    }
+  },
+  "1014944262007291944":{
+    "name": "itsgalo",
+    "projectBotHandlers": {
+      "default": "341"
     }
   },
   "880280317477404713": {
