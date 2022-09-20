@@ -208,7 +208,7 @@ const SAFETY_MESSAGE = new MessageEmbed()
   .setColor(ARTBOT_GREEN)
   // Set the main content of the embed
   .setDescription(
-    `**Always** double check who you are trading with! **Discord handles** can appear to be similar so verify a user by checking their User ID. [How to here](https://discord.com/channels/411959613370400778/1019738320303030345/1021586607188496465) \n
+    `**Always** double check who you are trading with! Discord handles can appear to be similar so verify a user by checking their **User ID**. [How to here](https://discord.com/channels/411959613370400778/1019738320303030345/1021586607188496465) \n
         **Avoid clicking links when possible.** Instead, use the official links provided by the platform’s verified Social accounts/Discord and navigate to the page/item you are trading.\n
         **Never** screen share with anyone even if they claim they’re from an official “support” team.\n
         **Never** share your seed phrase or private keys with **anyone.**\n
