@@ -26,7 +26,7 @@ const handleGiveawayMessage =
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3001
 
 // Trade activity Discord channel IDs.
 const PROD_CHANNEL_ACTIVITY_ALL = projectConfig.chIdByName['prod_all_activity']
