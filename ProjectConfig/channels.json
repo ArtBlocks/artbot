@@ -271,7 +271,10 @@
   "839739823669641227": {
     "name": "han-x-nicolas-daniel",
     "projectBotHandlers": {
-      "default": "64"
+      "default": "64",
+      "stringTriggers": {
+        "289": ["algobeats"]
+      }
     }
   },
   "849732302975008778": {
