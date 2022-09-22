@@ -27,7 +27,7 @@ class ProjectHandlerHelper {
         // Set the title of the field.
         .setTitle('Available Named Pieces / Sets')
         .setDescription(
-          'These are special tokens or sets of tokens that have been given a name by the community! Try them out here with `#<token>` or `#? <set>'
+          'These are special tokens or sets of tokens that have been given a name by the community! Try them out here with `#<token>` or `#? <set>`'
         )
         .addField('Tokens', singles)
         .addField('Sets', sets)
