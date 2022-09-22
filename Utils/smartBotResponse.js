@@ -17,6 +17,7 @@ const GASSTATION_API_KEY = process.env.GASSTATION_API_KEY
 
 const CHANNEL_FOR_SALE_LISTINGS = projectConfig.chIdByName['for-sale-listings']
 const CHANNEL_TRADE_SWAPS = projectConfig.chIdByName['trade-swaps']
+const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
 
 /*
  * Specific OpenSea assets for fetching project stats for "ArtBlocks Curated"
@@ -176,6 +177,7 @@ const HELP_MESSAGE = new MessageEmbed()
     **applications?**: An explanation of the current state of the Art Blocks application process.
     **gas?**: An explanation of what gas is and why you should **never** modify the gas limit.
     **staysafe?**: Tips on avoiding scams
+    **aliases?**: A handy list of aliases that can be used in \`#\` commands.
     `
   )
 // Custom message shown when someone asks about ArtBlocks
@@ -286,7 +288,6 @@ async function smartBotResponse(
   if (msgAuthor == ARTBOT_USERNAME) {
     return null
   }
-
   // Some shared helper variables.
   const inHelpChannel = channelID == CHANNEL_HELP
   const mentionedArtBot =
@@ -452,6 +453,23 @@ async function smartBotResponse(
         .addField('**Curated Projects**', parseKeyMetrics(curatedStats))
         .addField('**Artist Playground**', parseKeyMetrics(playgroundStats))
         .addField('**Factory Projects**', parseKeyMetrics(factoryStats))
+    )
+  }
+
+  const mentionsAlias = msgContentLowercase.includes('alias')
+  if (containsQuestion && mentionsAlias) {
+    let msg = ''
+    for (const [alias, name] of Object.entries(PROJECT_ALIASES)) {
+      msg += `**${alias}** = ${name}
+      `
+    }
+    return (
+      new MessageEmbed()
+        .setTitle('Aliases you can use in `#` commands')
+        // Set the color of the embed
+        .setColor(ARTBOT_GREEN)
+        // Set the main content of the embed
+        .setDescription(msg)
     )
   }
 
