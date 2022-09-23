@@ -52,12 +52,28 @@ class ProjectBot {
       return
     }
 
+    if (content.toLowerCase().includes('named')) {
+      if (this.namedMappings) {
+        msg.channel.send(this.namedMappings.listMappings())
+      } else {
+        msg.channel.send(
+          new MessageEmbed()
+            // Set the title of the field.
+            .setTitle('Named Pieces / Sets')
+            .setDescription(
+              'These are special tokens or sets of tokens that have been given a name by the community! Try them out here with `#<token>` or `#? <set>`'
+            )
+            .addField(
+              'No named tokens or sets!',
+              "I don't have any named tokens or sets for this project yet! [You can propose some here](https://github.com/ArtBlocks/artbot/issues/new/choose)"
+            )
+        )
+      }
+      return
+    }
+
     // decode any mappings
     if (this.namedMappings) {
-      if (content.toLowerCase().includes('named')) {
-        msg.channel.send(this.namedMappings.listMappings())
-        return
-      }
       content = this.namedMappings.transform(content)
     }
 
