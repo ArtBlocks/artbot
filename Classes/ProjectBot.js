@@ -54,6 +54,10 @@ class ProjectBot {
 
     // decode any mappings
     if (this.namedMappings) {
+      if (content.toLowerCase().includes('named')) {
+        msg.channel.send(this.namedMappings.listMappings())
+        return
+      }
       content = this.namedMappings.transform(content)
     }
 
