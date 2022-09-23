@@ -6,6 +6,13 @@ class ProjectHandlerHelper {
   }
 
   listMappings() {
+    let message = new MessageEmbed()
+      // Set the title of the field.
+      .setTitle('Available Named Pieces / Sets')
+      .setDescription(
+        'These are special tokens or sets of tokens that have been given a name by the community! Try them out here with `#<token>` or `#? <set>`'
+      )
+
     let singles = ''
     let sets = ''
     if (this.singles) {
@@ -13,6 +20,7 @@ class ProjectHandlerHelper {
         singles += `${singleName}
       `
       }
+      message.addField('Tokens', singles)
     }
 
     if (this.sets) {
@@ -20,18 +28,17 @@ class ProjectHandlerHelper {
         sets += `${setName}
       `
       }
+      message.addField('Sets', sets)
     }
 
-    return (
-      new MessageEmbed()
-        // Set the title of the field.
-        .setTitle('Available Named Pieces / Sets')
-        .setDescription(
-          'These are special tokens or sets of tokens that have been given a name by the community! Try them out here with `#<token>` or `#? <set>`'
-        )
-        .addField('Tokens', singles)
-        .addField('Sets', sets)
-    )
+    if (!singles && !sets) {
+      message.addField(
+        'No named tokens or sets!',
+        "I don't have any named tokens or sets for this project yet! [You can propose some here](https://github.com/ArtBlocks/artbot/issues/new/choose)"
+      )
+    }
+
+    return message
   }
 
   transform(messageContent) {
