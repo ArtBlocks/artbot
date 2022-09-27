@@ -16,6 +16,7 @@ const resolveEnsName = require('./APIBots/utils').resolveEnsName
 
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
 const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
+const { isWallet } = require('./APIBots/utils')
 
 // Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES =
@@ -132,10 +133,24 @@ class ArtIndexerBot {
     ) {
       return this.sendCurationStatusRandomTokenMessage(msg, projectKey)
     } else if (
-      (projectKey.startsWith('0x') || projectKey.endsWith('eth')) &&
-      !this.projects[projectKey]
+      !this.projects[projectKey] &&
+      isWallet(afterTheHash.split(' ')[0])
     ) {
-      return this.sendRandomWalletTokenMessage(msg, afterTheHash)
+      let wallet = afterTheHash.split(' ')[0]
+      afterTheHash = afterTheHash.replace(wallet, '')
+      projectKey = this.toProjectKey(afterTheHash)
+      if (PROJECT_ALIASES[projectKey]) {
+        projectKey = this.toProjectKey(PROJECT_ALIASES[projectKey])
+      }
+
+      if (projectKey && !this.projects[projectKey]) {
+        msg.channel.send(
+          `Sorry, I wasn't able to find that project: ${afterTheHash}`
+        )
+        return
+      }
+
+      return this.sendRandomWalletTokenMessage(msg, wallet, projectKey)
     }
 
     console.log(`Searching for project ${projectKey}`)
@@ -263,8 +278,12 @@ class ArtIndexerBot {
   }
 
   // Sends a random token from this wallet's collection
-  async sendRandomWalletTokenMessage(msg, wallet) {
-    console.log(`Getting random token for wallet ${wallet}`)
+  async sendRandomWalletTokenMessage(msg, wallet, projectKey = '') {
+    console.log(
+      `Getting random token${
+        projectKey ? ` from ${projectKey}` : ''
+      } in wallet ${wallet}`
+    )
     try {
       // Resolve ENS name if ends in .eth
       if (wallet.toLowerCase().endsWith('.eth')) {
@@ -288,6 +307,27 @@ class ArtIndexerBot {
       } else {
         tokens = await getAllWalletTokens(wallet)
         this.walletTokens[wallet] = tokens
+      }
+
+      if (projectKey) {
+        let tokensInProject = []
+        for (let index = 0; index < tokens.length; index++) {
+          let token = tokens[index]
+          if (this.toProjectKey(token.project.name) === projectKey) {
+            tokensInProject.push(token)
+          }
+        }
+        if (tokensInProject.length === 0) {
+          msg.channel.send(
+            `Sorry, I wasn't able to find any ${projectKey} tokens in that wallet: ${wallet}`
+          )
+          return
+        }
+        let _token =
+          tokensInProject[Math.floor(Math.random() * tokensInProject.length)]
+        let projBot = this.projects[this.toProjectKey(projectKey)]
+        msg.content = `#${_token.invocation}`
+        return projBot.handleNumberMessage(msg)
       }
 
       if (tokens.length === 0) {
