@@ -17,6 +17,7 @@ const GASSTATION_API_KEY = process.env.GASSTATION_API_KEY
 
 const CHANNEL_FOR_SALE_LISTINGS = projectConfig.chIdByName['for-sale-listings']
 const CHANNEL_TRADE_SWAPS = projectConfig.chIdByName['trade-swaps']
+const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
 
 /*
@@ -235,6 +236,8 @@ const OTC_MESSAGE = new MessageEmbed()
     For an OTC sale, we also encourage sending the Artist and Art Blocks royalties. More info can be found [on this post](https://discord.com/channels/411959613370400778/797930335874449408/1004904448583278712) in <#797930335874449408>`
   )
 
+let grantThanks = 0;
+
 // Returns a message containing information about the current gas prices.
 async function generateGasPriceMessage() {
   const gasStationResponse = await fetch(
@@ -276,11 +279,6 @@ async function smartBotResponse(
   artBotID,
   channelID
 ) {
-  // Bail early if not in prod environment and not using test channel.
-  if (!ARTBOT_IS_PROD && channelID !== CHANNEL_TESTING_GENERAL_NON_PROD) {
-    return null
-  }
-
   /*
    * NOTE: It is important to check if the message author is the ArtBot
    *       Itself to avoid a recursive infinite loop.
@@ -320,6 +318,14 @@ async function smartBotResponse(
     artbotOrHelpChannelSquigglePauseMentioned
   ) {
     return SQUIGGLE_PAUSE_MESSAGE
+  }
+
+  if (channelID == CHANNEL_BLOCK_TALK && (msgContentLowercase.includes('thanks') || msgContentLowercase.includes('thank you')) && msgContentLowercase.includes('grant')) {
+    grantThanks++;
+
+    return new MessageEmbed()
+      .setColor(randomColor())
+      .setDescription(`${msgAuthor} thanked Grant. Grant maintains Art Bot and has been thanked ${grantThanks} time(s) since last restart.`)
   }
 
   if (
