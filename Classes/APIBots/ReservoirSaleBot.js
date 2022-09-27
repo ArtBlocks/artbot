@@ -139,10 +139,13 @@ class ReservoirSaleBot extends APIPollBot {
         platformUrl = artBlocksData.external_url
         break
     }
-
+    const curationStatus = artBlocksData?.curation_status
+      ? artBlocksData.curation_status[0].toUpperCase() +
+        artBlocksData.curation_status.slice(1).toLowerCase()
+      : ''
     // Update thumbnail image to use larger variant from Art Blocks API.
     embed.setThumbnail(artBlocksData.image)
-
+    embed.addField('Collection', `${curationStatus}`, true)
     // Add inline field for viewing live script on Art Blocks.
     embed.addField(
       'Live Script',
