@@ -32,7 +32,7 @@ const getAllProjectsCurationStatus = gql`
   query getAllProjectsCurationStatus($first: Int!, $skip: Int) {
     projects_metadata(limit: $first, offset: $skip) {
       id
-      curation_status_display
+      vertical_name
     }
   }
 `
@@ -595,7 +595,7 @@ async function getProjectsCurationStatus() {
     }
     const curationMapping = {}
     allProjects.forEach((proj) => {
-      curationMapping[proj.id] = proj.curation_status_display.toLowerCase()
+      curationMapping[proj.id] = proj.vertical_name.toLowerCase()
     })
     return curationMapping
   } catch (err) {

@@ -71,7 +71,12 @@ function isWallet(msg) {
   return msg.startsWith('0x') || msg.endsWith('eth')
 }
 
+function isVerticalName(msg) {
+  return msg === 'curated' || msg === 'factory' || msg === 'playground'
+}
+
 module.exports.ensOrAddress = ensOrAddress
 module.exports.getOSName = getOSName
 module.exports.resolveEnsName = resolveEnsName
 module.exports.isWallet = isWallet
+module.exports.isVerticalName = isVerticalName
