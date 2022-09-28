@@ -236,7 +236,7 @@ const OTC_MESSAGE = new MessageEmbed()
     For an OTC sale, we also encourage sending the Artist and Art Blocks royalties. More info can be found [on this post](https://discord.com/channels/411959613370400778/797930335874449408/1004904448583278712) in <#797930335874449408>`
   )
 
-let grantThanks = 0;
+let grantThanks = 0
 
 // Returns a message containing information about the current gas prices.
 async function generateGasPriceMessage() {
@@ -325,12 +325,40 @@ async function smartBotResponse(
     return SQUIGGLE_PAUSE_MESSAGE
   }
 
-  if (channelID == CHANNEL_BLOCK_TALK && (msgContentLowercase.includes('thanks') || msgContentLowercase.includes('thank you')) && msgContentLowercase.includes('grant')) {
-    grantThanks++;
+  if (
+    channelID == CHANNEL_BLOCK_TALK &&
+    (msgContentLowercase.includes('thanks') ||
+      msgContentLowercase.includes('thank you')) &&
+    msgContentLowercase.includes('grant')
+  ) {
+    grantThanks++
 
     return new MessageEmbed()
       .setColor(randomColor())
-      .setDescription(`${msgAuthor} thanked Grant. Grant maintains Art Bot and has been thanked ${grantThanks} time(s) since last restart.`)
+      .setDescription(
+        `${msgAuthor} thanked Grant. Grant maintains Art Bot and has been thanked ${grantThanks} time(s) since last restart.`
+      )
+  }
+
+  if (
+    channelID == CHANNEL_BLOCK_TALK &&
+    msgContentLowercase.includes('alias') &&
+    containsQuestion &&
+    mentionedArtBot
+  ) {
+    let msg = ''
+    for (const [alias, name] of Object.entries(PROJECT_ALIASES)) {
+      msg += `**${alias}** = ${name}
+      `
+    }
+    return (
+      new MessageEmbed()
+        .setTitle('Aliases you can use in `#` commands')
+        // Set the color of the embed
+        .setColor(ARTBOT_GREEN)
+        // Set the main content of the embed
+        .setDescription(msg)
+    )
   }
 
   if (
@@ -464,23 +492,6 @@ async function smartBotResponse(
         .addField('**Curated Projects**', parseKeyMetrics(curatedStats))
         .addField('**Artist Playground**', parseKeyMetrics(playgroundStats))
         .addField('**Factory Projects**', parseKeyMetrics(factoryStats))
-    )
-  }
-
-  const mentionsAlias = msgContentLowercase.includes('alias')
-  if (containsQuestion && mentionsAlias) {
-    let msg = ''
-    for (const [alias, name] of Object.entries(PROJECT_ALIASES)) {
-      msg += `**${alias}** = ${name}
-      `
-    }
-    return (
-      new MessageEmbed()
-        .setTitle('Aliases you can use in `#` commands')
-        // Set the color of the embed
-        .setColor(ARTBOT_GREEN)
-        // Set the main content of the embed
-        .setDescription(msg)
     )
   }
 
