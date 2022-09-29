@@ -13,6 +13,7 @@ const getProjectsCurationStatus =
 const getAllWalletTokens =
   require('../Utils/parseArtBlocksAPI').getAllWalletTokens
 const resolveEnsName = require('./APIBots/utils').resolveEnsName
+const isVerticalName = require('./APIBots/utils').isVerticalName
 
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
 const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
@@ -126,11 +127,7 @@ class ArtIndexerBot {
       return this.sendRandomProjectRandomTokenMessage(msg, 1)
     } else if (projectKey === 'open') {
       return this.sendRandomOpenProjectRandomTokenMessage(msg)
-    } else if (
-      projectKey === 'curated' ||
-      projectKey === 'factory' ||
-      projectKey === 'playground'
-    ) {
+    } else if (isVerticalName(projectKey)) {
       return this.sendCurationStatusRandomTokenMessage(msg, projectKey)
     } else if (
       !this.projects[projectKey] &&
@@ -143,7 +140,11 @@ class ArtIndexerBot {
         projectKey = this.toProjectKey(PROJECT_ALIASES[projectKey])
       }
 
-      if (projectKey && !this.projects[projectKey]) {
+      if (
+        projectKey &&
+        !this.projects[projectKey] &&
+        !isVerticalName(projectKey)
+      ) {
         msg.channel.send(
           `Sorry, I wasn't able to find that project: ${afterTheHash}`
         )
@@ -309,7 +310,14 @@ class ArtIndexerBot {
         this.walletTokens[wallet] = tokens
       }
 
-      if (projectKey) {
+      if (tokens.length === 0) {
+        msg.channel.send(
+          `Sorry, I wasn't able to find any Art Blocks tokens in that wallet: ${wallet}`
+        )
+        return
+      }
+
+      if (projectKey && !isVerticalName(projectKey)) {
         let tokensInProject = []
         for (let index = 0; index < tokens.length; index++) {
           let token = tokens[index]
@@ -328,13 +336,30 @@ class ArtIndexerBot {
         let projBot = this.projects[this.toProjectKey(projectKey)]
         msg.content = `#${_token.invocation}`
         return projBot.handleNumberMessage(msg)
-      }
+      } else if (projectKey && isVerticalName(projectKey)) {
+        let tokensInVertical = []
+        for (let index = 0; index < tokens.length; index++) {
+          let token = tokens[index]
 
-      if (tokens.length === 0) {
-        msg.channel.send(
-          `Sorry, I wasn't able to find any Art Blocks tokens in that wallet: ${wallet}`
-        )
-        return
+          if (
+            this.projects[
+              this.toProjectKey(token.project.name)
+            ].curationStatus.toLowerCase() === projectKey
+          ) {
+            tokensInVertical.push(token)
+          }
+        }
+        if (tokensInVertical.length === 0) {
+          msg.channel.send(
+            `Sorry, I wasn't able to find any ${projectKey} tokens in that wallet: ${wallet}`
+          )
+          return
+        }
+        let _token =
+          tokensInVertical[Math.floor(Math.random() * tokensInVertical.length)]
+        let projBot = this.projects[this.toProjectKey(_token.project.name)]
+        msg.content = `#${_token.invocation}`
+        return projBot.handleNumberMessage(msg)
       }
 
       let attempts = 0
