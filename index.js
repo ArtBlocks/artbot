@@ -210,12 +210,20 @@ bot.on('message', (msg) => {
   smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
     (smartResponse) => {
       if (smartResponse !== null && smartResponse !== undefined) {
-        msg.reply(null, {
-          embed: smartResponse,
-          allowedMentions: {
-            repliedUser: true,
-          },
-        })
+        if (typeof smartResponse === 'string') {
+          msg.reply(smartResponse, {
+            allowedMentions: {
+              repliedUser: true,
+            },
+          })
+        } else {
+          msg.reply(null, {
+            embed: smartResponse,
+            allowedMentions: {
+              repliedUser: true,
+            },
+          })
+        }
       }
     }
   )

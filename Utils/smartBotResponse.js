@@ -378,6 +378,11 @@ async function smartBotResponse(
   }
 
   // Handle requests for help!
+  if (msgContentLowercase.includes('gm')) {
+    return 'gm'
+  }
+
+  // Handle requests for help!
   const mentionsHelp = msgContentLowercase.includes('help')
   if (containsQuestion && mentionsHelp) {
     return HELP_MESSAGE
