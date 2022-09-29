@@ -57,6 +57,7 @@ const contractProjects = gql`
         maxInvocations
         curationStatus
         active
+        artistName
         contract {
           id
         }
@@ -97,6 +98,7 @@ const contractProject = gql`
         maxInvocations
         active
         curationStatus
+        artistName
         contract {
           id
         }

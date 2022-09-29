@@ -43,6 +43,7 @@ class ArtIndexerBot {
   constructor(projectFetch = getArtBlocksProjects) {
     this.projectFetch = projectFetch
     this.projects = {}
+    this.artists = {}
     this.birthdays = {}
     this.curationMapping = {}
     this.sentBirthdays = {}
@@ -81,17 +82,23 @@ class ArtIndexerBot {
           editionSize: project.invocations,
           projectName: project.name,
           projectActive: project.active,
+          artistName: project.artistName,
           curationStatus: curationStatus ?? null,
           startTime: bday ? new Date(bday) : null,
         })
+
         const projectKey = this.toProjectKey(project.name)
         this.projects[projectKey] = newBot
+
         if (bday) {
           const [year, month, day] = bday.split('T')[0].split('-')
           bday = month + '-' + day
           this.birthdays[bday] = this.birthdays[bday] ?? []
           this.birthdays[bday].push(newBot)
         }
+        const artistName = this.toProjectKey(project.artistName)
+        this.artists[artistName] = this.artists[artistName] ?? []
+        this.artists[artistName].push(newBot)
 
         this.curationMapping[curationStatus] =
           this.curationMapping[curationStatus] ?? []
@@ -129,6 +136,8 @@ class ArtIndexerBot {
       return this.sendRandomOpenProjectRandomTokenMessage(msg)
     } else if (isVerticalName(projectKey)) {
       return this.sendCurationStatusRandomTokenMessage(msg, projectKey)
+    } else if (this.artists[projectKey]) {
+      return this.sendArtistRandomTokenMessage(msg, projectKey)
     } else if (
       !this.projects[projectKey] &&
       isWallet(afterTheHash.split(' ')[0])
@@ -143,6 +152,7 @@ class ArtIndexerBot {
       if (
         projectKey &&
         !this.projects[projectKey] &&
+        !this.artists[projectKey] &&
         !isVerticalName(projectKey)
       ) {
         msg.channel.send(
@@ -278,6 +288,28 @@ class ArtIndexerBot {
     }
   }
 
+  async sendArtistRandomTokenMessage(msg, artistName) {
+    console.log('Looking for artist ' + artistName)
+    let attempts = 0
+    if (!this.artists[artistName] || this.artists[artistName].length === 0) {
+      return
+    }
+    console.log('here')
+    while (attempts < 10) {
+      console.log(this.artists[artistName])
+      let projBot =
+        this.artists[artistName][
+          Math.floor(Math.random() * this.artists[artistName].length)
+        ]
+      console.log(this.artists[artistName].length)
+      console.log(projBot, projBot?.editionSize, projBot?.projectActive)
+      if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
+        return projBot.handleNumberMessage(msg)
+      }
+      attempts++
+    }
+  }
+
   // Sends a random token from this wallet's collection
   async sendRandomWalletTokenMessage(msg, wallet, projectKey = '') {
     console.log(
@@ -318,48 +350,76 @@ class ArtIndexerBot {
       }
 
       if (projectKey && !isVerticalName(projectKey)) {
-        let tokensInProject = []
-        for (let index = 0; index < tokens.length; index++) {
-          let token = tokens[index]
-          if (this.toProjectKey(token.project.name) === projectKey) {
-            tokensInProject.push(token)
-          }
-        }
-        if (tokensInProject.length === 0) {
-          msg.channel.send(
-            `Sorry, I wasn't able to find any ${projectKey} tokens in that wallet: ${wallet}`
-          )
-          return
-        }
-        let _token =
-          tokensInProject[Math.floor(Math.random() * tokensInProject.length)]
-        let projBot = this.projects[this.toProjectKey(projectKey)]
-        msg.content = `#${_token.invocation}`
-        return projBot.handleNumberMessage(msg)
-      } else if (projectKey && isVerticalName(projectKey)) {
-        let tokensInVertical = []
-        for (let index = 0; index < tokens.length; index++) {
-          let token = tokens[index]
+        if (this.artists[projectKey]) {
+          let tokensByArtist = []
+          for (let index = 0; index < tokens.length; index++) {
+            let token = tokens[index]
 
-          if (
-            this.projects[
-              this.toProjectKey(token.project.name)
-            ].curationStatus.toLowerCase() === projectKey
-          ) {
-            tokensInVertical.push(token)
+            if (
+              this.toProjectKey(
+                this.projects[this.toProjectKey(token.project.name)].artistName
+              ) === projectKey
+            ) {
+              tokensByArtist.push(token)
+            }
           }
+          if (tokensByArtist.length === 0) {
+            msg.channel.send(
+              `Sorry, I wasn't able to find any tokens by ${projectKey} in that wallet: ${wallet}`
+            )
+            return
+          }
+          let _token =
+            tokensByArtist[Math.floor(Math.random() * tokensByArtist.length)]
+          let projBot = this.projects[this.toProjectKey(_token.project.name)]
+          msg.content = `#${_token.invocation}`
+          return projBot.handleNumberMessage(msg)
+        } else if (isVerticalName(projectKey)) {
+          let tokensInVertical = []
+          for (let index = 0; index < tokens.length; index++) {
+            let token = tokens[index]
+
+            if (
+              this.projects[
+                this.toProjectKey(token.project.name)
+              ].curationStatus.toLowerCase() === projectKey
+            ) {
+              tokensInVertical.push(token)
+            }
+          }
+          if (tokensInVertical.length === 0) {
+            msg.channel.send(
+              `Sorry, I wasn't able to find any ${projectKey} tokens in that wallet: ${wallet}`
+            )
+            return
+          }
+          let _token =
+            tokensInVertical[
+              Math.floor(Math.random() * tokensInVertical.length)
+            ]
+          let projBot = this.projects[this.toProjectKey(_token.project.name)]
+          msg.content = `#${_token.invocation}`
+          return projBot.handleNumberMessage(msg)
+        } else {
+          let tokensInProject = []
+          for (let index = 0; index < tokens.length; index++) {
+            let token = tokens[index]
+            if (this.toProjectKey(token.project.name) === projectKey) {
+              tokensInProject.push(token)
+            }
+          }
+          if (tokensInProject.length === 0) {
+            msg.channel.send(
+              `Sorry, I wasn't able to find any ${projectKey} tokens in that wallet: ${wallet}`
+            )
+            return
+          }
+          let _token =
+            tokensInProject[Math.floor(Math.random() * tokensInProject.length)]
+          let projBot = this.projects[this.toProjectKey(projectKey)]
+          msg.content = `#${_token.invocation}`
+          return projBot.handleNumberMessage(msg)
         }
-        if (tokensInVertical.length === 0) {
-          msg.channel.send(
-            `Sorry, I wasn't able to find any ${projectKey} tokens in that wallet: ${wallet}`
-          )
-          return
-        }
-        let _token =
-          tokensInVertical[Math.floor(Math.random() * tokensInVertical.length)]
-        let projBot = this.projects[this.toProjectKey(_token.project.name)]
-        msg.content = `#${_token.invocation}`
-        return projBot.handleNumberMessage(msg)
       }
 
       let attempts = 0
