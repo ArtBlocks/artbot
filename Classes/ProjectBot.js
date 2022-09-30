@@ -145,7 +145,7 @@ class ProjectBot {
       title = artBlocksData.platform + ' - ' + title
     }
 
-    let moreDetailsText = `Add "?details" to your ArtBot command!`
+    let moreDetailsText = `Add "?details" to your command!`
 
     // If user did *not* request full details, return just a large image,
     // along with a link to the OpenSea page and ArtBlocks live script.
@@ -155,7 +155,12 @@ class ProjectBot {
         .setTitle(title)
         // Add link to title.
         .setURL(titleLink)
-        .addField('Want More Info?', moreDetailsText)
+        .addField(
+          'Live Script',
+          `[Generator](${artBlocksData.generator_url})`,
+          true
+        )
+        .addField('Want More Info?', moreDetailsText, true)
         // Set the full image for embed.
         .setImage(artBlocksData.image)
       msg.channel.send(imageContent)

@@ -279,11 +279,6 @@ async function smartBotResponse(
   artBotID,
   channelID
 ) {
-  // Bail early if not in prod environment and not using test channel.
-  if (!ARTBOT_IS_PROD && channelID !== CHANNEL_TESTING_GENERAL_NON_PROD) {
-    return null
-  }
-
   /*
    * NOTE: It is important to check if the message author is the ArtBot
    *       Itself to avoid a recursive infinite loop.
@@ -375,6 +370,11 @@ async function smartBotResponse(
    */
   if (!mentionedArtBotOrInOrHelp) {
     return null
+  }
+
+  // Handle requests for help!
+  if (msgContentLowercase.includes('gm')) {
+    return 'gm'
   }
 
   // Handle requests for help!
