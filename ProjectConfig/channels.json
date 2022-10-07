@@ -566,7 +566,7 @@
     "projectBotHandlers": {
       "default": "367",
       "stringTriggers": {
-        "313": ["phontons dream", "photon"]
+        "313": ["photons dream", "photon"]
       }
     }
   },
