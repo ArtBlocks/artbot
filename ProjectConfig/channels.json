@@ -496,7 +496,8 @@
       "default": "296",
       "stringTriggers": {
         "183": ["quarantine"],
-        "99": ["spaghettification", "spaghetti"]
+        "99": ["spaghettification", "spaghetti"],
+        "362": ["erratic"]
       }
     }
   },
@@ -536,28 +537,37 @@
       "default": "334"
     }
   },
-  "1004821404329455656":{
+  "1004821404329455656": {
     "name": "maya-man",
     "projectBotHandlers": {
       "default": "337"
     }
   },
-  "1009952305170350201":{
+  "1009952305170350201": {
     "name": "legowelt-x-rafael-rozendaal",
     "projectBotHandlers": {
       "default": "336"
     }
   },
-  "1014944262007291944":{
+  "1014944262007291944": {
     "name": "itsgalo",
     "projectBotHandlers": {
       "default": "341"
     }
   },
-  "1020066672939380747":{
+  "1020066672939380747": {
     "name": "kelly-milligan",
     "projectBotHandlers": {
       "default": "364"
+    }
+  },
+  "1025075763541717023": {
+    "name": "harvey-rayner",
+    "projectBotHandlers": {
+      "default": "367",
+      "stringTriggers": {
+        "313": ["phontons dream", "photon"]
+      }
     }
   },
   "880280317477404713": {
