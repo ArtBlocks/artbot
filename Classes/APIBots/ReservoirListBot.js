@@ -86,11 +86,14 @@ class ReservoirListBot extends APIPollBot {
     const artBlocksResponse = await fetch(tokenUrl)
     const artBlocksData = await artBlocksResponse.json()
 
-    const curationStatus = artBlocksData?.curation_status
+    let curationStatus = artBlocksData?.curation_status
       ? artBlocksData.curation_status[0].toUpperCase() +
         artBlocksData.curation_status.slice(1).toLowerCase()
       : ''
 
+    if (artBlocksData?.platform === 'Art Blocks x Pace') {
+      curationStatus = 'AB x Pace'
+    }
     // Update thumbnail image to use larger variant from Art Blocks API.
     embed.setThumbnail(artBlocksData.image)
     embed.addField('Collection', `${curationStatus}`, true)
