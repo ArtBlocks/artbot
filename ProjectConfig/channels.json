@@ -192,7 +192,8 @@
           "24hours",
           "24 heures",
           "24 hours"
-        ]
+        ],
+        "350": ["departed"]
       }
     }
   },
