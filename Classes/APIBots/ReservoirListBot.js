@@ -114,9 +114,7 @@ class ReservoirListBot extends APIPollBot {
         platformUrl = this.buildLooksRareURL(contract, tokenID)
         break
       case 'x2y2':
-        // NOTE: While X2Y2 doesn't support our royalities, we won't show sales/listings for em
-        return
-        // platformUrl = this.buildX2Y2URL(contract, tokenID)
+        platformUrl = this.buildX2Y2URL(contract, tokenID)
         break
       default:
         platformUrl = artBlocksData.external_url
