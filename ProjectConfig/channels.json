@@ -524,7 +524,10 @@
   "989614992418570300": {
     "name": "melissa-wiederrecht",
     "projectBotHandlers": {
-      "default": "328"
+      "default": "328",
+      "stringTriggers": {
+        "366": ["sandaliya"]
+      }
     }
   },
   "999756711818702868": {
