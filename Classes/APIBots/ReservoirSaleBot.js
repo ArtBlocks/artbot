@@ -14,13 +14,21 @@ class ReservoirSaleBot extends APIPollBot {
    * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
    * @param {*} bot - Discord bot that will be sending messages
    */
-  constructor(apiEndpoint, refreshRateMs, bot, headers, contract = '') {
+  constructor(
+    apiEndpoint,
+    refreshRateMs,
+    bot,
+    headers,
+    contract = '',
+    mintBot = null
+  ) {
     apiEndpoint =
       apiEndpoint + '&startTimestamp=' + (Date.now() / 1000).toFixed()
     super(apiEndpoint, refreshRateMs, bot, headers)
     this.contract = contract
     this.lastUpdatedTime = (this.lastUpdatedTime / 1000).toFixed()
     this.saleIds = new Set()
+    this.mintBot = mintBot
   }
 
   /**
@@ -76,8 +84,10 @@ class ReservoirSaleBot extends APIPollBot {
     let platform = msg.orderSource
     embed.setColor(this.saleColor)
 
-    if (msg.orderKind === 'mint') {
-      return // Don't send mint events
+    if (msg.orderKind === 'mint' && this.mintBot) {
+      // Add mint event to mintBot and return
+      this.mintBot.addMint(msg.token.contractAddress, msg.token.tokenId, msg.to)
+      return
     }
 
     if (BAN_ADDRESSES.has(owner)) {

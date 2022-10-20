@@ -8,6 +8,7 @@ const getArtBlocksFactoryProjects =
 
 const AddressCollector = require('./Classes/AddressCollector').AddressCollector
 const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot
+const MintBot = require('./Classes/MintBot').MintBot
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json')
 const { ReservoirSaleBot } = require('./Classes/APIBots/ReservoirSaleBot')
@@ -135,6 +136,7 @@ const factoryParty = new ArtIndexerBot(getArtBlocksFactoryProjects)
 const artIndexerBot = new ArtIndexerBot()
 const pbabIndexerBot = new ArtIndexerBot(getPBABProjects)
 const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
+const mintBot = new MintBot(bot)
 
 // Special address collector.
 const addressCollector = new AddressCollector()
