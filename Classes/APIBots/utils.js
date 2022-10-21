@@ -1,7 +1,11 @@
+require('dotenv').config()
 const ethers = require('ethers')
 const fetch = require('node-fetch')
 
-let provider = new ethers.providers.AlchemyProvider('homestead')
+let provider = new ethers.providers.EtherscanProvider(
+  'homestead',
+  process.env.ETHERSCAN_API_KEY
+)
 
 // Runtime ENS cache just to limit queries
 let ensAddressMap = {}
