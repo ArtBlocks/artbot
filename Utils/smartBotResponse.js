@@ -128,24 +128,31 @@ const OPENSEA_CURATED_MESSAGE = new MessageEmbed()
   )
 
 /*
- * Custom message shown when someone asks what the "Playground" vs. "Curated"
- * vs. "Factory" is.
+ * Custom message shown when someone asks what the "Heritage" vs. "Curated"
+ * vs. "Explorations", etc is.
  */
-const PLAYGROUND_CURATED_FACTORY_MESSAGE = new MessageEmbed()
+const VERTICALS_MESSAGE = new MessageEmbed()
   // Set the title of the field
   .setTitle(
-    'How are "Curated", "Playground", "Factory", and "Collaborations" different?'
+    'How are "Curated", "Presents", "Explorations", "Heritage", and "Collaborations" different?'
   )
   // Set the color of the embed
   .setColor(ARTBOT_GREEN)
   // Set the main content of the embed
   .setDescription(
-    `It looks like you're wondering about the different types of Art Blocks projects.\n
-    **Art Blocks Curated Collection** includes projects selected by the curation board representing our vision of cutting-edge generative artwork. These highly innovative releases by renowned artists reflect both astounding beauty and technical pioneering.\n
-    **Art Blocks Playground** is where artists who have previously been approved for a curated drop are encouraged to play and be innovative. Like all Art Blocks releases, these projects must meet a quality standard, but experimentation is encouraged in the Playground.\n
-    **Art Blocks Factory** was created for artists that do not wish to wait for approval by the curation board or are not selected. While the requirements are more relaxed compared to our Curated Series, Factory projects reflect the innovation, creativity, and artistic beauty associated with Art Blocks.\n
-    **Art Blocks x Collaborations** are with select partners and organized into a new vertical of co-branded collections. Because partner projects live directly in the Art Blocks ecosystem, they will be subject to the same quality review and scheduling as any other Art Blocks project. These collections represent true collaborations between Art Blocks and our partners to shape the program of offerings. \n
-    Check out [artblocks.io/learn](https://artblocks.io/learn) for a full explanation!`
+    `It looks like you're wondering about the different types of Art Blocks projects.
+    
+    **Art Blocks Curated** includes projects selected by the curation board representing our vision of cutting-edge generative artwork. These highly innovative releases by artists reflect both astounding beauty and technical pioneering.
+
+    **Art Blocks Explorations** encompasses our wild ideas and commissioned experiments. It is the place where we tinker, and these projects are connected not by theme or structure, but rather by their pursuit of delight.
+    
+    **Art Blocks Presents** comprises of projects screened and selected by Art Blocks and embodies our standards for artistic creativity, conceptual rigor, and technical achievement.
+    
+    **Art Blocks x Collaborations** are with select partners and organized into a new vertical of co-branded collections. Because partner projects live directly in the Art Blocks ecosystem, they will be subject to the same quality review and scheduling as any other Art Blocks project. These collections represent true collaborations between Art Blocks and our partners to shape the program of offerings.
+    
+    **Art Blocks Heritage** is a designation to denote Art Blocks projects released as either Playground or Factory projects before 10/4/22.
+    
+    **Art Blocks 2.0** is a reorientation of our product that includes a new smart contract for our projects, new product collections called "Presents" and "Explorations," and a refreshed and greatly expanded website. The new contract significantly reduces the cost for both artists and collectors, while the new product collections provide new opportunities for experimentation, and set the stage for the future of Art Blocks. Finally, the new website provides more robust engineering, scalability, and a consistent, inclusive user experience, including editorial content about the artists launching on our platform. See [this article](https://medium.com/the-link-art-blocks/the-next-version-of-art-blocks-7ff01308b475) for more details, and visit us at [artblocks.io](https://artblocks.io/) to experience these improvements for yourself.`
   )
 
 // Custom message shown when someone asks for the OpenSea links.
@@ -172,7 +179,7 @@ const HELP_MESSAGE = new MessageEmbed()
     **genart?**: What is generative art?
     **squiggle paused?**: An explanation of why Chromie Squiggle minting is paused.
     **drop?**: Where to find information about the next drop.
-    **playground?** (or **curated?** or **factory?** or **collaborations?**): Information about the different types of Art Blocks projects.
+    **presents?** (or **curated?** or **heritage?** or **collaborations?** or **explorations?* or **v2?**): Information about the different types of Art Blocks projects.
     **opensea?**: Links to the three different Art Blocks collections on OpenSea (Curated, Playground, and Factory).
     **metrics?**: The latest Art Blocks platform metrics.
     **applications?**: An explanation of the current state of the Art Blocks application process.
@@ -420,14 +427,17 @@ async function smartBotResponse(
     return OPENSEA_CURATED_MESSAGE
   }
   // Handle questions about Curated Projects vs. Artist Playground vs. Factory.
-  const mentionedCuratedPlaygroundFactory =
+  const mentionedVerticals =
     msgContentLowercase.includes('curated') ||
-    msgContentLowercase.includes('playground') ||
-    msgContentLowercase.includes('factory') ||
+    msgContentLowercase.includes('presents') ||
+    msgContentLowercase.includes('heritage') ||
+    msgContentLowercase.includes('explorations') ||
+    msgContentLowercase.includes('v2') ||
     msgContentLowercase.includes('collaborations')
-  if (containsQuestion && mentionedCuratedPlaygroundFactory) {
-    return PLAYGROUND_CURATED_FACTORY_MESSAGE
+  if (containsQuestion && mentionedVerticals) {
+    return VERTICALS_MESSAGE
   }
+
   // Handle OpenSea link requests.
   const mentionedOpenSea = msgContentLowercase.includes('opensea')
   if (containsQuestion && mentionedOpenSea) {
