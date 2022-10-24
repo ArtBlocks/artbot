@@ -134,13 +134,13 @@ const OPENSEA_CURATED_MESSAGE = new MessageEmbed()
 const VERTICALS_MESSAGE = new MessageEmbed()
   // Set the title of the field
   .setTitle(
-    'How are "Curated", "Presents", "Explorations", "Heritage", and "Collaborations" different?'
+    'How are "Curated," "Explorations," "Presents," "Collaborations," and "Heritage" different?'
   )
   // Set the color of the embed
   .setColor(ARTBOT_GREEN)
   // Set the main content of the embed
   .setDescription(
-    `It looks like you're wondering about the different types of Art Blocks projects.
+    `It looks like you're wondering about the different types of Art Blocks collections.
     
     **Art Blocks Curated** includes projects selected by the curation board representing our vision of cutting-edge generative artwork. These highly innovative releases by artists reflect both astounding beauty and technical pioneering.
 
@@ -151,8 +151,17 @@ const VERTICALS_MESSAGE = new MessageEmbed()
     **Art Blocks x Collaborations** are with select partners and organized into a new vertical of co-branded collections. Because partner projects live directly in the Art Blocks ecosystem, they will be subject to the same quality review and scheduling as any other Art Blocks project. These collections represent true collaborations between Art Blocks and our partners to shape the program of offerings.
     
     **Art Blocks Heritage** is a designation to denote Art Blocks projects released as either Playground or Factory projects before 10/4/22.
-    
-    **Art Blocks 2.0** is a reorientation of our product that includes a new smart contract for our projects, new product collections called "Presents" and "Explorations," and a refreshed and greatly expanded website. The new contract significantly reduces the cost for both artists and collectors, while the new product collections provide new opportunities for experimentation, and set the stage for the future of Art Blocks. Finally, the new website provides more robust engineering, scalability, and a consistent, inclusive user experience, including editorial content about the artists launching on our platform. See [this article](https://medium.com/the-link-art-blocks/the-next-version-of-art-blocks-7ff01308b475) for more details, and visit us at [artblocks.io](https://artblocks.io/) to experience these improvements for yourself.`
+  `
+  )
+
+const V2_MESSAGE = new MessageEmbed()
+  // Set the title of the field
+  .setTitle('What is Art Blocks 2.0?')
+  // Set the color of the embed
+  .setColor(ARTBOT_GREEN)
+  // Set the main content of the embed
+  .setDescription(
+    `**Art Blocks 2.0** is a reorientation of our product that includes a new smart contract for our projects, new product collections called "Presents" and "Explorations," and a refreshed and greatly expanded website. The new contract significantly reduces the cost for both artists and collectors, while the new product collections provide new opportunities for experimentation, and set the stage for the future of Art Blocks. Finally, the new website provides more robust engineering, scalability, and a consistent, inclusive user experience, including editorial content about the artists launching on our platform. See [this article](https://medium.com/the-link-art-blocks/the-next-version-of-art-blocks-7ff01308b475) for more details, and visit us at [artblocks.io](https://artblocks.io/) to experience these improvements for yourself.`
   )
 
 // Custom message shown when someone asks for the OpenSea links.
@@ -179,7 +188,8 @@ const HELP_MESSAGE = new MessageEmbed()
     **genart?**: What is generative art?
     **squiggle paused?**: An explanation of why Chromie Squiggle minting is paused.
     **drop?**: Where to find information about the next drop.
-    **presents?** (or **curated?** or **heritage?** or **collaborations?** or **explorations?* or **v2?**): Information about the different types of Art Blocks projects.
+    **presents?** (or **curated?** or **heritage?** or **collaborations?** or **explorations?**): Information about the different types of Art Blocks projects.
+    **v2?**: Information about Art Blocks 2.0.
     **opensea?**: Links to the three different Art Blocks collections on OpenSea (Curated, Playground, and Factory).
     **metrics?**: The latest Art Blocks platform metrics.
     **applications?**: An explanation of the current state of the Art Blocks application process.
@@ -432,10 +442,13 @@ async function smartBotResponse(
     msgContentLowercase.includes('presents') ||
     msgContentLowercase.includes('heritage') ||
     msgContentLowercase.includes('explorations') ||
-    msgContentLowercase.includes('v2') ||
     msgContentLowercase.includes('collaborations')
   if (containsQuestion && mentionedVerticals) {
     return VERTICALS_MESSAGE
+  }
+  const mentionedV2 = msgContentLowercase.includes('v2')
+  if (containsQuestion && mentionedV2) {
+    return V2_MESSAGE
   }
 
   // Handle OpenSea link requests.
