@@ -142,7 +142,7 @@ const VERTICALS_MESSAGE = new MessageEmbed()
   .setDescription(
     `It looks like you're wondering about the different types of Art Blocks collections.
     
-    **Art Blocks Curated** includes projects selected by the curation board representing our vision of cutting-edge generative artwork. These highly innovative releases by artists reflect both astounding beauty and technical pioneering.
+    **Art Blocks Curated** includes projects selected by the [curation board](https://medium.com/the-link-art-blocks/meet-the-art-blocks-curation-board-696102e747e3) representing our vision of cutting-edge generative artwork. These highly innovative releases by artists reflect both astounding beauty and technical pioneering.
 
     **Art Blocks Explorations** encompasses our wild ideas and commissioned experiments. It is the place where we tinker, and these projects are connected not by theme or structure, but rather by their pursuit of delight.
     
