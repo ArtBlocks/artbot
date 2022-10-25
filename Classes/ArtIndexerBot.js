@@ -46,7 +46,7 @@ class ArtIndexerBot {
     this.projects = {}
     this.artists = {}
     this.birthdays = {}
-    this.curationMapping = {}
+    this.collectionMapping = {}
     this.sentBirthdays = {}
     this.walletTokens = {}
     this.init()
@@ -67,17 +67,17 @@ class ArtIndexerBot {
     try {
       const projects = await this.projectFetch()
       const bdays = await getProjectsBirthdays()
-      const curation = await getProjectsCurationStatus()
-      const curationStatuses = curation[0]
-      const heritageStatuses = curation[1]
+      const collectionInfo = await getProjectsCurationStatus()
+      const collections = collectionInfo[0]
+      const heritageStatuses = collectionInfo[1]
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i]
         console.log(
           `Refreshing project cache for Project ${project.projectId} ${project.name}`
         )
         let bday = bdays[`${project.contract.id}-${project.projectId}`]
-        const curationStatus = this.toProjectKey(
-          curationStatuses[`${project.contract.id}-${project.projectId}`]
+        const collection = this.toProjectKey(
+          collections[`${project.contract.id}-${project.projectId}`]
         )
         const heritageStatus = this.toProjectKey(
           heritageStatuses[`${project.contract.id}-${project.projectId}`]
@@ -89,7 +89,7 @@ class ArtIndexerBot {
           projectName: project.name,
           projectActive: project.active,
           artistName: project.artistName,
-          curationStatus: curationStatus ?? null,
+          collection: collection ?? null,
           heritageStatus: heritageStatus ?? null,
           startTime: bday ? new Date(bday) : null,
         })
@@ -107,19 +107,19 @@ class ArtIndexerBot {
         this.artists[artistName] = this.artists[artistName] ?? []
         this.artists[artistName].push(newBot)
 
-        this.curationMapping[curationStatus] =
-          this.curationMapping[curationStatus] ?? []
-        this.curationMapping[curationStatus].push(newBot)
+        this.collectionMapping[collection] =
+          this.collectionMapping[collection] ?? []
+        this.collectionMapping[collection].push(newBot)
         if (heritageStatus) {
           // Umbrella 'heritage' status
-          this.curationMapping['heritage'] =
-            this.curationMapping['heritage'] ?? []
-          this.curationMapping['heritage'].push(newBot)
+          this.collectionMapping['heritage'] =
+            this.collectionMapping['heritage'] ?? []
+          this.collectionMapping['heritage'].push(newBot)
 
           // Individual heritage status (e.g. 'factory')
-          this.curationMapping[heritageStatus] =
-            this.curationMapping[heritageStatus] ?? []
-          this.curationMapping[heritageStatus].push(newBot)
+          this.collectionMapping[heritageStatus] =
+            this.collectionMapping[heritageStatus] ?? []
+          this.collectionMapping[heritageStatus].push(newBot)
         }
       }
     } catch (err) {
@@ -284,19 +284,19 @@ class ArtIndexerBot {
     }
   }
 
-  async sendCurationStatusRandomTokenMessage(msg, curationStatus) {
+  async sendCurationStatusRandomTokenMessage(msg, collectionType) {
     let attempts = 0
     if (
-      !this.curationMapping[curationStatus] ||
-      this.curationMapping[curationStatus].length === 0
+      !this.collectionMapping[collectionType] ||
+      this.collectionMapping[collectionType].length === 0
     ) {
       return
     }
     while (attempts < 10) {
       let projBot =
-        this.curationMapping[curationStatus][
+        this.collectionMapping[collectionType][
           Math.floor(
-            Math.random() * this.curationMapping[curationStatus].length
+            Math.random() * this.collectionMapping[collectionType].length
           )
         ]
 
@@ -395,13 +395,12 @@ class ArtIndexerBot {
           return projBot.handleNumberMessage(msg)
         } else if (isVerticalName(projectKey)) {
           // Random token from a vertical
-          projectKey = getVerticalName(projectKey)
           let tokensInVertical = []
           for (let index = 0; index < tokens.length; index++) {
             let token = tokens[index]
             let projBot = this.projects[this.toProjectKey(token.project.name)]
             if (
-              projBot.curationStatus.toLowerCase() === projectKey ||
+              projBot.collection.toLowerCase() === projectKey ||
               projBot.heritageStatus.toLowerCase() === projectKey
             ) {
               tokensInVertical.push(token)

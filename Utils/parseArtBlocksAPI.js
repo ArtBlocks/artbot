@@ -604,19 +604,19 @@ async function getProjectsCurationStatus() {
         break
       }
     }
-    const curationMapping = {}
+    const collectionMapping = {}
     const heritageStatuses = {}
     allProjects.forEach((proj) => {
-      curationStatus = proj.vertical_name.toLowerCase()
+      collectionName = proj.vertical_name.toLowerCase()
       if (proj.vertical?.category_name?.toLowerCase() !== 'collections') {
-        curationStatus = proj.vertical?.category_name?.toLowerCase()
+        collectionName = proj.vertical?.category_name?.toLowerCase()
       }
       if (proj.heritage_curation_status) {
         heritageStatuses[proj.id] = proj.heritage_curation_status
       }
-      curationMapping[proj.id] = curationStatus
+      collectionMapping[proj.id] = collectionName
     })
-    return [curationMapping, heritageStatuses]
+    return [collectionMapping, heritageStatuses]
   } catch (err) {
     console.error(err)
     return {}
