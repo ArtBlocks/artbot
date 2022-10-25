@@ -1,12 +1,10 @@
 const { APIPollBot } = require('./ApiPollBot')
 const { MessageEmbed } = require('discord.js')
-const fetch = require('node-fetch')
+const axios = require('axios')
 const {
   sendEmbedToSaleChannels,
   BAN_ADDRESSES,
 } = require('../../Utils/activityTriager')
-const { getENSName } = require('./utils')
-const { ethers } = require('ethers')
 /** API Poller for Reservoir Sale events */
 class ReservoirSaleBot extends APIPollBot {
   /** Constructor just calls super
@@ -29,13 +27,15 @@ class ReservoirSaleBot extends APIPollBot {
    * Response spec: https://docs.reservoir.tools/reference/getsalesbulkv1
    * @param {*} responseData - Dict parsed from API request json
    */
-  handleAPIResponse(responseData) {
+  async handleAPIResponse(responseData) {
     let maxTime = 0
     for (const data of responseData.sales) {
       const eventTime = data.timestamp
       // Only deal with event if it is new and unique saleId
       if (this.lastUpdatedTime < eventTime && !this.saleIds.has(data.saleId)) {
-        this.buildDiscordMessage(data)
+        this.buildDiscordMessage(data).catch((err) => {
+          console.log('Error sending sale message', err)
+        })
         this.saleIds.add(data.saleId)
       }
 
@@ -63,15 +63,12 @@ class ReservoirSaleBot extends APIPollBot {
   async buildDiscordMessage(msg) {
     // Create embed we will be sending
     const embed = new MessageEmbed()
-    // Parsing Opensea message to get info
+    // Parsing Reservoir sale message to get info
     const tokenID = msg.token.tokenId
-    // const openseaURL = msg.asset.permalink
-
-    // Event_type will either be SALE or LIST
-    const eventType = 'successful'
 
     let priceText = 'Sale Price'
-    let price = msg.price
+    const price = msg.price.amount.decimal
+    const currency = msg.price.currency.symbol
     let owner = msg.from
     let platform = msg.orderSource
     embed.setColor(this.saleColor)
@@ -87,7 +84,7 @@ class ReservoirSaleBot extends APIPollBot {
 
     let sellerText = await this.ensOrAddress(msg.from)
     let buyerText = await this.ensOrAddress(msg.to)
-    if (platform.toLowerCase() === 'opensea') {
+    if (platform.toLowerCase().includes('opensea')) {
       if (!sellerText.includes('.eth')) {
         const sellerOS = await this.osName(msg.from)
         sellerText =
@@ -105,7 +102,6 @@ class ReservoirSaleBot extends APIPollBot {
     embed.addField(`Seller (${platform})`, `[${sellerText}](${sellerProfile})`)
     embed.addField('Buyer', `[${buyerText}](${buyerProfile})`)
 
-    const currency = msg.orderSide === 'bid' ? 'WETH' : 'ETH'
     embed.addField(priceText, `${price} ${currency}`, true)
 
     // Get Art Blocks metadata response for the item.
@@ -113,9 +109,8 @@ class ReservoirSaleBot extends APIPollBot {
       this.contract === ''
         ? `https://token.artblocks.io/${tokenID}`
         : `https://token.artblocks.io/${this.contract}/${tokenID}`
-    const artBlocksResponse = await fetch(tokenUrl)
-    const artBlocksData = await artBlocksResponse.json()
-
+    const artBlocksResponse = await axios.get(tokenUrl)
+    const artBlocksData = artBlocksResponse?.data
     let platformUrl = ''
     switch (platform.toLowerCase()) {
       case 'opensea':

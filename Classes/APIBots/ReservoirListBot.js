@@ -1,6 +1,6 @@
 const { APIPollBot } = require('./ApiPollBot')
 const { MessageEmbed } = require('discord.js')
-const fetch = require('node-fetch')
+const axios = require('axios')
 const {
   sendEmbedToListChannels,
   BAN_ADDRESSES,
@@ -27,13 +27,15 @@ class ReservoirListBot extends APIPollBot {
    * Response spec: https://docs.reservoir.tools/reference/getordersasksv2
    * @param {*} responseData - Dict parsed from API request json
    */
-  handleAPIResponse(responseData) {
+  async handleAPIResponse(responseData) {
     let maxTime = 0
     for (const data of responseData.orders) {
       const eventTime = Date.parse(data.createdAt)
       // Only deal with event if it is new
       if (this.lastUpdatedTime < eventTime) {
-        this.buildDiscordMessage(data)
+        this.buildDiscordMessage(data).catch((err) => {
+          console.log('Error sending listing message', err)
+        })
       }
 
       // Save the time of the latest event from this batch
@@ -60,8 +62,9 @@ class ReservoirListBot extends APIPollBot {
     // Parsing message to get info
     const tokenID = msg.tokenSetId.split(':')[2]
     const contract = msg.contract
-    let priceText = 'List Price'
-    let price = msg.price
+    const priceText = 'List Price'
+    const price = msg.price.amount.decimal
+    const currency = msg.price.currency.symbol
     let owner = msg.maker
     let platform = msg.source.name
 
@@ -76,15 +79,15 @@ class ReservoirListBot extends APIPollBot {
     const sellerProfile = baseABProfile + owner
     embed.addField(`Seller (${platform})`, `[${sellerText}](${sellerProfile})`)
 
-    embed.addField(priceText, price + 'ETH', true)
+    embed.addField(priceText, `${price} ${currency}`, true)
 
     // Get Art Blocks metadata response for the item.
     const tokenUrl =
       this.contract === ''
         ? `https://token.artblocks.io/${tokenID}`
         : `https://token.artblocks.io/${this.contract}/${tokenID}`
-    const artBlocksResponse = await fetch(tokenUrl)
-    const artBlocksData = await artBlocksResponse.json()
+    const artBlocksResponse = await axios.get(tokenUrl)
+    const artBlocksData = artBlocksResponse?.data
 
     let curationStatus = artBlocksData?.curation_status
       ? artBlocksData.curation_status[0].toUpperCase() +

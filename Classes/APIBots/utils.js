@@ -1,6 +1,6 @@
 require('dotenv').config()
+const axios = require('axios')
 const ethers = require('ethers')
-const fetch = require('node-fetch')
 
 let provider = new ethers.providers.EtherscanProvider(
   'homestead',
@@ -11,13 +11,24 @@ let provider = new ethers.providers.EtherscanProvider(
 let ensAddressMap = {}
 let ensResolvedMap = {}
 let osAddressMap = {}
+const MAX_ENS_RETRIES = 3
 
 async function getENSName(address) {
   let name = ''
   if (ensAddressMap[address]) {
     name = ensAddressMap[address]
   } else {
-    let ens = await provider.lookupAddress(address)
+    let ens = ''
+    let retries = 0
+    while (ens === '' && retries < MAX_ENS_RETRIES) {
+      try {
+        ens = await provider.lookupAddress(address)
+      } catch (err) {
+        retries++
+        console.warn(`ENS lookup error on ${address}`, err)
+      }
+    }
+
     name = ens ?? ''
     ensAddressMap[address] = name
     ensResolvedMap[name] = address
@@ -30,8 +41,20 @@ async function resolveEnsName(ensName) {
   if (ensResolvedMap[ensName]) {
     wallet = ensResolvedMap[ensName]
   } else {
-    wallet = await provider.resolveName(ensName)
-    ensResolvedMap[ensName] = wallet
+    let retries = 0
+
+    while (wallet === '' && retries < MAX_ENS_RETRIES) {
+      try {
+        wallet = await provider.resolveName(ensName)
+      } catch (err) {
+        retries++
+        console.warn(`ENS resolve error on ${ensName}`, err)
+      }
+    }
+
+    if (wallet !== '') {
+      ensResolvedMap[ensName] = wallet
+    }
   }
   return wallet
 }
@@ -48,18 +71,17 @@ async function getOSName(address) {
     name = osAddressMap[address]
   } else {
     try {
-      let response = await fetch(`https://api.opensea.io/user/${address}`, {
-        method: 'GET',
+      let response = await axios.get(`https://api.opensea.io/user/${address}`, {
         headers: {
           Accept: 'application/json',
           'X-API-KEY': process.env.OPENSEA_API_KEY,
         },
       })
-      let responseBody = await response.json()
-      if (responseBody.detail) {
+      let responseBody = response?.data
+      if (responseBody?.detail) {
         throw new Error(responseBody.detail)
       }
-      name = responseBody.username ?? ''
+      name = responseBody?.username ?? ''
       osAddressMap[address] = name
     } catch (err) {
       // Probably rate limited - return empty sting but don't cache
