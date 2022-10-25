@@ -76,10 +76,12 @@ class ArtIndexerBot {
           `Refreshing project cache for Project ${project.projectId} ${project.name}`
         )
         let bday = bdays[`${project.contract.id}-${project.projectId}`]
-        const curationStatus =
+        const curationStatus = this.toProjectKey(
           curationStatuses[`${project.contract.id}-${project.projectId}`]
-        const heritageStatus =
+        )
+        const heritageStatus = this.toProjectKey(
           heritageStatuses[`${project.contract.id}-${project.projectId}`]
+        )
         const newBot = new ProjectBot({
           projectNumber: project.projectId,
           coreContract: project.contract.id,
@@ -114,7 +116,7 @@ class ArtIndexerBot {
             this.curationMapping['heritage'] ?? []
           this.curationMapping['heritage'].push(newBot)
 
-          // Individual heritage status (e.g. 'curated series 8')
+          // Individual heritage status (e.g. 'factory')
           this.curationMapping[heritageStatus] =
             this.curationMapping[heritageStatus] ?? []
           this.curationMapping[heritageStatus].push(newBot)
@@ -365,8 +367,9 @@ class ArtIndexerBot {
         return
       }
 
-      if (projectKey && !isVerticalName(projectKey)) {
+      if (projectKey) {
         if (this.artists[projectKey]) {
+          // Random token from artist
           let tokensByArtist = []
           for (let index = 0; index < tokens.length; index++) {
             let token = tokens[index]
@@ -391,15 +394,15 @@ class ArtIndexerBot {
           msg.content = `#${_token.invocation}`
           return projBot.handleNumberMessage(msg)
         } else if (isVerticalName(projectKey)) {
+          // Random token from a vertical
           projectKey = getVerticalName(projectKey)
           let tokensInVertical = []
           for (let index = 0; index < tokens.length; index++) {
             let token = tokens[index]
-
+            let projBot = this.projects[this.toProjectKey(token.project.name)]
             if (
-              this.projects[
-                this.toProjectKey(token.project.name)
-              ].curationStatus.toLowerCase() === projectKey
+              projBot.curationStatus.toLowerCase() === projectKey ||
+              projBot.heritageStatus.toLowerCase() === projectKey
             ) {
               tokensInVertical.push(token)
             }
@@ -418,6 +421,7 @@ class ArtIndexerBot {
           msg.content = `#${_token.invocation}`
           return projBot.handleNumberMessage(msg)
         } else {
+          // Random token from project
           let tokensInProject = []
           for (let index = 0; index < tokens.length; index++) {
             let token = tokens[index]
@@ -438,6 +442,8 @@ class ArtIndexerBot {
           return projBot.handleNumberMessage(msg)
         }
       }
+
+      // Get a random token
 
       let attempts = 0
       while (attempts < 10) {

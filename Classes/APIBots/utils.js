@@ -103,17 +103,18 @@ function isVerticalName(msg) {
     msg === 'presents' ||
     msg === 'collaborations' ||
     msg === 'collabs' ||
-    msg === 'heritage'
+    msg === 'heritage' ||
+    msg === 'factory' ||
+    msg === 'playground' ||
+    msg === 'explorations' ||
+    msg === 'engine' ||
+    msg.startsWith('curatedseries')
   )
 }
 function getVerticalName(msg) {
   switch (msg) {
     case 'collabs':
       return 'collaborations'
-    case 'collaborations':
-    case 'heritage':
-    case 'curated':
-    case 'presents':
     default:
       return msg
   }
