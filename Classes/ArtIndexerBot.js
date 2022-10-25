@@ -311,15 +311,14 @@ class ArtIndexerBot {
     if (!this.artists[artistName] || this.artists[artistName].length === 0) {
       return
     }
-    console.log('here')
+
     while (attempts < 10) {
       console.log(this.artists[artistName])
       let projBot =
         this.artists[artistName][
           Math.floor(Math.random() * this.artists[artistName].length)
         ]
-      console.log(this.artists[artistName].length)
-      console.log(projBot, projBot?.editionSize, projBot?.projectActive)
+
       if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
         return projBot.handleNumberMessage(msg)
       }
