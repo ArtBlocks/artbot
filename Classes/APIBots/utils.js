@@ -1,19 +1,34 @@
+require('dotenv').config()
+const axios = require('axios')
 const ethers = require('ethers')
-const fetch = require('node-fetch')
 
-let provider = new ethers.providers.AlchemyProvider('homestead')
+let provider = new ethers.providers.EtherscanProvider(
+  'homestead',
+  process.env.ETHERSCAN_API_KEY
+)
 
 // Runtime ENS cache just to limit queries
 let ensAddressMap = {}
 let ensResolvedMap = {}
 let osAddressMap = {}
+const MAX_ENS_RETRIES = 3
 
 async function getENSName(address) {
   let name = ''
   if (ensAddressMap[address]) {
     name = ensAddressMap[address]
   } else {
-    let ens = await provider.lookupAddress(address)
+    let ens = ''
+    let retries = 0
+    while (ens === '' && retries < MAX_ENS_RETRIES) {
+      try {
+        ens = await provider.lookupAddress(address)
+      } catch (err) {
+        retries++
+        console.warn(`ENS lookup error on ${address}`, err)
+      }
+    }
+
     name = ens ?? ''
     ensAddressMap[address] = name
     ensResolvedMap[name] = address
@@ -26,8 +41,20 @@ async function resolveEnsName(ensName) {
   if (ensResolvedMap[ensName]) {
     wallet = ensResolvedMap[ensName]
   } else {
-    wallet = await provider.resolveName(ensName)
-    ensResolvedMap[ensName] = wallet
+    let retries = 0
+
+    while (wallet === '' && retries < MAX_ENS_RETRIES) {
+      try {
+        wallet = await provider.resolveName(ensName)
+      } catch (err) {
+        retries++
+        console.warn(`ENS resolve error on ${ensName}`, err)
+      }
+    }
+
+    if (wallet !== '') {
+      ensResolvedMap[ensName] = wallet
+    }
   }
   return wallet
 }
@@ -44,18 +71,17 @@ async function getOSName(address) {
     name = osAddressMap[address]
   } else {
     try {
-      let response = await fetch(`https://api.opensea.io/user/${address}`, {
-        method: 'GET',
+      let response = await axios.get(`https://api.opensea.io/user/${address}`, {
         headers: {
           Accept: 'application/json',
           'X-API-KEY': process.env.OPENSEA_API_KEY,
         },
       })
-      let responseBody = await response.json()
-      if (responseBody.detail) {
+      let responseBody = response?.data
+      if (responseBody?.detail) {
         throw new Error(responseBody.detail)
       }
-      name = responseBody.username ?? ''
+      name = responseBody?.username ?? ''
       osAddressMap[address] = name
     } catch (err) {
       // Probably rate limited - return empty sting but don't cache
@@ -72,7 +98,26 @@ function isWallet(msg) {
 }
 
 function isVerticalName(msg) {
-  return msg === 'curated' || msg === 'factory' || msg === 'playground'
+  return (
+    msg === 'curated' ||
+    msg === 'presents' ||
+    msg === 'collaborations' ||
+    msg === 'collabs' ||
+    msg === 'heritage' ||
+    msg === 'factory' ||
+    msg === 'playground' ||
+    msg === 'explorations' ||
+    msg === 'engine' ||
+    msg.startsWith('curatedseries')
+  )
+}
+function getVerticalName(msg) {
+  switch (msg) {
+    case 'collabs':
+      return 'collaborations'
+    default:
+      return msg
+  }
 }
 
 module.exports.ensOrAddress = ensOrAddress
@@ -80,3 +125,4 @@ module.exports.getOSName = getOSName
 module.exports.resolveEnsName = resolveEnsName
 module.exports.isWallet = isWallet
 module.exports.isVerticalName = isVerticalName
+module.exports.getVerticalName = getVerticalName

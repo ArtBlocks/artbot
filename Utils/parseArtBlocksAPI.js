@@ -33,6 +33,10 @@ const getAllProjectsCurationStatus = gql`
     projects_metadata(limit: $first, offset: $skip) {
       id
       vertical_name
+      heritage_curation_status
+      vertical {
+        category_name
+      }
     }
   }
 `
@@ -489,6 +493,11 @@ async function getArtBlocksProjects() {
 async function getArtBlocksOpenProjects() {
   return await getContractsOpenProjects(Object.values(CORE_CONTRACTS))
 }
+async function getArtBlocksAndCollabProjects() {
+  return await getContractsProjects(
+    Object.values(CORE_CONTRACTS).concat(Object.values(COLLAB_CONTRACTS))
+  )
+}
 
 /**
  * get data for all AB x Pace projects
@@ -595,11 +604,19 @@ async function getProjectsCurationStatus() {
         break
       }
     }
-    const curationMapping = {}
+    const collectionMapping = {}
+    const heritageStatuses = {}
     allProjects.forEach((proj) => {
-      curationMapping[proj.id] = proj.vertical_name.toLowerCase()
+      collectionName = proj.vertical_name.toLowerCase()
+      if (proj.vertical?.category_name?.toLowerCase() !== 'collections') {
+        collectionName = proj.vertical?.category_name?.toLowerCase()
+      }
+      if (proj.heritage_curation_status) {
+        heritageStatuses[proj.id] = proj.heritage_curation_status
+      }
+      collectionMapping[proj.id] = collectionName
     })
-    return curationMapping
+    return [collectionMapping, heritageStatuses]
   } catch (err) {
     console.error(err)
     return {}
@@ -650,6 +667,7 @@ async function getAllWalletTokens(walletAddress) {
 }
 
 module.exports.getArtBlocksProject = getArtBlocksProject
+module.exports.getArtBlocksAndCollabProjects = getArtBlocksAndCollabProjects
 module.exports.getArtBlocksFactoryProjects = getArtBlocksFactoryProjects
 module.exports.getArtBlocksProjects = getArtBlocksProjects
 module.exports.getArtBlocksOpenProjects = getArtBlocksOpenProjects
