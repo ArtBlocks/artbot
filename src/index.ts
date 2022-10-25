@@ -11,17 +11,14 @@ const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json')
 const { ReservoirSaleBot } = require('./Classes/APIBots/ReservoirSaleBot')
 const { ReservoirListBot } = require('./Classes/APIBots/ReservoirListBot')
-// const { ArchipelagoBot } = require('./Classes/APIBots/ArchipelagoBot')
+const { ArchipelagoBot } = require('./Classes/APIBots/ArchipelagoBot')
 // Special handlers.
-const { triageActivityMessage } = require('./Utils/activityTriager')
 const {
   getPBABProjects,
   getArtBlocksXPaceProjects,
 } = require('./Utils/parseArtBlocksAPI')
 const COLLAB_CONTRACTS = require('./ProjectConfig/collaborationContracts.json')
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
-const handleGiveawayMessage =
-  require('./Utils/giveawayCommands').handleGiveawayMessage
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN
@@ -180,8 +177,8 @@ if (!TEST_MODE) {
     }
   )
 
-  // const archipelagoBot = new ArchipelagoBot(bot)
-  // archipelagoBot.activate()
+  const archipelagoBot = new ArchipelagoBot(bot)
+  archipelagoBot.activate()
 
   // Listing/Sales bots for Pace collab contract
   new ReservoirListBot(

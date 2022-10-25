@@ -1,3 +1,5 @@
+import { Client } from "discord.js"
+
 const fetch = require('node-fetch')
 const ReconnectingWebsocket = require('reconnecting-websocket')
 const WS = require('ws')
@@ -15,12 +17,16 @@ const WEB_SOCKET_URL = 'wss://api.archipelago.art/ws'
 const COLLECTIONS_API = 'https://api.archipelago.art/v1/market/collections'
 const HEADERS = { 'User-Agent': 'artbot/1.0' }
 const ONE_MILLION = 1000000
-const MIN_TRADE_PRICE = 10n ** 16n // 0.01 ETH
+const MIN_TRADE_PRICE = 1e16 // 0.01 ETH
 const ARCHIPELAGO_GOLD = '#9C814B'
 
 class ArchipelagoBot {
-  constructor(discordClient) {
+  discordClient: Client
+  client: any
+  slugToCollections: Map<string, any> 
+  constructor(discordClient: Client) {
     this.discordClient = discordClient
+    this.slugToCollections = new Map()
   }
 
   async activate() {
@@ -33,7 +39,7 @@ class ArchipelagoBot {
         JSON.stringify({ type: 'SUBSCRIBE_TOPIC', topic: 'ALL_COLLECTIONS' })
       )
     this.client.addEventListener('open', () => subscribe())
-    this.client.addEventListener('message', (ev) => this.onMessage(ev.data))
+    this.client.addEventListener('message', (ev: any) => this.onMessage(ev.data))
   }
 
   async refreshCollections() {
@@ -47,7 +53,7 @@ class ArchipelagoBot {
     }
   }
 
-  async getCollection(slug) {
+  async getCollection(slug: string) {
     let collection = this.slugToCollections.get(slug)
     if (collection == null) {
       console.log(
@@ -59,7 +65,7 @@ class ArchipelagoBot {
     return collection
   }
 
-  async getArtBlocksData(slug, tokenIndex) {
+  async getArtBlocksData(slug: string, tokenIndex: number) {
     const collection = await this.getCollection(slug)
     if (collection == null) {
       return null
@@ -82,7 +88,7 @@ class ArchipelagoBot {
     return artBlocksData
   }
 
-  async sendAskEmbed({ asker: seller, price, slug, tokenIndex }) {
+  async sendAskEmbed({ asker: seller, price, slug, tokenIndex }: any) {
     const artBlocksData = await this.getArtBlocksData(slug, tokenIndex)
     if (artBlocksData == null) {
       console.log(`Unable to get ArtBlocks data for ${slug} #${tokenIndex}`)
@@ -111,7 +117,7 @@ class ArchipelagoBot {
     sendEmbedToListChannels(this.discordClient, embed, artBlocksData)
   }
 
-  async sendTradeEmbed({ buyer, seller, price, slug, tokenIndex }) {
+  async sendTradeEmbed({ buyer, seller, price, slug, tokenIndex }: any) {
     const artBlocksData = await this.getArtBlocksData(slug, tokenIndex)
     if (artBlocksData == null) {
       console.warn(`Unable to get ArtBlocks data for ${slug} #${tokenIndex}`)
@@ -149,7 +155,7 @@ class ArchipelagoBot {
     sendEmbedToSaleChannels(this.discordClient, embed, artBlocksData)
   }
 
-  onMessage(msg) {
+  onMessage(msg: any) {
     const message = JSON.parse(msg)
     switch (message.type) {
       case 'ASK_PLACED':
@@ -178,15 +184,15 @@ class ArchipelagoBot {
 
 // Copied from Archipelago UI codebase.
 const priceToString = (
-  price,
-  { decimals = 18, maximumFractionDigits, precisionAdjustment = 0 } = {}
+  price: any,
+  { decimals = 18, maximumFractionDigits, precisionAdjustment = 0 }: any = {}
 ) => {
   // Babel polyfill for BigInt (exponentiation with ** doesn't work!)
-  let divisor = 10n
+  let divisor = 10
   for (let i = 0; i < decimals - 6 - 1; i++) {
-    divisor = divisor * 10n
+    divisor = divisor * 10
   }
-  const amount = Number(BigInt(price) / divisor) / 1e6
+  const amount = Number(BigInt(price) / BigInt(divisor)) / 1e6
   let parsedFractionDigits
   if (maximumFractionDigits == null) {
     parsedFractionDigits =
