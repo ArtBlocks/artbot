@@ -150,7 +150,7 @@ const VERTICALS_MESSAGE = new MessageEmbed()
     
     **Art Blocks x Collaborations** are with select partners and organized into a new vertical of co-branded collections. Because partner projects live directly in the Art Blocks ecosystem, they will be subject to the same quality review and scheduling as any other Art Blocks project. These collections represent true collaborations between Art Blocks and our partners to shape the program of offerings.
     
-    **Art Blocks Heritage** is a designation to denote Art Blocks projects released as either Playground or Factory projects before 10/4/22.
+    **Art Blocks Heritage** is a designation to denote Art Blocks projects released as either Playground or Factory projects before 11/1/22.
   `
   )
 
