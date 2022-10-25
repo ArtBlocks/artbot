@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js')
-const fetch = require('node-fetch')
+const axios = require('axios')
 const Web3 = require('web3')
 const { ProjectHandlerHelper } = require('./ProjectHandlerHelper')
 
@@ -96,24 +96,8 @@ class ProjectBot {
     }
 
     const tokenID = pieceNumber + this.projectNumber * 1e6
-    const openSeaURL = `https://api.opensea.io/api/v1/asset/${this.coreContract}/${tokenID}/`
 
-    await fetch(openSeaURL, {
-      method: 'GET',
-      headers: {
-        'X-API-KEY': process.env.OPENSEA_API_KEY,
-      },
-    })
-      .then((response) => response.json())
-      .then((openSeaData) => {
-        this.sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested)
-      })
-      .catch((err) => {
-        console.warn(
-          `MetaData message is being sent in a degraded manner. Is OpenSea's API down? https://status.opensea.io/`
-        )
-        this.sendMetaDataMessage(null, msg, tokenID, detailsRequested)
-      })
+    this.sendMetaDataMessage(msg, tokenID, detailsRequested)
   }
 
   /**
@@ -123,16 +107,16 @@ class ProjectBot {
    * @param {*} tokenID
    * @param {*} detailsRequested
    */
-  async sendMetaDataMessage(openSeaData, msg, tokenID, detailsRequested) {
-    const artBlocksResponse = await fetch(
+  async sendMetaDataMessage(msg, tokenID, detailsRequested) {
+    const artBlocksResponse = await axios.get(
       `https://token.artblocks.io/${this.coreContract}/${tokenID}`
     )
-    const artBlocksData = await artBlocksResponse.json()
+    const artBlocksData = artBlocksResponse.data
+
+    const osUrl = `https://api.opensea.io/api/v1/asset/${this.coreContract}/${tokenID}/`
 
     const titleLink =
-      artBlocksData.external_url !== ''
-        ? artBlocksData.external_url
-        : openSeaData.permalink
+      artBlocksData.external_url !== '' ? artBlocksData.external_url : osUrl
 
     let title = artBlocksData.name + ' - ' + artBlocksData.artist
 
@@ -191,25 +175,6 @@ class ProjectBot {
       )
       // Add "Features" field.
       .addField('Features', assetFeatures)
-
-    // If OpenSea data is available add it otherwise say we are operating in a degraded mode
-    try {
-      if (!openSeaData) {
-        throw new Error('OpenSea data is not available')
-      }
-      embedContent
-        // Add sale number details.
-        .addField('Total Sales', this.parseNumSales(openSeaData.num_sales))
-        // Add current owner info.
-        .addFields(this.parseOwnerInfo(openSeaData.owner))
-        // Add sale info.
-        .addFields(this.parseSaleInfo(openSeaData.last_sale))
-    } catch (e) {
-      embedContent.addField(
-        'Sales Info',
-        'It seems there is a problem with the OpenSea API. Check status [here](https://status.opensea.io/).'
-      )
-    }
 
     msg.channel.send(embedContent)
   }
