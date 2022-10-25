@@ -1,6 +1,5 @@
-const fetch = require('node-fetch')
 const { ensOrAddress, getOSName } = require('./utils')
-
+const axios = require('axios')
 /** Abstract parent class for all API Poll Bots */
 class APIPollBot {
   /**
@@ -30,20 +29,15 @@ class APIPollBot {
    * Polls provided apiEndpoint with provided headers
    */
   async pollApi() {
-    https: await fetch(this.apiEndpoint, {
-      method: 'GET',
-      headers: this.headers,
-    })
-      .then((response) => response.json())
-      .then((responseData) => {
-        this.handleAPIResponse(responseData)
-      })
-      .catch((err) => {
-        console.log(err)
-        console.warn(
-          `Error encountered when polling endpoint: ${this.apiEndpoint}`
-        )
-      })
+    try {
+      const response = await axios.get(this.apiEndpoint, this.headers)
+      this.handleAPIResponse(response.data)
+    } catch (err) {
+      console.log(err)
+      console.warn(
+        `Error encountered when polling endpoint: ${this.apiEndpoint}`
+      )
+    }
   }
 
   /**
