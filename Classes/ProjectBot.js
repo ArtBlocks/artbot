@@ -24,6 +24,7 @@ class ProjectBot {
     namedMappings,
     artistName = '',
     curationStatus = null,
+    heritageStatus = null,
     startTime = null,
   }) {
     this.projectNumber = projectNumber
@@ -36,6 +37,7 @@ class ProjectBot {
       : null
     this.artistName = artistName
     this.curationStatus = curationStatus
+    this.heritageStatus = heritageStatus
     this.startTime = startTime
   }
 

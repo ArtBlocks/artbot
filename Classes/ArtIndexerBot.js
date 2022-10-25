@@ -2,8 +2,8 @@ require('dotenv').config()
 const deburr = require('lodash.deburr')
 const Web3 = require('web3')
 const ProjectBot = require('./ProjectBot').ProjectBot
-const getArtBlocksProjects =
-  require('../Utils/parseArtBlocksAPI').getArtBlocksProjects
+const getArtBlocksAndCollabProjects =
+  require('../Utils/parseArtBlocksAPI').getArtBlocksAndCollabProjects
 const getArtBlocksOpenProjects =
   require('../Utils/parseArtBlocksAPI').getArtBlocksOpenProjects
 const getProjectsBirthdays =
@@ -14,6 +14,7 @@ const getAllWalletTokens =
   require('../Utils/parseArtBlocksAPI').getAllWalletTokens
 const resolveEnsName = require('./APIBots/utils').resolveEnsName
 const isVerticalName = require('./APIBots/utils').isVerticalName
+const getVerticalName = require('./APIBots/utils').getVerticalName
 
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
 const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
@@ -40,7 +41,7 @@ BIRTHDAY_CHECK_TIME.setSeconds(0)
 BIRTHDAY_CHECK_TIME.setMilliseconds(0)
 
 class ArtIndexerBot {
-  constructor(projectFetch = getArtBlocksProjects) {
+  constructor(projectFetch = getArtBlocksAndCollabProjects) {
     this.projectFetch = projectFetch
     this.projects = {}
     this.artists = {}
@@ -66,7 +67,9 @@ class ArtIndexerBot {
     try {
       const projects = await this.projectFetch()
       const bdays = await getProjectsBirthdays()
-      const curationStatuses = await getProjectsCurationStatus()
+      const curation = await getProjectsCurationStatus()
+      const curationStatuses = curation[0]
+      const heritageStatuses = curation[1]
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i]
         console.log(
@@ -75,7 +78,8 @@ class ArtIndexerBot {
         let bday = bdays[`${project.contract.id}-${project.projectId}`]
         const curationStatus =
           curationStatuses[`${project.contract.id}-${project.projectId}`]
-
+        const heritageStatus =
+          heritageStatuses[`${project.contract.id}-${project.projectId}`]
         const newBot = new ProjectBot({
           projectNumber: project.projectId,
           coreContract: project.contract.id,
@@ -84,6 +88,7 @@ class ArtIndexerBot {
           projectActive: project.active,
           artistName: project.artistName,
           curationStatus: curationStatus ?? null,
+          heritageStatus: heritageStatus ?? null,
           startTime: bday ? new Date(bday) : null,
         })
 
@@ -103,6 +108,17 @@ class ArtIndexerBot {
         this.curationMapping[curationStatus] =
           this.curationMapping[curationStatus] ?? []
         this.curationMapping[curationStatus].push(newBot)
+        if (heritageStatus) {
+          // Umbrella 'heritage' status
+          this.curationMapping['heritage'] =
+            this.curationMapping['heritage'] ?? []
+          this.curationMapping['heritage'].push(newBot)
+
+          // Individual heritage status (e.g. 'curated series 8')
+          this.curationMapping[heritageStatus] =
+            this.curationMapping[heritageStatus] ?? []
+          this.curationMapping[heritageStatus].push(newBot)
+        }
       }
     } catch (err) {
       console.error(`Error while initializing ArtIndexerBots\n${err}`)
@@ -135,6 +151,7 @@ class ArtIndexerBot {
     } else if (projectKey === 'open') {
       return this.sendRandomOpenProjectRandomTokenMessage(msg)
     } else if (isVerticalName(projectKey)) {
+      projectKey = getVerticalName(projectKey)
       return this.sendCurationStatusRandomTokenMessage(msg, projectKey)
     } else if (this.artists[projectKey]) {
       return this.sendArtistRandomTokenMessage(msg, projectKey)
@@ -375,6 +392,7 @@ class ArtIndexerBot {
           msg.content = `#${_token.invocation}`
           return projBot.handleNumberMessage(msg)
         } else if (isVerticalName(projectKey)) {
+          projectKey = getVerticalName(projectKey)
           let tokensInVertical = []
           for (let index = 0; index < tokens.length; index++) {
             let token = tokens[index]

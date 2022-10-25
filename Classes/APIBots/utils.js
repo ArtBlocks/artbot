@@ -76,7 +76,25 @@ function isWallet(msg) {
 }
 
 function isVerticalName(msg) {
-  return msg === 'curated' || msg === 'factory' || msg === 'playground'
+  return (
+    msg === 'curated' ||
+    msg === 'presents' ||
+    msg === 'collaborations' ||
+    msg === 'collabs' ||
+    msg === 'heritage'
+  )
+}
+function getVerticalName(msg) {
+  switch (msg) {
+    case 'collabs':
+      return 'collaborations'
+    case 'collaborations':
+    case 'heritage':
+    case 'curated':
+    case 'presents':
+    default:
+      return msg
+  }
 }
 
 module.exports.ensOrAddress = ensOrAddress
@@ -84,3 +102,4 @@ module.exports.getOSName = getOSName
 module.exports.resolveEnsName = resolveEnsName
 module.exports.isWallet = isWallet
 module.exports.isVerticalName = isVerticalName
+module.exports.getVerticalName = getVerticalName
