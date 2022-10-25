@@ -11,13 +11,24 @@ let provider = new ethers.providers.EtherscanProvider(
 let ensAddressMap = {}
 let ensResolvedMap = {}
 let osAddressMap = {}
+const MAX_ENS_RETRIES = 3
 
 async function getENSName(address) {
   let name = ''
   if (ensAddressMap[address]) {
     name = ensAddressMap[address]
   } else {
-    let ens = await provider.lookupAddress(address)
+    let ens = ''
+    let retries = 0
+    while (ens === '' && retries < MAX_ENS_RETRIES) {
+      try {
+        ens = await provider.lookupAddress(address)
+      } catch (err) {
+        retries++
+        console.warn(`ENS lookup error on ${address}`, err)
+      }
+    }
+
     name = ens ?? ''
     ensAddressMap[address] = name
     ensResolvedMap[name] = address
@@ -30,8 +41,20 @@ async function resolveEnsName(ensName) {
   if (ensResolvedMap[ensName]) {
     wallet = ensResolvedMap[ensName]
   } else {
-    wallet = await provider.resolveName(ensName)
-    ensResolvedMap[ensName] = wallet
+    let retries = 0
+
+    while (wallet === '' && retries < MAX_ENS_RETRIES) {
+      try {
+        wallet = await provider.resolveName(ensName)
+      } catch (err) {
+        retries++
+        console.warn(`ENS resolve error on ${ensName}`, err)
+      }
+    }
+
+    if (wallet !== '') {
+      ensResolvedMap[ensName] = wallet
+    }
   }
   return wallet
 }
