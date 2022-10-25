@@ -1,6 +1,6 @@
 require('dotenv').config()
+const axios = require('axios')
 const ethers = require('ethers')
-const fetch = require('node-fetch')
 
 let provider = new ethers.providers.EtherscanProvider(
   'homestead',
@@ -71,18 +71,17 @@ async function getOSName(address) {
     name = osAddressMap[address]
   } else {
     try {
-      let response = await fetch(`https://api.opensea.io/user/${address}`, {
-        method: 'GET',
+      let response = await axios.get(`https://api.opensea.io/user/${address}`, {
         headers: {
           Accept: 'application/json',
           'X-API-KEY': process.env.OPENSEA_API_KEY,
         },
       })
-      let responseBody = await response.json()
-      if (responseBody.detail) {
+      let responseBody = response?.data
+      if (responseBody?.detail) {
         throw new Error(responseBody.detail)
       }
-      name = responseBody.username ?? ''
+      name = responseBody?.username ?? ''
       osAddressMap[address] = name
     } catch (err) {
       // Probably rate limited - return empty sting but don't cache

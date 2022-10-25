@@ -30,8 +30,10 @@ class APIPollBot {
    */
   async pollApi() {
     try {
-      const response = await axios.get(this.apiEndpoint, this.headers)
-      this.handleAPIResponse(response.data)
+      const response = await axios.get(this.apiEndpoint, {
+        headers: this.headers,
+      })
+      await this.handleAPIResponse(response.data)
     } catch (err) {
       console.log(err)
       console.warn(
@@ -45,7 +47,7 @@ class APIPollBot {
    * Parses endpoint response
    * @param {*} responseData - Dict parsed from API request json
    */
-  handleAPIResponse(responseData) {
+  async handleAPIResponse(responseData) {
     console.warn('handleAPIResponse function not implemented!')
   }
 
