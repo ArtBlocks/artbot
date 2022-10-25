@@ -134,7 +134,7 @@ const OPENSEA_CURATED_MESSAGE = new MessageEmbed()
 const VERTICALS_MESSAGE = new MessageEmbed()
   // Set the title of the field
   .setTitle(
-    'How are "Curated," "Explorations," "Presents," "Collaborations," and "Heritage" different?'
+    'How are Curated, Explorations, Presents, Collaborations, and Heritage different?'
   )
   // Set the color of the embed
   .setColor(ARTBOT_GREEN)
