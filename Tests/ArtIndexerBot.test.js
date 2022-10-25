@@ -1,4 +1,4 @@
-const { ArtIndexerBot } = require('../Classes/ArtIndexerBot')
+const { ArtIndexerBot } = require('../src/Classes/ArtIndexerBot')
 
 let bot
 beforeAll(async () => {

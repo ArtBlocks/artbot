@@ -1,18 +1,17 @@
-require('dotenv').config()
-const { Client } = require('discord.js')
-const { GiveawaysManager } = require('discord-giveaways')
+import * as dotenv from 'dotenv'
+dotenv.config()
+import { Client } from 'discord.js'
 const express = require('express')
 const bodyParser = require('body-parser')
 const getArtBlocksFactoryProjects =
   require('./Utils/parseArtBlocksAPI').getArtBlocksFactoryProjects
 
-const AddressCollector = require('./Classes/AddressCollector').AddressCollector
 const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json')
 const { ReservoirSaleBot } = require('./Classes/APIBots/ReservoirSaleBot')
 const { ReservoirListBot } = require('./Classes/APIBots/ReservoirListBot')
-const { ArchipelagoBot } = require('./Classes/APIBots/ArchipelagoBot')
+// const { ArchipelagoBot } = require('./Classes/APIBots/ArchipelagoBot')
 // Special handlers.
 const { triageActivityMessage } = require('./Utils/activityTriager')
 const {
@@ -61,7 +60,7 @@ const app = express()
 
 app.use(bodyParser.json())
 
-app.post('/update', function (req, res) {
+app.post('/update', function (req: any, res: any) {
   console.log(
     'received update with body:\n',
     JSON.stringify(req.body, null, 2),
@@ -74,7 +73,7 @@ app.post('/update', function (req, res) {
   })
 })
 
-app.get('/update', function (req, res) {
+app.get('/update', function (req: any, res: any) {
   console.log('received get with body:\n', req.body, '\n')
 
   res.setHeader('Content-Type', 'application/json')
@@ -91,53 +90,16 @@ app.listen(PORT, function () {
 const bot = new Client()
 bot.login(TOKEN)
 
-bot.on('ready', (client) => {
-  console.info(`Logged in as ${bot.user.tag}!`)
+bot.on('ready', () => {
+  console.info(`Logged in as ${bot.user?.tag}!`)
   artIndexerBot.startRandomRoutine(bot.channels.cache.get(CHANNEL_ART_CHAT))
   artIndexerBot.startBirthdayRoutine(bot.channels.cache, projectConfig)
-})
-
-// Manage Giveaways with Artbot
-bot.giveawaysManager = new GiveawaysManager(bot, {
-  storage: './giveaways.json',
-  updateCountdownEvery: 5000,
-  default: {
-    botsCanWin: false,
-    embedColor: '#FF0000',
-    reaction: '🎉',
-  },
-})
-bot.giveawaysManager.on(
-  'giveawayReactionAdded',
-  (giveaway, member, reaction) => {
-    console.log(
-      `${member.user.tag} entered giveaway #${giveaway.messageID} (${reaction.emoji.name})`
-    )
-  }
-)
-bot.giveawaysManager.on(
-  'giveawayReactionRemoved',
-  (giveaway, member, reaction) => {
-    console.log(
-      `${member.user.tag} unreact to giveaway #${giveaway.messageID} (${reaction.emoji.name})`
-    )
-  }
-)
-bot.giveawaysManager.on('giveawayEnded', (giveaway, winners) => {
-  console.log(
-    `Giveaway #${giveaway.messageID} ended! Winners: ${winners
-      .map((member) => member.user.username)
-      .join(', ')}`
-  )
 })
 
 const factoryParty = new ArtIndexerBot(getArtBlocksFactoryProjects)
 const artIndexerBot = new ArtIndexerBot()
 const pbabIndexerBot = new ArtIndexerBot(getPBABProjects)
 const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
-
-// Special address collector.
-const addressCollector = new AddressCollector()
 
 // Message event handler.
 bot.on('message', (msg) => {
@@ -150,32 +112,6 @@ bot.on('message', (msg) => {
   // short-circuit handling the message
   const channel = projectConfig.channels[channelID]
   if (!channel) {
-    return
-  }
-
-  /*
-   * If the message is in the activity channel, forward the message on
-   * To the appropriate sub-channel.
-   */
-  if (channelID == PROD_CHANNEL_ACTIVITY_ALL) {
-    // Just commenting this out for now in case we need it back in emergency
-    // triageActivityMessage(msg, bot)
-    return
-  }
-
-  /*
-   * If message is in special address collection channel, forward message
-   * To that handler and return early.
-   */
-  if (channelID == CHANNEL_ADDRESS_COLLECTION) {
-    addressCollector.addressCollectionHandler(msg)
-    return
-  }
-
-  // Respond to giveaway requests.
-  if (msgContentLowercase.includes('giveaway!')) {
-    console.log('Time for a giveaway')
-    handleGiveawayMessage(msg, bot)
     return
   }
 
@@ -206,22 +142,15 @@ bot.on('message', (msg) => {
   }
 
   // Handle special info questions that ArtBot knows how to answer.
-  const artBotID = bot.user.id
+  const artBotID = bot.user?.id
   smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
-    (smartResponse) => {
+    (smartResponse: string) => {
       if (smartResponse !== null && smartResponse !== undefined) {
         if (typeof smartResponse === 'string') {
-          msg.reply(smartResponse, {
-            allowedMentions: {
-              repliedUser: true,
-            },
-          })
+          msg.reply(smartResponse)
         } else {
           msg.reply(null, {
             embed: smartResponse,
-            allowedMentions: {
-              repliedUser: true,
-            },
           })
         }
       }
@@ -251,8 +180,8 @@ if (!TEST_MODE) {
     }
   )
 
-  const archipelagoBot = new ArchipelagoBot(bot)
-  archipelagoBot.activate()
+  // const archipelagoBot = new ArchipelagoBot(bot)
+  // archipelagoBot.activate()
 
   // Listing/Sales bots for Pace collab contract
   new ReservoirListBot(

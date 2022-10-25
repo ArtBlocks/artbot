@@ -1,4 +1,6 @@
-require('dotenv').config()
+import * as dotenv from 'dotenv'
+dotenv.config()
+
 const axios = require('axios')
 const ethers = require('ethers')
 
@@ -8,12 +10,12 @@ let provider = new ethers.providers.EtherscanProvider(
 )
 
 // Runtime ENS cache just to limit queries
-let ensAddressMap = {}
-let ensResolvedMap = {}
-let osAddressMap = {}
+let ensAddressMap: {[id: string]: string} = {}
+let ensResolvedMap: {[id: string]: string} = {}
+let osAddressMap: {[id: string]: string} = {}
 const MAX_ENS_RETRIES = 3
 
-async function getENSName(address) {
+async function getENSName(address: string): Promise<string> {
   let name = ''
   if (ensAddressMap[address]) {
     name = ensAddressMap[address]
@@ -36,7 +38,7 @@ async function getENSName(address) {
   return name
 }
 
-async function resolveEnsName(ensName) {
+async function resolveEnsName(ensName: string): Promise<string> {
   let wallet = ''
   if (ensResolvedMap[ensName]) {
     wallet = ensResolvedMap[ensName]
@@ -59,12 +61,12 @@ async function resolveEnsName(ensName) {
   return wallet
 }
 
-async function ensOrAddress(address) {
+async function ensOrAddress(address: string): Promise<string> {
   let ens = await getENSName(address)
   return ens !== '' ? ens : address
 }
 
-async function getOSName(address) {
+async function getOSName(address: string): Promise<string> {
   let name = ''
   if (osAddressMap[address]) {
     console.log('Cached!')
@@ -93,11 +95,11 @@ async function getOSName(address) {
   return name
 }
 
-function isWallet(msg) {
+function isWallet(msg: string): boolean {
   return msg.startsWith('0x') || msg.endsWith('eth')
 }
 
-function isVerticalName(msg) {
+function isVerticalName(msg: string): boolean {
   return (
     msg === 'curated' ||
     msg === 'presents' ||
@@ -111,7 +113,7 @@ function isVerticalName(msg) {
     msg.startsWith('curatedseries')
   )
 }
-function getVerticalName(msg) {
+function getVerticalName(msg: string): string {
   switch (msg) {
     case 'collabs':
       return 'collaborations'

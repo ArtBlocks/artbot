@@ -1,7 +1,10 @@
-require('dotenv').config()
+import { Channel, Collection, Message, TextChannel } from 'discord.js'
+import * as dotenv from 'dotenv'
+import { ProjectBot } from './ProjectBot'
+dotenv.config()
+
 const deburr = require('lodash.deburr')
 const Web3 = require('web3')
-const ProjectBot = require('./ProjectBot').ProjectBot
 const getArtBlocksAndCollabProjects =
   require('../Utils/parseArtBlocksAPI').getArtBlocksAndCollabProjects
 const getArtBlocksOpenProjects =
@@ -22,7 +25,7 @@ const { isWallet } = require('./APIBots/utils')
 
 // Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES =
-  process.env.METADATA_REFRESH_INTERVAL_MINUTES
+  process.env.METADATA_REFRESH_INTERVAL_MINUTES ?? '60'
 
 // RandomBot Stuff
 const RANDOM_ART_AMOUNT = 10
@@ -41,6 +44,14 @@ BIRTHDAY_CHECK_TIME.setSeconds(0)
 BIRTHDAY_CHECK_TIME.setMilliseconds(0)
 
 class ArtIndexerBot {
+  projectFetch: () => any
+  projects: { [id: string]: ProjectBot }
+  artists: { [id: string]: ProjectBot[] }
+  birthdays: { [id: string]: ProjectBot[] }
+  collectionMapping: { [id: string]: ProjectBot[] }
+  sentBirthdays: { [id: string]: boolean }
+  walletTokens: { [id: string]: string[] }
+
   constructor(projectFetch = getArtBlocksAndCollabProjects) {
     this.projectFetch = projectFetch
     this.projects = {}
@@ -60,7 +71,7 @@ class ArtIndexerBot {
 
     setInterval(async () => {
       await this.buildProjectBots()
-    }, METADATA_REFRESH_INTERVAL_MINUTES * 60000)
+    }, parseInt(METADATA_REFRESH_INTERVAL_MINUTES) * 60000)
   }
 
   async buildProjectBots() {
@@ -82,17 +93,18 @@ class ArtIndexerBot {
         const heritageStatus = this.toProjectKey(
           heritageStatuses[`${project.contract.id}-${project.projectId}`]
         )
-        const newBot = new ProjectBot({
-          projectNumber: project.projectId,
-          coreContract: project.contract.id,
-          editionSize: project.invocations,
-          projectName: project.name,
-          projectActive: project.active,
-          artistName: project.artistName,
-          collection: collection ?? null,
-          heritageStatus: heritageStatus ?? null,
-          startTime: bday ? new Date(bday) : null,
-        })
+        const newBot = new ProjectBot(
+          project.projectId,
+          project.contract.id,
+          project.invocations,
+          project.name,
+          project.active,
+          undefined,
+          project.artistName,
+          collection ?? undefined,
+          heritageStatus ?? undefined,
+          bday ? new Date(bday) : undefined
+        )
 
         const projectKey = this.toProjectKey(project.name)
         this.projects[projectKey] = newBot
@@ -127,7 +139,7 @@ class ArtIndexerBot {
     }
   }
 
-  async handleNumberMessage(msg) {
+  async handleNumberMessage(msg: Message) {
     const content = msg.content
 
     if (content.length <= 1) {
@@ -191,7 +203,7 @@ class ArtIndexerBot {
     }
   }
 
-  toProjectKey(projectName) {
+  toProjectKey(projectName: string) {
     const projectKey = deburr(projectName)
       .toLowerCase()
       .replace(/[^a-z0-9]/gi, '')
@@ -204,8 +216,8 @@ class ArtIndexerBot {
     return projectKey
   }
 
-  async startRandomRoutine(channel) {
-    let msg = {}
+  async startRandomRoutine(channel: TextChannel) {
+    let msg = {} as Message
     msg.content = '#?'
     msg.channel = channel
     // Try to message(s) in #ab-art-chat every minute
@@ -222,7 +234,10 @@ class ArtIndexerBot {
     }, 1 * 60000)
   }
 
-  async startBirthdayRoutine(channels, projectConfig) {
+  async startBirthdayRoutine(
+    channels: Collection<string, Channel>,
+    projectConfig: any
+  ) {
     setInterval(() => {
       let now = new Date()
       // Only send message if hour and minute match up with specified time
@@ -250,7 +265,7 @@ class ArtIndexerBot {
 
   // This function takes a channel and sends a message containing a random
   // token from a random project
-  async sendRandomProjectRandomTokenMessage(msg, numMessages) {
+  async sendRandomProjectRandomTokenMessage(msg: Message, numMessages: number) {
     let attempts = 0
     while (attempts < 10) {
       const keys = Object.keys(this.projects)
@@ -268,7 +283,7 @@ class ArtIndexerBot {
 
   // This function takes a channel and sends a message containing a random
   // token from a random open project
-  async sendRandomOpenProjectRandomTokenMessage(msg) {
+  async sendRandomOpenProjectRandomTokenMessage(msg: Message) {
     let attempts = 0
     while (attempts < 10) {
       const openProjects = await getArtBlocksOpenProjects()
@@ -284,7 +299,10 @@ class ArtIndexerBot {
     }
   }
 
-  async sendCurationStatusRandomTokenMessage(msg, collectionType) {
+  async sendCurationStatusRandomTokenMessage(
+    msg: Message,
+    collectionType: string
+  ) {
     let attempts = 0
     if (
       !this.collectionMapping[collectionType] ||
@@ -307,7 +325,7 @@ class ArtIndexerBot {
     }
   }
 
-  async sendArtistRandomTokenMessage(msg, artistName) {
+  async sendArtistRandomTokenMessage(msg: Message, artistName: string) {
     console.log('Looking for artist ' + artistName)
     let attempts = 0
     if (!this.artists[artistName] || this.artists[artistName].length === 0) {
@@ -329,7 +347,11 @@ class ArtIndexerBot {
   }
 
   // Sends a random token from this wallet's collection
-  async sendRandomWalletTokenMessage(msg, wallet, projectKey = '') {
+  async sendRandomWalletTokenMessage(
+    msg: Message,
+    wallet: string,
+    projectKey = ''
+  ) {
     console.log(
       `Getting random token${
         projectKey ? ` from ${projectKey}` : ''
@@ -400,8 +422,8 @@ class ArtIndexerBot {
             let token = tokens[index]
             let projBot = this.projects[this.toProjectKey(token.project.name)]
             if (
-              projBot.collection.toLowerCase() === projectKey ||
-              projBot.heritageStatus.toLowerCase() === projectKey
+              projBot.collection?.toLowerCase() === projectKey ||
+              projBot.heritageStatus?.toLowerCase() === projectKey
             ) {
               tokensInVertical.push(token)
             }
