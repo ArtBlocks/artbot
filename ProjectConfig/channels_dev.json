@@ -56,5 +56,9 @@
   },
   "1007693989350211685": {
     "name": "trade-swaps"
+  },
+  "981922516215955476": {
+    "name": "artblocks-mints",
+    "mints": ["STAGING"]
   }
 }

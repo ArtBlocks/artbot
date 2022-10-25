@@ -18,13 +18,16 @@ const PARTNER_CONTRACTS = require('../ProjectConfig/partnerContracts.json')
 
 // utility class that routes number messages for each channel
 class Channel {
-  constructor({ name, projectBotHandlers }) {
+  constructor({ name, projectBotHandlers, mints }) {
     this.name = name
     this.hasProjectBotHandler = !!projectBotHandlers
     if (projectBotHandlers) {
       this.default = projectBotHandlers.default
       this.stringTriggers = projectBotHandlers.stringTriggers || undefined
       this.tokenIdTriggers = projectBotHandlers.tokenIdTriggers || undefined
+    }
+    if (mints) {
+      this.mints = mints
     }
   }
 
@@ -100,6 +103,7 @@ class ProjectConfig {
   constructor() {
     this.channels = ProjectConfig.buildChannelHandlers(CHANNELS)
     this.chIdByName = ProjectConfig.buildChannelIDByName(this.channels)
+    this.mintsToChannel = ProjectConfig.buildMintsToChannel(this.channels)
     this.projectToChannel = {}
     this.initialize()
   }
@@ -169,9 +173,9 @@ class ProjectConfig {
         projectNumber,
         configContract
       )
-      console.log(
-        `Refreshing project cache for Project ${projectNumber} ${name}`
-      )
+      // console.log(
+      //   `Refreshing project cache for Project ${projectNumber} ${name}`
+      // )
       projectBots[botId] = new ProjectBot({
         projectNumber,
         coreContract: contract.id,
@@ -194,6 +198,8 @@ class ProjectConfig {
     const channels = {}
     Object.entries(ChannelsJson).forEach(([chID, chParams]) => {
       channels[chID] = new Channel(chParams)
+      if (chParams.mints) {
+      }
     })
     return channels
   }
@@ -207,6 +213,30 @@ class ProjectConfig {
     const chIdByName = {}
     Object.entries(channels).forEach(([chID, channel]) => {
       chIdByName[channel.name] = chID
+    })
+    return chIdByName
+  }
+
+  mintNameToContracts(mintName) {
+    switch (mintName) {
+      case CORE:
+        return Object.values(CORE_CONTRACTS)
+      case COLLABS:
+        return Object.values(COLLAB_CONTRACTS)
+
+      default:
+        break
+    }
+  }
+  static buildMintsToChannel(channels) {
+    const chIdByName = {}
+    Object.entries(channels).forEach(([chID, channel]) => {
+      chIdByName[channel.name] = chID
+      if (channel.mints) {
+        channel.mints.forEach((mint) => {
+          chIdByName[mint] = chID
+        })
+      }
     })
     return chIdByName
   }

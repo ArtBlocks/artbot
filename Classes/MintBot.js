@@ -3,15 +3,32 @@ const { ensOrAddress } = require('./APIBots/utils')
 const fetch = require('node-fetch')
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 const MINT_REFRESH_TIME_SECONDS = 10
-
+const MINT_CONFIG = require('../ProjectConfig/mintBot_config.json')
+const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
+const COLLAB_CONTRACTS = require('../ProjectConfig/collaborationContracts.json')
 // Handles all logic and posting of new project mints!
 class MintBot {
   constructor(bot) {
     this.bot = bot
     this.mintsToPost = []
-    this.contractToChannels = {}
+
     // Uncomment when MintBot config is finalized!
     // this.startRoutine()
+  }
+  buildContractToChannel(mintType, channels) {
+    let contracts = []
+    switch (mintType) {
+      case 'CORE':
+        contracts = Object.values(CORE_CONTRACTS)
+      case 'COLLAB':
+        contracts = Object.values(COLLAB_CONTRACTS)
+      case 'ENGINE':
+      case 'STAGING':
+
+      default:
+        break
+    }
+    return contractToChannel
   }
 
   // Check and see if the mint has an image rendered yet
