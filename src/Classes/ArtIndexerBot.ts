@@ -423,7 +423,8 @@ class ArtIndexerBot {
             let projBot = this.projects[this.toProjectKey(token.project.name)]
             if (
               projBot.collection?.toLowerCase() === projectKey ||
-              projBot.heritageStatus?.toLowerCase() === projectKey
+              projBot.heritageStatus?.toLowerCase() === projectKey ||
+              (projectKey === 'heritage' && projBot.heritageStatus)
             ) {
               tokensInVertical.push(token)
             }
