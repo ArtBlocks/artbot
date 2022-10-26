@@ -186,8 +186,10 @@ class ArchipelagoBot {
 
 // Copied from Archipelago UI codebase.
 const priceToString = (
-  price: any,
-  { decimals = 18, maximumFractionDigits, precisionAdjustment = 0 }: any = {}
+  price: number,
+  decimals = 18,
+  maximumFractionDigits?: number,
+  precisionAdjustment = 0
 ) => {
   // Babel polyfill for BigInt (exponentiation with ** doesn't work!)
   let divisor = 10
@@ -195,7 +197,7 @@ const priceToString = (
     divisor = divisor * 10
   }
   const amount = Number(BigInt(price) / BigInt(divisor)) / 1e6
-  let parsedFractionDigits
+  let parsedFractionDigits = 0
   if (maximumFractionDigits == null) {
     parsedFractionDigits =
       amount < 0.0001
@@ -216,7 +218,7 @@ const priceToString = (
   }
   return amount.toLocaleString(undefined, {
     maximumFractionDigits:
-      (maximumFractionDigits || parsedFractionDigits) + precisionAdjustment,
+      (maximumFractionDigits ?? parsedFractionDigits) + precisionAdjustment,
   })
 }
 

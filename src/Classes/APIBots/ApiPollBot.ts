@@ -12,6 +12,13 @@ class APIPollBot {
   saleColor: string
   lastUpdatedTime: number
 
+  /**
+   * Constructor
+   * @param {string} apiEndpoint - Endpoint to be hitting
+   * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
+   * @param {*} bot - Discord bot that will be sending messages
+   * @param {*} headers - Optional: any headers to supply (namely, API tokens)
+   */
   constructor(
     apiEndpoint: string,
     refreshRateMs: number,
