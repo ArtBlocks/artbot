@@ -1,7 +1,9 @@
-require('dotenv').config()
+import { Channel, Collection, Message, TextChannel } from 'discord.js'
+import * as dotenv from 'dotenv'
+import { ProjectBot } from './ProjectBot'
+dotenv.config()
+
 const deburr = require('lodash.deburr')
-const Web3 = require('web3')
-const ProjectBot = require('./ProjectBot').ProjectBot
 const getArtBlocksAndCollabProjects =
   require('../Utils/parseArtBlocksAPI').getArtBlocksAndCollabProjects
 const getArtBlocksOpenProjects =
@@ -16,13 +18,12 @@ const resolveEnsName = require('./APIBots/utils').resolveEnsName
 const isVerticalName = require('./APIBots/utils').isVerticalName
 const getVerticalName = require('./APIBots/utils').getVerticalName
 
-const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
 const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
 const { isWallet } = require('./APIBots/utils')
 
 // Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES =
-  process.env.METADATA_REFRESH_INTERVAL_MINUTES
+  process.env.METADATA_REFRESH_INTERVAL_MINUTES ?? '60'
 
 // RandomBot Stuff
 const RANDOM_ART_AMOUNT = 10
@@ -41,6 +42,14 @@ BIRTHDAY_CHECK_TIME.setSeconds(0)
 BIRTHDAY_CHECK_TIME.setMilliseconds(0)
 
 class ArtIndexerBot {
+  projectFetch: () => any
+  projects: { [id: string]: ProjectBot }
+  artists: { [id: string]: ProjectBot[] }
+  birthdays: { [id: string]: ProjectBot[] }
+  collectionMapping: { [id: string]: ProjectBot[] }
+  sentBirthdays: { [id: string]: boolean }
+  walletTokens: { [id: string]: string[] }
+
   constructor(projectFetch = getArtBlocksAndCollabProjects) {
     this.projectFetch = projectFetch
     this.projects = {}
@@ -60,7 +69,7 @@ class ArtIndexerBot {
 
     setInterval(async () => {
       await this.buildProjectBots()
-    }, METADATA_REFRESH_INTERVAL_MINUTES * 60000)
+    }, parseInt(METADATA_REFRESH_INTERVAL_MINUTES) * 60000)
   }
 
   async buildProjectBots() {
@@ -82,23 +91,24 @@ class ArtIndexerBot {
         const heritageStatus = this.toProjectKey(
           heritageStatuses[`${project.contract.id}-${project.projectId}`]
         )
-        const newBot = new ProjectBot({
-          projectNumber: project.projectId,
-          coreContract: project.contract.id,
-          editionSize: project.invocations,
-          projectName: project.name,
-          projectActive: project.active,
-          artistName: project.artistName,
-          collection: collection ?? null,
-          heritageStatus: heritageStatus ?? null,
-          startTime: bday ? new Date(bday) : null,
-        })
+        const newBot = new ProjectBot(
+          project.projectId,
+          project.contract.id,
+          project.invocations,
+          project.name,
+          project.active,
+          undefined,
+          project.artistName,
+          collection ?? undefined,
+          heritageStatus ?? undefined,
+          bday ? new Date(bday) : undefined
+        )
 
         const projectKey = this.toProjectKey(project.name)
         this.projects[projectKey] = newBot
 
         if (bday) {
-          const [year, month, day] = bday.split('T')[0].split('-')
+          const [, month, day] = bday.split('T')[0].split('-')
           bday = month + '-' + day
           this.birthdays[bday] = this.birthdays[bday] ?? []
           this.birthdays[bday].push(newBot)
@@ -127,7 +137,7 @@ class ArtIndexerBot {
     }
   }
 
-  async handleNumberMessage(msg) {
+  async handleNumberMessage(msg: Message) {
     const content = msg.content
 
     if (content.length <= 1) {
@@ -161,7 +171,7 @@ class ArtIndexerBot {
       !this.projects[projectKey] &&
       isWallet(afterTheHash.split(' ')[0])
     ) {
-      let wallet = afterTheHash.split(' ')[0]
+      const wallet = afterTheHash.split(' ')[0]
       afterTheHash = afterTheHash.replace(wallet, '')
       projectKey = this.toProjectKey(afterTheHash)
       if (PROJECT_ALIASES[projectKey]) {
@@ -191,7 +201,7 @@ class ArtIndexerBot {
     }
   }
 
-  toProjectKey(projectName) {
+  toProjectKey(projectName: string) {
     const projectKey = deburr(projectName)
       .toLowerCase()
       .replace(/[^a-z0-9]/gi, '')
@@ -204,13 +214,13 @@ class ArtIndexerBot {
     return projectKey
   }
 
-  async startRandomRoutine(channel) {
-    let msg = {}
+  async startRandomRoutine(channel: TextChannel) {
+    const msg = {} as Message
     msg.content = '#?'
     msg.channel = channel
     // Try to message(s) in #ab-art-chat every minute
     setInterval(() => {
-      let now = new Date()
+      const now = new Date()
       // Only send message if hour and minute match up with specified time
       if (
         now.getHours() !== RANDOM_ART_TIME.getHours() ||
@@ -222,9 +232,12 @@ class ArtIndexerBot {
     }, 1 * 60000)
   }
 
-  async startBirthdayRoutine(channels, projectConfig) {
+  async startBirthdayRoutine(
+    channels: Collection<string, Channel>,
+    projectConfig: any
+  ) {
     setInterval(() => {
-      let now = new Date()
+      const now = new Date()
       // Only send message if hour and minute match up with specified time
       if (
         now.getHours() !== BIRTHDAY_CHECK_TIME.getHours() ||
@@ -250,12 +263,12 @@ class ArtIndexerBot {
 
   // This function takes a channel and sends a message containing a random
   // token from a random project
-  async sendRandomProjectRandomTokenMessage(msg, numMessages) {
+  async sendRandomProjectRandomTokenMessage(msg: Message, numMessages: number) {
     let attempts = 0
     while (attempts < 10) {
       const keys = Object.keys(this.projects)
-      let projectKey = keys[Math.floor(Math.random() * keys.length)]
-      let projBot = this.projects[projectKey]
+      const projectKey = keys[Math.floor(Math.random() * keys.length)]
+      const projBot = this.projects[projectKey]
       if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
         for (let i = 0; i < numMessages; i++) {
           projBot.handleNumberMessage(msg)
@@ -268,15 +281,15 @@ class ArtIndexerBot {
 
   // This function takes a channel and sends a message containing a random
   // token from a random open project
-  async sendRandomOpenProjectRandomTokenMessage(msg) {
+  async sendRandomOpenProjectRandomTokenMessage(msg: Message) {
     let attempts = 0
     while (attempts < 10) {
       const openProjects = await getArtBlocksOpenProjects()
 
-      let project =
+      const project =
         openProjects[Math.floor(Math.random() * openProjects.length)]
 
-      let projBot = this.projects[this.toProjectKey(project.name)]
+      const projBot = this.projects[this.toProjectKey(project.name)]
       if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
         return projBot.handleNumberMessage(msg)
       }
@@ -284,7 +297,10 @@ class ArtIndexerBot {
     }
   }
 
-  async sendCurationStatusRandomTokenMessage(msg, collectionType) {
+  async sendCurationStatusRandomTokenMessage(
+    msg: Message,
+    collectionType: string
+  ) {
     let attempts = 0
     if (
       !this.collectionMapping[collectionType] ||
@@ -293,7 +309,7 @@ class ArtIndexerBot {
       return
     }
     while (attempts < 10) {
-      let projBot =
+      const projBot =
         this.collectionMapping[collectionType][
           Math.floor(
             Math.random() * this.collectionMapping[collectionType].length
@@ -307,7 +323,7 @@ class ArtIndexerBot {
     }
   }
 
-  async sendArtistRandomTokenMessage(msg, artistName) {
+  async sendArtistRandomTokenMessage(msg: Message, artistName: string) {
     console.log('Looking for artist ' + artistName)
     let attempts = 0
     if (!this.artists[artistName] || this.artists[artistName].length === 0) {
@@ -316,7 +332,7 @@ class ArtIndexerBot {
 
     while (attempts < 10) {
       console.log(this.artists[artistName])
-      let projBot =
+      const projBot =
         this.artists[artistName][
           Math.floor(Math.random() * this.artists[artistName].length)
         ]
@@ -329,7 +345,11 @@ class ArtIndexerBot {
   }
 
   // Sends a random token from this wallet's collection
-  async sendRandomWalletTokenMessage(msg, wallet, projectKey = '') {
+  async sendRandomWalletTokenMessage(
+    msg: Message,
+    wallet: string,
+    projectKey = ''
+  ) {
     console.log(
       `Getting random token${
         projectKey ? ` from ${projectKey}` : ''
@@ -338,7 +358,7 @@ class ArtIndexerBot {
     try {
       // Resolve ENS name if ends in .eth
       if (wallet.toLowerCase().endsWith('.eth')) {
-        let ensName = wallet
+        const ensName = wallet
 
         wallet = await resolveEnsName(ensName)
 
@@ -370,9 +390,9 @@ class ArtIndexerBot {
       if (projectKey) {
         if (this.artists[projectKey]) {
           // Random token from artist
-          let tokensByArtist = []
+          const tokensByArtist = []
           for (let index = 0; index < tokens.length; index++) {
-            let token = tokens[index]
+            const token = tokens[index]
 
             if (
               this.toProjectKey(
@@ -388,20 +408,21 @@ class ArtIndexerBot {
             )
             return
           }
-          let _token =
+          const _token =
             tokensByArtist[Math.floor(Math.random() * tokensByArtist.length)]
-          let projBot = this.projects[this.toProjectKey(_token.project.name)]
+          const projBot = this.projects[this.toProjectKey(_token.project.name)]
           msg.content = `#${_token.invocation}`
           return projBot.handleNumberMessage(msg)
         } else if (isVerticalName(projectKey)) {
           // Random token from a vertical
-          let tokensInVertical = []
+          const tokensInVertical = []
           for (let index = 0; index < tokens.length; index++) {
-            let token = tokens[index]
-            let projBot = this.projects[this.toProjectKey(token.project.name)]
+            const token = tokens[index]
+            const projBot = this.projects[this.toProjectKey(token.project.name)]
             if (
-              projBot.collection.toLowerCase() === projectKey ||
-              projBot.heritageStatus.toLowerCase() === projectKey
+              projBot.collection?.toLowerCase() === projectKey ||
+              projBot.heritageStatus?.toLowerCase() === projectKey ||
+              (projectKey === 'heritage' && projBot.heritageStatus)
             ) {
               tokensInVertical.push(token)
             }
@@ -412,18 +433,18 @@ class ArtIndexerBot {
             )
             return
           }
-          let _token =
+          const _token =
             tokensInVertical[
               Math.floor(Math.random() * tokensInVertical.length)
             ]
-          let projBot = this.projects[this.toProjectKey(_token.project.name)]
+          const projBot = this.projects[this.toProjectKey(_token.project.name)]
           msg.content = `#${_token.invocation}`
           return projBot.handleNumberMessage(msg)
         } else {
           // Random token from project
-          let tokensInProject = []
+          const tokensInProject = []
           for (let index = 0; index < tokens.length; index++) {
-            let token = tokens[index]
+            const token = tokens[index]
             if (this.toProjectKey(token.project.name) === projectKey) {
               tokensInProject.push(token)
             }
@@ -434,9 +455,9 @@ class ArtIndexerBot {
             )
             return
           }
-          let _token =
+          const _token =
             tokensInProject[Math.floor(Math.random() * tokensInProject.length)]
-          let projBot = this.projects[this.toProjectKey(projectKey)]
+          const projBot = this.projects[this.toProjectKey(projectKey)]
           msg.content = `#${_token.invocation}`
           return projBot.handleNumberMessage(msg)
         }
@@ -446,10 +467,10 @@ class ArtIndexerBot {
 
       let attempts = 0
       while (attempts < 10) {
-        let token = tokens[Math.floor(Math.random() * tokens.length)]
+        const token = tokens[Math.floor(Math.random() * tokens.length)]
 
         console.log(`looking for wallet project: ${token.project.name}`)
-        let projBot = this.projects[this.toProjectKey(token.project.name)]
+        const projBot = this.projects[this.toProjectKey(token.project.name)]
         if (projBot) {
           msg.content = `#${token.invocation}`
           return projBot.handleNumberMessage(msg)

@@ -1,0 +1,23 @@
+name: 'Lint and Format'
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: yarn install --ignore-scripts
+      - name: Run linter
+        run: yarn lint --quiet
+      - name: Run formatter
+        run: yarn format
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Apply prettier formatting changes

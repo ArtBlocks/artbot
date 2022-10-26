@@ -1,3 +1,5 @@
+import { Client } from 'discord.js'
+
 const { APIPollBot } = require('./ApiPollBot')
 const { MessageEmbed } = require('discord.js')
 const axios = require('axios')
@@ -13,12 +15,11 @@ class ReservoirSaleBot extends APIPollBot {
    * @param {*} bot - Discord bot that will be sending messages
    */
   constructor(
-    apiEndpoint,
-    refreshRateMs,
-    bot,
-    headers,
-    contract = '',
-    mintBot = null
+    apiEndpoint: string,
+    refreshRateMs: number,
+    bot: Client,
+    headers: any,
+    contract = ''
   ) {
     apiEndpoint =
       apiEndpoint + '&startTimestamp=' + (Date.now() / 1000).toFixed()
@@ -26,7 +27,6 @@ class ReservoirSaleBot extends APIPollBot {
     this.contract = contract
     this.lastUpdatedTime = (this.lastUpdatedTime / 1000).toFixed()
     this.saleIds = new Set()
-    this.mintBot = mintBot
   }
 
   /**
@@ -35,7 +35,7 @@ class ReservoirSaleBot extends APIPollBot {
    * Response spec: https://docs.reservoir.tools/reference/getsalesbulkv1
    * @param {*} responseData - Dict parsed from API request json
    */
-  async handleAPIResponse(responseData) {
+  async handleAPIResponse(responseData: any) {
     let maxTime = 0
     for (const data of responseData.sales) {
       const eventTime = data.timestamp
@@ -68,17 +68,17 @@ class ReservoirSaleBot extends APIPollBot {
    * OS API Spec: https://docs.opensea.io/reference/retrieving-asset-events
    * @param {*} msg - Dict of event data from API response
    */
-  async buildDiscordMessage(msg) {
+  async buildDiscordMessage(msg: any) {
     // Create embed we will be sending
     const embed = new MessageEmbed()
     // Parsing Reservoir sale message to get info
     const tokenID = msg.token.tokenId
 
-    let priceText = 'Sale Price'
+    const priceText = 'Sale Price'
     const price = msg.price.amount.decimal
     const currency = msg.price.currency.symbol
-    let owner = msg.from
-    let platform = msg.orderSource
+    const owner = msg.from
+    const platform = msg.orderSource
     embed.setColor(this.saleColor)
 
     if (msg.orderKind === 'mint' && this.mintBot) {

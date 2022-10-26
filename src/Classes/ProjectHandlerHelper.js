@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 const { MessageEmbed } = require('discord.js')
 class ProjectHandlerHelper {
   constructor(singles, sets) {

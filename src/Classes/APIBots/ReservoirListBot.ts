@@ -1,3 +1,5 @@
+import { Client } from 'discord.js'
+
 const { APIPollBot } = require('./ApiPollBot')
 const { MessageEmbed } = require('discord.js')
 const axios = require('axios')
@@ -13,7 +15,13 @@ class ReservoirListBot extends APIPollBot {
    * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
    * @param {*} bot - Discord bot that will be sending messages
    */
-  constructor(apiEndpoint, refreshRateMs, bot, headers, contract = '') {
+  constructor(
+    apiEndpoint: string,
+    refreshRateMs: number,
+    bot: Client,
+    headers: any,
+    contract = ''
+  ) {
     super(apiEndpoint, refreshRateMs, bot, headers)
     this.contract = contract
     this.listColor = '#407FDB'
@@ -27,7 +35,7 @@ class ReservoirListBot extends APIPollBot {
    * Response spec: https://docs.reservoir.tools/reference/getordersasksv2
    * @param {*} responseData - Dict parsed from API request json
    */
-  async handleAPIResponse(responseData) {
+  async handleAPIResponse(responseData: any) {
     let maxTime = 0
     for (const data of responseData.orders) {
       const eventTime = Date.parse(data.createdAt)
@@ -55,7 +63,7 @@ class ReservoirListBot extends APIPollBot {
    * Reservoir API Spec: https://docs.reservoir.tools/reference/getordersasksv2
    * @param {*} msg - Dict of event data from API response
    */
-  async buildDiscordMessage(msg) {
+  async buildDiscordMessage(msg: any) {
     // Create embed we will be sending
     const embed = new MessageEmbed()
 
@@ -65,8 +73,8 @@ class ReservoirListBot extends APIPollBot {
     const priceText = 'List Price'
     const price = msg.price.amount.decimal
     const currency = msg.price.currency.symbol
-    let owner = msg.maker
-    let platform = msg.source.name
+    const owner = msg.maker
+    const platform = msg.source.name
 
     embed.setColor(this.listColor)
 
