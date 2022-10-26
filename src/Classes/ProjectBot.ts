@@ -263,12 +263,12 @@ export class ProjectBot {
     try {
       console.log('sending birthday message(s) for:', this.projectName)
 
-      const artBlocksResponse = await fetch(
+      const artBlocksResponse = await axios.get(
         `https://token.artblocks.io/${this.coreContract}/${
           this.projectNumber * ONE_MILLION
         }`
       )
-      const artBlocksData = await artBlocksResponse.json()
+      const artBlocksData = await artBlocksResponse.data
       if (
         !artBlocksData ||
         !artBlocksData.image ||
