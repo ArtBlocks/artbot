@@ -2,6 +2,5 @@
   "CORE": ["artblocks-mints"],
   "STAGING": ["ab-art-chat"],
   "COLLAB": ["artblocks-mints", "ab-x-pace"],
-  "OPEN_CORE": ["block-talk"],
   "ENGINE": ["engine-mints"]
 }

@@ -613,8 +613,7 @@
     "name": "factory-projects"
   },
   "880468116226850866": {
-    "name": "ab-art-chat",
-    "mints": ["STAGING"]
+    "name": "ab-art-chat"
   },
   "859521842317754369": {
     "name": "prod_all_activity"
@@ -629,8 +628,7 @@
     "name": "sales-feed"
   },
   "830924481627291709": {
-    "name": "block-talk",
-    "mints": ["OPEN_CORE"]
+    "name": "block-talk"
   },
   "976944919757348965": {
     "name": "pbab-chat"
@@ -651,12 +649,10 @@
     "name": "for-sale-listings"
   },
   "782311037172973618": {
-    "name": "artblocks-mints",
-    "mints": ["CORE", "COLLAB"]
+    "name": "artblocks-mints"
   },
   "1014641051140624445": {
-    "name": "engine-mints",
-    "mints": ["ENGINE"]
+    "name": "engine-mints"
   },
   "880937060075192320": {
     "name": "fidenza-and-ic-sales",

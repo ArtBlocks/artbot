@@ -1,42 +1,70 @@
 import { Client, TextChannel } from 'discord.js'
+import { mintBot } from '../index'
 
 const { MessageEmbed } = require('discord.js')
 const { ensOrAddress } = require('./APIBots/utils')
 const fetch = require('node-fetch')
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
-const MINT_REFRESH_TIME_SECONDS = 10
-// const MINT_CONFIG = require('../ProjectConfig/mintBot_config.json')
-// const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
-// const COLLAB_CONTRACTS = require('../ProjectConfig/collaborationContracts.json')
+const MINT_REFRESH_TIME_SECONDS = 5
+const MINT_CONFIG: {
+  [id: string]: string[]
+} = require('../ProjectConfig/mintBotConfig.json')
+const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
+const COLLAB_CONTRACTS = require('../ProjectConfig/collaborationContracts.json')
+const STAGING_CONTRACTS = require('../ProjectConfig/stagingContracts.json')
 // Handles all logic and posting of new project mints!
 
 enum MintType {
-  CORE,
-  COLLAB,
-  ENGINE,
-  STAGING,
+  CORE = 'CORE',
+  COLLAB = 'COLLAB',
+  ENGINE = 'ENGINE',
+  STAGING = 'STAGING',
 }
 
 class MintBot {
   bot: Client
   mintsToPost: Mint[]
+  contractToChannel: { [id: string]: string[] }
   constructor(bot: Client) {
     this.bot = bot
     this.mintsToPost = []
+    this.contractToChannel = this.buildContractToChannel()
 
-    // Uncomment when MintBot config is finalized!
-    // this.startRoutine()
+    this.startRoutine()
   }
-  // buildContractToChannel(mintType: MintType, channels: Channel[]) {
-  //   let contracts = []
-  //   switch (mintType) {
-  //     case CORE:
-  //       contracts = Object.values(CORE_CONTRACTS)
-  //     default:
-  //       break
-  //   }
-  //   return contractToChannel
-  // }
+
+  buildContractToChannel(): { [id: string]: string[] } {
+    const contractToChannel: { [id: string]: string[] } = {}
+    Object.entries(MINT_CONFIG).forEach(([mintType, channels]) => {
+      let contracts: string[] = []
+      switch (mintType) {
+        case MintType.CORE:
+          contracts = Object.values(CORE_CONTRACTS)
+          break
+        case MintType.COLLAB:
+          contracts = Object.values(COLLAB_CONTRACTS)
+          break
+        case MintType.ENGINE:
+          // TODO: Add engine contracts
+          break
+        case MintType.STAGING:
+          contracts = Object.values(STAGING_CONTRACTS)
+          break
+        default:
+          break
+      }
+      channels.forEach((channel) => {
+        contracts.forEach((contract) => {
+          if (!contractToChannel[contract]) {
+            contractToChannel[contract] = []
+          }
+          contractToChannel[contract].push(channel)
+        })
+      })
+    })
+
+    return contractToChannel
+  }
 
   // Check and see if the mint has an image rendered yet
   // If it does, report to discord
@@ -82,7 +110,6 @@ class MintBot {
       this.mintsToPost = this.mintsToPost.filter(
         (mint) => !goodMints.includes(mint)
       )
-      console.log(this.mintsToPost)
     }, MINT_REFRESH_TIME_SECONDS * 1000)
   }
 }
@@ -133,12 +160,16 @@ class Mint {
     embed.author = null
     embed.setTitle(`Minted: ${this.tokenName}`)
 
-    const channel = this.bot.channels?.cache.get(
-      projectConfig.chIdByName['block-talk']
-    ) as TextChannel
-    if (channel) {
-      channel.send(embed)
-    }
+    mintBot.contractToChannel[this.contractAddress].forEach(
+      (channel: string) => {
+        const discordChannel = this.bot.channels?.cache.get(
+          projectConfig.chIdByName[channel]
+        ) as TextChannel
+        if (discordChannel) {
+          discordChannel.send(embed)
+        }
+      }
+    )
   }
 }
 

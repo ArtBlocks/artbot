@@ -1,4 +1,5 @@
 import { Client } from 'discord.js'
+import { mintBot } from '../..'
 
 const { APIPollBot } = require('./ApiPollBot')
 const { MessageEmbed } = require('discord.js')
@@ -81,9 +82,9 @@ class ReservoirSaleBot extends APIPollBot {
     const platform = msg.orderSource
     embed.setColor(this.saleColor)
 
-    if (msg.orderKind === 'mint' && this.mintBot) {
+    if (msg.orderKind === 'mint') {
       // Add mint event to mintBot and return
-      this.mintBot.addMint(msg.token.contractAddress, msg.token.tokenId, msg.to)
+      mintBot?.addMint(msg.token.contract, msg.token.tokenId, msg.to)
       return
     }
 

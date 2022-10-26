@@ -92,7 +92,8 @@ const factoryParty = new ArtIndexerBot(getArtBlocksFactoryProjects)
 const artIndexerBot = new ArtIndexerBot()
 const pbabIndexerBot = new ArtIndexerBot(getPBABProjects)
 const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
-const mintBot = new MintBot(bot)
+
+export const mintBot = new MintBot(bot)
 
 // Message event handler.
 bot.on('message', (msg) => {

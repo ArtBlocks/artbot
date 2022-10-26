@@ -18,16 +18,13 @@ const PARTNER_CONTRACTS = require('../ProjectConfig/partnerContracts.json')
 
 // utility class that routes number messages for each channel
 class Channel {
-  constructor({ name, projectBotHandlers, mints }) {
+  constructor({ name, projectBotHandlers }) {
     this.name = name
     this.hasProjectBotHandler = !!projectBotHandlers
     if (projectBotHandlers) {
       this.default = projectBotHandlers.default
       this.stringTriggers = projectBotHandlers.stringTriggers || undefined
       this.tokenIdTriggers = projectBotHandlers.tokenIdTriggers || undefined
-    }
-    if (mints) {
-      this.mints = mints
     }
   }
 
@@ -103,7 +100,6 @@ class ProjectConfig {
   constructor() {
     this.channels = ProjectConfig.buildChannelHandlers(CHANNELS)
     this.chIdByName = ProjectConfig.buildChannelIDByName(this.channels)
-    this.mintsToChannel = ProjectConfig.buildMintsToChannel(this.channels)
     this.projectToChannel = {}
     this.initialize()
   }
@@ -197,8 +193,6 @@ class ProjectConfig {
     const channels = {}
     Object.entries(ChannelsJson).forEach(([chID, chParams]) => {
       channels[chID] = new Channel(chParams)
-      if (chParams.mints) {
-      }
     })
     return channels
   }
@@ -212,30 +206,6 @@ class ProjectConfig {
     const chIdByName = {}
     Object.entries(channels).forEach(([chID, channel]) => {
       chIdByName[channel.name] = chID
-    })
-    return chIdByName
-  }
-
-  mintNameToContracts(mintName) {
-    switch (mintName) {
-      case CORE:
-        return Object.values(CORE_CONTRACTS)
-      case COLLABS:
-        return Object.values(COLLAB_CONTRACTS)
-
-      default:
-        break
-    }
-  }
-  static buildMintsToChannel(channels) {
-    const chIdByName = {}
-    Object.entries(channels).forEach(([chID, channel]) => {
-      chIdByName[channel.name] = chID
-      if (channel.mints) {
-        channel.mints.forEach((mint) => {
-          chIdByName[mint] = chID
-        })
-      }
     })
     return chIdByName
   }
