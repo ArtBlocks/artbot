@@ -1,4 +1,4 @@
-import { Client } from "discord.js"
+import { Client } from 'discord.js'
 
 const fetch = require('node-fetch')
 const ReconnectingWebsocket = require('reconnecting-websocket')
@@ -23,7 +23,7 @@ const ARCHIPELAGO_GOLD = '#9C814B'
 class ArchipelagoBot {
   discordClient: Client
   client: any
-  slugToCollections: Map<string, any> 
+  slugToCollections: Map<string, any>
   constructor(discordClient: Client) {
     this.discordClient = discordClient
     this.slugToCollections = new Map()
@@ -39,7 +39,9 @@ class ArchipelagoBot {
         JSON.stringify({ type: 'SUBSCRIBE_TOPIC', topic: 'ALL_COLLECTIONS' })
       )
     this.client.addEventListener('open', () => subscribe())
-    this.client.addEventListener('message', (ev: any) => this.onMessage(ev.data))
+    this.client.addEventListener('message', (ev: any) =>
+      this.onMessage(ev.data)
+    )
   }
 
   async refreshCollections() {
@@ -98,7 +100,7 @@ class ArchipelagoBot {
       console.log(`Skipping banned seller ${seller} for ${slug} #${tokenIndex}`)
       return
     }
-    let sellerText = await ensOrAddress(seller)
+    const sellerText = await ensOrAddress(seller)
     const archipelagoUrl = `https://archipelago.art/collections/${slug}/${tokenIndex}`
     const embed = new MessageEmbed()
     const sellerUrl = `https://archipelago.art/address/${seller}`

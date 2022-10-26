@@ -1,4 +1,4 @@
-import { Client, Message } from "discord.js"
+import { Client, Message } from 'discord.js'
 
 const { ensOrAddress, getOSName } = require('./utils')
 const axios = require('axios')
@@ -12,7 +12,12 @@ class APIPollBot {
   saleColor: string
   lastUpdatedTime: number
 
-  constructor(apiEndpoint: string, refreshRateMs: number, bot: Client, headers = {}) {
+  constructor(
+    apiEndpoint: string,
+    refreshRateMs: number,
+    bot: Client,
+    headers = {}
+  ) {
     this.apiEndpoint = apiEndpoint
     this.refreshRateMs = refreshRateMs
     this.bot = bot
@@ -51,7 +56,7 @@ class APIPollBot {
    * @param {*} responseData - Dict parsed from API request json
    */
   async handleAPIResponse(responseData: any) {
-    console.warn('handleAPIResponse function not implemented!')
+    console.warn('handleAPIResponse function not implemented!', responseData)
   }
 
   /**
@@ -60,7 +65,7 @@ class APIPollBot {
    * @param {*} msg - Event info dict
    */
   async buildDiscordMessage(msg: Message) {
-    console.warn('buildDiscordMessage function not implemented!')
+    console.warn('buildDiscordMessage function not implemented!', msg)
   }
 
   async ensOrAddress(address: string): Promise<string> {

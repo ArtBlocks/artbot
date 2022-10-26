@@ -21,7 +21,7 @@ const NON_BOT_CHANNELS = [
 
 describe('testing config files', () => {
   test('testing channels.json', () => {
-    Object.entries(CHANNELS).forEach(([chID, chParams]) => {
+    Object.entries(CHANNELS).forEach(([, chParams]) => {
       expect(chParams.name).toBeDefined()
       expect(chParams.name.length).toBeGreaterThan(0)
 
@@ -48,14 +48,14 @@ describe('testing config files', () => {
     })
   })
   test('testing partnerContracts.json', () => {
-    Object.entries(PARTNER_CONTRACTS).forEach(([name, contractAddr]) => {
+    Object.entries(PARTNER_CONTRACTS).forEach(([, contractAddr]) => {
       expect(contractAddr).toBeDefined()
       expect(contractAddr.length).toBeGreaterThan(0)
       expect(contractAddr.toLowerCase()).toBe(contractAddr)
     })
   })
   test('testing coreContracts.json', () => {
-    Object.entries(CORE_CONTRACTS).forEach(([name, contractAddr]) => {
+    Object.entries(CORE_CONTRACTS).forEach(([, contractAddr]) => {
       expect(contractAddr).toBeDefined()
       expect(contractAddr.length).toBeGreaterThan(0)
       expect(contractAddr.toLowerCase()).toBe(contractAddr)

@@ -4,7 +4,6 @@ import { ProjectBot } from './ProjectBot'
 dotenv.config()
 
 const deburr = require('lodash.deburr')
-const Web3 = require('web3')
 const getArtBlocksAndCollabProjects =
   require('../Utils/parseArtBlocksAPI').getArtBlocksAndCollabProjects
 const getArtBlocksOpenProjects =
@@ -19,7 +18,6 @@ const resolveEnsName = require('./APIBots/utils').resolveEnsName
 const isVerticalName = require('./APIBots/utils').isVerticalName
 const getVerticalName = require('./APIBots/utils').getVerticalName
 
-const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
 const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
 const { isWallet } = require('./APIBots/utils')
 
@@ -110,7 +108,7 @@ class ArtIndexerBot {
         this.projects[projectKey] = newBot
 
         if (bday) {
-          const [year, month, day] = bday.split('T')[0].split('-')
+          const [, month, day] = bday.split('T')[0].split('-')
           bday = month + '-' + day
           this.birthdays[bday] = this.birthdays[bday] ?? []
           this.birthdays[bday].push(newBot)
@@ -173,7 +171,7 @@ class ArtIndexerBot {
       !this.projects[projectKey] &&
       isWallet(afterTheHash.split(' ')[0])
     ) {
-      let wallet = afterTheHash.split(' ')[0]
+      const wallet = afterTheHash.split(' ')[0]
       afterTheHash = afterTheHash.replace(wallet, '')
       projectKey = this.toProjectKey(afterTheHash)
       if (PROJECT_ALIASES[projectKey]) {
@@ -217,12 +215,12 @@ class ArtIndexerBot {
   }
 
   async startRandomRoutine(channel: TextChannel) {
-    let msg = {} as Message
+    const msg = {} as Message
     msg.content = '#?'
     msg.channel = channel
     // Try to message(s) in #ab-art-chat every minute
     setInterval(() => {
-      let now = new Date()
+      const now = new Date()
       // Only send message if hour and minute match up with specified time
       if (
         now.getHours() !== RANDOM_ART_TIME.getHours() ||
@@ -239,7 +237,7 @@ class ArtIndexerBot {
     projectConfig: any
   ) {
     setInterval(() => {
-      let now = new Date()
+      const now = new Date()
       // Only send message if hour and minute match up with specified time
       if (
         now.getHours() !== BIRTHDAY_CHECK_TIME.getHours() ||
@@ -269,8 +267,8 @@ class ArtIndexerBot {
     let attempts = 0
     while (attempts < 10) {
       const keys = Object.keys(this.projects)
-      let projectKey = keys[Math.floor(Math.random() * keys.length)]
-      let projBot = this.projects[projectKey]
+      const projectKey = keys[Math.floor(Math.random() * keys.length)]
+      const projBot = this.projects[projectKey]
       if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
         for (let i = 0; i < numMessages; i++) {
           projBot.handleNumberMessage(msg)
@@ -288,10 +286,10 @@ class ArtIndexerBot {
     while (attempts < 10) {
       const openProjects = await getArtBlocksOpenProjects()
 
-      let project =
+      const project =
         openProjects[Math.floor(Math.random() * openProjects.length)]
 
-      let projBot = this.projects[this.toProjectKey(project.name)]
+      const projBot = this.projects[this.toProjectKey(project.name)]
       if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
         return projBot.handleNumberMessage(msg)
       }
@@ -311,7 +309,7 @@ class ArtIndexerBot {
       return
     }
     while (attempts < 10) {
-      let projBot =
+      const projBot =
         this.collectionMapping[collectionType][
           Math.floor(
             Math.random() * this.collectionMapping[collectionType].length
@@ -334,7 +332,7 @@ class ArtIndexerBot {
 
     while (attempts < 10) {
       console.log(this.artists[artistName])
-      let projBot =
+      const projBot =
         this.artists[artistName][
           Math.floor(Math.random() * this.artists[artistName].length)
         ]
@@ -360,7 +358,7 @@ class ArtIndexerBot {
     try {
       // Resolve ENS name if ends in .eth
       if (wallet.toLowerCase().endsWith('.eth')) {
-        let ensName = wallet
+        const ensName = wallet
 
         wallet = await resolveEnsName(ensName)
 
@@ -392,9 +390,9 @@ class ArtIndexerBot {
       if (projectKey) {
         if (this.artists[projectKey]) {
           // Random token from artist
-          let tokensByArtist = []
+          const tokensByArtist = []
           for (let index = 0; index < tokens.length; index++) {
-            let token = tokens[index]
+            const token = tokens[index]
 
             if (
               this.toProjectKey(
@@ -410,17 +408,17 @@ class ArtIndexerBot {
             )
             return
           }
-          let _token =
+          const _token =
             tokensByArtist[Math.floor(Math.random() * tokensByArtist.length)]
-          let projBot = this.projects[this.toProjectKey(_token.project.name)]
+          const projBot = this.projects[this.toProjectKey(_token.project.name)]
           msg.content = `#${_token.invocation}`
           return projBot.handleNumberMessage(msg)
         } else if (isVerticalName(projectKey)) {
           // Random token from a vertical
-          let tokensInVertical = []
+          const tokensInVertical = []
           for (let index = 0; index < tokens.length; index++) {
-            let token = tokens[index]
-            let projBot = this.projects[this.toProjectKey(token.project.name)]
+            const token = tokens[index]
+            const projBot = this.projects[this.toProjectKey(token.project.name)]
             if (
               projBot.collection?.toLowerCase() === projectKey ||
               projBot.heritageStatus?.toLowerCase() === projectKey ||
@@ -435,18 +433,18 @@ class ArtIndexerBot {
             )
             return
           }
-          let _token =
+          const _token =
             tokensInVertical[
               Math.floor(Math.random() * tokensInVertical.length)
             ]
-          let projBot = this.projects[this.toProjectKey(_token.project.name)]
+          const projBot = this.projects[this.toProjectKey(_token.project.name)]
           msg.content = `#${_token.invocation}`
           return projBot.handleNumberMessage(msg)
         } else {
           // Random token from project
-          let tokensInProject = []
+          const tokensInProject = []
           for (let index = 0; index < tokens.length; index++) {
-            let token = tokens[index]
+            const token = tokens[index]
             if (this.toProjectKey(token.project.name) === projectKey) {
               tokensInProject.push(token)
             }
@@ -457,9 +455,9 @@ class ArtIndexerBot {
             )
             return
           }
-          let _token =
+          const _token =
             tokensInProject[Math.floor(Math.random() * tokensInProject.length)]
-          let projBot = this.projects[this.toProjectKey(projectKey)]
+          const projBot = this.projects[this.toProjectKey(projectKey)]
           msg.content = `#${_token.invocation}`
           return projBot.handleNumberMessage(msg)
         }
@@ -469,10 +467,10 @@ class ArtIndexerBot {
 
       let attempts = 0
       while (attempts < 10) {
-        let token = tokens[Math.floor(Math.random() * tokens.length)]
+        const token = tokens[Math.floor(Math.random() * tokens.length)]
 
         console.log(`looking for wallet project: ${token.project.name}`)
-        let projBot = this.projects[this.toProjectKey(token.project.name)]
+        const projBot = this.projects[this.toProjectKey(token.project.name)]
         if (projBot) {
           msg.content = `#${token.invocation}`
           return projBot.handleNumberMessage(msg)

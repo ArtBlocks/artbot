@@ -1,5 +1,5 @@
+/* eslint-disable no-constant-condition */
 require('dotenv').config()
-const parse = require('node-html-parser').parse
 const fetch = require('node-fetch')
 const { createClient, gql } = require('@urql/core')
 

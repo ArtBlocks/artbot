@@ -17,5 +17,5 @@
     "useUnknownInCatchVariables": false,
     "outDir": "./build"
   },
-  "include": ["./**/*", "src/Classes"]
+  "include": ["./**/*", "src/**/*.ts", "src/**/*.js"],
 }

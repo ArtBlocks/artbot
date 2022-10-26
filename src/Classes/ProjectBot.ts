@@ -148,7 +148,7 @@ export class ProjectBot {
       title = artBlocksData.platform + ' - ' + title
     }
 
-    let moreDetailsText = `Add "?details" to your command!`
+    const moreDetailsText = `Add "?details" to your command!`
 
     // If user did *not* request full details, return just a large image,
     // along with a link to the OpenSea page and ArtBlocks live script.
@@ -277,7 +277,7 @@ export class ProjectBot {
       ) {
         return
       }
-      let title = `:tada:  Happy Birthday to ${artBlocksData.collection_name}!  :tada:`
+      const title = `:tada:  Happy Birthday to ${artBlocksData.collection_name}!  :tada:`
 
       const embedContent = new MessageEmbed()
         .setColor('#9370DB')

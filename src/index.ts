@@ -24,9 +24,6 @@ const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 const TOKEN = process.env.TOKEN
 const PORT = process.env.PORT || 3001
 
-// Trade activity Discord channel IDs.
-const PROD_CHANNEL_ACTIVITY_ALL = projectConfig.chIdByName['prod_all_activity']
-
 // Factory Channel
 const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects']
 
@@ -41,9 +38,6 @@ const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
 
 // AB Art Chat
 const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat']
-
-// Special address collection channel.
-const CHANNEL_ADDRESS_COLLECTION = process.env.CHANNEL_ADDRESS_COLLECTION
 
 // Rate (in ms) to poll API endpoints
 const API_POLL_TIME_MS = 10000

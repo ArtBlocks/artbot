@@ -1,4 +1,4 @@
-import { Client } from "discord.js"
+import { Client } from 'discord.js'
 
 const { APIPollBot } = require('./ApiPollBot')
 const { MessageEmbed } = require('discord.js')
@@ -14,7 +14,13 @@ class ReservoirSaleBot extends APIPollBot {
    * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
    * @param {*} bot - Discord bot that will be sending messages
    */
-  constructor(apiEndpoint: string, refreshRateMs: number, bot: Client, headers: any, contract = '') {
+  constructor(
+    apiEndpoint: string,
+    refreshRateMs: number,
+    bot: Client,
+    headers: any,
+    contract = ''
+  ) {
     apiEndpoint =
       apiEndpoint + '&startTimestamp=' + (Date.now() / 1000).toFixed()
     super(apiEndpoint, refreshRateMs, bot, headers)
@@ -68,11 +74,11 @@ class ReservoirSaleBot extends APIPollBot {
     // Parsing Reservoir sale message to get info
     const tokenID = msg.token.tokenId
 
-    let priceText = 'Sale Price'
+    const priceText = 'Sale Price'
     const price = msg.price.amount.decimal
     const currency = msg.price.currency.symbol
-    let owner = msg.from
-    let platform = msg.orderSource
+    const owner = msg.from
+    const platform = msg.orderSource
     embed.setColor(this.saleColor)
 
     if (msg.orderKind === 'mint') {

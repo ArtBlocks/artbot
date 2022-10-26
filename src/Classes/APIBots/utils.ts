@@ -4,15 +4,15 @@ dotenv.config()
 const axios = require('axios')
 const ethers = require('ethers')
 
-let provider = new ethers.providers.EtherscanProvider(
+const provider = new ethers.providers.EtherscanProvider(
   'homestead',
   process.env.ETHERSCAN_API_KEY
 )
 
 // Runtime ENS cache just to limit queries
-let ensAddressMap: {[id: string]: string} = {}
-let ensResolvedMap: {[id: string]: string} = {}
-let osAddressMap: {[id: string]: string} = {}
+const ensAddressMap: { [id: string]: string } = {}
+const ensResolvedMap: { [id: string]: string } = {}
+const osAddressMap: { [id: string]: string } = {}
 const MAX_ENS_RETRIES = 3
 
 async function getENSName(address: string): Promise<string> {
@@ -62,7 +62,7 @@ async function resolveEnsName(ensName: string): Promise<string> {
 }
 
 async function ensOrAddress(address: string): Promise<string> {
-  let ens = await getENSName(address)
+  const ens = await getENSName(address)
   return ens !== '' ? ens : address
 }
 
@@ -73,13 +73,16 @@ async function getOSName(address: string): Promise<string> {
     name = osAddressMap[address]
   } else {
     try {
-      let response = await axios.get(`https://api.opensea.io/user/${address}`, {
-        headers: {
-          Accept: 'application/json',
-          'X-API-KEY': process.env.OPENSEA_API_KEY,
-        },
-      })
-      let responseBody = response?.data
+      const response = await axios.get(
+        `https://api.opensea.io/user/${address}`,
+        {
+          headers: {
+            Accept: 'application/json',
+            'X-API-KEY': process.env.OPENSEA_API_KEY,
+          },
+        }
+      )
+      const responseBody = response?.data
       if (responseBody?.detail) {
         throw new Error(responseBody.detail)
       }

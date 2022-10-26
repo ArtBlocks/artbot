@@ -1,4 +1,4 @@
-import { Client, Message } from "discord.js"
+import { Client } from 'discord.js'
 
 const { APIPollBot } = require('./ApiPollBot')
 const { MessageEmbed } = require('discord.js')
@@ -15,7 +15,13 @@ class ReservoirListBot extends APIPollBot {
    * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
    * @param {*} bot - Discord bot that will be sending messages
    */
-  constructor(apiEndpoint: string, refreshRateMs: number, bot: Client, headers: any, contract = '') {
+  constructor(
+    apiEndpoint: string,
+    refreshRateMs: number,
+    bot: Client,
+    headers: any,
+    contract = ''
+  ) {
     super(apiEndpoint, refreshRateMs, bot, headers)
     this.contract = contract
     this.listColor = '#407FDB'
@@ -67,8 +73,8 @@ class ReservoirListBot extends APIPollBot {
     const priceText = 'List Price'
     const price = msg.price.amount.decimal
     const currency = msg.price.currency.symbol
-    let owner = msg.maker
-    let platform = msg.source.name
+    const owner = msg.maker
+    const platform = msg.source.name
 
     embed.setColor(this.listColor)
 
