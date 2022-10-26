@@ -6,15 +6,13 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier',
   ],
+  parserOptions: {
+    project: './tsconfig.json',
+    ecmaVersion: 2021,
+  },
   env: {
-    es6: true,
     jest: true,
     node: true,
-  },
-  settings: {
-    react: {
-      version: 'detect',
-    },
   },
   rules: {
     '@typescript-eslint/explicit-function-return-type': 'off',
