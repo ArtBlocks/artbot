@@ -36,9 +36,9 @@ jobs:
           command: |
             export TEST_MODE=true &&
             timeout 2m yarn start || ( [[ $? -eq 124 ]] && echo "WARNING: Timeout reached, but that's OK" )
-      - run:
-          name: Run Tests
-          command: yarn test
+      # - run:
+      #     name: Run Tests
+      #     command: yarn test
 
 workflows:
   build-workflow:

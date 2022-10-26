@@ -1,5 +1,5 @@
+/* eslint-disable no-constant-condition */
 require('dotenv').config()
-const parse = require('node-html-parser').parse
 const fetch = require('node-fetch')
 const { createClient, gql } = require('@urql/core')
 
@@ -607,7 +607,7 @@ async function getProjectsCurationStatus() {
     const collectionMapping = {}
     const heritageStatuses = {}
     allProjects.forEach((proj) => {
-      collectionName = proj.vertical_name.toLowerCase()
+      let collectionName = proj.vertical_name.toLowerCase()
       if (proj.vertical?.category_name?.toLowerCase() !== 'collections') {
         collectionName = proj.vertical?.category_name?.toLowerCase()
       }

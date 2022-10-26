@@ -125,7 +125,6 @@ class ProjectConfig {
    */
   async buildProjectBots(channelsJson, projectBotsJson) {
     const projectBots = {}
-    const projectBotConfigs = Object.entries(projectBotsJson)
 
     // Loops over channelsJson and adds all project IDs to a set of bots that
     // need to be instatiated.

@@ -88,7 +88,7 @@ async function triageActivityMessage(msg, bot) {
   // Iterate through entire array of embeds, though there should only
   // ever be one at a time per message.
   const embeds = msg.embeds
-  for (i = 0; i < embeds.length; i++) {
+  for (let i = 0; i < embeds.length; i++) {
     const embed = embeds[i]
 
     if (embed.author == null) {
@@ -106,7 +106,7 @@ async function triageActivityMessage(msg, bot) {
 
     // Get current description.
     let description = embed.description
-    const re = /.*Owner\:\*\*\s+(.*)\s+\(.*/
+    const re = /.*Owner:\*\*\s+(.*)\s+\(.*/
     const owner = description.match(re)[0].split(' ')[2].trim()
 
     // Return early if description includes bot-banned user.

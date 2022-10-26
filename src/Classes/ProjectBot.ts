@@ -1,3 +1,5 @@
+import { Message } from 'discord.js'
+
 const { MessageEmbed } = require('discord.js')
 const axios = require('axios')
 const Web3 = require('web3')
@@ -14,19 +16,30 @@ const ONE_MILLION = 1e6
 /**
  * Bot for handling projects
  */
-class ProjectBot {
-  constructor({
-    projectNumber,
-    coreContract,
-    editionSize,
-    projectName,
-    projectActive,
-    namedMappings,
+export class ProjectBot {
+  projectNumber: number
+  coreContract: string
+  editionSize: number
+  projectName: string
+  projectActive: boolean
+  namedMappings: any
+  artistName: string
+  collection?: string
+  heritageStatus?: string
+  startTime?: Date
+
+  constructor(
+    projectNumber: number,
+    coreContract: string,
+    editionSize: number,
+    projectName: string,
+    projectActive: boolean,
+    namedMappings: any,
     artistName = '',
-    collection = null,
-    heritageStatus = null,
-    startTime = null,
-  }) {
+    collection?: string,
+    heritageStatus?: string,
+    startTime?: Date
+  ) {
     this.projectNumber = projectNumber
     this.coreContract = coreContract
     this.editionSize = editionSize
@@ -34,20 +47,20 @@ class ProjectBot {
     this.projectActive = projectActive
     this.namedMappings = namedMappings
       ? ProjectBot.getProjectHandlerHelper(namedMappings)
-      : null
+      : undefined
     this.artistName = artistName
     this.collection = collection
     this.heritageStatus = heritageStatus
     this.startTime = startTime
   }
 
-  static getProjectHandlerHelper({ singles, sets }) {
+  static getProjectHandlerHelper({ singles, sets }: any) {
     const singlesMap = singles ? require(`../NamedMappings/${singles}`) : null
     const setsMap = sets ? require(`../NamedMappings/${sets}`) : null
     return new ProjectHandlerHelper(singlesMap, setsMap)
   }
 
-  async handleNumberMessage(msg) {
+  async handleNumberMessage(msg: Message) {
     let content = msg.content
     if (content.length <= 1) {
       msg.channel.send(
@@ -85,7 +98,7 @@ class ProjectBot {
     const afterTheHash = content.substring(1)
     let pieceNumber
     if (afterTheHash[0] == '?') {
-      pieceNumber = parseInt(Math.random() * this.editionSize)
+      pieceNumber = Math.floor(Math.random() * this.editionSize)
     } else {
       pieceNumber = parseInt(afterTheHash)
     }
@@ -99,7 +112,7 @@ class ProjectBot {
 
     const tokenID = pieceNumber + this.projectNumber * 1e6
 
-    this.sendMetaDataMessage(msg, tokenID, detailsRequested)
+    this.sendMetaDataMessage(msg, tokenID.toString(), detailsRequested)
   }
 
   /**
@@ -109,7 +122,11 @@ class ProjectBot {
    * @param {*} tokenID
    * @param {*} detailsRequested
    */
-  async sendMetaDataMessage(msg, tokenID, detailsRequested) {
+  async sendMetaDataMessage(
+    msg: Message,
+    tokenID: string,
+    detailsRequested: boolean
+  ) {
     const artBlocksResponse = await axios.get(
       `https://token.artblocks.io/${this.coreContract}/${tokenID}`
     )
@@ -131,7 +148,7 @@ class ProjectBot {
       title = artBlocksData.platform + ' - ' + title
     }
 
-    let moreDetailsText = `Add "?details" to your command!`
+    const moreDetailsText = `Add "?details" to your command!`
 
     // If user did *not* request full details, return just a large image,
     // along with a link to the OpenSea page and ArtBlocks live script.
@@ -181,7 +198,7 @@ class ProjectBot {
     msg.channel.send(embedContent)
   }
 
-  parseOwnerInfo(ownerAccount) {
+  parseOwnerInfo(ownerAccount: any) {
     const address = ownerAccount.address
     const addressPreview =
       address !== null ? address.slice(0, 8) : UNKNOWN_ADDRESS
@@ -199,7 +216,7 @@ class ProjectBot {
     }
   }
 
-  parseSaleInfo(saleInfo) {
+  parseSaleInfo(saleInfo: any) {
     if (saleInfo !== null && saleInfo.event_type == 'successful') {
       const eventDate = new Date(saleInfo.created_date).toLocaleDateString()
       const sellerAccount = saleInfo.transaction.to_account
@@ -235,24 +252,23 @@ class ProjectBot {
     }
   }
 
-  parseNumSales(numSales) {
+  parseNumSales(numSales: number) {
     if (numSales == 0) {
       return 'None'
     }
     return `${numSales}`
   }
 
-  async sendBirthdayMessage(channels, projectConfig) {
+  async sendBirthdayMessage(channels: any, projectConfig: any) {
     try {
       console.log('sending birthday message(s) for:', this.projectName)
 
-      let msg = {}
-      const artBlocksResponse = await fetch(
+      const artBlocksResponse = await axios.get(
         `https://token.artblocks.io/${this.coreContract}/${
           this.projectNumber * ONE_MILLION
         }`
       )
-      const artBlocksData = await artBlocksResponse.json()
+      const artBlocksData = await artBlocksResponse.data
       if (
         !artBlocksData ||
         !artBlocksData.image ||
@@ -261,7 +277,7 @@ class ProjectBot {
       ) {
         return
       }
-      let title = `:tada:  Happy Birthday to ${artBlocksData.collection_name}!  :tada:`
+      const title = `:tada:  Happy Birthday to ${artBlocksData.collection_name}!  :tada:`
 
       const embedContent = new MessageEmbed()
         .setColor('#9370DB')
@@ -270,7 +286,7 @@ class ProjectBot {
         .setDescription(
           `${
             this.projectName
-          } was released on this day in ${this.startTime.getFullYear()}! 
+          } was released on this day in ${this.startTime?.getFullYear()}! 
         
         What are your favorite outputs from ${this.projectName}?
 
@@ -280,19 +296,20 @@ class ProjectBot {
         .setFooter(`${artBlocksData.name}`)
 
       // Send all birthdays to #block-talk
-      msg.channel = channels.get(projectConfig.chIdByName['block-talk'])
-      msg.channel.send(embedContent)
+
+      let channel = channels.get(projectConfig.chIdByName['block-talk'])
+      channel.send(embedContent)
 
       if (projectConfig.projectToChannel[this.projectNumber]) {
         // Send in artist channel if one exists
-        msg.channel = channels.get(
+        channel = channels.get(
           projectConfig.projectToChannel[this.projectNumber]
         )
-        msg.channel.send(embedContent)
+        channel.send(embedContent)
       } else {
         // Otherwise send in #factory-projects
-        msg.channel = channels.get(projectConfig.chIdByName['factory-projects'])
-        msg.channel.send(embedContent)
+        channel = channels.get(projectConfig.chIdByName['factory-projects'])
+        channel.send(embedContent)
       }
     } catch (err) {
       console.error(

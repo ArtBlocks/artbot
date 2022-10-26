@@ -1,7 +1,17 @@
+import { Client, Message } from 'discord.js'
+
 const { ensOrAddress, getOSName } = require('./utils')
 const axios = require('axios')
 /** Abstract parent class for all API Poll Bots */
 class APIPollBot {
+  apiEndpoint: string
+  refreshRateMs: number
+  bot: Client
+  headers: any
+  listColor: string
+  saleColor: string
+  lastUpdatedTime: number
+
   /**
    * Constructor
    * @param {string} apiEndpoint - Endpoint to be hitting
@@ -9,7 +19,12 @@ class APIPollBot {
    * @param {*} bot - Discord bot that will be sending messages
    * @param {*} headers - Optional: any headers to supply (namely, API tokens)
    */
-  constructor(apiEndpoint, refreshRateMs, bot, headers = {}) {
+  constructor(
+    apiEndpoint: string,
+    refreshRateMs: number,
+    bot: Client,
+    headers = {}
+  ) {
     this.apiEndpoint = apiEndpoint
     this.refreshRateMs = refreshRateMs
     this.bot = bot
@@ -47,8 +62,8 @@ class APIPollBot {
    * Parses endpoint response
    * @param {*} responseData - Dict parsed from API request json
    */
-  async handleAPIResponse(responseData) {
-    console.warn('handleAPIResponse function not implemented!')
+  async handleAPIResponse(responseData: any) {
+    console.warn('handleAPIResponse function not implemented!', responseData)
   }
 
   /**
@@ -56,25 +71,25 @@ class APIPollBot {
    * Builds and sends any Discord messages
    * @param {*} msg - Event info dict
    */
-  async buildDiscordMessage(msg) {
-    console.warn('buildDiscordMessage function not implemented!')
+  async buildDiscordMessage(msg: Message) {
+    console.warn('buildDiscordMessage function not implemented!', msg)
   }
 
-  async ensOrAddress(address) {
+  async ensOrAddress(address: string): Promise<string> {
     return await ensOrAddress(address)
   }
 
-  async osName(address) {
+  async osName(address: string): Promise<string> {
     return await getOSName(address)
   }
 
-  buildOpenseaURL(contractAddr, tokenId) {
+  buildOpenseaURL(contractAddr: string, tokenId: string): string {
     return `https://opensea.io/assets/ethereum/${contractAddr}/${tokenId}`
   }
-  buildLooksRareURL(contractAddr, tokenId) {
+  buildLooksRareURL(contractAddr: string, tokenId: string): string {
     return `https://looksrare.org/collections/${contractAddr}/${tokenId}`
   }
-  buildX2Y2URL(contractAddr, tokenId) {
+  buildX2Y2URL(contractAddr: string, tokenId: string): string {
     return `https://x2y2.io/eth/${contractAddr}/${tokenId}`
   }
 }
