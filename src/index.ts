@@ -152,7 +152,7 @@ bot.on('message', (msg) => {
 // Instantiate API Pollers (if not in test mode)
 if (!TEST_MODE) {
   new ReservoirListBot(
-    `https://api.reservoir.tools/orders/asks/v3?contracts=${CORE_CONTRACTS.OG}&contracts=${CORE_CONTRACTS.V2}&sortBy=createdAt&limit=${reservoirListLimit}`,
+    `https://api.reservoir.tools/orders/asks/v3?contracts=${CORE_CONTRACTS.OG}&contracts=${CORE_CONTRACTS.V2}&contracts=${COLLAB_CONTRACTS.AB_X_PACE}&sortBy=createdAt&limit=${reservoirListLimit}`,
     API_POLL_TIME_MS,
     bot,
     {
@@ -162,7 +162,7 @@ if (!TEST_MODE) {
   )
 
   new ReservoirSaleBot(
-    `https://api.reservoir.tools/sales/v4?contract=${CORE_CONTRACTS.OG}&contract=${CORE_CONTRACTS.V2}&limit=${reservoirSaleLimit}`,
+    `https://api.reservoir.tools/sales/v4?contract=${CORE_CONTRACTS.OG}&contract=${CORE_CONTRACTS.V2}&contract=${COLLAB_CONTRACTS.AB_X_PACE}&limit=${reservoirSaleLimit}`,
     API_POLL_TIME_MS,
     bot,
     {
@@ -173,27 +173,4 @@ if (!TEST_MODE) {
 
   const archipelagoBot = new ArchipelagoBot(bot)
   archipelagoBot.activate()
-
-  // Listing/Sales bots for Pace collab contract
-  new ReservoirListBot(
-    `https://api.reservoir.tools/orders/asks/v3?contracts=${COLLAB_CONTRACTS.AB_X_PACE}&sortBy=createdAt&limit=${reservoirListLimit}`,
-    API_POLL_TIME_MS * 2,
-    bot,
-    {
-      Accept: 'application/json',
-      'x-api-key': process.env.RESERVOIR_API_KEY,
-    },
-    COLLAB_CONTRACTS.AB_X_PACE
-  )
-
-  new ReservoirSaleBot(
-    `https://api.reservoir.tools/sales/v4?contract=${COLLAB_CONTRACTS.AB_X_PACE}&limit=${reservoirSaleLimit}`,
-    API_POLL_TIME_MS * 2,
-    bot,
-    {
-      Accept: 'application/json',
-      'x-api-key': process.env.RESERVOIR_API_KEY,
-    },
-    COLLAB_CONTRACTS.AB_X_PACE
-  )
 }

@@ -8,7 +8,7 @@ const provider = new ethers.providers.EtherscanProvider(
   'homestead',
   process.env.ETHERSCAN_API_KEY
 )
-
+const CORE_CONTRACTS = require('../../ProjectConfig/coreContracts.json')
 // Runtime ENS cache just to limit queries
 const ensAddressMap: { [id: string]: string } = {}
 const ensResolvedMap: { [id: string]: string } = {}
@@ -122,6 +122,21 @@ function getVerticalName(msg: string): string {
       return 'collaborations'
     default:
       return msg
+  }
+}
+
+export function getTokenApiUrl(
+  contractAddress: string,
+  tokenId: string
+): string {
+  contractAddress = contractAddress.toLowerCase()
+  if (
+    Object.values(CORE_CONTRACTS).includes(contractAddress) ||
+    contractAddress === ''
+  ) {
+    return `https://token.artblocks.io/${tokenId}`
+  } else {
+    return `https://token.artblocks.io/${contractAddress}/${tokenId}`
   }
 }
 
