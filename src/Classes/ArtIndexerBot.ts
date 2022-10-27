@@ -331,7 +331,6 @@ class ArtIndexerBot {
     }
 
     while (attempts < 10) {
-      console.log(this.artists[artistName])
       const projBot =
         this.artists[artistName][
           Math.floor(Math.random() * this.artists[artistName].length)
