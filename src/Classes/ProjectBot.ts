@@ -321,5 +321,3 @@ export class ProjectBot {
     return
   }
 }
-
-module.exports.ProjectBot = ProjectBot
