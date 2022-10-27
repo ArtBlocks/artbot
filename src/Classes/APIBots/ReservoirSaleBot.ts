@@ -1,5 +1,4 @@
 import { Client } from 'discord.js'
-import { mintBot } from '../..'
 import { getTokenApiUrl } from './utils'
 
 const { APIPollBot } = require('./ApiPollBot')
@@ -37,7 +36,7 @@ type ReservoirSaleResponse = {
 }
 
 /** API Poller for Reservoir Sale events */
-export class ReservoirSaleAndMintBot extends APIPollBot {
+export class ReservoirSaleBot extends APIPollBot {
   /** Constructor just calls super
    * @param {string} apiEndpoint - Endpoint to be hitting
    * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
@@ -112,7 +111,7 @@ export class ReservoirSaleAndMintBot extends APIPollBot {
 
     if (sale.orderKind === 'mint') {
       // Add mint event to mintBot and return
-      mintBot?.addMint(sale.token.contract, sale.token.tokenId, msg.to)
+      // mintBot?.addMint(sale.token.contract, sale.token.tokenId, sale.to)
       return
     }
 

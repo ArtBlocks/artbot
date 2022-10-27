@@ -1,9 +1,4 @@
-import {
-  createClient,
-  fetchExchange,
-  cacheExchange,
-  dedupExchange,
-} from '@urql/core'
+import { createClient } from '@urql/core'
 import * as dotenv from 'dotenv'
 dotenv.config()
 
@@ -13,26 +8,11 @@ import {
   GetTokensImagesDocument,
 } from './generated/graphql'
 const fetch = require('node-fetch')
-import {
-  retryExchange,
-  RetryExchangeOptions,
-} from '@urql/exchange-retry/dist/types/retryExchange'
 import { DocumentNode } from 'graphql'
-
-const retryOptions: RetryExchangeOptions = {
-  maxNumberAttempts: 3,
-  retryIf: (error) => !!error,
-}
 
 const hasuraClient = createClient({
   url: process.env.HASURA_GRAPHQL_ENDPOINT as string,
   fetch: fetch as any,
-  exchanges: [
-    dedupExchange,
-    cacheExchange,
-    retryExchange(retryOptions) as any,
-    fetchExchange,
-  ],
   fetchOptions: () => ({
     headers: {
       'x-hasura-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET,

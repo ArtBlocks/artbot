@@ -9,7 +9,7 @@ const provider = new ethers.providers.EtherscanProvider(
   process.env.ETHERSCAN_API_KEY
 )
 
-const STAGING_CONTRACTS = require('../ProjectConfig/stagingContracts.json')
+const STAGING_CONTRACTS = require('../../ProjectConfig/stagingContracts.json')
 
 const CORE_CONTRACTS = require('../../ProjectConfig/coreContracts.json')
 // Runtime ENS cache just to limit queries
@@ -143,6 +143,8 @@ export function getTokenApiUrl(
     contractAddress === ''
   ) {
     return `https://token.artblocks.io/${tokenId}`
+  } else if (Object.values(STAGING_CONTRACTS).includes(contractAddress)) {
+    return `https://token.staging.artblocks.io/${contractAddress}/${tokenId}`
   } else {
     return `https://token.artblocks.io/${contractAddress}/${tokenId}`
   }
