@@ -110,9 +110,7 @@ export class ReservoirSaleBot extends APIPollBot {
     embed.setColor(this.saleColor)
 
     if (sale.orderKind === 'mint') {
-      // Add mint event to mintBot and return
-      // mintBot?.addMint(sale.token.contract, sale.token.tokenId, sale.to)
-      return
+      return // Don't send mint events
     }
 
     if (BAN_ADDRESSES.has(owner)) {

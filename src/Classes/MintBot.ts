@@ -67,13 +67,14 @@ export class MintBot {
     return contractToChannel
   }
 
-  // Check and see if the mint has an image rendered yet
-  // If it does, report to discord
+  // Go through all mints in the queue and make sure the image exists
+  // If it does, report to discord and remove from the queue
   // If it doesn't, add it back in the queue to check again later
   async checkAndPostMints() {
     await Promise.all(
       Object.entries(this.mintsToPost).map(async ([id, mint]) => {
         const tokenUrl = getTokenApiUrl(mint.contractAddress, mint.tokenId)
+
         let artBlocksResponse
         try {
           artBlocksResponse = await axios.get(tokenUrl)
@@ -87,6 +88,7 @@ export class MintBot {
           console.log('ERROR', e)
           return
         }
+
         const artBlocksData = artBlocksResponse.data
         if (artBlocksData.image) {
           const imageRes = await axios.get(artBlocksData.image)
@@ -103,6 +105,7 @@ export class MintBot {
     )
   }
 
+  // Function to add a new mint to the queue!
   addMint(contractAddress: string, tokenID: string, owner: string) {
     console.log('NEW MINT', contractAddress, tokenID, owner)
     const id = `${contractAddress}-${tokenID}`

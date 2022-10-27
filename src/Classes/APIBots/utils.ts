@@ -128,11 +128,6 @@ function getVerticalName(msg: string): string {
   }
 }
 
-export function isStaging(contractAddress: string) {
-  return Object.values(STAGING_CONTRACTS).includes(
-    contractAddress.toLowerCase()
-  )
-}
 export function getTokenApiUrl(
   contractAddress: string,
   tokenId: string
