@@ -9,7 +9,7 @@ const {
   BAN_ADDRESSES,
 } = require('../../Utils/activityTriager')
 /** API Poller for Reservoir Sale events */
-class ReservoirSaleBot extends APIPollBot {
+export class ReservoirSaleAndMintBot extends APIPollBot {
   /** Constructor just calls super
    * @param {string} apiEndpoint - Endpoint to be hitting
    * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
@@ -171,5 +171,3 @@ class ReservoirSaleBot extends APIPollBot {
     }
   }
 }
-
-module.exports.ReservoirSaleBot = ReservoirSaleBot

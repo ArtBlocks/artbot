@@ -21,7 +21,7 @@ enum MintType {
   STAGING = 'STAGING',
 }
 
-class MintBot {
+export class MintBot {
   bot: Client
   mintsToPost: Mint[]
   contractToChannel: { [id: string]: string[] }
@@ -66,11 +66,22 @@ class MintBot {
     return contractToChannel
   }
 
+  getMintTokenApiUrl(contractAddress: string, tokenID: string) {
+    const contract = contractAddress.toLowerCase()
+    if (Object.values(CORE_CONTRACTS).includes(contract)) {
+      return `https://token.artblocks.io/${tokenID}`
+    } else if (Object.values(STAGING_CONTRACTS).includes(contract)) {
+      return `https://token.staging.artblocks.io/${tokenID}`
+    } else {
+      return `https://token.artblocks.io/${contract}/${tokenID}`
+    }
+  }
+
   // Check and see if the mint has an image rendered yet
   // If it does, report to discord
   // If it doesn't, add it back in the queue to check again later
   async checkMintImage(mint: Mint) {
-    const tokenUrl = `https://token.staging.artblocks.io/${mint.tokenId}`
+    const tokenUrl = this.getMintTokenApiUrl(mint.contractAddress, mint.tokenId)
     const artBlocksResponse = await fetch(tokenUrl)
     const artBlocksData = await artBlocksResponse.json()
     if (artBlocksData.image) {
@@ -97,7 +108,6 @@ class MintBot {
   // tries to report any new mints to the discord!
   startRoutine() {
     setInterval(async () => {
-      console.log('Starting mint routine')
       const goodMints: Mint[] = []
       await Promise.all(
         this.mintsToPost.map(async (mint) => {
@@ -172,5 +182,3 @@ class Mint {
     )
   }
 }
-
-module.exports.MintBot = MintBot

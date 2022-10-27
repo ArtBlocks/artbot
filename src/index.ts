@@ -7,10 +7,10 @@ const getArtBlocksFactoryProjects =
   require('./Utils/parseArtBlocksAPI').getArtBlocksFactoryProjects
 
 const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot
-const MintBot = require('./Classes/MintBot').MintBot
+import { MintBot } from './Classes/MintBot'
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json')
-const { ReservoirSaleBot } = require('./Classes/APIBots/ReservoirSaleBot')
+import { ReservoirSaleAndMintBot } from './Classes/APIBots/ReservoirSaleAndMintBot'
 const { ReservoirListBot } = require('./Classes/APIBots/ReservoirListBot')
 const { ArchipelagoBot } = require('./Classes/APIBots/ArchipelagoBot')
 // Special handlers.
@@ -164,7 +164,7 @@ if (!TEST_MODE) {
     }
   )
 
-  new ReservoirSaleBot(
+  new ReservoirSaleAndMintBot(
     `https://api.reservoir.tools/sales/v4?contract=${CORE_CONTRACTS.OG}&contract=${CORE_CONTRACTS.V2}&limit=${reservoirSaleLimit}`,
     API_POLL_TIME_MS,
     bot,
@@ -189,7 +189,7 @@ if (!TEST_MODE) {
     COLLAB_CONTRACTS.AB_X_PACE
   )
 
-  new ReservoirSaleBot(
+  new ReservoirSaleAndMintBot(
     `https://api.reservoir.tools/sales/v4?contract=${COLLAB_CONTRACTS.AB_X_PACE}&limit=${reservoirSaleLimit}`,
     API_POLL_TIME_MS * 2,
     bot,
