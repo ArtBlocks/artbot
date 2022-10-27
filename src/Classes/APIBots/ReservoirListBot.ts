@@ -104,6 +104,12 @@ class ReservoirListBot extends APIPollBot {
       console.log(`Skipping message propagation for ${owner}`)
       return
     }
+
+    if (listing.source.name.toLowerCase().includes('looksrare')) {
+      console.log(`Skipping message propagation for LooksRare`)
+      return
+    }
+
     const sellerText = await this.ensOrAddress(listing.maker)
     const baseABProfile = 'https://www.artblocks.io/user/'
     const sellerProfile = baseABProfile + owner

@@ -117,6 +117,10 @@ class ReservoirSaleBot extends APIPollBot {
       console.log(`Skipping message propagation for ${owner}`)
       return
     }
+    if (sale.orderSource.toLowerCase().includes('looksrare')) {
+      console.log(`Skipping message propagation for LooksRare`)
+      return
+    }
 
     // Get Art Blocks metadata response for the item.
     const tokenUrl = getTokenApiUrl(sale.token.contract, tokenID)
