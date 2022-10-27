@@ -1,9 +1,11 @@
 import { Client, TextChannel } from 'discord.js'
 import { mintBot } from '../index'
-
+import axios from 'axios'
+import { getTokensImages } from '../Utils/Hasura/queryHasura'
+import { isStaging } from './APIBots/utils'
 const { MessageEmbed } = require('discord.js')
 const { ensOrAddress } = require('./APIBots/utils')
-const fetch = require('node-fetch')
+
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 const MINT_REFRESH_TIME_SECONDS = 5
 const MINT_CONFIG: {
@@ -23,11 +25,11 @@ enum MintType {
 
 export class MintBot {
   bot: Client
-  mintsToPost: Mint[]
+  newMints: { [id: string]: Mint } = {}
+  mintsToPost: { [id: string]: Mint } = {}
   contractToChannel: { [id: string]: string[] }
   constructor(bot: Client) {
     this.bot = bot
-    this.mintsToPost = []
     this.contractToChannel = this.buildContractToChannel()
 
     this.startRoutine()
@@ -77,49 +79,61 @@ export class MintBot {
     }
   }
 
+  async bulkUpdateNewMintMetadata() {
+    const metadata = await getTokensImages(Object.keys(this.newMints))
+    if (metadata) {
+      metadata.tokens_metadata.forEach((token) => {
+        if (token.image_id) {
+          // Image is Generated! Move to mintsToPost queue
+          this.mintsToPost[token.id] = this.newMints[token.id]
+          delete this.newMints[token.id]
+        }
+      })
+    }
+  }
+
   // Check and see if the mint has an image rendered yet
   // If it does, report to discord
   // If it doesn't, add it back in the queue to check again later
-  async checkMintImage(mint: Mint) {
-    const tokenUrl = this.getMintTokenApiUrl(mint.contractAddress, mint.tokenId)
-    const artBlocksResponse = await fetch(tokenUrl)
-    const artBlocksData = await artBlocksResponse.json()
-    if (artBlocksData.image) {
-      const imageRes = await fetch(artBlocksData.image)
+  async checkAndPostMints() {
+    Object.entries(this.mintsToPost).forEach(async ([id, mint]) => {
+      const tokenUrl = this.getMintTokenApiUrl(
+        mint.contractAddress,
+        mint.tokenId
+      )
+      const artBlocksResponse = await axios.get(tokenUrl)
+      const artBlocksData = artBlocksResponse.data
+      if (artBlocksData.image) {
+        const imageRes = await axios.get(artBlocksData.image)
 
-      // Ensure image is available
-      if (imageRes.status === 200) {
-        mint.image = artBlocksData.image
-        mint.generatorLink = artBlocksData.generator_url
-        mint.tokenName = artBlocksData.name
-        mint.postToDiscord()
-        return true
+        // Triple check to ensure image is available
+        if (imageRes.status === 200) {
+          mint.image = artBlocksData.image
+          mint.generatorLink = artBlocksData.generator_url
+          mint.tokenName = artBlocksData.name
+          mint.postToDiscord()
+          delete this.mintsToPost[id]
+        }
       }
-    }
-
-    return false
+    })
   }
 
   addMint(contractAddress: string, tokenID: string, owner: string) {
-    this.mintsToPost.push(new Mint(this.bot, contractAddress, tokenID, owner))
+    const id = `${contractAddress}-${tokenID}`
+    if (isStaging(contractAddress)) {
+      this.mintsToPost[id] = new Mint(this.bot, contractAddress, tokenID, owner)
+    } else {
+      this.newMints[id] = new Mint(this.bot, contractAddress, tokenID, owner)
+    }
   }
 
   // Routine that runs every MINT_REFRESH_TIME_SECONDS seconds and
   // tries to report any new mints to the discord!
   startRoutine() {
     setInterval(async () => {
-      const goodMints: Mint[] = []
-      await Promise.all(
-        this.mintsToPost.map(async (mint) => {
-          const goodMint = await this.checkMintImage(mint)
-          if (goodMint) {
-            goodMints.push(mint)
-          }
-        })
-      )
-      this.mintsToPost = this.mintsToPost.filter(
-        (mint) => !goodMints.includes(mint)
-      )
+      await this.bulkUpdateNewMintMetadata()
+
+      await this.checkAndPostMints()
     }, MINT_REFRESH_TIME_SECONDS * 1000)
   }
 }

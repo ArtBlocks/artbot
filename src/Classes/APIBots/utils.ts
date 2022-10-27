@@ -9,6 +9,8 @@ const provider = new ethers.providers.EtherscanProvider(
   process.env.ETHERSCAN_API_KEY
 )
 
+const STAGING_CONTRACTS = require('../ProjectConfig/stagingContracts.json')
+
 // Runtime ENS cache just to limit queries
 const ensAddressMap: { [id: string]: string } = {}
 const ensResolvedMap: { [id: string]: string } = {}
@@ -123,6 +125,12 @@ function getVerticalName(msg: string): string {
     default:
       return msg
   }
+}
+
+export function isStaging(contractAddress: string) {
+  return Object.values(STAGING_CONTRACTS).includes(
+    contractAddress.toLowerCase()
+  )
 }
 
 module.exports.ensOrAddress = ensOrAddress

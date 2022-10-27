@@ -1,0 +1,6 @@
+query GetTokensImages($token_ids: [String!]) {
+  tokens_metadata(where: { id: { _in: $token_ids } }) {
+    id
+    image_id
+  }
+}
