@@ -11,6 +11,7 @@ const provider = new ethers.providers.EtherscanProvider(
 
 const STAGING_CONTRACTS = require('../ProjectConfig/stagingContracts.json')
 
+const CORE_CONTRACTS = require('../../ProjectConfig/coreContracts.json')
 // Runtime ENS cache just to limit queries
 const ensAddressMap: { [id: string]: string } = {}
 const ensResolvedMap: { [id: string]: string } = {}
@@ -131,6 +132,20 @@ export function isStaging(contractAddress: string) {
   return Object.values(STAGING_CONTRACTS).includes(
     contractAddress.toLowerCase()
   )
+}
+export function getTokenApiUrl(
+  contractAddress: string,
+  tokenId: string
+): string {
+  contractAddress = contractAddress.toLowerCase()
+  if (
+    Object.values(CORE_CONTRACTS).includes(contractAddress) ||
+    contractAddress === ''
+  ) {
+    return `https://token.artblocks.io/${tokenId}`
+  } else {
+    return `https://token.artblocks.io/${contractAddress}/${tokenId}`
+  }
 }
 
 module.exports.ensOrAddress = ensOrAddress
