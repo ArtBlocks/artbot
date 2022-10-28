@@ -102,16 +102,16 @@ class ReservoirSaleBot extends APIPollBot {
     // Parsing Reservoir sale message to get info
     const tokenID = sale.token.tokenId
 
+    if (sale.orderKind === 'mint') {
+      return // Don't send mint events
+    }
+
     const priceText = 'Sale Price'
     const price = sale.price.amount.decimal
     const currency = sale.price.currency.symbol
     const owner = sale.from
     const platform = sale.orderSource.toLowerCase()
     embed.setColor(this.saleColor)
-
-    if (sale.orderKind === 'mint') {
-      return // Don't send mint events
-    }
 
     if (BAN_ADDRESSES.has(owner)) {
       console.log(`Skipping message propagation for ${owner}`)
