@@ -171,7 +171,9 @@ class ReservoirSaleBot extends APIPollBot {
       curationStatus = 'AB x Pace'
     }
     // Update thumbnail image to use larger variant from Art Blocks API.
-    embed.setThumbnail(artBlocksData.image)
+    if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
+      embed.setThumbnail(artBlocksData.image)
+    }
     embed.addField('Collection', `${curationStatus}`, true)
     // Add inline field for viewing live script on Art Blocks.
     embed.addField(
