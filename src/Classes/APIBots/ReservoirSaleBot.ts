@@ -1,4 +1,5 @@
 import { Client } from 'discord.js'
+import { getTokenApiUrl } from './utils'
 
 const { APIPollBot } = require('./ApiPollBot')
 const { MessageEmbed } = require('discord.js')
@@ -7,6 +8,33 @@ const {
   sendEmbedToSaleChannels,
   BAN_ADDRESSES,
 } = require('../../Utils/activityTriager')
+
+type ReservoirSale = {
+  from: string
+  to: string
+  saleId: string
+  orderSource: string
+  orderKind: string
+  token: {
+    contract: string
+    tokenId: string
+  }
+  price: {
+    currency: {
+      symbol: string
+    }
+    amount: {
+      decimal: number
+    }
+  }
+  timestamp: number
+}
+
+type ReservoirSaleResponse = {
+  sales: ReservoirSale[]
+  continuation: string
+}
+
 /** API Poller for Reservoir Sale events */
 class ReservoirSaleBot extends APIPollBot {
   /** Constructor just calls super
@@ -35,7 +63,7 @@ class ReservoirSaleBot extends APIPollBot {
    * Response spec: https://docs.reservoir.tools/reference/getsalesbulkv1
    * @param {*} responseData - Dict parsed from API request json
    */
-  async handleAPIResponse(responseData: any) {
+  async handleAPIResponse(responseData: ReservoirSaleResponse) {
     let maxTime = 0
     for (const data of responseData.sales) {
       const eventTime = data.timestamp
@@ -66,22 +94,22 @@ class ReservoirSaleBot extends APIPollBot {
   /**
    * Handles constructing and sending Discord embed message
    * OS API Spec: https://docs.opensea.io/reference/retrieving-asset-events
-   * @param {*} msg - Dict of event data from API response
+   * @param {*} sale - Dict of event data from API response
    */
-  async buildDiscordMessage(msg: any) {
+  async buildDiscordMessage(sale: ReservoirSale) {
     // Create embed we will be sending
     const embed = new MessageEmbed()
     // Parsing Reservoir sale message to get info
-    const tokenID = msg.token.tokenId
+    const tokenID = sale.token.tokenId
 
     const priceText = 'Sale Price'
-    const price = msg.price.amount.decimal
-    const currency = msg.price.currency.symbol
-    const owner = msg.from
-    const platform = msg.orderSource
+    const price = sale.price.amount.decimal
+    const currency = sale.price.currency.symbol
+    const owner = sale.from
+    const platform = sale.orderSource.toLowerCase()
     embed.setColor(this.saleColor)
 
-    if (msg.orderKind === 'mint') {
+    if (sale.orderKind === 'mint') {
       return // Don't send mint events
     }
 
@@ -89,57 +117,51 @@ class ReservoirSaleBot extends APIPollBot {
       console.log(`Skipping message propagation for ${owner}`)
       return
     }
+    if (sale.orderSource.toLowerCase().includes('looksrare')) {
+      console.log(`Skipping message propagation for LooksRare`)
+      return
+    }
 
-    let sellerText = await this.ensOrAddress(msg.from)
-    let buyerText = await this.ensOrAddress(msg.to)
-    if (platform.toLowerCase().includes('opensea')) {
+    // Get Art Blocks metadata response for the item.
+    const tokenUrl = getTokenApiUrl(sale.token.contract, tokenID)
+    const artBlocksResponse = await axios.get(tokenUrl)
+    const artBlocksData = artBlocksResponse?.data
+
+    let sellerText = await this.ensOrAddress(sale.from)
+    let buyerText = await this.ensOrAddress(sale.to)
+    let platformUrl = artBlocksData.external_url
+
+    if (platform.includes('opensea')) {
       if (!sellerText.includes('.eth')) {
-        const sellerOS = await this.osName(msg.from)
+        const sellerOS = await this.osName(sale.from)
         sellerText =
           sellerOS === '' ? sellerText : `${sellerText} (OS: ${sellerOS})`
       }
       if (!buyerText.includes('.eth')) {
-        const buyerOS = await this.osName(msg.to)
+        const buyerOS = await this.osName(sale.to)
         buyerText = buyerOS === '' ? buyerText : `${buyerText} (OS: ${buyerOS})`
       }
-    }
 
+      platformUrl = this.buildOpenseaURL(
+        sale.token.contract,
+        sale.token.tokenId
+      )
+    } else if (platform.includes('looksrare')) {
+      platformUrl = this.buildLooksRareURL(
+        sale.token.contract,
+        sale.token.tokenId
+      )
+    } else if (platform.includes('x2y2')) {
+      platformUrl = this.buildX2Y2URL(sale.token.contract, sale.token.tokenId)
+    }
     const baseABProfile = 'https://www.artblocks.io/user/'
     const sellerProfile = baseABProfile + owner
-    const buyerProfile = baseABProfile + msg.to
+    const buyerProfile = baseABProfile + sale.to
     embed.addField(`Seller (${platform})`, `[${sellerText}](${sellerProfile})`)
     embed.addField('Buyer', `[${buyerText}](${buyerProfile})`)
 
     embed.addField(priceText, `${price} ${currency}`, true)
 
-    // Get Art Blocks metadata response for the item.
-    const tokenUrl =
-      this.contract === ''
-        ? `https://token.artblocks.io/${tokenID}`
-        : `https://token.artblocks.io/${this.contract}/${tokenID}`
-    const artBlocksResponse = await axios.get(tokenUrl)
-    const artBlocksData = artBlocksResponse?.data
-    let platformUrl = ''
-    switch (platform.toLowerCase()) {
-      case 'opensea':
-        platformUrl = this.buildOpenseaURL(
-          msg.token.contract,
-          msg.token.tokenId
-        )
-        break
-      case 'looksrare':
-        platformUrl = this.buildLooksRareURL(
-          msg.token.contract,
-          msg.token.tokenId
-        )
-        break
-      case 'x2y2':
-        platformUrl = this.buildX2Y2URL(msg.token.contract, msg.token.tokenId)
-        break
-      default:
-        platformUrl = artBlocksData.external_url
-        break
-    }
     let curationStatus = artBlocksData?.curation_status
       ? artBlocksData.curation_status[0].toUpperCase() +
         artBlocksData.curation_status.slice(1).toLowerCase()
