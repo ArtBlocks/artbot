@@ -2,7 +2,7 @@ import { Client } from 'discord.js'
 import { getTokenApiUrl } from './utils'
 
 const { APIPollBot } = require('./ApiPollBot')
-const { MessageEmbed } = require('discord.js')
+const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
 const {
   sendEmbedToSaleChannels,
@@ -98,7 +98,7 @@ class ReservoirSaleBot extends APIPollBot {
    */
   async buildDiscordMessage(sale: ReservoirSale) {
     // Create embed we will be sending
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
     // Parsing Reservoir sale message to get info
     const tokenID = sale.token.tokenId
 
@@ -157,11 +157,21 @@ class ReservoirSaleBot extends APIPollBot {
     const baseABProfile = 'https://www.artblocks.io/user/'
     const sellerProfile = baseABProfile + owner
     const buyerProfile = baseABProfile + sale.to
-    embed.addField(`Seller (${platform})`, `[${sellerText}](${sellerProfile})`)
-    embed.addField('Buyer', `[${buyerText}](${buyerProfile})`)
-
-    embed.addField(priceText, `${price} ${currency}`, true)
-
+    embed.addFields(
+      {
+        name: `Seller (${platform})`,
+        value: `[${sellerText}](${sellerProfile})`,
+      },
+      {
+        name: `Buyer`,
+        value: `[${buyerText}](${buyerProfile})`,
+      },
+      {
+        name: priceText,
+        value: `${price} ${currency}`,
+        inline: true,
+      }
+    )
     let curationStatus = artBlocksData?.curation_status
       ? artBlocksData.curation_status[0].toUpperCase() +
         artBlocksData.curation_status.slice(1).toLowerCase()
@@ -174,12 +184,17 @@ class ReservoirSaleBot extends APIPollBot {
     if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
       embed.setThumbnail(artBlocksData.image)
     }
-    embed.addField('Collection', `${curationStatus}`, true)
-    // Add inline field for viewing live script on Art Blocks.
-    embed.addField(
-      'Live Script',
-      `[view on artblocks.io](${artBlocksData.external_url})`,
-      true
+    embed.addFields(
+      {
+        name: `Collection`,
+        value: `${curationStatus}`,
+        inline: true,
+      },
+      {
+        name: 'Live Script',
+        value: `[view on artblocks.io](${artBlocksData.external_url})`,
+        inline: true,
+      }
     )
     // Update to remove author name and to reflect this info in piece name
     // rather than token number as the title and URL field..
