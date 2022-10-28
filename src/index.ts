@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
-import { Client } from 'discord.js'
+import { Client, Events, GatewayIntentBits } from 'discord.js'
 const express = require('express')
 const bodyParser = require('body-parser')
 const getArtBlocksFactoryProjects =
@@ -78,12 +78,17 @@ app.listen(PORT, function () {
 })
 
 // Bot setup.
-const bot = new Client()
+const bot = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+})
 bot.login(TOKEN)
 
 bot.on('ready', () => {
   console.info(`Logged in as ${bot.user?.tag}!`)
-  artIndexerBot.startRandomRoutine(bot.channels.cache.get(CHANNEL_ART_CHAT))
   artIndexerBot.startBirthdayRoutine(bot.channels.cache, projectConfig)
 })
 
@@ -92,8 +97,7 @@ const artIndexerBot = new ArtIndexerBot()
 const pbabIndexerBot = new ArtIndexerBot(getPBABProjects)
 const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
 
-// Message event handler.
-bot.on('message', (msg) => {
+bot.on(Events.MessageCreate, async (msg) => {
   const msgAuthor = msg.author.username
   const msgContent = msg.content
   const msgContentLowercase = msgContent.toLowerCase()
@@ -140,9 +144,7 @@ bot.on('message', (msg) => {
         if (typeof smartResponse === 'string') {
           msg.reply(smartResponse)
         } else {
-          msg.reply(null, {
-            embed: smartResponse,
-          })
+          msg.reply({ embeds: [smartResponse] })
         }
       }
     }

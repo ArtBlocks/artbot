@@ -1,6 +1,6 @@
 import { Message } from 'discord.js'
 
-const { MessageEmbed } = require('discord.js')
+const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
 const Web3 = require('web3')
 const { ProjectHandlerHelper } = require('./ProjectHandlerHelper')
@@ -71,19 +71,20 @@ export class ProjectBot {
 
     if (content.toLowerCase().includes('named')) {
       if (this.namedMappings) {
-        msg.channel.send(this.namedMappings.listMappings())
+        msg.channel.send({ embeds: [this.namedMappings.listMappings()] })
       } else {
         msg.channel.send(
-          new MessageEmbed()
+          new EmbedBuilder()
             // Set the title of the field.
             .setTitle('Named Pieces / Sets')
             .setDescription(
               'These are special tokens or sets of tokens that have been given a name by the community! Try them out here with `#<token>` or `#? <set>`'
             )
-            .addField(
-              'No named tokens or sets!',
-              "I don't have any named tokens or sets for this project yet! [You can propose some here](https://github.com/ArtBlocks/artbot/issues/new/choose)"
-            )
+            .addFields({
+              name: 'No named tokens or sets!',
+              value:
+                "I don't have any named tokens or sets for this project yet! [You can propose some here](https://github.com/ArtBlocks/artbot/issues/new/choose)",
+            })
         )
       }
       return
@@ -153,20 +154,27 @@ export class ProjectBot {
     // If user did *not* request full details, return just a large image,
     // along with a link to the OpenSea page and ArtBlocks live script.
     if (!detailsRequested) {
-      const imageContent = new MessageEmbed()
+      const imageContent = new EmbedBuilder()
         // Set the title of the field.
         .setTitle(title)
         // Add link to title.
         .setURL(titleLink)
-        .addField(
-          'Live Script',
-          `[Generator](${artBlocksData.generator_url})`,
-          true
+        .addFields(
+          {
+            name: 'Live Script',
+            value: `[Generator](${artBlocksData.generator_url})`,
+            inline: true,
+          },
+          {
+            name: 'Want More Info?',
+            value: moreDetailsText,
+            inline: true,
+          }
         )
-        .addField('Want More Info?', moreDetailsText, true)
         // Set the full image for embed.
         .setImage(artBlocksData.image)
-      msg.channel.send(imageContent)
+
+      msg.channel.send({ embeds: [imageContent] })
       return
     }
 
@@ -178,7 +186,7 @@ export class ProjectBot {
             .map((key) => `${key}: ${features[key]}`)
             .join('\n')
         : 'Not yet available.'
-    const embedContent = new MessageEmbed()
+    const embedContent = new EmbedBuilder()
       // Set the title of the field.
       .setTitle(title)
       // Add link to title.
@@ -188,14 +196,19 @@ export class ProjectBot {
       // Set the main content of the embed
       .setThumbnail(artBlocksData.image)
       // Add "Live Script" field.
-      .addField(
-        'Live Script',
-        `[view on artblocks.io](${artBlocksData.external_url})`
+      .addFields(
+        {
+          name: 'Live Script',
+          value: `[Generator](${artBlocksData.generator_url})`,
+          inline: true,
+        },
+        {
+          name: 'Features',
+          value: assetFeatures,
+        }
       )
-      // Add "Features" field.
-      .addField('Features', assetFeatures)
 
-    msg.channel.send(embedContent)
+    console.log(embedContent)
   }
 
   parseOwnerInfo(ownerAccount: any) {
@@ -279,7 +292,7 @@ export class ProjectBot {
       }
       const title = `:tada:  Happy Birthday to ${artBlocksData.collection_name}!  :tada:`
 
-      const embedContent = new MessageEmbed()
+      const embedContent = new EmbedBuilder()
         .setColor('#9370DB')
         .setTitle(title)
         .setImage(artBlocksData.image)
@@ -298,18 +311,18 @@ export class ProjectBot {
       // Send all birthdays to #block-talk
 
       let channel = channels.get(projectConfig.chIdByName['block-talk'])
-      channel.send(embedContent)
+      channel.send({ embeds: [embedContent] })
 
       if (projectConfig.projectToChannel[this.projectNumber]) {
         // Send in artist channel if one exists
         channel = channels.get(
           projectConfig.projectToChannel[this.projectNumber]
         )
-        channel.send(embedContent)
+        channel.send({ embeds: [embedContent] })
       } else {
         // Otherwise send in #factory-projects
         channel = channels.get(projectConfig.chIdByName['factory-projects'])
-        channel.send(embedContent)
+        channel.send({ embeds: [embedContent] })
       }
     } catch (err) {
       console.error(

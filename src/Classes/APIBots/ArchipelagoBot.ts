@@ -3,7 +3,7 @@ import { Client } from 'discord.js'
 const fetch = require('node-fetch')
 const ReconnectingWebsocket = require('reconnecting-websocket')
 const WS = require('ws')
-const { MessageEmbed } = require('discord.js')
+const { EmbedBuilder } = require('discord.js')
 const CORE_CONTRACTS = require('../../ProjectConfig/coreContracts.json')
 const { ensOrAddress } = require('./utils')
 
@@ -102,17 +102,19 @@ class ArchipelagoBot {
     }
     const sellerText = await ensOrAddress(seller)
     const archipelagoUrl = `https://archipelago.art/collections/${slug}/${tokenIndex}`
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
     const sellerUrl = `https://archipelago.art/address/${seller}`
-    embed.addField('Seller (Archipelago)', `[${sellerText}](${sellerUrl})`)
-    embed.addField('List Price', priceToString(price) + ' ETH')
+    embed.addFields(
+      { name: 'Seller (Archipelago)', value: `[${sellerText}](${sellerUrl})` },
+      { name: 'List Price', value: priceToString(price) + ' ETH' },
+      {
+        name: 'Live Script',
+        value: `[view on artblocks.io](${artBlocksData.external_url})`,
+        inline: true,
+      }
+    )
     embed.setColor(ARCHIPELAGO_GOLD)
     embed.setThumbnail(artBlocksData.image)
-    embed.addField(
-      'Live Script',
-      `[view on artblocks.io](${artBlocksData.external_url})`,
-      true
-    )
     embed.author = null
     embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`)
     embed.setURL(archipelagoUrl)
@@ -134,23 +136,26 @@ class ArchipelagoBot {
       return
     }
     const archipelagoUrl = `https://archipelago.art/collections/${slug}/${tokenIndex}`
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
 
     const sellerText = await ensOrAddress(seller)
     const buyerText = await ensOrAddress(buyer)
 
     const sellerUrl = `https://archipelago.art/address/${seller}`
-    embed.addField('Seller (Archipelago)', `[${sellerText}](${sellerUrl})`)
     const buyerUrl = `https://archipelago.art/address/${buyer}`
-    embed.addField('Buyer', `[${buyerText}](${buyerUrl})`)
-    embed.addField('Price', priceToString(price) + ' ETH')
+
+    embed.addFields(
+      { name: 'Seller (Archipelago)', value: `[${sellerText}](${sellerUrl})` },
+      { name: 'Buyer', value: `[${buyerText}](${buyerUrl})` },
+      { name: 'Price', value: priceToString(price) + ' ETH' },
+      {
+        name: 'Live Script',
+        value: `[view on artblocks.io](${artBlocksData.external_url})`,
+        inline: true,
+      }
+    )
     embed.setColor(ARCHIPELAGO_GOLD)
     embed.setThumbnail(artBlocksData.image)
-    embed.addField(
-      'Live Script',
-      `[view on artblocks.io](${artBlocksData.external_url})`,
-      true
-    )
     embed.author = null
     embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`)
     embed.setURL(archipelagoUrl)
