@@ -89,17 +89,24 @@ export class MintBot {
           return
         }
 
-        const artBlocksData = artBlocksResponse.data
-        if (artBlocksData.image) {
-          const imageRes = await axios.get(artBlocksData.image)
-          // Double check to ensure image is available
-          if (imageRes.status === 200) {
-            delete this.mintsToPost[id]
-            mint.image = artBlocksData.image
-            mint.generatorLink = artBlocksData.generator_url
-            mint.tokenName = artBlocksData.name
-            mint.postToDiscord()
+        try {
+          const artBlocksData = artBlocksResponse.data
+          if (artBlocksData.image) {
+            const imageRes = await axios.get(artBlocksData.image)
+            // Double check to ensure image is available
+            if (imageRes.status === 200) {
+              delete this.mintsToPost[id]
+              mint.image = artBlocksData.image
+              mint.generatorLink = artBlocksData.generator_url
+              mint.tokenName = artBlocksData.name
+              mint.artistName = artBlocksData.artist
+              mint.artblocksUrl = artBlocksData.external_url
+              mint.postToDiscord()
+            }
           }
+        } catch (e) {
+          console.log('Error getting mint id:', e)
+          return
         }
       })
     )
@@ -143,6 +150,8 @@ class Mint {
   image: string
   generatorLink: string
   tokenName: string
+  artistName: string
+  artblocksUrl: string
   constructor(
     bot: Client,
     contractAddress: string,
@@ -156,6 +165,8 @@ class Mint {
     this.image = ''
     this.generatorLink = ''
     this.tokenName = ''
+    this.artistName = ''
+    this.artblocksUrl = ''
   }
 
   async postToDiscord() {
@@ -176,11 +187,11 @@ class Mint {
       `[view on artblocks.io](${this.generatorLink})`,
       true
     )
-    // Update to remove author name and to reflect this info in piece name
-    // rather than token number as the title and URL field..
-    embed.author = null
-    embed.setTitle(`Minted: ${this.tokenName}`)
 
+    embed.author = null
+    embed.setTitle(`Minted: ${this.tokenName} - ${this.artistName}`)
+
+    embed.setURL(this.artblocksUrl)
     mintBot.contractToChannel[this.contractAddress].forEach(
       (channel: string) => {
         const discordChannel = this.bot.channels?.cache.get(
