@@ -311,8 +311,12 @@ async function smartBotResponse(
     (msgContentLowercase.includes('thanks') ||
       msgContentLowercase.includes('thank you') ||
       msgContentLowercase.includes('gracias') ||
+      msgContentLowercase.includes('asante') ||
+      msgContentLowercase.includes('domo arigato') ||
+      msgContentLowercase.includes('cheers') ||
       msgContentLowercase.includes('danke')) &&
-    msgContentLowercase.includes('grant')
+    (msgContentLowercase.includes('grant') ||
+    msgContentLowercase.includes('grant-san'))
   ) {
     grantThanks++
 
