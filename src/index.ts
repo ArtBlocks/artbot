@@ -7,9 +7,10 @@ const getArtBlocksFactoryProjects =
   require('./Utils/parseArtBlocksAPI').getArtBlocksFactoryProjects
 
 const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot
+import { MintBot } from './Classes/MintBot'
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json')
-const { ReservoirSaleBot } = require('./Classes/APIBots/ReservoirSaleBot')
+import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
 const { ReservoirListBot } = require('./Classes/APIBots/ReservoirListBot')
 const { ArchipelagoBot } = require('./Classes/APIBots/ArchipelagoBot')
 // Special handlers.
@@ -73,6 +74,41 @@ app.get('/update', function (req: any, res: any) {
   })
 })
 
+type MintEvent = {
+  event: {
+    data: {
+      new: {
+        contract_address: string
+        owner_address: string
+        project_name: string
+        token_id: string
+        minted_at: string
+      }
+    }
+  }
+}
+
+app.post('/new-mint', function (req: any, res: any) {
+  const mintEvent = req.body as MintEvent
+  const mintData = mintEvent.event.data.new
+
+  if (req.headers.webhook_secret !== process.env.MINT_WEBHOOK_SECRET) {
+    console.log('Invalid mint webhook secret')
+    res.status(401).json({ status: 'unauthorized' })
+    return
+  }
+
+  mintBot.addMint(
+    mintData.contract_address,
+    mintData.token_id,
+    mintData.owner_address
+  )
+  res.setHeader('Content-Type', 'application/json')
+  res.json({
+    success: true,
+  })
+})
+
 app.listen(PORT, function () {
   console.log('Server is listening on port ', PORT)
 })
@@ -96,6 +132,8 @@ const factoryParty = new ArtIndexerBot(getArtBlocksFactoryProjects)
 const artIndexerBot = new ArtIndexerBot()
 const pbabIndexerBot = new ArtIndexerBot(getPBABProjects)
 const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
+
+export const mintBot = new MintBot(bot)
 
 bot.on(Events.MessageCreate, async (msg) => {
   const msgAuthor = msg.author.username
