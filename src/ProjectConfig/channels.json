@@ -654,15 +654,6 @@
   "1014641051140624445": {
     "name": "engine-mints"
   },
-  "880937060075192320": {
-    "name": "fidenza-and-ic-sales",
-    "projectBotHandlers": {
-      "default": "78",
-      "stringTriggers": {
-        "228": ["ic", "incomplete", "control"]
-      }
-    }
-  },
   "919937880288284722": {
     "name": "plottables-numbersinmotion",
     "projectBotHandlers": {

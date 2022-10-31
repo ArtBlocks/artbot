@@ -7,8 +7,6 @@ const CHANNEL_SALES = projectConfig.chIdByName['sales-feed']
 const CHANNEL_LISTINGS = projectConfig.chIdByName['listing-feed']
 const CHANNEL_SQUIGGLE_SALES = projectConfig.chIdByName['squiggle_square']
 const CHANNEL_SQUIGGLE_LISTINGS = projectConfig.chIdByName['squiggle-listings']
-const CHANNEL_FIDENZA_AND_IC_SALES =
-  projectConfig.chIdByName['fidenza-and-ic-sales']
 // AB x Pace
 const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
 
@@ -201,16 +199,6 @@ function sendEmbedToSaleChannels(bot, embed, artBlocksData) {
     if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
       bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send({ embeds: [embed] })
     }
-    if (artBlocksData.collection_name.includes('Fidenza')) {
-      bot.channels.cache
-        .get(CHANNEL_FIDENZA_AND_IC_SALES)
-        .send({ embeds: [embed] })
-    }
-    if (artBlocksData.collection_name.includes('Incomplete Control')) {
-      bot.channels.cache
-        .get(CHANNEL_FIDENZA_AND_IC_SALES)
-        .send({ embeds: [embed] })
-    }
     // Send Pace sales to AB x Pace channel
     if (artBlocksData.platform.includes('Art Blocks x Pace')) {
       bot.channels.cache.get(CHANNEL_AB_X_PACE).send({ embeds: [embed] })
@@ -233,16 +221,6 @@ function sendEmbedToListChannels(bot, embed, artBlocksData) {
     if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
       bot.channels.cache
         .get(CHANNEL_SQUIGGLE_LISTINGS)
-        .send({ embeds: [embed] })
-    }
-    if (artBlocksData.collection_name.includes('Fidenza')) {
-      bot.channels.cache
-        .get(CHANNEL_FIDENZA_AND_IC_SALES)
-        .send({ embeds: [embed] })
-    }
-    if (artBlocksData.collection_name.includes('Incomplete Control')) {
-      bot.channels.cache
-        .get(CHANNEL_FIDENZA_AND_IC_SALES)
         .send({ embeds: [embed] })
     }
   } catch (e) {
