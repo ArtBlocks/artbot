@@ -309,8 +309,13 @@ async function smartBotResponse(
   if (
     channelID == CHANNEL_BLOCK_TALK &&
     (msgContentLowercase.includes('thanks') ||
-      msgContentLowercase.includes('thank you')) &&
-    msgContentLowercase.includes('grant')
+      msgContentLowercase.includes('thank you') ||
+      msgContentLowercase.includes('gracias') ||
+      msgContentLowercase.includes('domo arigato') ||
+      msgContentLowercase.includes('cheers') ||
+      msgContentLowercase.includes('danke')) &&
+    (msgContentLowercase.includes('grant') ||
+    msgContentLowercase.includes('grant-san'))
   ) {
     grantThanks++
 
