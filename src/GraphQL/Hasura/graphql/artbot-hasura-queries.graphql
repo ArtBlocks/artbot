@@ -1,0 +1,17 @@
+query getProjectStartTimes($first: Int!, $skip: Int) {
+  projects_metadata(limit: $first, offset: $skip) {
+    id
+    start_datetime
+  }
+}
+
+query getAllProjectsCurationStatus($first: Int!, $skip: Int) {
+  projects_metadata(limit: $first, offset: $skip) {
+    id
+    vertical_name
+    heritage_curation_status
+    vertical {
+      category_name
+    }
+  }
+}

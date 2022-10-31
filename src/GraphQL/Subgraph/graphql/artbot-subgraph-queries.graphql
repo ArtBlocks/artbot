@@ -1,0 +1,111 @@
+query getContractProjectsMinimal($id: ID!, $first: Int!, $skip: Int) {
+  contract(id: $id) {
+    projects(first: $first, skip: $skip, orderBy: projectId) {
+      projectId
+    }
+  }
+}
+
+query getContractProjects($id: ID!, $first: Int!, $skip: Int) {
+  contract(id: $id) {
+    projects(first: $first, skip: $skip, orderBy: projectId) {
+      projectId
+      name
+      invocations
+      maxInvocations
+      curationStatus
+      active
+      artistName
+      contract {
+        id
+      }
+    }
+  }
+}
+
+query getContractOpenProjects($id: ID!, $first: Int!, $skip: Int) {
+  contract(id: $id) {
+    projects(
+      first: $first
+      skip: $skip
+      orderBy: projectId
+      where: { paused: false, active: true, complete: false }
+    ) {
+      projectId
+      name
+      invocations
+      maxInvocations
+      curationStatus
+      active
+      contract {
+        id
+      }
+    }
+  }
+}
+
+query getContractProject($id: ID!, $projectId: BigInt!) {
+  contract(id: $id) {
+    projects(where: { projectId: $projectId }) {
+      name
+      invocations
+      maxInvocations
+      active
+      curationStatus
+      artistName
+      contract {
+        id
+      }
+    }
+  }
+}
+
+query getContractProjectsWithCurationStatus(
+  $id: ID!
+  $first: Int!
+  $skip: Int
+  $curationStatus: String
+) {
+  contract(id: $id) {
+    projects(
+      where: { curationStatus: $curationStatus, active: true }
+      first: $first
+      skip: $skip
+      orderBy: projectId
+    ) {
+      projectId
+      name
+      invocations
+      maxInvocations
+      active
+      curationStatus
+      contract {
+        id
+      }
+    }
+  }
+}
+
+query getWalletTokens(
+  $wallet: String!
+  $contracts: [String!]!
+  $first: Int!
+  $skip: Int
+) {
+  tokens(
+    first: $first
+    skip: $skip
+    where: { owner: $wallet, contract_in: $contracts }
+  ) {
+    invocation
+    project {
+      name
+    }
+  }
+}
+
+query getEngineContracts($ids: [ID!]) {
+  contracts(where: { id_not_in: $ids }) {
+    id
+  }
+}
