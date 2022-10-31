@@ -82,6 +82,7 @@ type MintEvent = {
         owner_address: string
         project_name: string
         token_id: string
+        minted_at: string
       }
     }
   }
@@ -89,10 +90,10 @@ type MintEvent = {
 
 app.post('/new-mint', function (req: any, res: any) {
   const mintEvent = req.body as MintEvent
-  // console.log('NEW MINT RECEIVED with body:\n', mintEvent, '\n')
   const mintData = mintEvent.event.data.new
 
   if (req.headers.webhook_secret !== process.env.MINT_WEBHOOK_SECRET) {
+    console.log('Invalid mint webhook secret')
     res.status(401).json({ status: 'unauthorized' })
     return
   }

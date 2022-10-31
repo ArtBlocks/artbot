@@ -1,19 +1,18 @@
-import { Client, TextChannel } from 'discord.js'
+import { Client, EmbedBuilder, TextChannel } from 'discord.js'
 import { mintBot } from '../index'
 import axios, { AxiosError } from 'axios'
 import { getTokenApiUrl } from './APIBots/utils'
-const { MessageEmbed } = require('discord.js')
-const { ensOrAddress } = require('./APIBots/utils')
+import { ensOrAddress } from './APIBots/utils'
 
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
-const MINT_REFRESH_TIME_SECONDS = 30
 const MINT_CONFIG: {
   [id: string]: string[]
 } = require('../ProjectConfig/mintBotConfig.json')
 const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
 const COLLAB_CONTRACTS = require('../ProjectConfig/collaborationContracts.json')
 const STAGING_CONTRACTS = require('../ProjectConfig/stagingContracts.json')
-// Handles all logic and posting of new project mints!
+
+const MINT_REFRESH_TIME_SECONDS = process.env.MINT_REFRESH_TIME_SECONDS ?? '60'
 
 enum MintType {
   CORE = 'CORE',
@@ -22,6 +21,7 @@ enum MintType {
   STAGING = 'STAGING',
 }
 
+// Handles all logic and posting of new project mints!
 export class MintBot {
   bot: Client
   newMints: { [id: string]: Mint } = {}
@@ -85,7 +85,7 @@ export class MintBot {
             delete this.mintsToPost[id]
             return
           }
-          console.log('ERROR', e)
+          console.log(`Error on fetching token API for ${id}`, e)
           return
         }
 
@@ -105,7 +105,7 @@ export class MintBot {
             }
           }
         } catch (e) {
-          console.log('Error getting mint id:', e)
+          console.log(`Error getting mint ${id}:`, e)
           return
         }
       })
@@ -138,7 +138,7 @@ export class MintBot {
         console.log(`${Object.keys(this.mintsToPost).length} mints to post`)
       }
       await this.checkAndPostMints()
-    }, MINT_REFRESH_TIME_SECONDS * 1000)
+    }, parseInt(MINT_REFRESH_TIME_SECONDS) * 1000)
   }
 }
 
@@ -171,34 +171,37 @@ class Mint {
 
   async postToDiscord() {
     // Create embed we will be sending
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
     const ownerText = await ensOrAddress(this.owner)
 
     const baseABProfile = 'https://www.artblocks.io/user/'
     const ownerProfile = baseABProfile + this.owner
-    embed.addField('Minted by', `[${ownerText}](${ownerProfile})`)
 
-    // Update thumbnail image to use larger variant from Art Blocks API.
+    embed.setTitle(`Minted: ${this.tokenName} - ${this.artistName}`)
+    embed.setURL(this.artblocksUrl)
     embed.setImage(this.image)
+    embed.setColor('#c9fdc9')
 
-    // Add inline field for viewing live script on Art Blocks.
-    embed.addField(
-      'Live Script',
-      `[view on artblocks.io](${this.generatorLink})`,
-      true
+    embed.addFields(
+      {
+        name: 'Minted by',
+        value: `[${ownerText}](${ownerProfile})`,
+        inline: true,
+      },
+      {
+        name: 'Live Script',
+        value: `[Generator](${this.generatorLink})`,
+        inline: true,
+      }
     )
 
-    embed.author = null
-    embed.setTitle(`Minted: ${this.tokenName} - ${this.artistName}`)
-
-    embed.setURL(this.artblocksUrl)
     mintBot.contractToChannel[this.contractAddress].forEach(
       (channel: string) => {
         const discordChannel = this.bot.channels?.cache.get(
           projectConfig.chIdByName[channel]
         ) as TextChannel
         if (discordChannel) {
-          discordChannel.send(embed)
+          discordChannel.send({ embeds: [embed] })
         }
       }
     )

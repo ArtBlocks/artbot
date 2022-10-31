@@ -64,7 +64,7 @@ async function resolveEnsName(ensName: string): Promise<string> {
   return wallet
 }
 
-async function ensOrAddress(address: string): Promise<string> {
+export async function ensOrAddress(address: string): Promise<string> {
   const ens = await getENSName(address)
   return ens !== '' ? ens : address
 }
