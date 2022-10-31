@@ -1,5 +1,5 @@
 /* eslint-disable no-prototype-builtins */
-const { MessageEmbed } = require('discord.js')
+const { EmbedBuilder } = require('discord.js')
 class ProjectHandlerHelper {
   constructor(singles, sets) {
     this.singles = singles
@@ -7,7 +7,7 @@ class ProjectHandlerHelper {
   }
 
   listMappings() {
-    let message = new MessageEmbed()
+    let message = new EmbedBuilder()
       // Set the title of the field.
       .setTitle('Available Named Pieces / Sets')
       .setDescription(
@@ -21,7 +21,7 @@ class ProjectHandlerHelper {
         singles += `${singleName}
       `
       }
-      message.addField('Tokens', singles)
+      message.addFields({ name: 'Tokens', value: singles })
     }
 
     if (this.sets) {
@@ -29,14 +29,15 @@ class ProjectHandlerHelper {
         sets += `${setName}
       `
       }
-      message.addField('Sets', sets)
+      message.addFields({ name: 'Sets', value: sets })
     }
 
     if (!singles && !sets) {
-      message.addField(
-        'No named tokens or sets!',
-        "I don't have any named tokens or sets for this project yet! [You can propose some here](https://github.com/ArtBlocks/artbot/issues/new/choose)"
-      )
+      message.addFields({
+        name: 'No named tokens or sets!',
+        value:
+          "I don't have any named tokens or sets for this project yet! [You can propose some here](https://github.com/ArtBlocks/artbot/issues/new/choose)",
+      })
     }
 
     return message

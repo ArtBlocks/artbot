@@ -2,7 +2,7 @@ import { Client } from 'discord.js'
 import { getTokenApiUrl } from './utils'
 
 const { APIPollBot } = require('./ApiPollBot')
-const { MessageEmbed } = require('discord.js')
+const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
 const {
   sendEmbedToSaleChannels,
@@ -98,9 +98,13 @@ export class ReservoirSaleBot extends APIPollBot {
    */
   async buildDiscordMessage(sale: ReservoirSale) {
     // Create embed we will be sending
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
     // Parsing Reservoir sale message to get info
     const tokenID = sale.token.tokenId
+
+    if (sale.orderKind === 'mint') {
+      return // Don't send mint events
+    }
 
     const priceText = 'Sale Price'
     const price = sale.price.amount.decimal
@@ -108,10 +112,6 @@ export class ReservoirSaleBot extends APIPollBot {
     const owner = sale.from
     const platform = sale.orderSource.toLowerCase()
     embed.setColor(this.saleColor)
-
-    if (sale.orderKind === 'mint') {
-      return // Don't send mint events
-    }
 
     if (BAN_ADDRESSES.has(owner)) {
       console.log(`Skipping message propagation for ${owner}`)
@@ -157,11 +157,21 @@ export class ReservoirSaleBot extends APIPollBot {
     const baseABProfile = 'https://www.artblocks.io/user/'
     const sellerProfile = baseABProfile + owner
     const buyerProfile = baseABProfile + sale.to
-    embed.addField(`Seller (${platform})`, `[${sellerText}](${sellerProfile})`)
-    embed.addField('Buyer', `[${buyerText}](${buyerProfile})`)
-
-    embed.addField(priceText, `${price} ${currency}`, true)
-
+    embed.addFields(
+      {
+        name: `Seller (${platform})`,
+        value: `[${sellerText}](${sellerProfile})`,
+      },
+      {
+        name: `Buyer`,
+        value: `[${buyerText}](${buyerProfile})`,
+      },
+      {
+        name: priceText,
+        value: `${price} ${currency}`,
+        inline: true,
+      }
+    )
     let curationStatus = artBlocksData?.curation_status
       ? artBlocksData.curation_status[0].toUpperCase() +
         artBlocksData.curation_status.slice(1).toLowerCase()
@@ -171,13 +181,20 @@ export class ReservoirSaleBot extends APIPollBot {
       curationStatus = 'AB x Pace'
     }
     // Update thumbnail image to use larger variant from Art Blocks API.
-    embed.setThumbnail(artBlocksData.image)
-    embed.addField('Collection', `${curationStatus}`, true)
-    // Add inline field for viewing live script on Art Blocks.
-    embed.addField(
-      'Live Script',
-      `[view on artblocks.io](${artBlocksData.external_url})`,
-      true
+    if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
+      embed.setThumbnail(artBlocksData.image)
+    }
+    embed.addFields(
+      {
+        name: `Collection`,
+        value: `${curationStatus}`,
+        inline: true,
+      },
+      {
+        name: 'Live Script',
+        value: `[view on artblocks.io](${artBlocksData.external_url})`,
+        inline: true,
+      }
     )
     // Update to remove author name and to reflect this info in piece name
     // rather than token number as the title and URL field..

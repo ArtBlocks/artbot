@@ -2,7 +2,7 @@ import { Client } from 'discord.js'
 import { getTokenApiUrl } from './utils'
 
 const { APIPollBot } = require('./ApiPollBot')
-const { MessageEmbed } = require('discord.js')
+const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
 const {
   sendEmbedToListChannels,
@@ -88,7 +88,7 @@ class ReservoirListBot extends APIPollBot {
    */
   async buildDiscordMessage(listing: ReservoirListing) {
     // Create embed we will be sending
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
 
     // Parsing message to get info
     const tokenID = listing.tokenSetId.split(':')[2]
@@ -113,9 +113,18 @@ class ReservoirListBot extends APIPollBot {
     const sellerText = await this.ensOrAddress(listing.maker)
     const baseABProfile = 'https://www.artblocks.io/user/'
     const sellerProfile = baseABProfile + owner
-    embed.addField(`Seller (${platform})`, `[${sellerText}](${sellerProfile})`)
 
-    embed.addField(priceText, `${price} ${currency}`, true)
+    embed.addFields(
+      {
+        name: `Seller (${platform})`,
+        value: `[${sellerText}](${sellerProfile})`,
+      },
+      {
+        name: priceText,
+        value: `${price} ${currency}`,
+        inline: true,
+      }
+    )
 
     // Get Art Blocks metadata response for the item.
     const tokenUrl = getTokenApiUrl(listing.contract, tokenID)
@@ -130,15 +139,23 @@ class ReservoirListBot extends APIPollBot {
     if (artBlocksData?.platform === 'Art Blocks x Pace') {
       curationStatus = 'AB x Pace'
     }
-    // Update thumbnail image to use larger variant from Art Blocks API.
-    embed.setThumbnail(artBlocksData.image)
-    embed.addField('Collection', `${curationStatus}`, true)
 
-    // Add inline field for viewing live script on Art Blocks.
-    embed.addField(
-      'Live Script',
-      `[view on artblocks.io](${artBlocksData.external_url})`,
-      true
+    // Update thumbnail image to use larger variant from Art Blocks API.
+    if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
+      embed.setThumbnail(artBlocksData.image)
+    }
+
+    embed.addFields(
+      {
+        name: `Collection`,
+        value: `${curationStatus}`,
+        inline: true,
+      },
+      {
+        name: 'Live Script',
+        value: `[view on artblocks.io](${artBlocksData.external_url})`,
+        inline: true,
+      }
     )
 
     const platformUrl = listing.source.url

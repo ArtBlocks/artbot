@@ -1,4 +1,4 @@
-import { Channel, Collection, Message, TextChannel } from 'discord.js'
+import { Channel, Collection, Message } from 'discord.js'
 import * as dotenv from 'dotenv'
 import { ProjectBot } from './ProjectBot'
 dotenv.config()
@@ -25,8 +25,6 @@ const { isWallet } = require('./APIBots/utils')
 const METADATA_REFRESH_INTERVAL_MINUTES =
   process.env.METADATA_REFRESH_INTERVAL_MINUTES ?? '60'
 
-// RandomBot Stuff
-const RANDOM_ART_AMOUNT = 10
 // Time for random art (UTC) - 8am EST
 const RANDOM_ART_TIME = new Date()
 RANDOM_ART_TIME.setHours(12)
@@ -212,24 +210,6 @@ class ArtIndexerBot {
     }
 
     return projectKey
-  }
-
-  async startRandomRoutine(channel: TextChannel) {
-    const msg = {} as Message
-    msg.content = '#?'
-    msg.channel = channel
-    // Try to message(s) in #ab-art-chat every minute
-    setInterval(() => {
-      const now = new Date()
-      // Only send message if hour and minute match up with specified time
-      if (
-        now.getHours() !== RANDOM_ART_TIME.getHours() ||
-        now.getMinutes() !== RANDOM_ART_TIME.getMinutes()
-      ) {
-        return
-      }
-      this.sendRandomProjectRandomTokenMessage(msg, RANDOM_ART_AMOUNT)
-    }, 1 * 60000)
   }
 
   async startBirthdayRoutine(

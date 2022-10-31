@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { MessageEmbed } = require('discord.js')
+const { EmbedBuilder } = require('discord.js')
 const fetch = require('node-fetch')
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 
@@ -13,20 +13,6 @@ const CHANNEL_TRADE_SWAPS = projectConfig.chIdByName['trade-swaps']
 const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
 
-/*
- * Specific OpenSea assets for fetching project stats for "ArtBlocks Curated"
- * and "Artist Playground".
- * Squiggle #0
- */
-const ARTBLOCKS_CURATED_ASSET =
-  'https://api.opensea.io/api/v1/asset/0x059edd72cd353df5106d2b9cc5ab83a52287ac3a/0'
-// View Card #0
-const ARTBLOCKS_PLAYGROUND_ASSET =
-  'https://api.opensea.io/api/v1/asset/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/6000000'
-// Light Beams #0
-const ARTBLOCKS_FACTORY_ASSET =
-  'https://api.opensea.io/api/v1/asset/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/32000000'
-
 // ArtBot details..
 const ARTBOT_USERNAME = 'artbot'
 const ARTBOT_GREEN = 0x00ff00
@@ -38,14 +24,14 @@ function randomColor() {
 }
 
 // Thank you message for people asking the artbot how it is.
-const ARTBOT_HOW_ARE_YOU = new MessageEmbed()
+const ARTBOT_HOW_ARE_YOU = new EmbedBuilder()
   // Set the main content of the embed
   .setDescription(
     `I'm doing well! :) Heard the puzzle piece Generative Artworks gave me came in handy.`
   )
 
 // Custom message shown when someone asks why Squiggle minting is paused.
-const SQUIGGLE_PAUSE_MESSAGE = new MessageEmbed()
+const SQUIGGLE_PAUSE_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle('Why is Squiggle minting paused?')
   // Set the color of the embed
@@ -56,7 +42,7 @@ const SQUIGGLE_PAUSE_MESSAGE = new MessageEmbed()
   )
 
 // Custom messages shown when someone asks about applications.
-const APPLICATIONS_OPEN_MESSAGE = new MessageEmbed()
+const APPLICATIONS_OPEN_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle('How do I apply to release my project on Art Blocks?')
   // Set the color of the embed
@@ -67,7 +53,7 @@ const APPLICATIONS_OPEN_MESSAGE = new MessageEmbed()
   )
 
 // Custom message shown when someone asks about gas.
-const GAS_MESSAGE = new MessageEmbed()
+const GAS_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle('Should I modify the gas settings?')
   // Set the color of the embed
@@ -78,7 +64,7 @@ const GAS_MESSAGE = new MessageEmbed()
   )
 
 // Custom message shown when someone asks artbot about high gas.
-const MM_HIGH_GAS_MESSAGE = new MessageEmbed()
+const MM_HIGH_GAS_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle('Why is MetaMask showing an extremely high gas fee?')
   // Set the color of the embed
@@ -89,7 +75,7 @@ const MM_HIGH_GAS_MESSAGE = new MessageEmbed()
   )
 
 // Custom message shown when someone asks about when the next drop is.
-const NEXT_DROP_MESSAGE = new MessageEmbed()
+const NEXT_DROP_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle('When is the next drop?')
   // Set the color of the embed
@@ -99,7 +85,7 @@ const NEXT_DROP_MESSAGE = new MessageEmbed()
     `It looks like you're wondering about when the next drop is.\n\nFor details on upcoming scheduled releases, please check the [#upcoming-projects](https://discord.com/channels/411959613370400778/872986185167949885) channel.`
   )
 
-const OPENSEA_CURATED_MESSAGE = new MessageEmbed()
+const OPENSEA_CURATED_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle(
     'Why is this non-curated project showing up as "ArtBlocks Curated" on OpenSea?'
@@ -115,7 +101,7 @@ const OPENSEA_CURATED_MESSAGE = new MessageEmbed()
  * Custom message shown when someone asks what the "Heritage" vs. "Curated"
  * vs. "Explorations", etc is.
  */
-const VERTICALS_MESSAGE = new MessageEmbed()
+const VERTICALS_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle(
     'How are Curated, Explorations, Presents, Collaborations, and Heritage different?'
@@ -138,7 +124,7 @@ const VERTICALS_MESSAGE = new MessageEmbed()
   `
   )
 
-const V2_MESSAGE = new MessageEmbed()
+const V2_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle('What is Art Blocks 2.0?')
   // Set the color of the embed
@@ -149,7 +135,7 @@ const V2_MESSAGE = new MessageEmbed()
   )
 
 // Custom message shown when someone asks for the OpenSea links.
-const OPENSEA_LINKS_MESSAGE = new MessageEmbed()
+const OPENSEA_LINKS_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle('Looking for ArtBlocks on OpenSea?')
   // Set the color of the embed
@@ -160,7 +146,7 @@ const OPENSEA_LINKS_MESSAGE = new MessageEmbed()
   )
 
 // Custom message shown when someone asks about when the next drop is.
-const HELP_MESSAGE = new MessageEmbed()
+const HELP_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle('Looking for help?')
   // Set the color of the embed
@@ -175,7 +161,6 @@ const HELP_MESSAGE = new MessageEmbed()
     **presents?** (or **curated?** or **heritage?** or **collaborations?** or **explorations?**): Information about the different types of Art Blocks projects.
     **v2?**: Information about Art Blocks 2.0.
     **opensea?**: Links to the three different Art Blocks collections on OpenSea (Curated, Playground, and Factory).
-    **metrics?**: The latest Art Blocks platform metrics.
     **applications?**: An explanation of the current state of the Art Blocks application process.
     **gas?**: An explanation of what gas is and why you should **never** modify the gas limit.
     **staysafe?**: Tips on avoiding scams
@@ -183,7 +168,7 @@ const HELP_MESSAGE = new MessageEmbed()
     `
   )
 // Custom message shown when someone asks about ArtBlocks
-const ARTBLOCKS_MESSAGE = new MessageEmbed()
+const ARTBLOCKS_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle('What is Art Blocks?')
   // Set the color of the embed
@@ -194,7 +179,7 @@ const ARTBLOCKS_MESSAGE = new MessageEmbed()
   )
 
 // Custom message shown when someone asks about gen art
-const GENART_MESSAGE = new MessageEmbed()
+const GENART_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle('What is generative art?')
   // Set the color of the embed
@@ -205,7 +190,7 @@ const GENART_MESSAGE = new MessageEmbed()
   )
 
 // Custom message shown when someone asks about safety
-const SAFETY_MESSAGE = new MessageEmbed()
+const SAFETY_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle('Tips on avoiding scams')
   // Set the color of the embed
@@ -225,7 +210,7 @@ const SAFETY_MESSAGE = new MessageEmbed()
         `
   )
 
-const OTC_MESSAGE = new MessageEmbed()
+const OTC_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle('Warning: OTC trades can be dangerous')
   // Set the color of the embed
@@ -252,7 +237,7 @@ async function generateGasPriceMessage() {
     fireString = ':fire:'
   }
   return (
-    new MessageEmbed()
+    new EmbedBuilder()
       // Set the title of the field
       .setTitle(`${fireString}:fuelpump: Gas Prices :fuelpump:${fireString}`)
       // Set the color of the embed
@@ -324,12 +309,17 @@ async function smartBotResponse(
   if (
     channelID == CHANNEL_BLOCK_TALK &&
     (msgContentLowercase.includes('thanks') ||
-      msgContentLowercase.includes('thank you')) &&
-    msgContentLowercase.includes('grant')
+      msgContentLowercase.includes('thank you') ||
+      msgContentLowercase.includes('gracias') ||
+      msgContentLowercase.includes('domo arigato') ||
+      msgContentLowercase.includes('cheers') ||
+      msgContentLowercase.includes('danke')) &&
+    (msgContentLowercase.includes('grant') ||
+    msgContentLowercase.includes('grant-san'))
   ) {
     grantThanks++
 
-    return new MessageEmbed()
+    return new EmbedBuilder()
       .setColor(randomColor())
       .setDescription(
         `${msgAuthor} thanked Grant. Grant maintains Art Bot and has been thanked ${grantThanks} time(s) since last restart.`
@@ -348,7 +338,7 @@ async function smartBotResponse(
       `
     }
     return (
-      new MessageEmbed()
+      new EmbedBuilder()
         .setTitle('Aliases you can use in `#` commands')
         // Set the color of the embed
         .setColor(ARTBOT_GREEN)
@@ -474,59 +464,8 @@ async function smartBotResponse(
     }
     return GAS_MESSAGE
   }
-  // Handle project stats requests.
-  const mentionedMetrics = msgContentLowercase.includes('metric')
-  if (containsQuestion && mentionedMetrics) {
-    const curatedResponse = await fetch(ARTBLOCKS_CURATED_ASSET)
-    const curatedData = await curatedResponse.json()
-    const curatedStats = curatedData.collection.stats
-
-    const playgroundResponse = await fetch(ARTBLOCKS_PLAYGROUND_ASSET)
-    const playgroundData = await playgroundResponse.json()
-    const playgroundStats = playgroundData.collection.stats
-
-    const factoryResponse = await fetch(ARTBLOCKS_FACTORY_ASSET)
-    const factoryData = await factoryResponse.json()
-    const factoryStats = factoryData.collection.stats
-
-    return (
-      new MessageEmbed()
-        // Set the title of the field
-        .setTitle('What are the latest ArtBlocks metrics?')
-        // Set the color of the embed
-        .setColor(ARTBOT_GREEN)
-        // Set the main content of the embed
-        .addField('**Curated Projects**', parseKeyMetrics(curatedStats))
-        .addField('**Artist Playground**', parseKeyMetrics(playgroundStats))
-        .addField('**Factory Projects**', parseKeyMetrics(factoryStats))
-    )
-  }
 
   return null
-}
-
-function parseKeyMetrics(stats) {
-  return `**Number of Pieces:** ${parseInt(
-    stats.count
-  )}\n**Number of Owners:** ${parseInt(
-    stats.num_owners
-  )}\n**Whale Ratio (Pieces/Owner):** ${parseInt(
-    stats.count / stats.num_owners
-  )}\n**Total Volume:** ${parseInt(
-    stats.total_volume
-  )}Ξ\n**Total Sales:** ${parseInt(
-    stats.total_sales
-  )}Ξ\n**Average Price:** ${parseFloat(stats.average_price).toFixed(
-    4
-  )}Ξ\n**7-Day Volume:** ${parseInt(
-    stats.seven_day_volume
-  )}Ξ\n**7-Day Sales:** ${parseInt(
-    stats.seven_day_sales
-  )}Ξ\n**7-Day Average Price:** ${parseFloat(
-    stats.seven_day_average_price
-  ).toFixed(4)}Ξ\n**7-Day Change:** ${parseFloat(
-    stats.seven_day_change * 100
-  ).toFixed(2)}%`
 }
 
 module.exports.smartBotResponse = smartBotResponse
