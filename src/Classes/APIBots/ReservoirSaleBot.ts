@@ -13,6 +13,7 @@ type ReservoirSale = {
   from: string
   to: string
   saleId: string
+  fillSource: string
   orderSource: string
   orderKind: string
   token: {
@@ -110,14 +111,14 @@ export class ReservoirSaleBot extends APIPollBot {
     const price = sale.price.amount.decimal
     const currency = sale.price.currency.symbol
     const owner = sale.from
-    const platform = sale.orderSource.toLowerCase()
+    const platform = sale.fillSource.toLowerCase()
     embed.setColor(this.saleColor)
 
     if (BAN_ADDRESSES.has(owner)) {
       console.log(`Skipping message propagation for ${owner}`)
       return
     }
-    if (sale.orderSource.toLowerCase().includes('looksrare')) {
+    if (platform.toLowerCase().includes('looksrare')) {
       console.log(`Skipping message propagation for LooksRare`)
       return
     }
