@@ -46,6 +46,7 @@ export class MintBot {
           break
         case MintType.EXPLORE:
           contracts = Object.values(EXPLORATIONS_CONTRACTS)
+          break
         case MintType.COLLAB:
           contracts = Object.values(COLLAB_CONTRACTS)
           break
