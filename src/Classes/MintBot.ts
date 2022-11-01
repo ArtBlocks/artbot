@@ -11,11 +11,13 @@ const MINT_CONFIG: {
 const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
 const COLLAB_CONTRACTS = require('../ProjectConfig/collaborationContracts.json')
 const STAGING_CONTRACTS = require('../ProjectConfig/stagingContracts.json')
+const EXPLORATIONS_CONTRACTS = require('../ProjectConfig/explorationsContracts.json')
 
 const MINT_REFRESH_TIME_SECONDS = process.env.MINT_REFRESH_TIME_SECONDS ?? '60'
 
 enum MintType {
   CORE = 'CORE',
+  EXPLORE = 'EXPLORE',
   COLLAB = 'COLLAB',
   ENGINE = 'ENGINE',
   STAGING = 'STAGING',
@@ -42,6 +44,8 @@ export class MintBot {
         case MintType.CORE:
           contracts = Object.values(CORE_CONTRACTS)
           break
+        case MintType.EXPLORE:
+          contracts = Object.values(EXPLORATIONS_CONTRACTS)
         case MintType.COLLAB:
           contracts = Object.values(COLLAB_CONTRACTS)
           break
