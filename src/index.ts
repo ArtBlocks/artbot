@@ -202,7 +202,7 @@ if (!TEST_MODE) {
   )
 
   new ReservoirSaleBot(
-    `https://api.reservoir.tools/sales/v4?contract=${CORE_CONTRACTS.OG}&contract=${CORE_CONTRACTS.V2}&contract=${COLLAB_CONTRACTS.AB_X_PACE}&limit=${reservoirSaleLimit}`,
+    `https://api.reservoir.tools/sales/v4?contract=${CORE_CONTRACTS.OG}&contract=${CORE_CONTRACTS.V2}&contract=${CORE_CONTRACTS.V3}&contract=${COLLAB_CONTRACTS.AB_X_PACE}&limit=${reservoirSaleLimit}`,
     API_POLL_TIME_MS,
     bot,
     {
