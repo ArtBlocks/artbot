@@ -12,6 +12,7 @@ const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
 const COLLAB_CONTRACTS = require('../ProjectConfig/collaborationContracts.json')
 const STAGING_CONTRACTS = require('../ProjectConfig/stagingContracts.json')
 const EXPLORATIONS_CONTRACTS = require('../ProjectConfig/explorationsContracts.json')
+const PARTNER_CONTRACTS = require('../ProjectConfig/partnerContracts.json')
 
 const MINT_REFRESH_TIME_SECONDS = process.env.MINT_REFRESH_TIME_SECONDS ?? '60'
 
@@ -57,6 +58,11 @@ export class MintBot {
           contracts = Object.values(STAGING_CONTRACTS)
           break
         default:
+          // Non-MintTypes are partner contracts that forward to other discord servers/channels
+          contracts = PARTNER_CONTRACTS[mintType]
+          if (typeof contracts === 'string') {
+            contracts = [contracts]
+          }
           break
       }
       channels.forEach((channel) => {
