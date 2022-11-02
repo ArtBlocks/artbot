@@ -17,7 +17,7 @@ const MINT_REFRESH_TIME_SECONDS = process.env.MINT_REFRESH_TIME_SECONDS ?? '60'
 
 enum MintType {
   CORE = 'CORE',
-  EXPLORE = 'EXPLORE',
+  EXPLORATIONS = 'EXPLORATIONS',
   COLLAB = 'COLLAB',
   ENGINE = 'ENGINE',
   STAGING = 'STAGING',
@@ -44,7 +44,7 @@ export class MintBot {
         case MintType.CORE:
           contracts = Object.values(CORE_CONTRACTS)
           break
-        case MintType.EXPLORE:
+        case MintType.EXPLORATIONS:
           contracts = Object.values(EXPLORATIONS_CONTRACTS)
           break
         case MintType.COLLAB:
