@@ -10,6 +10,7 @@ const provider = new ethers.providers.EtherscanProvider(
 )
 
 const STAGING_CONTRACTS = require('../../ProjectConfig/stagingContracts.json')
+const EXPLORATIONS_CONTRACTS = require('../../ProjectConfig/explorationsContracts.json')
 
 const CORE_CONTRACTS = require('../../ProjectConfig/coreContracts.json')
 // Runtime ENS cache just to limit queries
@@ -143,6 +144,12 @@ export function getTokenApiUrl(
   } else {
     return `https://token.artblocks.io/${contractAddress}/${tokenId}`
   }
+}
+
+export function isExplorationsContract(contractAddress: string): boolean {
+  return Object.values(EXPLORATIONS_CONTRACTS).includes(
+    contractAddress.toLowerCase()
+  )
 }
 
 module.exports.ensOrAddress = ensOrAddress

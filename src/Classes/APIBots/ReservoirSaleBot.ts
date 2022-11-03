@@ -1,5 +1,5 @@
 import { Client } from 'discord.js'
-import { getTokenApiUrl } from './utils'
+import { getTokenApiUrl, isExplorationsContract } from './utils'
 
 const { APIPollBot } = require('./ApiPollBot')
 const { EmbedBuilder } = require('discord.js')
@@ -180,6 +180,8 @@ export class ReservoirSaleBot extends APIPollBot {
 
     if (artBlocksData?.platform === 'Art Blocks x Pace') {
       curationStatus = 'AB x Pace'
+    } else if (isExplorationsContract(sale.token.contract)) {
+      curationStatus = 'Explorations'
     }
     // Update thumbnail image to use larger variant from Art Blocks API.
     if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
