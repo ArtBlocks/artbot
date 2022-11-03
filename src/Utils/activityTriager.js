@@ -7,6 +7,10 @@ const CHANNEL_SALES = projectConfig.chIdByName['sales-feed']
 const CHANNEL_LISTINGS = projectConfig.chIdByName['listing-feed']
 const CHANNEL_SQUIGGLE_SALES = projectConfig.chIdByName['squiggle_square']
 const CHANNEL_SQUIGGLE_LISTINGS = projectConfig.chIdByName['squiggle-listings']
+
+const STEVIE_P_SALES = projectConfig.chIdByName['stevie-p-sales']
+const STEVIE_P_LISTINGS = projectConfig.chIdByName['stevie-p-listings']
+
 // AB x Pace
 const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
 
@@ -203,6 +207,9 @@ function sendEmbedToSaleChannels(bot, embed, artBlocksData) {
     if (artBlocksData.platform.includes('Art Blocks x Pace')) {
       bot.channels.cache.get(CHANNEL_AB_X_PACE).send({ embeds: [embed] })
     }
+    if (artBlocksData.artist.includes('Steve Pikelny')) {
+      bot.channels.cache.get(STEVIE_P_SALES).send({ embeds: [embed] })
+    }
   } catch (e) {
     console.warn(e)
   }
@@ -222,6 +229,9 @@ function sendEmbedToListChannels(bot, embed, artBlocksData) {
       bot.channels.cache
         .get(CHANNEL_SQUIGGLE_LISTINGS)
         .send({ embeds: [embed] })
+    }
+    if (artBlocksData.artist.includes('Steve Pikelny')) {
+      bot.channels.cache.get(STEVIE_P_LISTINGS).send({ embeds: [embed] })
     }
   } catch (e) {
     console.warn(e)
