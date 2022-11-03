@@ -194,6 +194,11 @@ async function triageActivityMessage(msg, bot) {
 function sendEmbedToSaleChannels(bot, embed, artBlocksData) {
   try {
     bot.channels.cache.get(CHANNEL_SALES).send({ embeds: [embed] })
+
+    if (artBlocksData.collection_name.includes('Friendship Bracelets')) {
+      return
+    }
+
     bot.channels.cache.get(CHANNEL_SALES_CHAT).send({ embeds: [embed] })
     // Forward all Chromie Squiggles sales on to the DAO.
     if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
