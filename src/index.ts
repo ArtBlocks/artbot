@@ -10,6 +10,7 @@ const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot
 import { MintBot } from './Classes/MintBot'
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json')
+const EXPLORATIONS_CONTRACTS = require('./ProjectConfig/explorationsContracts.json')
 import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
 const { ReservoirListBot } = require('./Classes/APIBots/ReservoirListBot')
 const { ArchipelagoBot } = require('./Classes/APIBots/ArchipelagoBot')
@@ -192,7 +193,7 @@ bot.on(Events.MessageCreate, async (msg) => {
 // Instantiate API Pollers (if not in test mode)
 if (!TEST_MODE) {
   new ReservoirListBot(
-    `https://api.reservoir.tools/orders/asks/v3?contracts=${CORE_CONTRACTS.OG}&contracts=${CORE_CONTRACTS.V2}&contracts=${COLLAB_CONTRACTS.AB_X_PACE}&sortBy=createdAt&limit=${reservoirListLimit}`,
+    `https://api.reservoir.tools/orders/asks/v3?contracts=${CORE_CONTRACTS.OG}&contracts=${CORE_CONTRACTS.V2}&contracts=${CORE_CONTRACTS.V3}&contracts=${EXPLORATIONS_CONTRACTS.EXPLORATIONS}&contracts=${COLLAB_CONTRACTS.AB_X_PACE}&sortBy=createdAt&limit=${reservoirListLimit}`,
     API_POLL_TIME_MS,
     bot,
     {
@@ -202,7 +203,7 @@ if (!TEST_MODE) {
   )
 
   new ReservoirSaleBot(
-    `https://api.reservoir.tools/sales/v4?contract=${CORE_CONTRACTS.OG}&contract=${CORE_CONTRACTS.V2}&contract=${CORE_CONTRACTS.V3}&contract=${COLLAB_CONTRACTS.AB_X_PACE}&limit=${reservoirSaleLimit}`,
+    `https://api.reservoir.tools/sales/v4?contract=${CORE_CONTRACTS.OG}&contract=${CORE_CONTRACTS.V2}&contract=${CORE_CONTRACTS.V3}&contract=${EXPLORATIONS_CONTRACTS.EXPLORATIONS}&contract=${COLLAB_CONTRACTS.AB_X_PACE}&limit=${reservoirSaleLimit}`,
     API_POLL_TIME_MS,
     bot,
     {
