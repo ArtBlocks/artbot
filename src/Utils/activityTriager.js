@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv'
+dotenv.config()
+
 const fetch = require('node-fetch')
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 
@@ -203,7 +206,7 @@ function sendEmbedToSaleChannels(bot, embed, artBlocksData, saleAmt = null) {
     if (
       artBlocksData.collection_name.includes('Friendship Bracelets') &&
       saleAmt &&
-      saleAmt < 0.1
+      saleAmt < (parseFloat(process.env.FB_THRESHOLD) ?? 0.1)
     ) {
       return
     }
