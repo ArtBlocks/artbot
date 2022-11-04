@@ -206,7 +206,7 @@ export class ReservoirSaleBot extends APIPollBot {
     embed.setURL(platformUrl)
     if (artBlocksData.collection_name) {
       console.log(artBlocksData.name + ' SALE')
-      sendEmbedToSaleChannels(this.bot, embed, artBlocksData)
+      sendEmbedToSaleChannels(this.bot, embed, artBlocksData, price)
     }
   }
 }
