@@ -16,7 +16,7 @@ const PROJECT_BOTS = ARTBOT_IS_PROD
   ? require('./projectBots.json')
   : require('./projectBots_dev.json')
 import { ProjectBot } from '../Classes/ProjectBot'
-const { getContractProject } = require('../Utils/parseArtBlocksAPI')
+import { getContractProject } from '../GraphQL/Subgraph/querySubgraph'
 const PARTNER_CONTRACTS = require('../ProjectConfig/partnerContracts.json')
 
 type ProjectBotHandlers = {
@@ -207,7 +207,7 @@ class ProjectConfig {
         projectNumber,
         contract.id,
         invocations,
-        name,
+        name ?? '',
         active,
         namedMappings
       )

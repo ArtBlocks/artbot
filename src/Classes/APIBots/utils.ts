@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv'
+import { ProjectsMetadataDetailsFragment } from '../../GraphQL/Hasura/generated/graphql'
 dotenv.config()
 
 const axios = require('axios')
@@ -150,6 +151,36 @@ export function isExplorationsContract(contractAddress: string): boolean {
   return Object.values(EXPLORATIONS_CONTRACTS).includes(
     contractAddress.toLowerCase()
   )
+}
+
+export function buildBirthdayMapping(
+  projects: ProjectsMetadataDetailsFragment[]
+): { [id: string]: string } {
+  const birthdayMapping: { [id: string]: string } = {}
+  projects.forEach((proj) => {
+    birthdayMapping[proj.id] = proj.start_datetime
+  })
+
+  return birthdayMapping
+}
+
+export function buildCollectionMapping(
+  projects: ProjectsMetadataDetailsFragment[]
+): { [id: string]: string }[] {
+  const collectionMapping: { [id: string]: string } = {}
+  const heritageStatuses: { [id: string]: string } = {}
+  projects.forEach((proj) => {
+    let collectionName = proj.vertical_name.toLowerCase()
+    if (proj.vertical?.category_name?.toLowerCase() !== 'collections') {
+      collectionName = proj.vertical?.category_name?.toLowerCase()
+    }
+    if (proj.heritage_curation_status) {
+      heritageStatuses[proj.id] = proj.heritage_curation_status
+    }
+    collectionMapping[proj.id] = collectionName
+  })
+
+  return [collectionMapping, heritageStatuses]
 }
 
 module.exports.ensOrAddress = ensOrAddress

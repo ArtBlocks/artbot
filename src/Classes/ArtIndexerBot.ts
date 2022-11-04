@@ -1,18 +1,17 @@
 import { Channel, Collection, Message } from 'discord.js'
 import * as dotenv from 'dotenv'
+import { getProjectsHasuraDetails } from '../GraphQL/Hasura/queryHasura'
+import {
+  getAllProjects,
+  getAllTokensInWallet,
+  getArtblocksOpenProjects,
+} from '../GraphQL/Subgraph/querySubgraph'
 import { ProjectBot } from './ProjectBot'
+import { buildBirthdayMapping, buildCollectionMapping } from './APIBots/utils'
 dotenv.config()
 
 const deburr = require('lodash.deburr')
-const getAllProjects = require('../Utils/parseArtBlocksAPI').getAllProjects
-const getArtBlocksOpenProjects =
-  require('../Utils/parseArtBlocksAPI').getArtBlocksOpenProjects
-const getProjectsBirthdays =
-  require('../Utils/parseArtBlocksAPI').getProjectsBirthdays
-const getProjectsCurationStatus =
-  require('../Utils/parseArtBlocksAPI').getProjectsCurationStatus
-const getAllWalletTokens =
-  require('../Utils/parseArtBlocksAPI').getAllWalletTokens
+
 const resolveEnsName = require('./APIBots/utils').resolveEnsName
 const isVerticalName = require('./APIBots/utils').isVerticalName
 const getVerticalName = require('./APIBots/utils').getVerticalName
@@ -38,7 +37,7 @@ BIRTHDAY_CHECK_TIME.setMinutes(0)
 BIRTHDAY_CHECK_TIME.setSeconds(0)
 BIRTHDAY_CHECK_TIME.setMilliseconds(0)
 
-class ArtIndexerBot {
+export class ArtIndexerBot {
   projectFetch: () => any
   projects: { [id: string]: ProjectBot }
   artists: { [id: string]: ProjectBot[] }
@@ -72,10 +71,15 @@ class ArtIndexerBot {
   async buildProjectBots() {
     try {
       const projects = await this.projectFetch()
-      const bdays = await getProjectsBirthdays()
-      const collectionInfo = await getProjectsCurationStatus()
+      const hasuraDetails = await getProjectsHasuraDetails().catch((e) => {
+        console.log('Hasura error or not set up', e)
+        return [] // Don't break if Hasura is not set up
+      })
+      const bdays = buildBirthdayMapping(hasuraDetails)
+      const collectionInfo = buildCollectionMapping(hasuraDetails)
       const collections = collectionInfo[0]
       const heritageStatuses = collectionInfo[1]
+
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i]
         console.log(
@@ -263,12 +267,12 @@ class ArtIndexerBot {
   async sendRandomOpenProjectRandomTokenMessage(msg: Message) {
     let attempts = 0
     while (attempts < 10) {
-      const openProjects = await getArtBlocksOpenProjects()
+      const openProjects = await getArtblocksOpenProjects()
 
       const project =
         openProjects[Math.floor(Math.random() * openProjects.length)]
 
-      const projBot = this.projects[this.toProjectKey(project.name)]
+      const projBot = this.projects[this.toProjectKey(project.name ?? '')]
       if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
         return projBot.handleNumberMessage(msg)
       }
@@ -350,11 +354,11 @@ class ArtIndexerBot {
 
       wallet = wallet.toLowerCase()
 
-      let tokens = []
+      let tokens: any[] = []
       if (this.walletTokens[wallet]) {
         tokens = this.walletTokens[wallet]
       } else {
-        tokens = await getAllWalletTokens(wallet)
+        tokens = (await getAllTokensInWallet(wallet)) ?? []
         this.walletTokens[wallet] = tokens
       }
 
@@ -468,5 +472,3 @@ class ArtIndexerBot {
     }
   }
 }
-
-module.exports.ArtIndexerBot = ArtIndexerBot

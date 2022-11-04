@@ -1,61 +1,49 @@
-query getContractProjectsMinimal($id: ID!, $first: Int!, $skip: Int) {
-  contract(id: $id) {
-    projects(first: $first, skip: $skip, orderBy: projectId) {
-      projectId
-    }
+fragment ProjectDetail on Project {
+  projectId
+  name
+  invocations
+  maxInvocations
+  active
+  paused
+  complete
+  artistName
+  contract {
+    id
   }
 }
 
-query getContractProjects($id: ID!, $first: Int!, $skip: Int) {
-  contract(id: $id) {
-    projects(first: $first, skip: $skip, orderBy: projectId) {
-      projectId
+query getAllProjects($first: Int!, $skip: Int) {
+  projects(first: $first, skip: $skip, orderBy: projectId) {
+    ...ProjectDetail
+  }
+}
+
+query getWalletTokens($wallet: String!, $first: Int!, $skip: Int) {
+  tokens(first: $first, skip: $skip, where: { owner: $wallet }) {
+    invocation
+    project {
       name
-      invocations
-      maxInvocations
-      curationStatus
-      active
-      artistName
-      contract {
-        id
-      }
     }
   }
 }
 
-query getContractOpenProjects($id: ID!, $first: Int!, $skip: Int) {
-  contract(id: $id) {
+query getContractOpenProjects($contract: ID!, $first: Int!, $skip: Int) {
+  contract(id: $contract) {
     projects(
       first: $first
       skip: $skip
       orderBy: projectId
       where: { paused: false, active: true, complete: false }
     ) {
-      projectId
-      name
-      invocations
-      maxInvocations
-      curationStatus
-      active
-      contract {
-        id
-      }
+      ...ProjectDetail
     }
   }
 }
 
-query getContractProject($id: ID!, $projectId: BigInt!) {
-  contract(id: $id) {
+query getContractProject($contract: ID!, $projectId: BigInt!) {
+  contract(id: $contract) {
     projects(where: { projectId: $projectId }) {
-      name
-      invocations
-      maxInvocations
-      active
-      curationStatus
-      artistName
-      contract {
-        id
-      }
+      ...ProjectDetail
     }
   }
 }
@@ -82,24 +70,6 @@ query getContractProjectsWithCurationStatus(
       contract {
         id
       }
-    }
-  }
-}
-
-query getWalletTokens(
-  $wallet: String!
-  $contracts: [String!]!
-  $first: Int!
-  $skip: Int
-) {
-  tokens(
-    first: $first
-    skip: $skip
-    where: { owner: $wallet, contract_in: $contracts }
-  ) {
-    invocation
-    project {
-      name
     }
   }
 }

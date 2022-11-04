@@ -1,11 +1,11 @@
-import gql from 'graphql-tag';
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-export type Maybe<T> = T | null | undefined;
-export type InputMaybe<T> = T | null | undefined;
+export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -13,179 +13,14 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  BigInt: string;
-  Bytes: string;
   bigint: any;
   float8: any;
-  json: any;
   jsonb: any;
   jsonpath: any;
   numeric: any;
   seed_float: any;
   timestamp: any;
-  timestamptz: string;
-  uuid: any;
-};
-
-export type Account = {
-  __typename?: 'Account';
-  id: Scalars['ID'];
-  /** Projects the account is listed as artist for */
-  projectsCreated?: Maybe<Array<Project>>;
-  /** Projects the account owns tokens from */
-  projectsOwned?: Maybe<Array<AccountProject>>;
-  tokens?: Maybe<Array<Token>>;
-  /** Contracts the account is whitelisted on */
-  whitelistedOn?: Maybe<Array<Whitelisting>>;
-};
-
-
-export type AccountProjectsCreatedArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Project_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<Project_Filter>;
-};
-
-
-export type AccountProjectsOwnedArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<AccountProject_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<AccountProject_Filter>;
-};
-
-
-export type AccountTokensArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Token_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<Token_Filter>;
-};
-
-
-export type AccountWhitelistedOnArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Whitelisting_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<Whitelisting_Filter>;
-};
-
-export type AccountProject = {
-  __typename?: 'AccountProject';
-  account: Account;
-  count: Scalars['Int'];
-  id: Scalars['ID'];
-  project: Project;
-};
-
-export type AccountProject_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  account?: InputMaybe<Scalars['String']>;
-  account_?: InputMaybe<Account_Filter>;
-  account_contains?: InputMaybe<Scalars['String']>;
-  account_contains_nocase?: InputMaybe<Scalars['String']>;
-  account_ends_with?: InputMaybe<Scalars['String']>;
-  account_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  account_gt?: InputMaybe<Scalars['String']>;
-  account_gte?: InputMaybe<Scalars['String']>;
-  account_in?: InputMaybe<Array<Scalars['String']>>;
-  account_lt?: InputMaybe<Scalars['String']>;
-  account_lte?: InputMaybe<Scalars['String']>;
-  account_not?: InputMaybe<Scalars['String']>;
-  account_not_contains?: InputMaybe<Scalars['String']>;
-  account_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  account_not_ends_with?: InputMaybe<Scalars['String']>;
-  account_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  account_not_in?: InputMaybe<Array<Scalars['String']>>;
-  account_not_starts_with?: InputMaybe<Scalars['String']>;
-  account_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  account_starts_with?: InputMaybe<Scalars['String']>;
-  account_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  count?: InputMaybe<Scalars['Int']>;
-  count_gt?: InputMaybe<Scalars['Int']>;
-  count_gte?: InputMaybe<Scalars['Int']>;
-  count_in?: InputMaybe<Array<Scalars['Int']>>;
-  count_lt?: InputMaybe<Scalars['Int']>;
-  count_lte?: InputMaybe<Scalars['Int']>;
-  count_not?: InputMaybe<Scalars['Int']>;
-  count_not_in?: InputMaybe<Array<Scalars['Int']>>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  project?: InputMaybe<Scalars['String']>;
-  project_?: InputMaybe<Project_Filter>;
-  project_contains?: InputMaybe<Scalars['String']>;
-  project_contains_nocase?: InputMaybe<Scalars['String']>;
-  project_ends_with?: InputMaybe<Scalars['String']>;
-  project_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  project_gt?: InputMaybe<Scalars['String']>;
-  project_gte?: InputMaybe<Scalars['String']>;
-  project_in?: InputMaybe<Array<Scalars['String']>>;
-  project_lt?: InputMaybe<Scalars['String']>;
-  project_lte?: InputMaybe<Scalars['String']>;
-  project_not?: InputMaybe<Scalars['String']>;
-  project_not_contains?: InputMaybe<Scalars['String']>;
-  project_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  project_not_ends_with?: InputMaybe<Scalars['String']>;
-  project_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  project_not_in?: InputMaybe<Array<Scalars['String']>>;
-  project_not_starts_with?: InputMaybe<Scalars['String']>;
-  project_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  project_starts_with?: InputMaybe<Scalars['String']>;
-  project_starts_with_nocase?: InputMaybe<Scalars['String']>;
-};
-
-export enum AccountProject_OrderBy {
-  Account = 'account',
-  Count = 'count',
-  Id = 'id',
-  Project = 'project'
-}
-
-export type Account_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  projectsCreated_?: InputMaybe<Project_Filter>;
-  projectsOwned_?: InputMaybe<AccountProject_Filter>;
-  tokens_?: InputMaybe<Token_Filter>;
-  whitelistedOn_?: InputMaybe<Whitelisting_Filter>;
-};
-
-export enum Account_OrderBy {
-  Id = 'id',
-  ProjectsCreated = 'projectsCreated',
-  ProjectsOwned = 'projectsOwned',
-  Tokens = 'tokens',
-  WhitelistedOn = 'whitelistedOn'
-}
-
-export type BlockChangedFilter = {
-  number_gte: Scalars['Int'];
-};
-
-export type Block_Height = {
-  hash?: InputMaybe<Scalars['Bytes']>;
-  number?: InputMaybe<Scalars['Int']>;
-  number_gte?: InputMaybe<Scalars['Int']>;
+  timestamptz: any;
 };
 
 /** Boolean expression to compare columns of type "Boolean". All fields are combined with logical 'AND'. */
@@ -201,304 +36,6 @@ export type Boolean_Comparison_Exp = {
   _nin?: InputMaybe<Array<Scalars['Boolean']>>;
 };
 
-export type Contract = {
-  __typename?: 'Contract';
-  admin: Scalars['Bytes'];
-  createdAt: Scalars['BigInt'];
-  /** Curation registry contract address */
-  curationRegistry?: Maybe<Scalars['Bytes']>;
-  /** Dependency registry contract address */
-  dependencyRegistry?: Maybe<Scalars['Bytes']>;
-  id: Scalars['ID'];
-  /** List of contracts that are allowed to mint */
-  mintWhitelisted: Array<Scalars['Bytes']>;
-  /** Associated minter filter (if applicable) */
-  minterFilter?: Maybe<MinterFilter>;
-  /** New projects forbidden (can only be true on V3+ contracts) */
-  newProjectsForbidden: Scalars['Boolean'];
-  nextProjectId: Scalars['BigInt'];
-  preferredArweaveGateway?: Maybe<Scalars['String']>;
-  preferredIPFSGateway?: Maybe<Scalars['String']>;
-  /** List of projects on the contract */
-  projects?: Maybe<Array<Project>>;
-  /** Randomizer contract used to generate token hashes */
-  randomizerContract?: Maybe<Scalars['Bytes']>;
-  /** Address that receives primary sales platform fees */
-  renderProviderAddress: Scalars['Bytes'];
-  /** Percentage of primary sales allocated to the platform */
-  renderProviderPercentage: Scalars['BigInt'];
-  /** Address that receives secondary sales platform royalties (null for pre-V3 contracts, check Royalty Registry) */
-  renderProviderSecondarySalesAddress?: Maybe<Scalars['Bytes']>;
-  /** Basis points of secondary sales allocated to the platform (null for pre-V3 contracts, check Royalty Registry) */
-  renderProviderSecondarySalesBPS?: Maybe<Scalars['BigInt']>;
-  /** List of tokens on the contract */
-  tokens?: Maybe<Array<Token>>;
-  /** Core contract type */
-  type: CoreType;
-  updatedAt: Scalars['BigInt'];
-  /** Accounts whitelisted on the contract */
-  whitelisted?: Maybe<Array<Whitelisting>>;
-};
-
-
-export type ContractProjectsArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Project_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<Project_Filter>;
-};
-
-
-export type ContractTokensArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Token_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<Token_Filter>;
-};
-
-
-export type ContractWhitelistedArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Whitelisting_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<Whitelisting_Filter>;
-};
-
-export type Contract_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  admin?: InputMaybe<Scalars['Bytes']>;
-  admin_contains?: InputMaybe<Scalars['Bytes']>;
-  admin_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  admin_not?: InputMaybe<Scalars['Bytes']>;
-  admin_not_contains?: InputMaybe<Scalars['Bytes']>;
-  admin_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  createdAt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_gt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_gte?: InputMaybe<Scalars['BigInt']>;
-  createdAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  createdAt_lt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_lte?: InputMaybe<Scalars['BigInt']>;
-  createdAt_not?: InputMaybe<Scalars['BigInt']>;
-  createdAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  curationRegistry?: InputMaybe<Scalars['Bytes']>;
-  curationRegistry_contains?: InputMaybe<Scalars['Bytes']>;
-  curationRegistry_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  curationRegistry_not?: InputMaybe<Scalars['Bytes']>;
-  curationRegistry_not_contains?: InputMaybe<Scalars['Bytes']>;
-  curationRegistry_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  dependencyRegistry?: InputMaybe<Scalars['Bytes']>;
-  dependencyRegistry_contains?: InputMaybe<Scalars['Bytes']>;
-  dependencyRegistry_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  dependencyRegistry_not?: InputMaybe<Scalars['Bytes']>;
-  dependencyRegistry_not_contains?: InputMaybe<Scalars['Bytes']>;
-  dependencyRegistry_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  mintWhitelisted?: InputMaybe<Array<Scalars['Bytes']>>;
-  mintWhitelisted_contains?: InputMaybe<Array<Scalars['Bytes']>>;
-  mintWhitelisted_contains_nocase?: InputMaybe<Array<Scalars['Bytes']>>;
-  mintWhitelisted_not?: InputMaybe<Array<Scalars['Bytes']>>;
-  mintWhitelisted_not_contains?: InputMaybe<Array<Scalars['Bytes']>>;
-  mintWhitelisted_not_contains_nocase?: InputMaybe<Array<Scalars['Bytes']>>;
-  minterFilter?: InputMaybe<Scalars['String']>;
-  minterFilter_?: InputMaybe<MinterFilter_Filter>;
-  minterFilter_contains?: InputMaybe<Scalars['String']>;
-  minterFilter_contains_nocase?: InputMaybe<Scalars['String']>;
-  minterFilter_ends_with?: InputMaybe<Scalars['String']>;
-  minterFilter_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  minterFilter_gt?: InputMaybe<Scalars['String']>;
-  minterFilter_gte?: InputMaybe<Scalars['String']>;
-  minterFilter_in?: InputMaybe<Array<Scalars['String']>>;
-  minterFilter_lt?: InputMaybe<Scalars['String']>;
-  minterFilter_lte?: InputMaybe<Scalars['String']>;
-  minterFilter_not?: InputMaybe<Scalars['String']>;
-  minterFilter_not_contains?: InputMaybe<Scalars['String']>;
-  minterFilter_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  minterFilter_not_ends_with?: InputMaybe<Scalars['String']>;
-  minterFilter_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  minterFilter_not_in?: InputMaybe<Array<Scalars['String']>>;
-  minterFilter_not_starts_with?: InputMaybe<Scalars['String']>;
-  minterFilter_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  minterFilter_starts_with?: InputMaybe<Scalars['String']>;
-  minterFilter_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  newProjectsForbidden?: InputMaybe<Scalars['Boolean']>;
-  newProjectsForbidden_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  newProjectsForbidden_not?: InputMaybe<Scalars['Boolean']>;
-  newProjectsForbidden_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  nextProjectId?: InputMaybe<Scalars['BigInt']>;
-  nextProjectId_gt?: InputMaybe<Scalars['BigInt']>;
-  nextProjectId_gte?: InputMaybe<Scalars['BigInt']>;
-  nextProjectId_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  nextProjectId_lt?: InputMaybe<Scalars['BigInt']>;
-  nextProjectId_lte?: InputMaybe<Scalars['BigInt']>;
-  nextProjectId_not?: InputMaybe<Scalars['BigInt']>;
-  nextProjectId_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  preferredArweaveGateway?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_contains?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_contains_nocase?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_ends_with?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_gt?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_gte?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_in?: InputMaybe<Array<Scalars['String']>>;
-  preferredArweaveGateway_lt?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_lte?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_not?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_not_contains?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_not_ends_with?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_not_in?: InputMaybe<Array<Scalars['String']>>;
-  preferredArweaveGateway_not_starts_with?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_starts_with?: InputMaybe<Scalars['String']>;
-  preferredArweaveGateway_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_contains?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_contains_nocase?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_ends_with?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_gt?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_gte?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_in?: InputMaybe<Array<Scalars['String']>>;
-  preferredIPFSGateway_lt?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_lte?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_not?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_not_contains?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_not_ends_with?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_not_in?: InputMaybe<Array<Scalars['String']>>;
-  preferredIPFSGateway_not_starts_with?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_starts_with?: InputMaybe<Scalars['String']>;
-  preferredIPFSGateway_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  projects_?: InputMaybe<Project_Filter>;
-  randomizerContract?: InputMaybe<Scalars['Bytes']>;
-  randomizerContract_contains?: InputMaybe<Scalars['Bytes']>;
-  randomizerContract_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  randomizerContract_not?: InputMaybe<Scalars['Bytes']>;
-  randomizerContract_not_contains?: InputMaybe<Scalars['Bytes']>;
-  randomizerContract_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  renderProviderAddress?: InputMaybe<Scalars['Bytes']>;
-  renderProviderAddress_contains?: InputMaybe<Scalars['Bytes']>;
-  renderProviderAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  renderProviderAddress_not?: InputMaybe<Scalars['Bytes']>;
-  renderProviderAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
-  renderProviderAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  renderProviderPercentage?: InputMaybe<Scalars['BigInt']>;
-  renderProviderPercentage_gt?: InputMaybe<Scalars['BigInt']>;
-  renderProviderPercentage_gte?: InputMaybe<Scalars['BigInt']>;
-  renderProviderPercentage_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  renderProviderPercentage_lt?: InputMaybe<Scalars['BigInt']>;
-  renderProviderPercentage_lte?: InputMaybe<Scalars['BigInt']>;
-  renderProviderPercentage_not?: InputMaybe<Scalars['BigInt']>;
-  renderProviderPercentage_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  renderProviderSecondarySalesAddress?: InputMaybe<Scalars['Bytes']>;
-  renderProviderSecondarySalesAddress_contains?: InputMaybe<Scalars['Bytes']>;
-  renderProviderSecondarySalesAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  renderProviderSecondarySalesAddress_not?: InputMaybe<Scalars['Bytes']>;
-  renderProviderSecondarySalesAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
-  renderProviderSecondarySalesAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  renderProviderSecondarySalesBPS?: InputMaybe<Scalars['BigInt']>;
-  renderProviderSecondarySalesBPS_gt?: InputMaybe<Scalars['BigInt']>;
-  renderProviderSecondarySalesBPS_gte?: InputMaybe<Scalars['BigInt']>;
-  renderProviderSecondarySalesBPS_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  renderProviderSecondarySalesBPS_lt?: InputMaybe<Scalars['BigInt']>;
-  renderProviderSecondarySalesBPS_lte?: InputMaybe<Scalars['BigInt']>;
-  renderProviderSecondarySalesBPS_not?: InputMaybe<Scalars['BigInt']>;
-  renderProviderSecondarySalesBPS_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  tokens_?: InputMaybe<Token_Filter>;
-  type?: InputMaybe<CoreType>;
-  type_in?: InputMaybe<Array<CoreType>>;
-  type_not?: InputMaybe<CoreType>;
-  type_not_in?: InputMaybe<Array<CoreType>>;
-  updatedAt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_gt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_gte?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  updatedAt_lt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_lte?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_not?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  whitelisted_?: InputMaybe<Whitelisting_Filter>;
-};
-
-export enum Contract_OrderBy {
-  Admin = 'admin',
-  CreatedAt = 'createdAt',
-  CurationRegistry = 'curationRegistry',
-  DependencyRegistry = 'dependencyRegistry',
-  Id = 'id',
-  MintWhitelisted = 'mintWhitelisted',
-  MinterFilter = 'minterFilter',
-  NewProjectsForbidden = 'newProjectsForbidden',
-  NextProjectId = 'nextProjectId',
-  PreferredArweaveGateway = 'preferredArweaveGateway',
-  PreferredIpfsGateway = 'preferredIPFSGateway',
-  Projects = 'projects',
-  RandomizerContract = 'randomizerContract',
-  RenderProviderAddress = 'renderProviderAddress',
-  RenderProviderPercentage = 'renderProviderPercentage',
-  RenderProviderSecondarySalesAddress = 'renderProviderSecondarySalesAddress',
-  RenderProviderSecondarySalesBps = 'renderProviderSecondarySalesBPS',
-  Tokens = 'tokens',
-  Type = 'type',
-  UpdatedAt = 'updatedAt',
-  Whitelisted = 'whitelisted'
-}
-
-export enum CoreType {
-  /** First Art Blocks flagship core */
-  GenArt721CoreV0 = 'GenArt721CoreV0',
-  /** Second Art Blocks flagship core */
-  GenArt721CoreV1 = 'GenArt721CoreV1',
-  /** Art Blocks Engine & Partner cores */
-  GenArt721CoreV2 = 'GenArt721CoreV2',
-  /** Third Art Blocks flagship core */
-  GenArt721CoreV3 = 'GenArt721CoreV3'
-}
-
-export type CreateApplicationInput = {
-  artistName: Scalars['String'];
-  creatorHistory?: InputMaybe<Scalars['String']>;
-  discord?: InputMaybe<Scalars['String']>;
-  email: Scalars['String'];
-  originalityAck: Scalars['Boolean'];
-  portfolio: Scalars['String'];
-  projectName: Scalars['String'];
-  technicalProficiency: Scalars['String'];
-  timelineAck: Scalars['Boolean'];
-  twitter?: InputMaybe<Scalars['String']>;
-  walletAddress: Scalars['String'];
-};
-
-export type CreateApplicationOutput = {
-  __typename?: 'CreateApplicationOutput';
-  shellUrl?: Maybe<Scalars['String']>;
-};
-
-export enum Exchange {
-  /** LooksRare */
-  LrV1 = 'LR_V1',
-  /** Opensea Seaport */
-  OsSp = 'OS_SP',
-  /** Opensea V1 */
-  OsV1 = 'OS_V1',
-  /** Opensea V2 */
-  OsV2 = 'OS_V2'
-}
-
 /** Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'. */
 export type Int_Comparison_Exp = {
   _eq?: InputMaybe<Scalars['Int']>;
@@ -512,1838 +49,11 @@ export type Int_Comparison_Exp = {
   _nin?: InputMaybe<Array<Scalars['Int']>>;
 };
 
-export type Minter = {
-  __typename?: 'Minter';
-  coreContract: Contract;
-  /** Configuration details used by specific minters (json string) */
-  extraMinterDetails: Scalars['String'];
-  /** Unique identifier made up of minter contract address */
-  id: Scalars['ID'];
-  /** Maximum allowed half life in seconds (exponential Dutch auction minters) */
-  maximumHalfLifeInSeconds?: Maybe<Scalars['BigInt']>;
-  /** Minimum allowed auction length in seconds (linear Dutch auction minters) */
-  minimumAuctionLengthInSeconds?: Maybe<Scalars['BigInt']>;
-  /** Minimum allowed half life in seconds (exponential Dutch auction minters) */
-  minimumHalfLifeInSeconds?: Maybe<Scalars['BigInt']>;
-  /** Associated Minter Filter */
-  minterFilter: MinterFilter;
-  /** Minter type */
-  type: MinterType;
-  updatedAt: Scalars['BigInt'];
-};
-
-export type MinterFilter = {
-  __typename?: 'MinterFilter';
-  /** Minters associated with MinterFilter */
-  associatedMinters: Array<Minter>;
-  /** Associated core contract */
-  coreContract: Contract;
-  /** Unique identifier made up of minter filter contract address */
-  id: Scalars['ID'];
-  /** Minters allowlisted on MinterFilter */
-  minterAllowlist: Array<Minter>;
-  updatedAt: Scalars['BigInt'];
-};
-
-
-export type MinterFilterAssociatedMintersArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Minter_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<Minter_Filter>;
-};
-
-
-export type MinterFilterMinterAllowlistArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Minter_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<Minter_Filter>;
-};
-
-export type MinterFilter_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  associatedMinters_?: InputMaybe<Minter_Filter>;
-  coreContract?: InputMaybe<Scalars['String']>;
-  coreContract_?: InputMaybe<Contract_Filter>;
-  coreContract_contains?: InputMaybe<Scalars['String']>;
-  coreContract_contains_nocase?: InputMaybe<Scalars['String']>;
-  coreContract_ends_with?: InputMaybe<Scalars['String']>;
-  coreContract_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  coreContract_gt?: InputMaybe<Scalars['String']>;
-  coreContract_gte?: InputMaybe<Scalars['String']>;
-  coreContract_in?: InputMaybe<Array<Scalars['String']>>;
-  coreContract_lt?: InputMaybe<Scalars['String']>;
-  coreContract_lte?: InputMaybe<Scalars['String']>;
-  coreContract_not?: InputMaybe<Scalars['String']>;
-  coreContract_not_contains?: InputMaybe<Scalars['String']>;
-  coreContract_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  coreContract_not_ends_with?: InputMaybe<Scalars['String']>;
-  coreContract_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  coreContract_not_in?: InputMaybe<Array<Scalars['String']>>;
-  coreContract_not_starts_with?: InputMaybe<Scalars['String']>;
-  coreContract_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  coreContract_starts_with?: InputMaybe<Scalars['String']>;
-  coreContract_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  minterAllowlist?: InputMaybe<Array<Scalars['String']>>;
-  minterAllowlist_?: InputMaybe<Minter_Filter>;
-  minterAllowlist_contains?: InputMaybe<Array<Scalars['String']>>;
-  minterAllowlist_contains_nocase?: InputMaybe<Array<Scalars['String']>>;
-  minterAllowlist_not?: InputMaybe<Array<Scalars['String']>>;
-  minterAllowlist_not_contains?: InputMaybe<Array<Scalars['String']>>;
-  minterAllowlist_not_contains_nocase?: InputMaybe<Array<Scalars['String']>>;
-  updatedAt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_gt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_gte?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  updatedAt_lt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_lte?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_not?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-};
-
-export enum MinterFilter_OrderBy {
-  AssociatedMinters = 'associatedMinters',
-  CoreContract = 'coreContract',
-  Id = 'id',
-  MinterAllowlist = 'minterAllowlist',
-  UpdatedAt = 'updatedAt'
-}
-
-export enum MinterType {
-  MinterDaExpV0 = 'MinterDAExpV0',
-  MinterDaExpV1 = 'MinterDAExpV1',
-  MinterDaExpV2 = 'MinterDAExpV2',
-  MinterDaLinV0 = 'MinterDALinV0',
-  MinterDaLinV1 = 'MinterDALinV1',
-  MinterDaLinV2 = 'MinterDALinV2',
-  MinterHolderV0 = 'MinterHolderV0',
-  MinterHolderV1 = 'MinterHolderV1',
-  MinterMerkleV0 = 'MinterMerkleV0',
-  MinterMerkleV1 = 'MinterMerkleV1',
-  MinterMerkleV2 = 'MinterMerkleV2',
-  MinterSetPriceErc20V0 = 'MinterSetPriceERC20V0',
-  MinterSetPriceErc20V1 = 'MinterSetPriceERC20V1',
-  MinterSetPriceErc20V2 = 'MinterSetPriceERC20V2',
-  MinterSetPriceV0 = 'MinterSetPriceV0',
-  MinterSetPriceV1 = 'MinterSetPriceV1',
-  MinterSetPriceV2 = 'MinterSetPriceV2'
-}
-
-export type Minter_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  coreContract?: InputMaybe<Scalars['String']>;
-  coreContract_?: InputMaybe<Contract_Filter>;
-  coreContract_contains?: InputMaybe<Scalars['String']>;
-  coreContract_contains_nocase?: InputMaybe<Scalars['String']>;
-  coreContract_ends_with?: InputMaybe<Scalars['String']>;
-  coreContract_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  coreContract_gt?: InputMaybe<Scalars['String']>;
-  coreContract_gte?: InputMaybe<Scalars['String']>;
-  coreContract_in?: InputMaybe<Array<Scalars['String']>>;
-  coreContract_lt?: InputMaybe<Scalars['String']>;
-  coreContract_lte?: InputMaybe<Scalars['String']>;
-  coreContract_not?: InputMaybe<Scalars['String']>;
-  coreContract_not_contains?: InputMaybe<Scalars['String']>;
-  coreContract_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  coreContract_not_ends_with?: InputMaybe<Scalars['String']>;
-  coreContract_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  coreContract_not_in?: InputMaybe<Array<Scalars['String']>>;
-  coreContract_not_starts_with?: InputMaybe<Scalars['String']>;
-  coreContract_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  coreContract_starts_with?: InputMaybe<Scalars['String']>;
-  coreContract_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  extraMinterDetails?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_contains?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_contains_nocase?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_ends_with?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_gt?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_gte?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_in?: InputMaybe<Array<Scalars['String']>>;
-  extraMinterDetails_lt?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_lte?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_not?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_not_contains?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_not_ends_with?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_not_in?: InputMaybe<Array<Scalars['String']>>;
-  extraMinterDetails_not_starts_with?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_starts_with?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  maximumHalfLifeInSeconds?: InputMaybe<Scalars['BigInt']>;
-  maximumHalfLifeInSeconds_gt?: InputMaybe<Scalars['BigInt']>;
-  maximumHalfLifeInSeconds_gte?: InputMaybe<Scalars['BigInt']>;
-  maximumHalfLifeInSeconds_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  maximumHalfLifeInSeconds_lt?: InputMaybe<Scalars['BigInt']>;
-  maximumHalfLifeInSeconds_lte?: InputMaybe<Scalars['BigInt']>;
-  maximumHalfLifeInSeconds_not?: InputMaybe<Scalars['BigInt']>;
-  maximumHalfLifeInSeconds_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  minimumAuctionLengthInSeconds?: InputMaybe<Scalars['BigInt']>;
-  minimumAuctionLengthInSeconds_gt?: InputMaybe<Scalars['BigInt']>;
-  minimumAuctionLengthInSeconds_gte?: InputMaybe<Scalars['BigInt']>;
-  minimumAuctionLengthInSeconds_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  minimumAuctionLengthInSeconds_lt?: InputMaybe<Scalars['BigInt']>;
-  minimumAuctionLengthInSeconds_lte?: InputMaybe<Scalars['BigInt']>;
-  minimumAuctionLengthInSeconds_not?: InputMaybe<Scalars['BigInt']>;
-  minimumAuctionLengthInSeconds_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  minimumHalfLifeInSeconds?: InputMaybe<Scalars['BigInt']>;
-  minimumHalfLifeInSeconds_gt?: InputMaybe<Scalars['BigInt']>;
-  minimumHalfLifeInSeconds_gte?: InputMaybe<Scalars['BigInt']>;
-  minimumHalfLifeInSeconds_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  minimumHalfLifeInSeconds_lt?: InputMaybe<Scalars['BigInt']>;
-  minimumHalfLifeInSeconds_lte?: InputMaybe<Scalars['BigInt']>;
-  minimumHalfLifeInSeconds_not?: InputMaybe<Scalars['BigInt']>;
-  minimumHalfLifeInSeconds_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  minterFilter?: InputMaybe<Scalars['String']>;
-  minterFilter_?: InputMaybe<MinterFilter_Filter>;
-  minterFilter_contains?: InputMaybe<Scalars['String']>;
-  minterFilter_contains_nocase?: InputMaybe<Scalars['String']>;
-  minterFilter_ends_with?: InputMaybe<Scalars['String']>;
-  minterFilter_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  minterFilter_gt?: InputMaybe<Scalars['String']>;
-  minterFilter_gte?: InputMaybe<Scalars['String']>;
-  minterFilter_in?: InputMaybe<Array<Scalars['String']>>;
-  minterFilter_lt?: InputMaybe<Scalars['String']>;
-  minterFilter_lte?: InputMaybe<Scalars['String']>;
-  minterFilter_not?: InputMaybe<Scalars['String']>;
-  minterFilter_not_contains?: InputMaybe<Scalars['String']>;
-  minterFilter_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  minterFilter_not_ends_with?: InputMaybe<Scalars['String']>;
-  minterFilter_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  minterFilter_not_in?: InputMaybe<Array<Scalars['String']>>;
-  minterFilter_not_starts_with?: InputMaybe<Scalars['String']>;
-  minterFilter_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  minterFilter_starts_with?: InputMaybe<Scalars['String']>;
-  minterFilter_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  type?: InputMaybe<MinterType>;
-  type_in?: InputMaybe<Array<MinterType>>;
-  type_not?: InputMaybe<MinterType>;
-  type_not_in?: InputMaybe<Array<MinterType>>;
-  updatedAt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_gt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_gte?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  updatedAt_lt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_lte?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_not?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-};
-
-export enum Minter_OrderBy {
-  CoreContract = 'coreContract',
-  ExtraMinterDetails = 'extraMinterDetails',
-  Id = 'id',
-  MaximumHalfLifeInSeconds = 'maximumHalfLifeInSeconds',
-  MinimumAuctionLengthInSeconds = 'minimumAuctionLengthInSeconds',
-  MinimumHalfLifeInSeconds = 'minimumHalfLifeInSeconds',
-  MinterFilter = 'minterFilter',
-  Type = 'type',
-  UpdatedAt = 'updatedAt'
-}
-
 export type OpenseaCollectionData = {
   __typename?: 'OpenseaCollectionData';
   projectId: Scalars['String'];
   url: Scalars['String'];
 };
-
-/** Defines the order direction, either ascending or descending */
-export enum OrderDirection {
-  Asc = 'asc',
-  Desc = 'desc'
-}
-
-export type Payment = {
-  __typename?: 'Payment';
-  /** Payment id formatted: '{SaleId}-{paymentNumber}' (paymentNumber will be 0 for non-Seaport trades) */
-  id: Scalars['ID'];
-  /** The address of the token used for the payment */
-  paymentToken: Scalars['Bytes'];
-  /** Type of token transferred in this payment */
-  paymentType: PaymentType;
-  /** The price of the sale */
-  price: Scalars['BigInt'];
-  /** The recipient address */
-  recipient: Scalars['Bytes'];
-  /** The associated sale */
-  sale: Sale;
-};
-
-export enum PaymentType {
-  Erc20 = 'ERC20',
-  Erc721 = 'ERC721',
-  Erc1155 = 'ERC1155',
-  Native = 'Native'
-}
-
-export type Payment_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  paymentToken?: InputMaybe<Scalars['Bytes']>;
-  paymentToken_contains?: InputMaybe<Scalars['Bytes']>;
-  paymentToken_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  paymentToken_not?: InputMaybe<Scalars['Bytes']>;
-  paymentToken_not_contains?: InputMaybe<Scalars['Bytes']>;
-  paymentToken_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  paymentType?: InputMaybe<PaymentType>;
-  paymentType_in?: InputMaybe<Array<PaymentType>>;
-  paymentType_not?: InputMaybe<PaymentType>;
-  paymentType_not_in?: InputMaybe<Array<PaymentType>>;
-  price?: InputMaybe<Scalars['BigInt']>;
-  price_gt?: InputMaybe<Scalars['BigInt']>;
-  price_gte?: InputMaybe<Scalars['BigInt']>;
-  price_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  price_lt?: InputMaybe<Scalars['BigInt']>;
-  price_lte?: InputMaybe<Scalars['BigInt']>;
-  price_not?: InputMaybe<Scalars['BigInt']>;
-  price_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  recipient?: InputMaybe<Scalars['Bytes']>;
-  recipient_contains?: InputMaybe<Scalars['Bytes']>;
-  recipient_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  recipient_not?: InputMaybe<Scalars['Bytes']>;
-  recipient_not_contains?: InputMaybe<Scalars['Bytes']>;
-  recipient_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  sale?: InputMaybe<Scalars['String']>;
-  sale_?: InputMaybe<Sale_Filter>;
-  sale_contains?: InputMaybe<Scalars['String']>;
-  sale_contains_nocase?: InputMaybe<Scalars['String']>;
-  sale_ends_with?: InputMaybe<Scalars['String']>;
-  sale_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  sale_gt?: InputMaybe<Scalars['String']>;
-  sale_gte?: InputMaybe<Scalars['String']>;
-  sale_in?: InputMaybe<Array<Scalars['String']>>;
-  sale_lt?: InputMaybe<Scalars['String']>;
-  sale_lte?: InputMaybe<Scalars['String']>;
-  sale_not?: InputMaybe<Scalars['String']>;
-  sale_not_contains?: InputMaybe<Scalars['String']>;
-  sale_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  sale_not_ends_with?: InputMaybe<Scalars['String']>;
-  sale_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  sale_not_in?: InputMaybe<Array<Scalars['String']>>;
-  sale_not_starts_with?: InputMaybe<Scalars['String']>;
-  sale_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  sale_starts_with?: InputMaybe<Scalars['String']>;
-  sale_starts_with_nocase?: InputMaybe<Scalars['String']>;
-};
-
-export enum Payment_OrderBy {
-  Id = 'id',
-  PaymentToken = 'paymentToken',
-  PaymentType = 'paymentType',
-  Price = 'price',
-  Recipient = 'recipient',
-  Sale = 'sale'
-}
-
-export type Project = {
-  __typename?: 'Project';
-  activatedAt?: Maybe<Scalars['BigInt']>;
-  /** Determines if the project should be visible to the public */
-  active: Scalars['Boolean'];
-  /** Address to split primary sales with the artist */
-  additionalPayee?: Maybe<Scalars['Bytes']>;
-  /** Percentage of artist's share of primary sales that goes to additional payee */
-  additionalPayeePercentage?: Maybe<Scalars['BigInt']>;
-  /** Address to split Secondary sales with the artist */
-  additionalPayeeSecondarySalesAddress?: Maybe<Scalars['Bytes']>;
-  /** Percentage of artist's share of secondary sales that goes to additional payee */
-  additionalPayeeSecondarySalesPercentage?: Maybe<Scalars['BigInt']>;
-  /** Artist that created the project */
-  artist: Account;
-  /** Wallet address of the artist */
-  artistAddress: Scalars['Bytes'];
-  /** Artist name */
-  artistName?: Maybe<Scalars['String']>;
-  /** Aspect ratio of the project (see `scriptJSON` if null) */
-  aspectRatio?: Maybe<Scalars['String']>;
-  baseIpfsUri?: Maybe<Scalars['String']>;
-  baseUri?: Maybe<Scalars['String']>;
-  /** A project is complete when it has reached its maximum invocations */
-  complete: Scalars['Boolean'];
-  /** Timestamp at which a project was completed */
-  completedAt?: Maybe<Scalars['BigInt']>;
-  contract: Contract;
-  createdAt: Scalars['BigInt'];
-  /** Curated, playground, factory. A project with no curation status is considered factory */
-  curationStatus?: Maybe<Scalars['String']>;
-  /** ERC-20 contract address if the project is purchasable via ERC-20 */
-  currencyAddress?: Maybe<Scalars['Bytes']>;
-  /** Currency symbol for ERC-20 */
-  currencySymbol?: Maybe<Scalars['String']>;
-  /** Artist description of the project */
-  description?: Maybe<Scalars['String']>;
-  /** Is the project dynamic or a static image */
-  dynamic: Scalars['Boolean'];
-  externalAssetDependencies: Array<ProjectExternalAssetDependency>;
-  /** Once the project's external asset dependencies are locked they may never be modified again */
-  externalAssetDependenciesLocked: Scalars['Boolean'];
-  /** The number of external asset dependencies stored on-chain */
-  externalAssetDependencyCount: Scalars['BigInt'];
-  /** Unique identifier made up of contract address and project id */
-  id: Scalars['ID'];
-  /** Number of times the project has been invoked - number of tokens of the project */
-  invocations: Scalars['BigInt'];
-  ipfsHash?: Maybe<Scalars['String']>;
-  /** License for the project */
-  license?: Maybe<Scalars['String']>;
-  /** For V3 and-on, this field is null, and projects lock 4 weeks after `completedAt`. Once the project is locked its script may never be updated again. */
-  locked?: Maybe<Scalars['Boolean']>;
-  /** Maximum number of invocations allowed for the project */
-  maxInvocations: Scalars['BigInt'];
-  /** Minter configuration for this project (not implemented prior to minter filters) */
-  minterConfiguration?: Maybe<ProjectMinterConfiguration>;
-  /** Project name */
-  name?: Maybe<Scalars['String']>;
-  /** Accounts that own tokens of the project */
-  owners?: Maybe<Array<AccountProject>>;
-  /** Purchases paused */
-  paused: Scalars['Boolean'];
-  pricePerTokenInWei: Scalars['BigInt'];
-  /** ID of the project on the contract */
-  projectId: Scalars['BigInt'];
-  /** Proposed Artist addresses and payment split percentages */
-  proposedArtistAddressesAndSplits?: Maybe<ProposedArtistAddressesAndSplit>;
-  /** Artist/additional payee royalty percentage */
-  royaltyPercentage?: Maybe<Scalars['BigInt']>;
-  /** Lookup table to get the Sale history of the project */
-  saleLookupTables: Array<SaleLookupTable>;
-  /** The full script composed of scripts */
-  script?: Maybe<Scalars['String']>;
-  /** The number of scripts stored on-chain */
-  scriptCount: Scalars['BigInt'];
-  /** Extra information about the script and rendering options */
-  scriptJSON?: Maybe<Scalars['String']>;
-  /** Script type and version (see `scriptJSON` if null) */
-  scriptTypeAndVersion?: Maybe<Scalars['String']>;
-  scriptUpdatedAt?: Maybe<Scalars['BigInt']>;
-  /** Parts of the project script */
-  scripts?: Maybe<Array<ProjectScript>>;
-  /** Tokens of the project */
-  tokens?: Maybe<Array<Token>>;
-  updatedAt: Scalars['BigInt'];
-  /** Does the project actually use the hash string */
-  useHashString: Scalars['Boolean'];
-  /** Does the project use media from ipfs */
-  useIpfs?: Maybe<Scalars['Boolean']>;
-  /** Artist or project website */
-  website?: Maybe<Scalars['String']>;
-};
-
-
-export type ProjectExternalAssetDependenciesArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<ProjectExternalAssetDependency_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<ProjectExternalAssetDependency_Filter>;
-};
-
-
-export type ProjectOwnersArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<AccountProject_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<AccountProject_Filter>;
-};
-
-
-export type ProjectSaleLookupTablesArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<SaleLookupTable_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<SaleLookupTable_Filter>;
-};
-
-
-export type ProjectScriptsArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<ProjectScript_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<ProjectScript_Filter>;
-};
-
-
-export type ProjectTokensArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Token_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<Token_Filter>;
-};
-
-export type ProjectExternalAssetDependency = {
-  __typename?: 'ProjectExternalAssetDependency';
-  /** The dependency cid */
-  cid: Scalars['String'];
-  /** The dependency type */
-  dependencyType: ProjectExternalAssetDependencyType;
-  /** Unique identifier made up of projectId-index */
-  id: Scalars['ID'];
-  /** The dependency index */
-  index: Scalars['BigInt'];
-  /** The associated project */
-  project: Project;
-};
-
-export enum ProjectExternalAssetDependencyType {
-  /** Asset hosted on Arweave */
-  Arweave = 'ARWEAVE',
-  /** Asset hosted on IPFS */
-  Ipfs = 'IPFS'
-}
-
-export type ProjectExternalAssetDependency_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  cid?: InputMaybe<Scalars['String']>;
-  cid_contains?: InputMaybe<Scalars['String']>;
-  cid_contains_nocase?: InputMaybe<Scalars['String']>;
-  cid_ends_with?: InputMaybe<Scalars['String']>;
-  cid_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  cid_gt?: InputMaybe<Scalars['String']>;
-  cid_gte?: InputMaybe<Scalars['String']>;
-  cid_in?: InputMaybe<Array<Scalars['String']>>;
-  cid_lt?: InputMaybe<Scalars['String']>;
-  cid_lte?: InputMaybe<Scalars['String']>;
-  cid_not?: InputMaybe<Scalars['String']>;
-  cid_not_contains?: InputMaybe<Scalars['String']>;
-  cid_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  cid_not_ends_with?: InputMaybe<Scalars['String']>;
-  cid_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  cid_not_in?: InputMaybe<Array<Scalars['String']>>;
-  cid_not_starts_with?: InputMaybe<Scalars['String']>;
-  cid_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  cid_starts_with?: InputMaybe<Scalars['String']>;
-  cid_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  dependencyType?: InputMaybe<ProjectExternalAssetDependencyType>;
-  dependencyType_in?: InputMaybe<Array<ProjectExternalAssetDependencyType>>;
-  dependencyType_not?: InputMaybe<ProjectExternalAssetDependencyType>;
-  dependencyType_not_in?: InputMaybe<Array<ProjectExternalAssetDependencyType>>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  index?: InputMaybe<Scalars['BigInt']>;
-  index_gt?: InputMaybe<Scalars['BigInt']>;
-  index_gte?: InputMaybe<Scalars['BigInt']>;
-  index_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  index_lt?: InputMaybe<Scalars['BigInt']>;
-  index_lte?: InputMaybe<Scalars['BigInt']>;
-  index_not?: InputMaybe<Scalars['BigInt']>;
-  index_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  project?: InputMaybe<Scalars['String']>;
-  project_?: InputMaybe<Project_Filter>;
-  project_contains?: InputMaybe<Scalars['String']>;
-  project_contains_nocase?: InputMaybe<Scalars['String']>;
-  project_ends_with?: InputMaybe<Scalars['String']>;
-  project_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  project_gt?: InputMaybe<Scalars['String']>;
-  project_gte?: InputMaybe<Scalars['String']>;
-  project_in?: InputMaybe<Array<Scalars['String']>>;
-  project_lt?: InputMaybe<Scalars['String']>;
-  project_lte?: InputMaybe<Scalars['String']>;
-  project_not?: InputMaybe<Scalars['String']>;
-  project_not_contains?: InputMaybe<Scalars['String']>;
-  project_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  project_not_ends_with?: InputMaybe<Scalars['String']>;
-  project_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  project_not_in?: InputMaybe<Array<Scalars['String']>>;
-  project_not_starts_with?: InputMaybe<Scalars['String']>;
-  project_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  project_starts_with?: InputMaybe<Scalars['String']>;
-  project_starts_with_nocase?: InputMaybe<Scalars['String']>;
-};
-
-export enum ProjectExternalAssetDependency_OrderBy {
-  Cid = 'cid',
-  DependencyType = 'dependencyType',
-  Id = 'id',
-  Index = 'index',
-  Project = 'project'
-}
-
-export type ProjectMinterConfiguration = {
-  __typename?: 'ProjectMinterConfiguration';
-  /** price of token or resting price of Duch auction, in wei */
-  basePrice?: Maybe<Scalars['BigInt']>;
-  /** currency address as defined on minter - address(0) reserved for ether */
-  currencyAddress: Scalars['Bytes'];
-  /** currency symbol as defined on minter - ETH reserved for ether */
-  currencySymbol: Scalars['String'];
-  /** Linear Dutch auction end time (unix timestamp) */
-  endTime?: Maybe<Scalars['BigInt']>;
-  /** Configuration details used by specific minter project configurations (json string) */
-  extraMinterDetails: Scalars['String'];
-  /** Half life for exponential decay Dutch auction, in seconds */
-  halfLifeSeconds?: Maybe<Scalars['BigInt']>;
-  /** Unique identifier made up of minter contract address-projectId */
-  id: Scalars['ID'];
-  /** The associated minter */
-  minter: Minter;
-  /** true if project's token price has been configured on minter */
-  priceIsConfigured: Scalars['Boolean'];
-  /** The associated project */
-  project: Project;
-  /** Defines if purchasing token to another is allowed */
-  purchaseToDisabled: Scalars['Boolean'];
-  /** Dutch auction start price, in wei */
-  startPrice?: Maybe<Scalars['BigInt']>;
-  /** Dutch auction start time (unix timestamp) */
-  startTime?: Maybe<Scalars['BigInt']>;
-};
-
-export type ProjectMinterConfiguration_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  basePrice?: InputMaybe<Scalars['BigInt']>;
-  basePrice_gt?: InputMaybe<Scalars['BigInt']>;
-  basePrice_gte?: InputMaybe<Scalars['BigInt']>;
-  basePrice_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  basePrice_lt?: InputMaybe<Scalars['BigInt']>;
-  basePrice_lte?: InputMaybe<Scalars['BigInt']>;
-  basePrice_not?: InputMaybe<Scalars['BigInt']>;
-  basePrice_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  currencyAddress?: InputMaybe<Scalars['Bytes']>;
-  currencyAddress_contains?: InputMaybe<Scalars['Bytes']>;
-  currencyAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  currencyAddress_not?: InputMaybe<Scalars['Bytes']>;
-  currencyAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
-  currencyAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  currencySymbol?: InputMaybe<Scalars['String']>;
-  currencySymbol_contains?: InputMaybe<Scalars['String']>;
-  currencySymbol_contains_nocase?: InputMaybe<Scalars['String']>;
-  currencySymbol_ends_with?: InputMaybe<Scalars['String']>;
-  currencySymbol_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  currencySymbol_gt?: InputMaybe<Scalars['String']>;
-  currencySymbol_gte?: InputMaybe<Scalars['String']>;
-  currencySymbol_in?: InputMaybe<Array<Scalars['String']>>;
-  currencySymbol_lt?: InputMaybe<Scalars['String']>;
-  currencySymbol_lte?: InputMaybe<Scalars['String']>;
-  currencySymbol_not?: InputMaybe<Scalars['String']>;
-  currencySymbol_not_contains?: InputMaybe<Scalars['String']>;
-  currencySymbol_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  currencySymbol_not_ends_with?: InputMaybe<Scalars['String']>;
-  currencySymbol_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  currencySymbol_not_in?: InputMaybe<Array<Scalars['String']>>;
-  currencySymbol_not_starts_with?: InputMaybe<Scalars['String']>;
-  currencySymbol_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  currencySymbol_starts_with?: InputMaybe<Scalars['String']>;
-  currencySymbol_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  endTime?: InputMaybe<Scalars['BigInt']>;
-  endTime_gt?: InputMaybe<Scalars['BigInt']>;
-  endTime_gte?: InputMaybe<Scalars['BigInt']>;
-  endTime_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  endTime_lt?: InputMaybe<Scalars['BigInt']>;
-  endTime_lte?: InputMaybe<Scalars['BigInt']>;
-  endTime_not?: InputMaybe<Scalars['BigInt']>;
-  endTime_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  extraMinterDetails?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_contains?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_contains_nocase?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_ends_with?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_gt?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_gte?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_in?: InputMaybe<Array<Scalars['String']>>;
-  extraMinterDetails_lt?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_lte?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_not?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_not_contains?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_not_ends_with?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_not_in?: InputMaybe<Array<Scalars['String']>>;
-  extraMinterDetails_not_starts_with?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_starts_with?: InputMaybe<Scalars['String']>;
-  extraMinterDetails_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  halfLifeSeconds?: InputMaybe<Scalars['BigInt']>;
-  halfLifeSeconds_gt?: InputMaybe<Scalars['BigInt']>;
-  halfLifeSeconds_gte?: InputMaybe<Scalars['BigInt']>;
-  halfLifeSeconds_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  halfLifeSeconds_lt?: InputMaybe<Scalars['BigInt']>;
-  halfLifeSeconds_lte?: InputMaybe<Scalars['BigInt']>;
-  halfLifeSeconds_not?: InputMaybe<Scalars['BigInt']>;
-  halfLifeSeconds_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  minter?: InputMaybe<Scalars['String']>;
-  minter_?: InputMaybe<Minter_Filter>;
-  minter_contains?: InputMaybe<Scalars['String']>;
-  minter_contains_nocase?: InputMaybe<Scalars['String']>;
-  minter_ends_with?: InputMaybe<Scalars['String']>;
-  minter_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  minter_gt?: InputMaybe<Scalars['String']>;
-  minter_gte?: InputMaybe<Scalars['String']>;
-  minter_in?: InputMaybe<Array<Scalars['String']>>;
-  minter_lt?: InputMaybe<Scalars['String']>;
-  minter_lte?: InputMaybe<Scalars['String']>;
-  minter_not?: InputMaybe<Scalars['String']>;
-  minter_not_contains?: InputMaybe<Scalars['String']>;
-  minter_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  minter_not_ends_with?: InputMaybe<Scalars['String']>;
-  minter_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  minter_not_in?: InputMaybe<Array<Scalars['String']>>;
-  minter_not_starts_with?: InputMaybe<Scalars['String']>;
-  minter_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  minter_starts_with?: InputMaybe<Scalars['String']>;
-  minter_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  priceIsConfigured?: InputMaybe<Scalars['Boolean']>;
-  priceIsConfigured_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  priceIsConfigured_not?: InputMaybe<Scalars['Boolean']>;
-  priceIsConfigured_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  project?: InputMaybe<Scalars['String']>;
-  project_?: InputMaybe<Project_Filter>;
-  project_contains?: InputMaybe<Scalars['String']>;
-  project_contains_nocase?: InputMaybe<Scalars['String']>;
-  project_ends_with?: InputMaybe<Scalars['String']>;
-  project_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  project_gt?: InputMaybe<Scalars['String']>;
-  project_gte?: InputMaybe<Scalars['String']>;
-  project_in?: InputMaybe<Array<Scalars['String']>>;
-  project_lt?: InputMaybe<Scalars['String']>;
-  project_lte?: InputMaybe<Scalars['String']>;
-  project_not?: InputMaybe<Scalars['String']>;
-  project_not_contains?: InputMaybe<Scalars['String']>;
-  project_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  project_not_ends_with?: InputMaybe<Scalars['String']>;
-  project_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  project_not_in?: InputMaybe<Array<Scalars['String']>>;
-  project_not_starts_with?: InputMaybe<Scalars['String']>;
-  project_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  project_starts_with?: InputMaybe<Scalars['String']>;
-  project_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  purchaseToDisabled?: InputMaybe<Scalars['Boolean']>;
-  purchaseToDisabled_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  purchaseToDisabled_not?: InputMaybe<Scalars['Boolean']>;
-  purchaseToDisabled_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  startPrice?: InputMaybe<Scalars['BigInt']>;
-  startPrice_gt?: InputMaybe<Scalars['BigInt']>;
-  startPrice_gte?: InputMaybe<Scalars['BigInt']>;
-  startPrice_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  startPrice_lt?: InputMaybe<Scalars['BigInt']>;
-  startPrice_lte?: InputMaybe<Scalars['BigInt']>;
-  startPrice_not?: InputMaybe<Scalars['BigInt']>;
-  startPrice_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  startTime?: InputMaybe<Scalars['BigInt']>;
-  startTime_gt?: InputMaybe<Scalars['BigInt']>;
-  startTime_gte?: InputMaybe<Scalars['BigInt']>;
-  startTime_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  startTime_lt?: InputMaybe<Scalars['BigInt']>;
-  startTime_lte?: InputMaybe<Scalars['BigInt']>;
-  startTime_not?: InputMaybe<Scalars['BigInt']>;
-  startTime_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-};
-
-export enum ProjectMinterConfiguration_OrderBy {
-  BasePrice = 'basePrice',
-  CurrencyAddress = 'currencyAddress',
-  CurrencySymbol = 'currencySymbol',
-  EndTime = 'endTime',
-  ExtraMinterDetails = 'extraMinterDetails',
-  HalfLifeSeconds = 'halfLifeSeconds',
-  Id = 'id',
-  Minter = 'minter',
-  PriceIsConfigured = 'priceIsConfigured',
-  Project = 'project',
-  PurchaseToDisabled = 'purchaseToDisabled',
-  StartPrice = 'startPrice',
-  StartTime = 'startTime'
-}
-
-export type ProjectScript = {
-  __typename?: 'ProjectScript';
-  id: Scalars['ID'];
-  index: Scalars['BigInt'];
-  project: Project;
-  script: Scalars['String'];
-};
-
-export type ProjectScript_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  index?: InputMaybe<Scalars['BigInt']>;
-  index_gt?: InputMaybe<Scalars['BigInt']>;
-  index_gte?: InputMaybe<Scalars['BigInt']>;
-  index_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  index_lt?: InputMaybe<Scalars['BigInt']>;
-  index_lte?: InputMaybe<Scalars['BigInt']>;
-  index_not?: InputMaybe<Scalars['BigInt']>;
-  index_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  project?: InputMaybe<Scalars['String']>;
-  project_?: InputMaybe<Project_Filter>;
-  project_contains?: InputMaybe<Scalars['String']>;
-  project_contains_nocase?: InputMaybe<Scalars['String']>;
-  project_ends_with?: InputMaybe<Scalars['String']>;
-  project_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  project_gt?: InputMaybe<Scalars['String']>;
-  project_gte?: InputMaybe<Scalars['String']>;
-  project_in?: InputMaybe<Array<Scalars['String']>>;
-  project_lt?: InputMaybe<Scalars['String']>;
-  project_lte?: InputMaybe<Scalars['String']>;
-  project_not?: InputMaybe<Scalars['String']>;
-  project_not_contains?: InputMaybe<Scalars['String']>;
-  project_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  project_not_ends_with?: InputMaybe<Scalars['String']>;
-  project_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  project_not_in?: InputMaybe<Array<Scalars['String']>>;
-  project_not_starts_with?: InputMaybe<Scalars['String']>;
-  project_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  project_starts_with?: InputMaybe<Scalars['String']>;
-  project_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  script?: InputMaybe<Scalars['String']>;
-  script_contains?: InputMaybe<Scalars['String']>;
-  script_contains_nocase?: InputMaybe<Scalars['String']>;
-  script_ends_with?: InputMaybe<Scalars['String']>;
-  script_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  script_gt?: InputMaybe<Scalars['String']>;
-  script_gte?: InputMaybe<Scalars['String']>;
-  script_in?: InputMaybe<Array<Scalars['String']>>;
-  script_lt?: InputMaybe<Scalars['String']>;
-  script_lte?: InputMaybe<Scalars['String']>;
-  script_not?: InputMaybe<Scalars['String']>;
-  script_not_contains?: InputMaybe<Scalars['String']>;
-  script_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  script_not_ends_with?: InputMaybe<Scalars['String']>;
-  script_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  script_not_in?: InputMaybe<Array<Scalars['String']>>;
-  script_not_starts_with?: InputMaybe<Scalars['String']>;
-  script_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  script_starts_with?: InputMaybe<Scalars['String']>;
-  script_starts_with_nocase?: InputMaybe<Scalars['String']>;
-};
-
-export enum ProjectScript_OrderBy {
-  Id = 'id',
-  Index = 'index',
-  Project = 'project',
-  Script = 'script'
-}
-
-export type Project_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  activatedAt?: InputMaybe<Scalars['BigInt']>;
-  activatedAt_gt?: InputMaybe<Scalars['BigInt']>;
-  activatedAt_gte?: InputMaybe<Scalars['BigInt']>;
-  activatedAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  activatedAt_lt?: InputMaybe<Scalars['BigInt']>;
-  activatedAt_lte?: InputMaybe<Scalars['BigInt']>;
-  activatedAt_not?: InputMaybe<Scalars['BigInt']>;
-  activatedAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  active?: InputMaybe<Scalars['Boolean']>;
-  active_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  active_not?: InputMaybe<Scalars['Boolean']>;
-  active_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  additionalPayee?: InputMaybe<Scalars['Bytes']>;
-  additionalPayeePercentage?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeePercentage_gt?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeePercentage_gte?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeePercentage_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  additionalPayeePercentage_lt?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeePercentage_lte?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeePercentage_not?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeePercentage_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  additionalPayeeSecondarySalesAddress?: InputMaybe<Scalars['Bytes']>;
-  additionalPayeeSecondarySalesAddress_contains?: InputMaybe<Scalars['Bytes']>;
-  additionalPayeeSecondarySalesAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  additionalPayeeSecondarySalesAddress_not?: InputMaybe<Scalars['Bytes']>;
-  additionalPayeeSecondarySalesAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
-  additionalPayeeSecondarySalesAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  additionalPayeeSecondarySalesPercentage?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeeSecondarySalesPercentage_gt?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeeSecondarySalesPercentage_gte?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeeSecondarySalesPercentage_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  additionalPayeeSecondarySalesPercentage_lt?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeeSecondarySalesPercentage_lte?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeeSecondarySalesPercentage_not?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeeSecondarySalesPercentage_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  additionalPayee_contains?: InputMaybe<Scalars['Bytes']>;
-  additionalPayee_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  additionalPayee_not?: InputMaybe<Scalars['Bytes']>;
-  additionalPayee_not_contains?: InputMaybe<Scalars['Bytes']>;
-  additionalPayee_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  artist?: InputMaybe<Scalars['String']>;
-  artistAddress?: InputMaybe<Scalars['Bytes']>;
-  artistAddress_contains?: InputMaybe<Scalars['Bytes']>;
-  artistAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  artistAddress_not?: InputMaybe<Scalars['Bytes']>;
-  artistAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
-  artistAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  artistName?: InputMaybe<Scalars['String']>;
-  artistName_contains?: InputMaybe<Scalars['String']>;
-  artistName_contains_nocase?: InputMaybe<Scalars['String']>;
-  artistName_ends_with?: InputMaybe<Scalars['String']>;
-  artistName_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  artistName_gt?: InputMaybe<Scalars['String']>;
-  artistName_gte?: InputMaybe<Scalars['String']>;
-  artistName_in?: InputMaybe<Array<Scalars['String']>>;
-  artistName_lt?: InputMaybe<Scalars['String']>;
-  artistName_lte?: InputMaybe<Scalars['String']>;
-  artistName_not?: InputMaybe<Scalars['String']>;
-  artistName_not_contains?: InputMaybe<Scalars['String']>;
-  artistName_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  artistName_not_ends_with?: InputMaybe<Scalars['String']>;
-  artistName_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  artistName_not_in?: InputMaybe<Array<Scalars['String']>>;
-  artistName_not_starts_with?: InputMaybe<Scalars['String']>;
-  artistName_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  artistName_starts_with?: InputMaybe<Scalars['String']>;
-  artistName_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  artist_?: InputMaybe<Account_Filter>;
-  artist_contains?: InputMaybe<Scalars['String']>;
-  artist_contains_nocase?: InputMaybe<Scalars['String']>;
-  artist_ends_with?: InputMaybe<Scalars['String']>;
-  artist_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  artist_gt?: InputMaybe<Scalars['String']>;
-  artist_gte?: InputMaybe<Scalars['String']>;
-  artist_in?: InputMaybe<Array<Scalars['String']>>;
-  artist_lt?: InputMaybe<Scalars['String']>;
-  artist_lte?: InputMaybe<Scalars['String']>;
-  artist_not?: InputMaybe<Scalars['String']>;
-  artist_not_contains?: InputMaybe<Scalars['String']>;
-  artist_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  artist_not_ends_with?: InputMaybe<Scalars['String']>;
-  artist_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  artist_not_in?: InputMaybe<Array<Scalars['String']>>;
-  artist_not_starts_with?: InputMaybe<Scalars['String']>;
-  artist_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  artist_starts_with?: InputMaybe<Scalars['String']>;
-  artist_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  aspectRatio?: InputMaybe<Scalars['String']>;
-  aspectRatio_contains?: InputMaybe<Scalars['String']>;
-  aspectRatio_contains_nocase?: InputMaybe<Scalars['String']>;
-  aspectRatio_ends_with?: InputMaybe<Scalars['String']>;
-  aspectRatio_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  aspectRatio_gt?: InputMaybe<Scalars['String']>;
-  aspectRatio_gte?: InputMaybe<Scalars['String']>;
-  aspectRatio_in?: InputMaybe<Array<Scalars['String']>>;
-  aspectRatio_lt?: InputMaybe<Scalars['String']>;
-  aspectRatio_lte?: InputMaybe<Scalars['String']>;
-  aspectRatio_not?: InputMaybe<Scalars['String']>;
-  aspectRatio_not_contains?: InputMaybe<Scalars['String']>;
-  aspectRatio_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  aspectRatio_not_ends_with?: InputMaybe<Scalars['String']>;
-  aspectRatio_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  aspectRatio_not_in?: InputMaybe<Array<Scalars['String']>>;
-  aspectRatio_not_starts_with?: InputMaybe<Scalars['String']>;
-  aspectRatio_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  aspectRatio_starts_with?: InputMaybe<Scalars['String']>;
-  aspectRatio_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  baseIpfsUri?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_contains?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_contains_nocase?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_ends_with?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_gt?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_gte?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_in?: InputMaybe<Array<Scalars['String']>>;
-  baseIpfsUri_lt?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_lte?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_not?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_not_contains?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_not_ends_with?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_not_in?: InputMaybe<Array<Scalars['String']>>;
-  baseIpfsUri_not_starts_with?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_starts_with?: InputMaybe<Scalars['String']>;
-  baseIpfsUri_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  baseUri?: InputMaybe<Scalars['String']>;
-  baseUri_contains?: InputMaybe<Scalars['String']>;
-  baseUri_contains_nocase?: InputMaybe<Scalars['String']>;
-  baseUri_ends_with?: InputMaybe<Scalars['String']>;
-  baseUri_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  baseUri_gt?: InputMaybe<Scalars['String']>;
-  baseUri_gte?: InputMaybe<Scalars['String']>;
-  baseUri_in?: InputMaybe<Array<Scalars['String']>>;
-  baseUri_lt?: InputMaybe<Scalars['String']>;
-  baseUri_lte?: InputMaybe<Scalars['String']>;
-  baseUri_not?: InputMaybe<Scalars['String']>;
-  baseUri_not_contains?: InputMaybe<Scalars['String']>;
-  baseUri_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  baseUri_not_ends_with?: InputMaybe<Scalars['String']>;
-  baseUri_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  baseUri_not_in?: InputMaybe<Array<Scalars['String']>>;
-  baseUri_not_starts_with?: InputMaybe<Scalars['String']>;
-  baseUri_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  baseUri_starts_with?: InputMaybe<Scalars['String']>;
-  baseUri_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  complete?: InputMaybe<Scalars['Boolean']>;
-  complete_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  complete_not?: InputMaybe<Scalars['Boolean']>;
-  complete_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  completedAt?: InputMaybe<Scalars['BigInt']>;
-  completedAt_gt?: InputMaybe<Scalars['BigInt']>;
-  completedAt_gte?: InputMaybe<Scalars['BigInt']>;
-  completedAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  completedAt_lt?: InputMaybe<Scalars['BigInt']>;
-  completedAt_lte?: InputMaybe<Scalars['BigInt']>;
-  completedAt_not?: InputMaybe<Scalars['BigInt']>;
-  completedAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  contract?: InputMaybe<Scalars['String']>;
-  contract_?: InputMaybe<Contract_Filter>;
-  contract_contains?: InputMaybe<Scalars['String']>;
-  contract_contains_nocase?: InputMaybe<Scalars['String']>;
-  contract_ends_with?: InputMaybe<Scalars['String']>;
-  contract_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  contract_gt?: InputMaybe<Scalars['String']>;
-  contract_gte?: InputMaybe<Scalars['String']>;
-  contract_in?: InputMaybe<Array<Scalars['String']>>;
-  contract_lt?: InputMaybe<Scalars['String']>;
-  contract_lte?: InputMaybe<Scalars['String']>;
-  contract_not?: InputMaybe<Scalars['String']>;
-  contract_not_contains?: InputMaybe<Scalars['String']>;
-  contract_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  contract_not_ends_with?: InputMaybe<Scalars['String']>;
-  contract_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  contract_not_in?: InputMaybe<Array<Scalars['String']>>;
-  contract_not_starts_with?: InputMaybe<Scalars['String']>;
-  contract_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  contract_starts_with?: InputMaybe<Scalars['String']>;
-  contract_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  createdAt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_gt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_gte?: InputMaybe<Scalars['BigInt']>;
-  createdAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  createdAt_lt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_lte?: InputMaybe<Scalars['BigInt']>;
-  createdAt_not?: InputMaybe<Scalars['BigInt']>;
-  createdAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  curationStatus?: InputMaybe<Scalars['String']>;
-  curationStatus_contains?: InputMaybe<Scalars['String']>;
-  curationStatus_contains_nocase?: InputMaybe<Scalars['String']>;
-  curationStatus_ends_with?: InputMaybe<Scalars['String']>;
-  curationStatus_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  curationStatus_gt?: InputMaybe<Scalars['String']>;
-  curationStatus_gte?: InputMaybe<Scalars['String']>;
-  curationStatus_in?: InputMaybe<Array<Scalars['String']>>;
-  curationStatus_lt?: InputMaybe<Scalars['String']>;
-  curationStatus_lte?: InputMaybe<Scalars['String']>;
-  curationStatus_not?: InputMaybe<Scalars['String']>;
-  curationStatus_not_contains?: InputMaybe<Scalars['String']>;
-  curationStatus_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  curationStatus_not_ends_with?: InputMaybe<Scalars['String']>;
-  curationStatus_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  curationStatus_not_in?: InputMaybe<Array<Scalars['String']>>;
-  curationStatus_not_starts_with?: InputMaybe<Scalars['String']>;
-  curationStatus_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  curationStatus_starts_with?: InputMaybe<Scalars['String']>;
-  curationStatus_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  currencyAddress?: InputMaybe<Scalars['Bytes']>;
-  currencyAddress_contains?: InputMaybe<Scalars['Bytes']>;
-  currencyAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  currencyAddress_not?: InputMaybe<Scalars['Bytes']>;
-  currencyAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
-  currencyAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  currencySymbol?: InputMaybe<Scalars['String']>;
-  currencySymbol_contains?: InputMaybe<Scalars['String']>;
-  currencySymbol_contains_nocase?: InputMaybe<Scalars['String']>;
-  currencySymbol_ends_with?: InputMaybe<Scalars['String']>;
-  currencySymbol_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  currencySymbol_gt?: InputMaybe<Scalars['String']>;
-  currencySymbol_gte?: InputMaybe<Scalars['String']>;
-  currencySymbol_in?: InputMaybe<Array<Scalars['String']>>;
-  currencySymbol_lt?: InputMaybe<Scalars['String']>;
-  currencySymbol_lte?: InputMaybe<Scalars['String']>;
-  currencySymbol_not?: InputMaybe<Scalars['String']>;
-  currencySymbol_not_contains?: InputMaybe<Scalars['String']>;
-  currencySymbol_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  currencySymbol_not_ends_with?: InputMaybe<Scalars['String']>;
-  currencySymbol_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  currencySymbol_not_in?: InputMaybe<Array<Scalars['String']>>;
-  currencySymbol_not_starts_with?: InputMaybe<Scalars['String']>;
-  currencySymbol_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  currencySymbol_starts_with?: InputMaybe<Scalars['String']>;
-  currencySymbol_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  description?: InputMaybe<Scalars['String']>;
-  description_contains?: InputMaybe<Scalars['String']>;
-  description_contains_nocase?: InputMaybe<Scalars['String']>;
-  description_ends_with?: InputMaybe<Scalars['String']>;
-  description_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  description_gt?: InputMaybe<Scalars['String']>;
-  description_gte?: InputMaybe<Scalars['String']>;
-  description_in?: InputMaybe<Array<Scalars['String']>>;
-  description_lt?: InputMaybe<Scalars['String']>;
-  description_lte?: InputMaybe<Scalars['String']>;
-  description_not?: InputMaybe<Scalars['String']>;
-  description_not_contains?: InputMaybe<Scalars['String']>;
-  description_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  description_not_ends_with?: InputMaybe<Scalars['String']>;
-  description_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  description_not_in?: InputMaybe<Array<Scalars['String']>>;
-  description_not_starts_with?: InputMaybe<Scalars['String']>;
-  description_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  description_starts_with?: InputMaybe<Scalars['String']>;
-  description_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  dynamic?: InputMaybe<Scalars['Boolean']>;
-  dynamic_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  dynamic_not?: InputMaybe<Scalars['Boolean']>;
-  dynamic_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  externalAssetDependenciesLocked?: InputMaybe<Scalars['Boolean']>;
-  externalAssetDependenciesLocked_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  externalAssetDependenciesLocked_not?: InputMaybe<Scalars['Boolean']>;
-  externalAssetDependenciesLocked_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  externalAssetDependencies_?: InputMaybe<ProjectExternalAssetDependency_Filter>;
-  externalAssetDependencyCount?: InputMaybe<Scalars['BigInt']>;
-  externalAssetDependencyCount_gt?: InputMaybe<Scalars['BigInt']>;
-  externalAssetDependencyCount_gte?: InputMaybe<Scalars['BigInt']>;
-  externalAssetDependencyCount_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  externalAssetDependencyCount_lt?: InputMaybe<Scalars['BigInt']>;
-  externalAssetDependencyCount_lte?: InputMaybe<Scalars['BigInt']>;
-  externalAssetDependencyCount_not?: InputMaybe<Scalars['BigInt']>;
-  externalAssetDependencyCount_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  invocations?: InputMaybe<Scalars['BigInt']>;
-  invocations_gt?: InputMaybe<Scalars['BigInt']>;
-  invocations_gte?: InputMaybe<Scalars['BigInt']>;
-  invocations_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  invocations_lt?: InputMaybe<Scalars['BigInt']>;
-  invocations_lte?: InputMaybe<Scalars['BigInt']>;
-  invocations_not?: InputMaybe<Scalars['BigInt']>;
-  invocations_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  ipfsHash?: InputMaybe<Scalars['String']>;
-  ipfsHash_contains?: InputMaybe<Scalars['String']>;
-  ipfsHash_contains_nocase?: InputMaybe<Scalars['String']>;
-  ipfsHash_ends_with?: InputMaybe<Scalars['String']>;
-  ipfsHash_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  ipfsHash_gt?: InputMaybe<Scalars['String']>;
-  ipfsHash_gte?: InputMaybe<Scalars['String']>;
-  ipfsHash_in?: InputMaybe<Array<Scalars['String']>>;
-  ipfsHash_lt?: InputMaybe<Scalars['String']>;
-  ipfsHash_lte?: InputMaybe<Scalars['String']>;
-  ipfsHash_not?: InputMaybe<Scalars['String']>;
-  ipfsHash_not_contains?: InputMaybe<Scalars['String']>;
-  ipfsHash_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  ipfsHash_not_ends_with?: InputMaybe<Scalars['String']>;
-  ipfsHash_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  ipfsHash_not_in?: InputMaybe<Array<Scalars['String']>>;
-  ipfsHash_not_starts_with?: InputMaybe<Scalars['String']>;
-  ipfsHash_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  ipfsHash_starts_with?: InputMaybe<Scalars['String']>;
-  ipfsHash_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  license?: InputMaybe<Scalars['String']>;
-  license_contains?: InputMaybe<Scalars['String']>;
-  license_contains_nocase?: InputMaybe<Scalars['String']>;
-  license_ends_with?: InputMaybe<Scalars['String']>;
-  license_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  license_gt?: InputMaybe<Scalars['String']>;
-  license_gte?: InputMaybe<Scalars['String']>;
-  license_in?: InputMaybe<Array<Scalars['String']>>;
-  license_lt?: InputMaybe<Scalars['String']>;
-  license_lte?: InputMaybe<Scalars['String']>;
-  license_not?: InputMaybe<Scalars['String']>;
-  license_not_contains?: InputMaybe<Scalars['String']>;
-  license_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  license_not_ends_with?: InputMaybe<Scalars['String']>;
-  license_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  license_not_in?: InputMaybe<Array<Scalars['String']>>;
-  license_not_starts_with?: InputMaybe<Scalars['String']>;
-  license_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  license_starts_with?: InputMaybe<Scalars['String']>;
-  license_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  locked?: InputMaybe<Scalars['Boolean']>;
-  locked_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  locked_not?: InputMaybe<Scalars['Boolean']>;
-  locked_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  maxInvocations?: InputMaybe<Scalars['BigInt']>;
-  maxInvocations_gt?: InputMaybe<Scalars['BigInt']>;
-  maxInvocations_gte?: InputMaybe<Scalars['BigInt']>;
-  maxInvocations_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  maxInvocations_lt?: InputMaybe<Scalars['BigInt']>;
-  maxInvocations_lte?: InputMaybe<Scalars['BigInt']>;
-  maxInvocations_not?: InputMaybe<Scalars['BigInt']>;
-  maxInvocations_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  minterConfiguration?: InputMaybe<Scalars['String']>;
-  minterConfiguration_?: InputMaybe<ProjectMinterConfiguration_Filter>;
-  minterConfiguration_contains?: InputMaybe<Scalars['String']>;
-  minterConfiguration_contains_nocase?: InputMaybe<Scalars['String']>;
-  minterConfiguration_ends_with?: InputMaybe<Scalars['String']>;
-  minterConfiguration_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  minterConfiguration_gt?: InputMaybe<Scalars['String']>;
-  minterConfiguration_gte?: InputMaybe<Scalars['String']>;
-  minterConfiguration_in?: InputMaybe<Array<Scalars['String']>>;
-  minterConfiguration_lt?: InputMaybe<Scalars['String']>;
-  minterConfiguration_lte?: InputMaybe<Scalars['String']>;
-  minterConfiguration_not?: InputMaybe<Scalars['String']>;
-  minterConfiguration_not_contains?: InputMaybe<Scalars['String']>;
-  minterConfiguration_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  minterConfiguration_not_ends_with?: InputMaybe<Scalars['String']>;
-  minterConfiguration_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  minterConfiguration_not_in?: InputMaybe<Array<Scalars['String']>>;
-  minterConfiguration_not_starts_with?: InputMaybe<Scalars['String']>;
-  minterConfiguration_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  minterConfiguration_starts_with?: InputMaybe<Scalars['String']>;
-  minterConfiguration_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  name?: InputMaybe<Scalars['String']>;
-  name_contains?: InputMaybe<Scalars['String']>;
-  name_contains_nocase?: InputMaybe<Scalars['String']>;
-  name_ends_with?: InputMaybe<Scalars['String']>;
-  name_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  name_gt?: InputMaybe<Scalars['String']>;
-  name_gte?: InputMaybe<Scalars['String']>;
-  name_in?: InputMaybe<Array<Scalars['String']>>;
-  name_lt?: InputMaybe<Scalars['String']>;
-  name_lte?: InputMaybe<Scalars['String']>;
-  name_not?: InputMaybe<Scalars['String']>;
-  name_not_contains?: InputMaybe<Scalars['String']>;
-  name_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  name_not_ends_with?: InputMaybe<Scalars['String']>;
-  name_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  name_not_in?: InputMaybe<Array<Scalars['String']>>;
-  name_not_starts_with?: InputMaybe<Scalars['String']>;
-  name_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  name_starts_with?: InputMaybe<Scalars['String']>;
-  name_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  owners_?: InputMaybe<AccountProject_Filter>;
-  paused?: InputMaybe<Scalars['Boolean']>;
-  paused_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  paused_not?: InputMaybe<Scalars['Boolean']>;
-  paused_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  pricePerTokenInWei?: InputMaybe<Scalars['BigInt']>;
-  pricePerTokenInWei_gt?: InputMaybe<Scalars['BigInt']>;
-  pricePerTokenInWei_gte?: InputMaybe<Scalars['BigInt']>;
-  pricePerTokenInWei_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  pricePerTokenInWei_lt?: InputMaybe<Scalars['BigInt']>;
-  pricePerTokenInWei_lte?: InputMaybe<Scalars['BigInt']>;
-  pricePerTokenInWei_not?: InputMaybe<Scalars['BigInt']>;
-  pricePerTokenInWei_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  projectId?: InputMaybe<Scalars['BigInt']>;
-  projectId_gt?: InputMaybe<Scalars['BigInt']>;
-  projectId_gte?: InputMaybe<Scalars['BigInt']>;
-  projectId_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  projectId_lt?: InputMaybe<Scalars['BigInt']>;
-  projectId_lte?: InputMaybe<Scalars['BigInt']>;
-  projectId_not?: InputMaybe<Scalars['BigInt']>;
-  projectId_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  proposedArtistAddressesAndSplits?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_?: InputMaybe<ProposedArtistAddressesAndSplit_Filter>;
-  proposedArtistAddressesAndSplits_contains?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_contains_nocase?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_ends_with?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_gt?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_gte?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_in?: InputMaybe<Array<Scalars['String']>>;
-  proposedArtistAddressesAndSplits_lt?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_lte?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_not?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_not_contains?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_not_ends_with?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_not_in?: InputMaybe<Array<Scalars['String']>>;
-  proposedArtistAddressesAndSplits_not_starts_with?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_starts_with?: InputMaybe<Scalars['String']>;
-  proposedArtistAddressesAndSplits_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  royaltyPercentage?: InputMaybe<Scalars['BigInt']>;
-  royaltyPercentage_gt?: InputMaybe<Scalars['BigInt']>;
-  royaltyPercentage_gte?: InputMaybe<Scalars['BigInt']>;
-  royaltyPercentage_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  royaltyPercentage_lt?: InputMaybe<Scalars['BigInt']>;
-  royaltyPercentage_lte?: InputMaybe<Scalars['BigInt']>;
-  royaltyPercentage_not?: InputMaybe<Scalars['BigInt']>;
-  royaltyPercentage_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  saleLookupTables_?: InputMaybe<SaleLookupTable_Filter>;
-  script?: InputMaybe<Scalars['String']>;
-  scriptCount?: InputMaybe<Scalars['BigInt']>;
-  scriptCount_gt?: InputMaybe<Scalars['BigInt']>;
-  scriptCount_gte?: InputMaybe<Scalars['BigInt']>;
-  scriptCount_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  scriptCount_lt?: InputMaybe<Scalars['BigInt']>;
-  scriptCount_lte?: InputMaybe<Scalars['BigInt']>;
-  scriptCount_not?: InputMaybe<Scalars['BigInt']>;
-  scriptCount_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  scriptJSON?: InputMaybe<Scalars['String']>;
-  scriptJSON_contains?: InputMaybe<Scalars['String']>;
-  scriptJSON_contains_nocase?: InputMaybe<Scalars['String']>;
-  scriptJSON_ends_with?: InputMaybe<Scalars['String']>;
-  scriptJSON_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  scriptJSON_gt?: InputMaybe<Scalars['String']>;
-  scriptJSON_gte?: InputMaybe<Scalars['String']>;
-  scriptJSON_in?: InputMaybe<Array<Scalars['String']>>;
-  scriptJSON_lt?: InputMaybe<Scalars['String']>;
-  scriptJSON_lte?: InputMaybe<Scalars['String']>;
-  scriptJSON_not?: InputMaybe<Scalars['String']>;
-  scriptJSON_not_contains?: InputMaybe<Scalars['String']>;
-  scriptJSON_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  scriptJSON_not_ends_with?: InputMaybe<Scalars['String']>;
-  scriptJSON_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  scriptJSON_not_in?: InputMaybe<Array<Scalars['String']>>;
-  scriptJSON_not_starts_with?: InputMaybe<Scalars['String']>;
-  scriptJSON_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  scriptJSON_starts_with?: InputMaybe<Scalars['String']>;
-  scriptJSON_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_contains?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_contains_nocase?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_ends_with?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_gt?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_gte?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_in?: InputMaybe<Array<Scalars['String']>>;
-  scriptTypeAndVersion_lt?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_lte?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_not?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_not_contains?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_not_ends_with?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_not_in?: InputMaybe<Array<Scalars['String']>>;
-  scriptTypeAndVersion_not_starts_with?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_starts_with?: InputMaybe<Scalars['String']>;
-  scriptTypeAndVersion_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  scriptUpdatedAt?: InputMaybe<Scalars['BigInt']>;
-  scriptUpdatedAt_gt?: InputMaybe<Scalars['BigInt']>;
-  scriptUpdatedAt_gte?: InputMaybe<Scalars['BigInt']>;
-  scriptUpdatedAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  scriptUpdatedAt_lt?: InputMaybe<Scalars['BigInt']>;
-  scriptUpdatedAt_lte?: InputMaybe<Scalars['BigInt']>;
-  scriptUpdatedAt_not?: InputMaybe<Scalars['BigInt']>;
-  scriptUpdatedAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  script_contains?: InputMaybe<Scalars['String']>;
-  script_contains_nocase?: InputMaybe<Scalars['String']>;
-  script_ends_with?: InputMaybe<Scalars['String']>;
-  script_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  script_gt?: InputMaybe<Scalars['String']>;
-  script_gte?: InputMaybe<Scalars['String']>;
-  script_in?: InputMaybe<Array<Scalars['String']>>;
-  script_lt?: InputMaybe<Scalars['String']>;
-  script_lte?: InputMaybe<Scalars['String']>;
-  script_not?: InputMaybe<Scalars['String']>;
-  script_not_contains?: InputMaybe<Scalars['String']>;
-  script_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  script_not_ends_with?: InputMaybe<Scalars['String']>;
-  script_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  script_not_in?: InputMaybe<Array<Scalars['String']>>;
-  script_not_starts_with?: InputMaybe<Scalars['String']>;
-  script_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  script_starts_with?: InputMaybe<Scalars['String']>;
-  script_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  scripts_?: InputMaybe<ProjectScript_Filter>;
-  tokens_?: InputMaybe<Token_Filter>;
-  updatedAt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_gt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_gte?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  updatedAt_lt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_lte?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_not?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  useHashString?: InputMaybe<Scalars['Boolean']>;
-  useHashString_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  useHashString_not?: InputMaybe<Scalars['Boolean']>;
-  useHashString_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  useIpfs?: InputMaybe<Scalars['Boolean']>;
-  useIpfs_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  useIpfs_not?: InputMaybe<Scalars['Boolean']>;
-  useIpfs_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  website?: InputMaybe<Scalars['String']>;
-  website_contains?: InputMaybe<Scalars['String']>;
-  website_contains_nocase?: InputMaybe<Scalars['String']>;
-  website_ends_with?: InputMaybe<Scalars['String']>;
-  website_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  website_gt?: InputMaybe<Scalars['String']>;
-  website_gte?: InputMaybe<Scalars['String']>;
-  website_in?: InputMaybe<Array<Scalars['String']>>;
-  website_lt?: InputMaybe<Scalars['String']>;
-  website_lte?: InputMaybe<Scalars['String']>;
-  website_not?: InputMaybe<Scalars['String']>;
-  website_not_contains?: InputMaybe<Scalars['String']>;
-  website_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  website_not_ends_with?: InputMaybe<Scalars['String']>;
-  website_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  website_not_in?: InputMaybe<Array<Scalars['String']>>;
-  website_not_starts_with?: InputMaybe<Scalars['String']>;
-  website_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  website_starts_with?: InputMaybe<Scalars['String']>;
-  website_starts_with_nocase?: InputMaybe<Scalars['String']>;
-};
-
-export enum Project_OrderBy {
-  ActivatedAt = 'activatedAt',
-  Active = 'active',
-  AdditionalPayee = 'additionalPayee',
-  AdditionalPayeePercentage = 'additionalPayeePercentage',
-  AdditionalPayeeSecondarySalesAddress = 'additionalPayeeSecondarySalesAddress',
-  AdditionalPayeeSecondarySalesPercentage = 'additionalPayeeSecondarySalesPercentage',
-  Artist = 'artist',
-  ArtistAddress = 'artistAddress',
-  ArtistName = 'artistName',
-  AspectRatio = 'aspectRatio',
-  BaseIpfsUri = 'baseIpfsUri',
-  BaseUri = 'baseUri',
-  Complete = 'complete',
-  CompletedAt = 'completedAt',
-  Contract = 'contract',
-  CreatedAt = 'createdAt',
-  CurationStatus = 'curationStatus',
-  CurrencyAddress = 'currencyAddress',
-  CurrencySymbol = 'currencySymbol',
-  Description = 'description',
-  Dynamic = 'dynamic',
-  ExternalAssetDependencies = 'externalAssetDependencies',
-  ExternalAssetDependenciesLocked = 'externalAssetDependenciesLocked',
-  ExternalAssetDependencyCount = 'externalAssetDependencyCount',
-  Id = 'id',
-  Invocations = 'invocations',
-  IpfsHash = 'ipfsHash',
-  License = 'license',
-  Locked = 'locked',
-  MaxInvocations = 'maxInvocations',
-  MinterConfiguration = 'minterConfiguration',
-  Name = 'name',
-  Owners = 'owners',
-  Paused = 'paused',
-  PricePerTokenInWei = 'pricePerTokenInWei',
-  ProjectId = 'projectId',
-  ProposedArtistAddressesAndSplits = 'proposedArtistAddressesAndSplits',
-  RoyaltyPercentage = 'royaltyPercentage',
-  SaleLookupTables = 'saleLookupTables',
-  Script = 'script',
-  ScriptCount = 'scriptCount',
-  ScriptJson = 'scriptJSON',
-  ScriptTypeAndVersion = 'scriptTypeAndVersion',
-  ScriptUpdatedAt = 'scriptUpdatedAt',
-  Scripts = 'scripts',
-  Tokens = 'tokens',
-  UpdatedAt = 'updatedAt',
-  UseHashString = 'useHashString',
-  UseIpfs = 'useIpfs',
-  Website = 'website'
-}
-
-export type ProposedArtistAddressesAndSplit = {
-  __typename?: 'ProposedArtistAddressesAndSplit';
-  /** Proposed artist additional payee address for primary sales */
-  additionalPayeePrimarySalesAddress: Scalars['Bytes'];
-  /** Proposed artist additional payee percentage for primary sales */
-  additionalPayeePrimarySalesPercentage: Scalars['BigInt'];
-  /** Proposed artist additional payee address for secondary sales */
-  additionalPayeeSecondarySalesAddress: Scalars['Bytes'];
-  /** Proposed artist additional payee percentage for secondary sales */
-  additionalPayeeSecondarySalesPercentage: Scalars['BigInt'];
-  /** Proposed artist address */
-  artistAddress: Scalars['Bytes'];
-  createdAt: Scalars['BigInt'];
-  /** Unique identifier made up of contract address and project id */
-  id: Scalars['ID'];
-  /** Project associated with this proposed artist addresses and splits */
-  project: Project;
-};
-
-export type ProposedArtistAddressesAndSplit_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  additionalPayeePrimarySalesAddress?: InputMaybe<Scalars['Bytes']>;
-  additionalPayeePrimarySalesAddress_contains?: InputMaybe<Scalars['Bytes']>;
-  additionalPayeePrimarySalesAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  additionalPayeePrimarySalesAddress_not?: InputMaybe<Scalars['Bytes']>;
-  additionalPayeePrimarySalesAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
-  additionalPayeePrimarySalesAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  additionalPayeePrimarySalesPercentage?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeePrimarySalesPercentage_gt?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeePrimarySalesPercentage_gte?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeePrimarySalesPercentage_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  additionalPayeePrimarySalesPercentage_lt?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeePrimarySalesPercentage_lte?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeePrimarySalesPercentage_not?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeePrimarySalesPercentage_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  additionalPayeeSecondarySalesAddress?: InputMaybe<Scalars['Bytes']>;
-  additionalPayeeSecondarySalesAddress_contains?: InputMaybe<Scalars['Bytes']>;
-  additionalPayeeSecondarySalesAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  additionalPayeeSecondarySalesAddress_not?: InputMaybe<Scalars['Bytes']>;
-  additionalPayeeSecondarySalesAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
-  additionalPayeeSecondarySalesAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  additionalPayeeSecondarySalesPercentage?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeeSecondarySalesPercentage_gt?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeeSecondarySalesPercentage_gte?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeeSecondarySalesPercentage_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  additionalPayeeSecondarySalesPercentage_lt?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeeSecondarySalesPercentage_lte?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeeSecondarySalesPercentage_not?: InputMaybe<Scalars['BigInt']>;
-  additionalPayeeSecondarySalesPercentage_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  artistAddress?: InputMaybe<Scalars['Bytes']>;
-  artistAddress_contains?: InputMaybe<Scalars['Bytes']>;
-  artistAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  artistAddress_not?: InputMaybe<Scalars['Bytes']>;
-  artistAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
-  artistAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  createdAt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_gt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_gte?: InputMaybe<Scalars['BigInt']>;
-  createdAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  createdAt_lt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_lte?: InputMaybe<Scalars['BigInt']>;
-  createdAt_not?: InputMaybe<Scalars['BigInt']>;
-  createdAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  project?: InputMaybe<Scalars['String']>;
-  project_?: InputMaybe<Project_Filter>;
-  project_contains?: InputMaybe<Scalars['String']>;
-  project_contains_nocase?: InputMaybe<Scalars['String']>;
-  project_ends_with?: InputMaybe<Scalars['String']>;
-  project_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  project_gt?: InputMaybe<Scalars['String']>;
-  project_gte?: InputMaybe<Scalars['String']>;
-  project_in?: InputMaybe<Array<Scalars['String']>>;
-  project_lt?: InputMaybe<Scalars['String']>;
-  project_lte?: InputMaybe<Scalars['String']>;
-  project_not?: InputMaybe<Scalars['String']>;
-  project_not_contains?: InputMaybe<Scalars['String']>;
-  project_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  project_not_ends_with?: InputMaybe<Scalars['String']>;
-  project_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  project_not_in?: InputMaybe<Array<Scalars['String']>>;
-  project_not_starts_with?: InputMaybe<Scalars['String']>;
-  project_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  project_starts_with?: InputMaybe<Scalars['String']>;
-  project_starts_with_nocase?: InputMaybe<Scalars['String']>;
-};
-
-export enum ProposedArtistAddressesAndSplit_OrderBy {
-  AdditionalPayeePrimarySalesAddress = 'additionalPayeePrimarySalesAddress',
-  AdditionalPayeePrimarySalesPercentage = 'additionalPayeePrimarySalesPercentage',
-  AdditionalPayeeSecondarySalesAddress = 'additionalPayeeSecondarySalesAddress',
-  AdditionalPayeeSecondarySalesPercentage = 'additionalPayeeSecondarySalesPercentage',
-  ArtistAddress = 'artistAddress',
-  CreatedAt = 'createdAt',
-  Id = 'id',
-  Project = 'project'
-}
-
-export type Sale = {
-  __typename?: 'Sale';
-  /** The block number of the sale */
-  blockNumber: Scalars['BigInt'];
-  /** The timestamp of the sale */
-  blockTimestamp: Scalars['BigInt'];
-  /** The buyer address */
-  buyer: Scalars['Bytes'];
-  /** The exchange used for this sale */
-  exchange: Exchange;
-  /** The sale id formated: tokenId - token.nextSaleId (using first token sold for bundles) for Opensea V1/V2, orderHash from sale event for Looksrare and Seaport */
-  id: Scalars['ID'];
-  /** Private sales are flagged by this boolean */
-  isPrivate: Scalars['Boolean'];
-  /** List of Payment tokens involved in this sale */
-  payments: Array<Payment>;
-  /** Lookup table to get the list of Tokens sold in this sale */
-  saleLookupTables: Array<SaleLookupTable>;
-  /** The sale type (Single | Bundle) */
-  saleType: SaleType;
-  /** The seller address */
-  seller: Scalars['Bytes'];
-  /** A raw formated string of the token(s) sold (i.e TokenID1::TokenID2::TokenID3) */
-  summaryTokensSold: Scalars['String'];
-  /** The hash of the transaction */
-  txHash: Scalars['Bytes'];
-};
-
-
-export type SalePaymentsArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Payment_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<Payment_Filter>;
-};
-
-
-export type SaleSaleLookupTablesArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<SaleLookupTable_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<SaleLookupTable_Filter>;
-};
-
-export type SaleLookupTable = {
-  __typename?: 'SaleLookupTable';
-  /** The block number of the sale */
-  blockNumber: Scalars['BigInt'];
-  /** Set to `Project Id::Token Id::Sale Id */
-  id: Scalars['ID'];
-  /** The associated project */
-  project: Project;
-  /** The associated sale */
-  sale: Sale;
-  /** Timestamp of the sale */
-  timestamp: Scalars['BigInt'];
-  /** The token sold */
-  token: Token;
-};
-
-export type SaleLookupTable_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  blockNumber?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_gt?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_gte?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  blockNumber_lt?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_lte?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_not?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  project?: InputMaybe<Scalars['String']>;
-  project_?: InputMaybe<Project_Filter>;
-  project_contains?: InputMaybe<Scalars['String']>;
-  project_contains_nocase?: InputMaybe<Scalars['String']>;
-  project_ends_with?: InputMaybe<Scalars['String']>;
-  project_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  project_gt?: InputMaybe<Scalars['String']>;
-  project_gte?: InputMaybe<Scalars['String']>;
-  project_in?: InputMaybe<Array<Scalars['String']>>;
-  project_lt?: InputMaybe<Scalars['String']>;
-  project_lte?: InputMaybe<Scalars['String']>;
-  project_not?: InputMaybe<Scalars['String']>;
-  project_not_contains?: InputMaybe<Scalars['String']>;
-  project_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  project_not_ends_with?: InputMaybe<Scalars['String']>;
-  project_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  project_not_in?: InputMaybe<Array<Scalars['String']>>;
-  project_not_starts_with?: InputMaybe<Scalars['String']>;
-  project_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  project_starts_with?: InputMaybe<Scalars['String']>;
-  project_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  sale?: InputMaybe<Scalars['String']>;
-  sale_?: InputMaybe<Sale_Filter>;
-  sale_contains?: InputMaybe<Scalars['String']>;
-  sale_contains_nocase?: InputMaybe<Scalars['String']>;
-  sale_ends_with?: InputMaybe<Scalars['String']>;
-  sale_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  sale_gt?: InputMaybe<Scalars['String']>;
-  sale_gte?: InputMaybe<Scalars['String']>;
-  sale_in?: InputMaybe<Array<Scalars['String']>>;
-  sale_lt?: InputMaybe<Scalars['String']>;
-  sale_lte?: InputMaybe<Scalars['String']>;
-  sale_not?: InputMaybe<Scalars['String']>;
-  sale_not_contains?: InputMaybe<Scalars['String']>;
-  sale_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  sale_not_ends_with?: InputMaybe<Scalars['String']>;
-  sale_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  sale_not_in?: InputMaybe<Array<Scalars['String']>>;
-  sale_not_starts_with?: InputMaybe<Scalars['String']>;
-  sale_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  sale_starts_with?: InputMaybe<Scalars['String']>;
-  sale_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  timestamp?: InputMaybe<Scalars['BigInt']>;
-  timestamp_gt?: InputMaybe<Scalars['BigInt']>;
-  timestamp_gte?: InputMaybe<Scalars['BigInt']>;
-  timestamp_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  timestamp_lt?: InputMaybe<Scalars['BigInt']>;
-  timestamp_lte?: InputMaybe<Scalars['BigInt']>;
-  timestamp_not?: InputMaybe<Scalars['BigInt']>;
-  timestamp_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  token?: InputMaybe<Scalars['String']>;
-  token_?: InputMaybe<Token_Filter>;
-  token_contains?: InputMaybe<Scalars['String']>;
-  token_contains_nocase?: InputMaybe<Scalars['String']>;
-  token_ends_with?: InputMaybe<Scalars['String']>;
-  token_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  token_gt?: InputMaybe<Scalars['String']>;
-  token_gte?: InputMaybe<Scalars['String']>;
-  token_in?: InputMaybe<Array<Scalars['String']>>;
-  token_lt?: InputMaybe<Scalars['String']>;
-  token_lte?: InputMaybe<Scalars['String']>;
-  token_not?: InputMaybe<Scalars['String']>;
-  token_not_contains?: InputMaybe<Scalars['String']>;
-  token_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  token_not_ends_with?: InputMaybe<Scalars['String']>;
-  token_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  token_not_in?: InputMaybe<Array<Scalars['String']>>;
-  token_not_starts_with?: InputMaybe<Scalars['String']>;
-  token_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  token_starts_with?: InputMaybe<Scalars['String']>;
-  token_starts_with_nocase?: InputMaybe<Scalars['String']>;
-};
-
-export enum SaleLookupTable_OrderBy {
-  BlockNumber = 'blockNumber',
-  Id = 'id',
-  Project = 'project',
-  Sale = 'sale',
-  Timestamp = 'timestamp',
-  Token = 'token'
-}
-
-export enum SaleType {
-  Bundle = 'Bundle',
-  Single = 'Single'
-}
-
-export type Sale_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  blockNumber?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_gt?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_gte?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  blockNumber_lt?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_lte?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_not?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  blockTimestamp?: InputMaybe<Scalars['BigInt']>;
-  blockTimestamp_gt?: InputMaybe<Scalars['BigInt']>;
-  blockTimestamp_gte?: InputMaybe<Scalars['BigInt']>;
-  blockTimestamp_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  blockTimestamp_lt?: InputMaybe<Scalars['BigInt']>;
-  blockTimestamp_lte?: InputMaybe<Scalars['BigInt']>;
-  blockTimestamp_not?: InputMaybe<Scalars['BigInt']>;
-  blockTimestamp_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  buyer?: InputMaybe<Scalars['Bytes']>;
-  buyer_contains?: InputMaybe<Scalars['Bytes']>;
-  buyer_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  buyer_not?: InputMaybe<Scalars['Bytes']>;
-  buyer_not_contains?: InputMaybe<Scalars['Bytes']>;
-  buyer_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  exchange?: InputMaybe<Exchange>;
-  exchange_in?: InputMaybe<Array<Exchange>>;
-  exchange_not?: InputMaybe<Exchange>;
-  exchange_not_in?: InputMaybe<Array<Exchange>>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  isPrivate?: InputMaybe<Scalars['Boolean']>;
-  isPrivate_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  isPrivate_not?: InputMaybe<Scalars['Boolean']>;
-  isPrivate_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  payments_?: InputMaybe<Payment_Filter>;
-  saleLookupTables_?: InputMaybe<SaleLookupTable_Filter>;
-  saleType?: InputMaybe<SaleType>;
-  saleType_in?: InputMaybe<Array<SaleType>>;
-  saleType_not?: InputMaybe<SaleType>;
-  saleType_not_in?: InputMaybe<Array<SaleType>>;
-  seller?: InputMaybe<Scalars['Bytes']>;
-  seller_contains?: InputMaybe<Scalars['Bytes']>;
-  seller_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  seller_not?: InputMaybe<Scalars['Bytes']>;
-  seller_not_contains?: InputMaybe<Scalars['Bytes']>;
-  seller_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  summaryTokensSold?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_contains?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_contains_nocase?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_ends_with?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_gt?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_gte?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_in?: InputMaybe<Array<Scalars['String']>>;
-  summaryTokensSold_lt?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_lte?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_not?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_not_contains?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_not_ends_with?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_not_in?: InputMaybe<Array<Scalars['String']>>;
-  summaryTokensSold_not_starts_with?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_starts_with?: InputMaybe<Scalars['String']>;
-  summaryTokensSold_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  txHash?: InputMaybe<Scalars['Bytes']>;
-  txHash_contains?: InputMaybe<Scalars['Bytes']>;
-  txHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  txHash_not?: InputMaybe<Scalars['Bytes']>;
-  txHash_not_contains?: InputMaybe<Scalars['Bytes']>;
-  txHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-};
-
-export enum Sale_OrderBy {
-  BlockNumber = 'blockNumber',
-  BlockTimestamp = 'blockTimestamp',
-  Buyer = 'buyer',
-  Exchange = 'exchange',
-  Id = 'id',
-  IsPrivate = 'isPrivate',
-  Payments = 'payments',
-  SaleLookupTables = 'saleLookupTables',
-  SaleType = 'saleType',
-  Seller = 'seller',
-  SummaryTokensSold = 'summaryTokensSold',
-  TxHash = 'txHash'
-}
 
 /** Boolean expression to compare columns of type "String". All fields are combined with logical 'AND'. */
 export type String_Comparison_Exp = {
@@ -2378,413 +88,6 @@ export type String_Comparison_Exp = {
   _similar?: InputMaybe<Scalars['String']>;
 };
 
-export type Token = {
-  __typename?: 'Token';
-  /** Contract the token is on */
-  contract: Contract;
-  createdAt: Scalars['BigInt'];
-  /** Unique string used as input to the tokens project script */
-  hash: Scalars['Bytes'];
-  /** Unique identifier made up of contract address and token id */
-  id: Scalars['ID'];
-  /** Invocation number of the project */
-  invocation: Scalars['BigInt'];
-  /** Next available sale id */
-  nextSaleId: Scalars['BigInt'];
-  /** Current owner of the token */
-  owner: Account;
-  /** Project of the token */
-  project: Project;
-  /** Lookup table to get the Sale history */
-  saleLookupTables: Array<SaleLookupTable>;
-  /** ID of the token on the contract */
-  tokenId: Scalars['BigInt'];
-  /** Transaction hash of token mint */
-  transactionHash: Scalars['Bytes'];
-  transfers?: Maybe<Array<Transfer>>;
-  updatedAt: Scalars['BigInt'];
-  uri?: Maybe<Scalars['String']>;
-};
-
-
-export type TokenSaleLookupTablesArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<SaleLookupTable_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<SaleLookupTable_Filter>;
-};
-
-
-export type TokenTransfersArgs = {
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Transfer_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where?: InputMaybe<Transfer_Filter>;
-};
-
-export type Token_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  contract?: InputMaybe<Scalars['String']>;
-  contract_?: InputMaybe<Contract_Filter>;
-  contract_contains?: InputMaybe<Scalars['String']>;
-  contract_contains_nocase?: InputMaybe<Scalars['String']>;
-  contract_ends_with?: InputMaybe<Scalars['String']>;
-  contract_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  contract_gt?: InputMaybe<Scalars['String']>;
-  contract_gte?: InputMaybe<Scalars['String']>;
-  contract_in?: InputMaybe<Array<Scalars['String']>>;
-  contract_lt?: InputMaybe<Scalars['String']>;
-  contract_lte?: InputMaybe<Scalars['String']>;
-  contract_not?: InputMaybe<Scalars['String']>;
-  contract_not_contains?: InputMaybe<Scalars['String']>;
-  contract_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  contract_not_ends_with?: InputMaybe<Scalars['String']>;
-  contract_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  contract_not_in?: InputMaybe<Array<Scalars['String']>>;
-  contract_not_starts_with?: InputMaybe<Scalars['String']>;
-  contract_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  contract_starts_with?: InputMaybe<Scalars['String']>;
-  contract_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  createdAt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_gt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_gte?: InputMaybe<Scalars['BigInt']>;
-  createdAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  createdAt_lt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_lte?: InputMaybe<Scalars['BigInt']>;
-  createdAt_not?: InputMaybe<Scalars['BigInt']>;
-  createdAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  hash?: InputMaybe<Scalars['Bytes']>;
-  hash_contains?: InputMaybe<Scalars['Bytes']>;
-  hash_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  hash_not?: InputMaybe<Scalars['Bytes']>;
-  hash_not_contains?: InputMaybe<Scalars['Bytes']>;
-  hash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  invocation?: InputMaybe<Scalars['BigInt']>;
-  invocation_gt?: InputMaybe<Scalars['BigInt']>;
-  invocation_gte?: InputMaybe<Scalars['BigInt']>;
-  invocation_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  invocation_lt?: InputMaybe<Scalars['BigInt']>;
-  invocation_lte?: InputMaybe<Scalars['BigInt']>;
-  invocation_not?: InputMaybe<Scalars['BigInt']>;
-  invocation_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  nextSaleId?: InputMaybe<Scalars['BigInt']>;
-  nextSaleId_gt?: InputMaybe<Scalars['BigInt']>;
-  nextSaleId_gte?: InputMaybe<Scalars['BigInt']>;
-  nextSaleId_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  nextSaleId_lt?: InputMaybe<Scalars['BigInt']>;
-  nextSaleId_lte?: InputMaybe<Scalars['BigInt']>;
-  nextSaleId_not?: InputMaybe<Scalars['BigInt']>;
-  nextSaleId_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  owner?: InputMaybe<Scalars['String']>;
-  owner_?: InputMaybe<Account_Filter>;
-  owner_contains?: InputMaybe<Scalars['String']>;
-  owner_contains_nocase?: InputMaybe<Scalars['String']>;
-  owner_ends_with?: InputMaybe<Scalars['String']>;
-  owner_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  owner_gt?: InputMaybe<Scalars['String']>;
-  owner_gte?: InputMaybe<Scalars['String']>;
-  owner_in?: InputMaybe<Array<Scalars['String']>>;
-  owner_lt?: InputMaybe<Scalars['String']>;
-  owner_lte?: InputMaybe<Scalars['String']>;
-  owner_not?: InputMaybe<Scalars['String']>;
-  owner_not_contains?: InputMaybe<Scalars['String']>;
-  owner_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  owner_not_ends_with?: InputMaybe<Scalars['String']>;
-  owner_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  owner_not_in?: InputMaybe<Array<Scalars['String']>>;
-  owner_not_starts_with?: InputMaybe<Scalars['String']>;
-  owner_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  owner_starts_with?: InputMaybe<Scalars['String']>;
-  owner_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  project?: InputMaybe<Scalars['String']>;
-  project_?: InputMaybe<Project_Filter>;
-  project_contains?: InputMaybe<Scalars['String']>;
-  project_contains_nocase?: InputMaybe<Scalars['String']>;
-  project_ends_with?: InputMaybe<Scalars['String']>;
-  project_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  project_gt?: InputMaybe<Scalars['String']>;
-  project_gte?: InputMaybe<Scalars['String']>;
-  project_in?: InputMaybe<Array<Scalars['String']>>;
-  project_lt?: InputMaybe<Scalars['String']>;
-  project_lte?: InputMaybe<Scalars['String']>;
-  project_not?: InputMaybe<Scalars['String']>;
-  project_not_contains?: InputMaybe<Scalars['String']>;
-  project_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  project_not_ends_with?: InputMaybe<Scalars['String']>;
-  project_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  project_not_in?: InputMaybe<Array<Scalars['String']>>;
-  project_not_starts_with?: InputMaybe<Scalars['String']>;
-  project_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  project_starts_with?: InputMaybe<Scalars['String']>;
-  project_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  saleLookupTables_?: InputMaybe<SaleLookupTable_Filter>;
-  tokenId?: InputMaybe<Scalars['BigInt']>;
-  tokenId_gt?: InputMaybe<Scalars['BigInt']>;
-  tokenId_gte?: InputMaybe<Scalars['BigInt']>;
-  tokenId_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  tokenId_lt?: InputMaybe<Scalars['BigInt']>;
-  tokenId_lte?: InputMaybe<Scalars['BigInt']>;
-  tokenId_not?: InputMaybe<Scalars['BigInt']>;
-  tokenId_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  transactionHash?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_contains?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  transactionHash_not?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_not_contains?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  transfers_?: InputMaybe<Transfer_Filter>;
-  updatedAt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_gt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_gte?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  updatedAt_lt?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_lte?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_not?: InputMaybe<Scalars['BigInt']>;
-  updatedAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  uri?: InputMaybe<Scalars['String']>;
-  uri_contains?: InputMaybe<Scalars['String']>;
-  uri_contains_nocase?: InputMaybe<Scalars['String']>;
-  uri_ends_with?: InputMaybe<Scalars['String']>;
-  uri_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  uri_gt?: InputMaybe<Scalars['String']>;
-  uri_gte?: InputMaybe<Scalars['String']>;
-  uri_in?: InputMaybe<Array<Scalars['String']>>;
-  uri_lt?: InputMaybe<Scalars['String']>;
-  uri_lte?: InputMaybe<Scalars['String']>;
-  uri_not?: InputMaybe<Scalars['String']>;
-  uri_not_contains?: InputMaybe<Scalars['String']>;
-  uri_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  uri_not_ends_with?: InputMaybe<Scalars['String']>;
-  uri_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  uri_not_in?: InputMaybe<Array<Scalars['String']>>;
-  uri_not_starts_with?: InputMaybe<Scalars['String']>;
-  uri_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  uri_starts_with?: InputMaybe<Scalars['String']>;
-  uri_starts_with_nocase?: InputMaybe<Scalars['String']>;
-};
-
-export enum Token_OrderBy {
-  Contract = 'contract',
-  CreatedAt = 'createdAt',
-  Hash = 'hash',
-  Id = 'id',
-  Invocation = 'invocation',
-  NextSaleId = 'nextSaleId',
-  Owner = 'owner',
-  Project = 'project',
-  SaleLookupTables = 'saleLookupTables',
-  TokenId = 'tokenId',
-  TransactionHash = 'transactionHash',
-  Transfers = 'transfers',
-  UpdatedAt = 'updatedAt',
-  Uri = 'uri'
-}
-
-export type Transfer = {
-  __typename?: 'Transfer';
-  createdAt: Scalars['BigInt'];
-  from: Scalars['Bytes'];
-  id: Scalars['ID'];
-  to: Scalars['Bytes'];
-  token: Token;
-  transactionHash: Scalars['Bytes'];
-};
-
-export type Transfer_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  createdAt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_gt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_gte?: InputMaybe<Scalars['BigInt']>;
-  createdAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  createdAt_lt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_lte?: InputMaybe<Scalars['BigInt']>;
-  createdAt_not?: InputMaybe<Scalars['BigInt']>;
-  createdAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  from?: InputMaybe<Scalars['Bytes']>;
-  from_contains?: InputMaybe<Scalars['Bytes']>;
-  from_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  from_not?: InputMaybe<Scalars['Bytes']>;
-  from_not_contains?: InputMaybe<Scalars['Bytes']>;
-  from_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  to?: InputMaybe<Scalars['Bytes']>;
-  to_contains?: InputMaybe<Scalars['Bytes']>;
-  to_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  to_not?: InputMaybe<Scalars['Bytes']>;
-  to_not_contains?: InputMaybe<Scalars['Bytes']>;
-  to_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  token?: InputMaybe<Scalars['String']>;
-  token_?: InputMaybe<Token_Filter>;
-  token_contains?: InputMaybe<Scalars['String']>;
-  token_contains_nocase?: InputMaybe<Scalars['String']>;
-  token_ends_with?: InputMaybe<Scalars['String']>;
-  token_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  token_gt?: InputMaybe<Scalars['String']>;
-  token_gte?: InputMaybe<Scalars['String']>;
-  token_in?: InputMaybe<Array<Scalars['String']>>;
-  token_lt?: InputMaybe<Scalars['String']>;
-  token_lte?: InputMaybe<Scalars['String']>;
-  token_not?: InputMaybe<Scalars['String']>;
-  token_not_contains?: InputMaybe<Scalars['String']>;
-  token_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  token_not_ends_with?: InputMaybe<Scalars['String']>;
-  token_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  token_not_in?: InputMaybe<Array<Scalars['String']>>;
-  token_not_starts_with?: InputMaybe<Scalars['String']>;
-  token_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  token_starts_with?: InputMaybe<Scalars['String']>;
-  token_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  transactionHash?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_contains?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  transactionHash_not?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_not_contains?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-};
-
-export enum Transfer_OrderBy {
-  CreatedAt = 'createdAt',
-  From = 'from',
-  Id = 'id',
-  To = 'to',
-  Token = 'token',
-  TransactionHash = 'transactionHash'
-}
-
-export type UpdateFeaturesScriptOutput = {
-  __typename?: 'UpdateFeaturesScriptOutput';
-  project_id: Scalars['String'];
-};
-
-export type UpdateProjectMediaScriptOutput = {
-  __typename?: 'UpdateProjectMediaScriptOutput';
-  project_id: Scalars['String'];
-};
-
-export type UpdateTokenMediaScriptOutput = {
-  __typename?: 'UpdateTokenMediaScriptOutput';
-  token_ids: Array<Maybe<Scalars['String']>>;
-};
-
-export type Whitelisting = {
-  __typename?: 'Whitelisting';
-  account: Account;
-  contract: Contract;
-  id: Scalars['ID'];
-};
-
-export type Whitelisting_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  account?: InputMaybe<Scalars['String']>;
-  account_?: InputMaybe<Account_Filter>;
-  account_contains?: InputMaybe<Scalars['String']>;
-  account_contains_nocase?: InputMaybe<Scalars['String']>;
-  account_ends_with?: InputMaybe<Scalars['String']>;
-  account_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  account_gt?: InputMaybe<Scalars['String']>;
-  account_gte?: InputMaybe<Scalars['String']>;
-  account_in?: InputMaybe<Array<Scalars['String']>>;
-  account_lt?: InputMaybe<Scalars['String']>;
-  account_lte?: InputMaybe<Scalars['String']>;
-  account_not?: InputMaybe<Scalars['String']>;
-  account_not_contains?: InputMaybe<Scalars['String']>;
-  account_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  account_not_ends_with?: InputMaybe<Scalars['String']>;
-  account_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  account_not_in?: InputMaybe<Array<Scalars['String']>>;
-  account_not_starts_with?: InputMaybe<Scalars['String']>;
-  account_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  account_starts_with?: InputMaybe<Scalars['String']>;
-  account_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  contract?: InputMaybe<Scalars['String']>;
-  contract_?: InputMaybe<Contract_Filter>;
-  contract_contains?: InputMaybe<Scalars['String']>;
-  contract_contains_nocase?: InputMaybe<Scalars['String']>;
-  contract_ends_with?: InputMaybe<Scalars['String']>;
-  contract_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  contract_gt?: InputMaybe<Scalars['String']>;
-  contract_gte?: InputMaybe<Scalars['String']>;
-  contract_in?: InputMaybe<Array<Scalars['String']>>;
-  contract_lt?: InputMaybe<Scalars['String']>;
-  contract_lte?: InputMaybe<Scalars['String']>;
-  contract_not?: InputMaybe<Scalars['String']>;
-  contract_not_contains?: InputMaybe<Scalars['String']>;
-  contract_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  contract_not_ends_with?: InputMaybe<Scalars['String']>;
-  contract_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  contract_not_in?: InputMaybe<Array<Scalars['String']>>;
-  contract_not_starts_with?: InputMaybe<Scalars['String']>;
-  contract_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  contract_starts_with?: InputMaybe<Scalars['String']>;
-  contract_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  id?: InputMaybe<Scalars['ID']>;
-  id_gt?: InputMaybe<Scalars['ID']>;
-  id_gte?: InputMaybe<Scalars['ID']>;
-  id_in?: InputMaybe<Array<Scalars['ID']>>;
-  id_lt?: InputMaybe<Scalars['ID']>;
-  id_lte?: InputMaybe<Scalars['ID']>;
-  id_not?: InputMaybe<Scalars['ID']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-};
-
-export enum Whitelisting_OrderBy {
-  Account = 'account',
-  Contract = 'contract',
-  Id = 'id'
-}
-
-export type _Block_ = {
-  __typename?: '_Block_';
-  /** The hash of the block */
-  hash?: Maybe<Scalars['Bytes']>;
-  /** The block number */
-  number: Scalars['Int'];
-};
-
-/** The type for the top-level _meta field */
-export type _Meta_ = {
-  __typename?: '_Meta_';
-  /**
-   * Information about a specific subgraph block. The hash of the block
-   * will be null if the _meta field has a block constraint that asks for
-   * a block number. It will be filled if the _meta field has no block constraint
-   * and therefore asks for the latest  block
-   *
-   */
-  block: _Block_;
-  /** The deployment ID */
-  deployment: Scalars['String'];
-  /** If `true`, the subgraph encountered indexing errors at some past block */
-  hasIndexingErrors: Scalars['Boolean'];
-};
-
-export enum _SubgraphErrorPolicy_ {
-  /** Data will be returned even if the subgraph has indexing errors */
-  Allow = 'allow',
-  /** If the subgraph has indexing errors, data will be omitted. The default. */
-  Deny = 'deny'
-}
-
 /** Boolean expression to compare columns of type "bigint". All fields are combined with logical 'AND'. */
 export type Bigint_Comparison_Exp = {
   _eq?: InputMaybe<Scalars['bigint']>;
@@ -2806,28 +109,6 @@ export type Categories = {
   project_vertical_category?: Maybe<Project_Vertical_Categories>;
 };
 
-/** aggregated selection of "categories" */
-export type Categories_Aggregate = {
-  __typename?: 'categories_aggregate';
-  aggregate?: Maybe<Categories_Aggregate_Fields>;
-  nodes: Array<Categories>;
-};
-
-/** aggregate fields of "categories" */
-export type Categories_Aggregate_Fields = {
-  __typename?: 'categories_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Categories_Max_Fields>;
-  min?: Maybe<Categories_Min_Fields>;
-};
-
-
-/** aggregate fields of "categories" */
-export type Categories_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Categories_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
 /** Boolean expression to filter rows from the table "categories". All fields are combined with a logical 'AND'. */
 export type Categories_Bool_Exp = {
   _and?: InputMaybe<Array<Categories_Bool_Exp>>;
@@ -2836,12 +117,6 @@ export type Categories_Bool_Exp = {
   name?: InputMaybe<String_Comparison_Exp>;
   project_vertical_category?: InputMaybe<Project_Vertical_Categories_Bool_Exp>;
 };
-
-/** unique or primary key constraints on table "categories" */
-export enum Categories_Constraint {
-  /** unique or primary key constraint on columns "name" */
-  CategoriesPkey = 'categories_pkey'
-}
 
 export enum Categories_Enum {
   Collaborations = 'collaborations',
@@ -2860,56 +135,10 @@ export type Categories_Enum_Comparison_Exp = {
   _nin?: InputMaybe<Array<Categories_Enum>>;
 };
 
-/** input type for inserting data into table "categories" */
-export type Categories_Insert_Input = {
-  name?: InputMaybe<Scalars['String']>;
-  project_vertical_category?: InputMaybe<Project_Vertical_Categories_Obj_Rel_Insert_Input>;
-};
-
-/** aggregate max on columns */
-export type Categories_Max_Fields = {
-  __typename?: 'categories_max_fields';
-  name?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Categories_Min_Fields = {
-  __typename?: 'categories_min_fields';
-  name?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "categories" */
-export type Categories_Mutation_Response = {
-  __typename?: 'categories_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Categories>;
-};
-
-/** input type for inserting object relation for remote table "categories" */
-export type Categories_Obj_Rel_Insert_Input = {
-  data: Categories_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Categories_On_Conflict>;
-};
-
-/** on_conflict condition type for table "categories" */
-export type Categories_On_Conflict = {
-  constraint: Categories_Constraint;
-  update_columns?: Array<Categories_Update_Column>;
-  where?: InputMaybe<Categories_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "categories". */
 export type Categories_Order_By = {
   name?: InputMaybe<Order_By>;
   project_vertical_category?: InputMaybe<Project_Vertical_Categories_Order_By>;
-};
-
-/** primary key columns input for table: categories */
-export type Categories_Pk_Columns_Input = {
-  name: Scalars['String'];
 };
 
 /** select columns of table "categories" */
@@ -2917,11 +146,6 @@ export enum Categories_Select_Column {
   /** column name */
   Name = 'name'
 }
-
-/** input type for updating data in table "categories" */
-export type Categories_Set_Input = {
-  name?: InputMaybe<Scalars['String']>;
-};
 
 /** Streaming cursor of the table "categories" */
 export type Categories_Stream_Cursor_Input = {
@@ -2936,18 +160,6 @@ export type Categories_Stream_Cursor_Value_Input = {
   name?: InputMaybe<Scalars['String']>;
 };
 
-/** update columns of table "categories" */
-export enum Categories_Update_Column {
-  /** column name */
-  Name = 'name'
-}
-
-export type Categories_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Categories_Set_Input>;
-  where: Categories_Bool_Exp;
-};
-
 /** columns and relationships of "contract_allowlistings" */
 export type Contract_Allowlistings = {
   __typename?: 'contract_allowlistings';
@@ -2959,40 +171,11 @@ export type Contract_Allowlistings = {
   user_address: Scalars['String'];
 };
 
-/** aggregated selection of "contract_allowlistings" */
-export type Contract_Allowlistings_Aggregate = {
-  __typename?: 'contract_allowlistings_aggregate';
-  aggregate?: Maybe<Contract_Allowlistings_Aggregate_Fields>;
-  nodes: Array<Contract_Allowlistings>;
-};
-
-/** aggregate fields of "contract_allowlistings" */
-export type Contract_Allowlistings_Aggregate_Fields = {
-  __typename?: 'contract_allowlistings_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Contract_Allowlistings_Max_Fields>;
-  min?: Maybe<Contract_Allowlistings_Min_Fields>;
-};
-
-
-/** aggregate fields of "contract_allowlistings" */
-export type Contract_Allowlistings_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Contract_Allowlistings_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
 /** order by aggregate values of table "contract_allowlistings" */
 export type Contract_Allowlistings_Aggregate_Order_By = {
   count?: InputMaybe<Order_By>;
   max?: InputMaybe<Contract_Allowlistings_Max_Order_By>;
   min?: InputMaybe<Contract_Allowlistings_Min_Order_By>;
-};
-
-/** input type for inserting array relation for remote table "contract_allowlistings" */
-export type Contract_Allowlistings_Arr_Rel_Insert_Input = {
-  data: Array<Contract_Allowlistings_Insert_Input>;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Contract_Allowlistings_On_Conflict>;
 };
 
 /** Boolean expression to filter rows from the table "contract_allowlistings". All fields are combined with a logical 'AND'. */
@@ -3006,62 +189,16 @@ export type Contract_Allowlistings_Bool_Exp = {
   user_address?: InputMaybe<String_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "contract_allowlistings" */
-export enum Contract_Allowlistings_Constraint {
-  /** unique or primary key constraint on columns "user_address", "contract_address" */
-  ContractAllowlistingsPkey = 'contract_allowlistings_pkey',
-  /** unique or primary key constraint on columns "user_address", "contract_address" */
-  ContractAllowlistingsUserAddressContractAddressKey = 'contract_allowlistings_user_address_contract_address_key'
-}
-
-/** input type for inserting data into table "contract_allowlistings" */
-export type Contract_Allowlistings_Insert_Input = {
-  contract?: InputMaybe<Contracts_Metadata_Obj_Rel_Insert_Input>;
-  contract_address?: InputMaybe<Scalars['String']>;
-  user?: InputMaybe<Users_Obj_Rel_Insert_Input>;
-  user_address?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Contract_Allowlistings_Max_Fields = {
-  __typename?: 'contract_allowlistings_max_fields';
-  contract_address?: Maybe<Scalars['String']>;
-  user_address?: Maybe<Scalars['String']>;
-};
-
 /** order by max() on columns of table "contract_allowlistings" */
 export type Contract_Allowlistings_Max_Order_By = {
   contract_address?: InputMaybe<Order_By>;
   user_address?: InputMaybe<Order_By>;
 };
 
-/** aggregate min on columns */
-export type Contract_Allowlistings_Min_Fields = {
-  __typename?: 'contract_allowlistings_min_fields';
-  contract_address?: Maybe<Scalars['String']>;
-  user_address?: Maybe<Scalars['String']>;
-};
-
 /** order by min() on columns of table "contract_allowlistings" */
 export type Contract_Allowlistings_Min_Order_By = {
   contract_address?: InputMaybe<Order_By>;
   user_address?: InputMaybe<Order_By>;
-};
-
-/** response of any mutation on the table "contract_allowlistings" */
-export type Contract_Allowlistings_Mutation_Response = {
-  __typename?: 'contract_allowlistings_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Contract_Allowlistings>;
-};
-
-/** on_conflict condition type for table "contract_allowlistings" */
-export type Contract_Allowlistings_On_Conflict = {
-  constraint: Contract_Allowlistings_Constraint;
-  update_columns?: Array<Contract_Allowlistings_Update_Column>;
-  where?: InputMaybe<Contract_Allowlistings_Bool_Exp>;
 };
 
 /** Ordering options when selecting data from "contract_allowlistings". */
@@ -3072,12 +209,6 @@ export type Contract_Allowlistings_Order_By = {
   user_address?: InputMaybe<Order_By>;
 };
 
-/** primary key columns input for table: contract_allowlistings */
-export type Contract_Allowlistings_Pk_Columns_Input = {
-  contract_address: Scalars['String'];
-  user_address: Scalars['String'];
-};
-
 /** select columns of table "contract_allowlistings" */
 export enum Contract_Allowlistings_Select_Column {
   /** column name */
@@ -3085,12 +216,6 @@ export enum Contract_Allowlistings_Select_Column {
   /** column name */
   UserAddress = 'user_address'
 }
-
-/** input type for updating data in table "contract_allowlistings" */
-export type Contract_Allowlistings_Set_Input = {
-  contract_address?: InputMaybe<Scalars['String']>;
-  user_address?: InputMaybe<Scalars['String']>;
-};
 
 /** Streaming cursor of the table "contract_allowlistings" */
 export type Contract_Allowlistings_Stream_Cursor_Input = {
@@ -3106,46 +231,10 @@ export type Contract_Allowlistings_Stream_Cursor_Value_Input = {
   user_address?: InputMaybe<Scalars['String']>;
 };
 
-/** update columns of table "contract_allowlistings" */
-export enum Contract_Allowlistings_Update_Column {
-  /** column name */
-  ContractAddress = 'contract_address',
-  /** column name */
-  UserAddress = 'user_address'
-}
-
-export type Contract_Allowlistings_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Contract_Allowlistings_Set_Input>;
-  where: Contract_Allowlistings_Bool_Exp;
-};
-
 /** columns and relationships of "contract_type_names" */
 export type Contract_Type_Names = {
   __typename?: 'contract_type_names';
   name: Scalars['String'];
-};
-
-/** aggregated selection of "contract_type_names" */
-export type Contract_Type_Names_Aggregate = {
-  __typename?: 'contract_type_names_aggregate';
-  aggregate?: Maybe<Contract_Type_Names_Aggregate_Fields>;
-  nodes: Array<Contract_Type_Names>;
-};
-
-/** aggregate fields of "contract_type_names" */
-export type Contract_Type_Names_Aggregate_Fields = {
-  __typename?: 'contract_type_names_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Contract_Type_Names_Max_Fields>;
-  min?: Maybe<Contract_Type_Names_Min_Fields>;
-};
-
-
-/** aggregate fields of "contract_type_names" */
-export type Contract_Type_Names_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Contract_Type_Names_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
 };
 
 /** Boolean expression to filter rows from the table "contract_type_names". All fields are combined with a logical 'AND'. */
@@ -3155,12 +244,6 @@ export type Contract_Type_Names_Bool_Exp = {
   _or?: InputMaybe<Array<Contract_Type_Names_Bool_Exp>>;
   name?: InputMaybe<String_Comparison_Exp>;
 };
-
-/** unique or primary key constraints on table "contract_type_names" */
-export enum Contract_Type_Names_Constraint {
-  /** unique or primary key constraint on columns "name" */
-  ContractTypeNamesPkey = 'contract_type_names_pkey'
-}
 
 export enum Contract_Type_Names_Enum {
   GenArt721CoreV0 = 'GenArt721CoreV0',
@@ -3179,47 +262,9 @@ export type Contract_Type_Names_Enum_Comparison_Exp = {
   _nin?: InputMaybe<Array<Contract_Type_Names_Enum>>;
 };
 
-/** input type for inserting data into table "contract_type_names" */
-export type Contract_Type_Names_Insert_Input = {
-  name?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Contract_Type_Names_Max_Fields = {
-  __typename?: 'contract_type_names_max_fields';
-  name?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Contract_Type_Names_Min_Fields = {
-  __typename?: 'contract_type_names_min_fields';
-  name?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "contract_type_names" */
-export type Contract_Type_Names_Mutation_Response = {
-  __typename?: 'contract_type_names_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Contract_Type_Names>;
-};
-
-/** on_conflict condition type for table "contract_type_names" */
-export type Contract_Type_Names_On_Conflict = {
-  constraint: Contract_Type_Names_Constraint;
-  update_columns?: Array<Contract_Type_Names_Update_Column>;
-  where?: InputMaybe<Contract_Type_Names_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "contract_type_names". */
 export type Contract_Type_Names_Order_By = {
   name?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: contract_type_names */
-export type Contract_Type_Names_Pk_Columns_Input = {
-  name: Scalars['String'];
 };
 
 /** select columns of table "contract_type_names" */
@@ -3227,11 +272,6 @@ export enum Contract_Type_Names_Select_Column {
   /** column name */
   Name = 'name'
 }
-
-/** input type for updating data in table "contract_type_names" */
-export type Contract_Type_Names_Set_Input = {
-  name?: InputMaybe<Scalars['String']>;
-};
 
 /** Streaming cursor of the table "contract_type_names" */
 export type Contract_Type_Names_Stream_Cursor_Input = {
@@ -3244,18 +284,6 @@ export type Contract_Type_Names_Stream_Cursor_Input = {
 /** Initial value of the column from where the streaming should start */
 export type Contract_Type_Names_Stream_Cursor_Value_Input = {
   name?: InputMaybe<Scalars['String']>;
-};
-
-/** update columns of table "contract_type_names" */
-export enum Contract_Type_Names_Update_Column {
-  /** column name */
-  Name = 'name'
-}
-
-export type Contract_Type_Names_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Contract_Type_Names_Set_Input>;
-  where: Contract_Type_Names_Bool_Exp;
 };
 
 /** columns and relationships of "contract_types" */
@@ -3271,31 +299,6 @@ export type Contract_TypesAbiArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
 
-/** aggregated selection of "contract_types" */
-export type Contract_Types_Aggregate = {
-  __typename?: 'contract_types_aggregate';
-  aggregate?: Maybe<Contract_Types_Aggregate_Fields>;
-  nodes: Array<Contract_Types>;
-};
-
-/** aggregate fields of "contract_types" */
-export type Contract_Types_Aggregate_Fields = {
-  __typename?: 'contract_types_aggregate_fields';
-  count: Scalars['Int'];
-};
-
-
-/** aggregate fields of "contract_types" */
-export type Contract_Types_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Contract_Types_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** append existing jsonb value of filtered columns with new jsonb value */
-export type Contract_Types_Append_Input = {
-  abi?: InputMaybe<Scalars['jsonb']>;
-};
-
 /** Boolean expression to filter rows from the table "contract_types". All fields are combined with a logical 'AND'. */
 export type Contract_Types_Bool_Exp = {
   _and?: InputMaybe<Array<Contract_Types_Bool_Exp>>;
@@ -3305,70 +308,10 @@ export type Contract_Types_Bool_Exp = {
   type?: InputMaybe<Contract_Type_Names_Enum_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "contract_types" */
-export enum Contract_Types_Constraint {
-  /** unique or primary key constraint on columns "type" */
-  ContractTypesPkey = 'contract_types_pkey'
-}
-
-/** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-export type Contract_Types_Delete_At_Path_Input = {
-  abi?: InputMaybe<Array<Scalars['String']>>;
-};
-
-/** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-export type Contract_Types_Delete_Elem_Input = {
-  abi?: InputMaybe<Scalars['Int']>;
-};
-
-/** delete key/value pair or string element. key/value pairs are matched based on their key value */
-export type Contract_Types_Delete_Key_Input = {
-  abi?: InputMaybe<Scalars['String']>;
-};
-
-/** input type for inserting data into table "contract_types" */
-export type Contract_Types_Insert_Input = {
-  abi?: InputMaybe<Scalars['jsonb']>;
-  type?: InputMaybe<Contract_Type_Names_Enum>;
-};
-
-/** response of any mutation on the table "contract_types" */
-export type Contract_Types_Mutation_Response = {
-  __typename?: 'contract_types_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Contract_Types>;
-};
-
-/** input type for inserting object relation for remote table "contract_types" */
-export type Contract_Types_Obj_Rel_Insert_Input = {
-  data: Contract_Types_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Contract_Types_On_Conflict>;
-};
-
-/** on_conflict condition type for table "contract_types" */
-export type Contract_Types_On_Conflict = {
-  constraint: Contract_Types_Constraint;
-  update_columns?: Array<Contract_Types_Update_Column>;
-  where?: InputMaybe<Contract_Types_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "contract_types". */
 export type Contract_Types_Order_By = {
   abi?: InputMaybe<Order_By>;
   type?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: contract_types */
-export type Contract_Types_Pk_Columns_Input = {
-  type: Contract_Type_Names_Enum;
-};
-
-/** prepend existing jsonb value of filtered columns with new jsonb value */
-export type Contract_Types_Prepend_Input = {
-  abi?: InputMaybe<Scalars['jsonb']>;
 };
 
 /** select columns of table "contract_types" */
@@ -3378,12 +321,6 @@ export enum Contract_Types_Select_Column {
   /** column name */
   Type = 'type'
 }
-
-/** input type for updating data in table "contract_types" */
-export type Contract_Types_Set_Input = {
-  abi?: InputMaybe<Scalars['jsonb']>;
-  type?: InputMaybe<Contract_Type_Names_Enum>;
-};
 
 /** Streaming cursor of the table "contract_types" */
 export type Contract_Types_Stream_Cursor_Input = {
@@ -3399,47 +336,18 @@ export type Contract_Types_Stream_Cursor_Value_Input = {
   type?: InputMaybe<Contract_Type_Names_Enum>;
 };
 
-/** update columns of table "contract_types" */
-export enum Contract_Types_Update_Column {
-  /** column name */
-  Abi = 'abi',
-  /** column name */
-  Type = 'type'
-}
-
-export type Contract_Types_Updates = {
-  /** append existing jsonb value of filtered columns with new jsonb value */
-  _append?: InputMaybe<Contract_Types_Append_Input>;
-  /** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-  _delete_at_path?: InputMaybe<Contract_Types_Delete_At_Path_Input>;
-  /** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-  _delete_elem?: InputMaybe<Contract_Types_Delete_Elem_Input>;
-  /** delete key/value pair or string element. key/value pairs are matched based on their key value */
-  _delete_key?: InputMaybe<Contract_Types_Delete_Key_Input>;
-  /** prepend existing jsonb value of filtered columns with new jsonb value */
-  _prepend?: InputMaybe<Contract_Types_Prepend_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Contract_Types_Set_Input>;
-  where: Contract_Types_Bool_Exp;
-};
-
 /** columns and relationships of "contracts_metadata" */
 export type Contracts_Metadata = {
   __typename?: 'contracts_metadata';
   address: Scalars['String'];
   admin?: Maybe<Scalars['String']>;
-  alertbot_secret?: Maybe<Scalars['String']>;
-  alertbot_url?: Maybe<Scalars['String']>;
   /** An array relationship */
   allowlisted_users: Array<Contract_Allowlistings>;
-  /** An aggregate relationship */
-  allowlisted_users_aggregate: Contract_Allowlistings_Aggregate;
   bucket_name?: Maybe<Scalars['String']>;
   contract_type: Contract_Type_Names_Enum;
   curation_registry_id?: Maybe<Scalars['String']>;
   /** An object relationship */
   default_vertical?: Maybe<Project_Verticals>;
-  default_vertical_name?: Maybe<Scalars['String']>;
   dependency_registry_id?: Maybe<Scalars['String']>;
   generator_url?: Maybe<Scalars['String']>;
   minter_address?: Maybe<Scalars['String']>;
@@ -3472,16 +380,6 @@ export type Contracts_Metadata = {
 
 /** columns and relationships of "contracts_metadata" */
 export type Contracts_MetadataAllowlisted_UsersArgs = {
-  distinct_on?: InputMaybe<Array<Contract_Allowlistings_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Contract_Allowlistings_Order_By>>;
-  where?: InputMaybe<Contract_Allowlistings_Bool_Exp>;
-};
-
-
-/** columns and relationships of "contracts_metadata" */
-export type Contracts_MetadataAllowlisted_Users_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Contract_Allowlistings_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -3553,14 +451,11 @@ export type Contracts_Metadata_Bool_Exp = {
   _or?: InputMaybe<Array<Contracts_Metadata_Bool_Exp>>;
   address?: InputMaybe<String_Comparison_Exp>;
   admin?: InputMaybe<String_Comparison_Exp>;
-  alertbot_secret?: InputMaybe<String_Comparison_Exp>;
-  alertbot_url?: InputMaybe<String_Comparison_Exp>;
   allowlisted_users?: InputMaybe<Contract_Allowlistings_Bool_Exp>;
   bucket_name?: InputMaybe<String_Comparison_Exp>;
   contract_type?: InputMaybe<Contract_Type_Names_Enum_Comparison_Exp>;
   curation_registry_id?: InputMaybe<String_Comparison_Exp>;
   default_vertical?: InputMaybe<Project_Verticals_Bool_Exp>;
-  default_vertical_name?: InputMaybe<String_Comparison_Exp>;
   dependency_registry_id?: InputMaybe<String_Comparison_Exp>;
   generator_url?: InputMaybe<String_Comparison_Exp>;
   minter_address?: InputMaybe<String_Comparison_Exp>;
@@ -3573,6 +468,7 @@ export type Contracts_Metadata_Bool_Exp = {
   preferred_arweave_gateway?: InputMaybe<String_Comparison_Exp>;
   preferred_ipfs_gateway?: InputMaybe<String_Comparison_Exp>;
   projects?: InputMaybe<Projects_Metadata_Bool_Exp>;
+  projects_aggregate?: InputMaybe<Projects_Metadata_Aggregate_Bool_Exp>;
   render_provider_address?: InputMaybe<String_Comparison_Exp>;
   render_provider_percentage?: InputMaybe<Int_Comparison_Exp>;
   render_provider_secondary_sales_address?: InputMaybe<String_Comparison_Exp>;
@@ -3583,62 +479,13 @@ export type Contracts_Metadata_Bool_Exp = {
   user_is_allowlisted?: InputMaybe<Boolean_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "contracts_metadata" */
-export enum Contracts_Metadata_Constraint {
-  /** unique or primary key constraint on columns "name" */
-  ContractsMetadataNameKey = 'contracts_metadata_name_key',
-  /** unique or primary key constraint on columns "address" */
-  ContractsMetadataPkey = 'contracts_metadata_pkey'
-}
-
-/** input type for incrementing numeric columns in table "contracts_metadata" */
-export type Contracts_Metadata_Inc_Input = {
-  render_provider_percentage?: InputMaybe<Scalars['Int']>;
-  render_provider_secondary_sales_bps?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "contracts_metadata" */
-export type Contracts_Metadata_Insert_Input = {
-  address?: InputMaybe<Scalars['String']>;
-  admin?: InputMaybe<Scalars['String']>;
-  alertbot_secret?: InputMaybe<Scalars['String']>;
-  alertbot_url?: InputMaybe<Scalars['String']>;
-  allowlisted_users?: InputMaybe<Contract_Allowlistings_Arr_Rel_Insert_Input>;
-  bucket_name?: InputMaybe<Scalars['String']>;
-  contract_type?: InputMaybe<Contract_Type_Names_Enum>;
-  curation_registry_id?: InputMaybe<Scalars['String']>;
-  default_vertical?: InputMaybe<Project_Verticals_Obj_Rel_Insert_Input>;
-  default_vertical_name?: InputMaybe<Scalars['String']>;
-  dependency_registry_id?: InputMaybe<Scalars['String']>;
-  generator_url?: InputMaybe<Scalars['String']>;
-  minter_address?: InputMaybe<Scalars['String']>;
-  minter_filter?: InputMaybe<Minter_Filters_Metadata_Obj_Rel_Insert_Input>;
-  minter_filter_address?: InputMaybe<Scalars['String']>;
-  name?: InputMaybe<Scalars['String']>;
-  new_projects_forbidden_offchain?: InputMaybe<Scalars['Boolean']>;
-  new_projects_forbidden_onchain?: InputMaybe<Scalars['Boolean']>;
-  preferred_arweave_gateway?: InputMaybe<Scalars['String']>;
-  preferred_ipfs_gateway?: InputMaybe<Scalars['String']>;
-  projects?: InputMaybe<Projects_Metadata_Arr_Rel_Insert_Input>;
-  render_provider_address?: InputMaybe<Scalars['String']>;
-  render_provider_percentage?: InputMaybe<Scalars['Int']>;
-  render_provider_secondary_sales_address?: InputMaybe<Scalars['String']>;
-  render_provider_secondary_sales_bps?: InputMaybe<Scalars['Int']>;
-  token_base_url?: InputMaybe<Scalars['String']>;
-  type?: InputMaybe<Contract_Types_Obj_Rel_Insert_Input>;
-  updated_at?: InputMaybe<Scalars['timestamp']>;
-};
-
 /** aggregate max on columns */
 export type Contracts_Metadata_Max_Fields = {
   __typename?: 'contracts_metadata_max_fields';
   address?: Maybe<Scalars['String']>;
   admin?: Maybe<Scalars['String']>;
-  alertbot_secret?: Maybe<Scalars['String']>;
-  alertbot_url?: Maybe<Scalars['String']>;
   bucket_name?: Maybe<Scalars['String']>;
   curation_registry_id?: Maybe<Scalars['String']>;
-  default_vertical_name?: Maybe<Scalars['String']>;
   dependency_registry_id?: Maybe<Scalars['String']>;
   generator_url?: Maybe<Scalars['String']>;
   minter_address?: Maybe<Scalars['String']>;
@@ -3659,11 +506,8 @@ export type Contracts_Metadata_Min_Fields = {
   __typename?: 'contracts_metadata_min_fields';
   address?: Maybe<Scalars['String']>;
   admin?: Maybe<Scalars['String']>;
-  alertbot_secret?: Maybe<Scalars['String']>;
-  alertbot_url?: Maybe<Scalars['String']>;
   bucket_name?: Maybe<Scalars['String']>;
   curation_registry_id?: Maybe<Scalars['String']>;
-  default_vertical_name?: Maybe<Scalars['String']>;
   dependency_registry_id?: Maybe<Scalars['String']>;
   generator_url?: Maybe<Scalars['String']>;
   minter_address?: Maybe<Scalars['String']>;
@@ -3679,41 +523,15 @@ export type Contracts_Metadata_Min_Fields = {
   updated_at?: Maybe<Scalars['timestamp']>;
 };
 
-/** response of any mutation on the table "contracts_metadata" */
-export type Contracts_Metadata_Mutation_Response = {
-  __typename?: 'contracts_metadata_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Contracts_Metadata>;
-};
-
-/** input type for inserting object relation for remote table "contracts_metadata" */
-export type Contracts_Metadata_Obj_Rel_Insert_Input = {
-  data: Contracts_Metadata_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Contracts_Metadata_On_Conflict>;
-};
-
-/** on_conflict condition type for table "contracts_metadata" */
-export type Contracts_Metadata_On_Conflict = {
-  constraint: Contracts_Metadata_Constraint;
-  update_columns?: Array<Contracts_Metadata_Update_Column>;
-  where?: InputMaybe<Contracts_Metadata_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "contracts_metadata". */
 export type Contracts_Metadata_Order_By = {
   address?: InputMaybe<Order_By>;
   admin?: InputMaybe<Order_By>;
-  alertbot_secret?: InputMaybe<Order_By>;
-  alertbot_url?: InputMaybe<Order_By>;
   allowlisted_users_aggregate?: InputMaybe<Contract_Allowlistings_Aggregate_Order_By>;
   bucket_name?: InputMaybe<Order_By>;
   contract_type?: InputMaybe<Order_By>;
   curation_registry_id?: InputMaybe<Order_By>;
   default_vertical?: InputMaybe<Project_Verticals_Order_By>;
-  default_vertical_name?: InputMaybe<Order_By>;
   dependency_registry_id?: InputMaybe<Order_By>;
   generator_url?: InputMaybe<Order_By>;
   minter_address?: InputMaybe<Order_By>;
@@ -3736,11 +554,6 @@ export type Contracts_Metadata_Order_By = {
   user_is_allowlisted?: InputMaybe<Order_By>;
 };
 
-/** primary key columns input for table: contracts_metadata */
-export type Contracts_Metadata_Pk_Columns_Input = {
-  address: Scalars['String'];
-};
-
 /** select columns of table "contracts_metadata" */
 export enum Contracts_Metadata_Select_Column {
   /** column name */
@@ -3748,17 +561,11 @@ export enum Contracts_Metadata_Select_Column {
   /** column name */
   Admin = 'admin',
   /** column name */
-  AlertbotSecret = 'alertbot_secret',
-  /** column name */
-  AlertbotUrl = 'alertbot_url',
-  /** column name */
   BucketName = 'bucket_name',
   /** column name */
   ContractType = 'contract_type',
   /** column name */
   CurationRegistryId = 'curation_registry_id',
-  /** column name */
-  DefaultVerticalName = 'default_vertical_name',
   /** column name */
   DependencyRegistryId = 'dependency_registry_id',
   /** column name */
@@ -3790,33 +597,6 @@ export enum Contracts_Metadata_Select_Column {
   /** column name */
   UpdatedAt = 'updated_at'
 }
-
-/** input type for updating data in table "contracts_metadata" */
-export type Contracts_Metadata_Set_Input = {
-  address?: InputMaybe<Scalars['String']>;
-  admin?: InputMaybe<Scalars['String']>;
-  alertbot_secret?: InputMaybe<Scalars['String']>;
-  alertbot_url?: InputMaybe<Scalars['String']>;
-  bucket_name?: InputMaybe<Scalars['String']>;
-  contract_type?: InputMaybe<Contract_Type_Names_Enum>;
-  curation_registry_id?: InputMaybe<Scalars['String']>;
-  default_vertical_name?: InputMaybe<Scalars['String']>;
-  dependency_registry_id?: InputMaybe<Scalars['String']>;
-  generator_url?: InputMaybe<Scalars['String']>;
-  minter_address?: InputMaybe<Scalars['String']>;
-  minter_filter_address?: InputMaybe<Scalars['String']>;
-  name?: InputMaybe<Scalars['String']>;
-  new_projects_forbidden_offchain?: InputMaybe<Scalars['Boolean']>;
-  new_projects_forbidden_onchain?: InputMaybe<Scalars['Boolean']>;
-  preferred_arweave_gateway?: InputMaybe<Scalars['String']>;
-  preferred_ipfs_gateway?: InputMaybe<Scalars['String']>;
-  render_provider_address?: InputMaybe<Scalars['String']>;
-  render_provider_percentage?: InputMaybe<Scalars['Int']>;
-  render_provider_secondary_sales_address?: InputMaybe<Scalars['String']>;
-  render_provider_secondary_sales_bps?: InputMaybe<Scalars['Int']>;
-  token_base_url?: InputMaybe<Scalars['String']>;
-  updated_at?: InputMaybe<Scalars['timestamp']>;
-};
 
 /** aggregate stddev on columns */
 export type Contracts_Metadata_Stddev_Fields = {
@@ -3851,12 +631,9 @@ export type Contracts_Metadata_Stream_Cursor_Input = {
 export type Contracts_Metadata_Stream_Cursor_Value_Input = {
   address?: InputMaybe<Scalars['String']>;
   admin?: InputMaybe<Scalars['String']>;
-  alertbot_secret?: InputMaybe<Scalars['String']>;
-  alertbot_url?: InputMaybe<Scalars['String']>;
   bucket_name?: InputMaybe<Scalars['String']>;
   contract_type?: InputMaybe<Contract_Type_Names_Enum>;
   curation_registry_id?: InputMaybe<Scalars['String']>;
-  default_vertical_name?: InputMaybe<Scalars['String']>;
   dependency_registry_id?: InputMaybe<Scalars['String']>;
   generator_url?: InputMaybe<Scalars['String']>;
   minter_address?: InputMaybe<Scalars['String']>;
@@ -3881,64 +658,6 @@ export type Contracts_Metadata_Sum_Fields = {
   render_provider_secondary_sales_bps?: Maybe<Scalars['Int']>;
 };
 
-/** update columns of table "contracts_metadata" */
-export enum Contracts_Metadata_Update_Column {
-  /** column name */
-  Address = 'address',
-  /** column name */
-  Admin = 'admin',
-  /** column name */
-  AlertbotSecret = 'alertbot_secret',
-  /** column name */
-  AlertbotUrl = 'alertbot_url',
-  /** column name */
-  BucketName = 'bucket_name',
-  /** column name */
-  ContractType = 'contract_type',
-  /** column name */
-  CurationRegistryId = 'curation_registry_id',
-  /** column name */
-  DefaultVerticalName = 'default_vertical_name',
-  /** column name */
-  DependencyRegistryId = 'dependency_registry_id',
-  /** column name */
-  GeneratorUrl = 'generator_url',
-  /** column name */
-  MinterAddress = 'minter_address',
-  /** column name */
-  MinterFilterAddress = 'minter_filter_address',
-  /** column name */
-  Name = 'name',
-  /** column name */
-  NewProjectsForbiddenOffchain = 'new_projects_forbidden_offchain',
-  /** column name */
-  NewProjectsForbiddenOnchain = 'new_projects_forbidden_onchain',
-  /** column name */
-  PreferredArweaveGateway = 'preferred_arweave_gateway',
-  /** column name */
-  PreferredIpfsGateway = 'preferred_ipfs_gateway',
-  /** column name */
-  RenderProviderAddress = 'render_provider_address',
-  /** column name */
-  RenderProviderPercentage = 'render_provider_percentage',
-  /** column name */
-  RenderProviderSecondarySalesAddress = 'render_provider_secondary_sales_address',
-  /** column name */
-  RenderProviderSecondarySalesBps = 'render_provider_secondary_sales_bps',
-  /** column name */
-  TokenBaseUrl = 'token_base_url',
-  /** column name */
-  UpdatedAt = 'updated_at'
-}
-
-export type Contracts_Metadata_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Contracts_Metadata_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Contracts_Metadata_Set_Input>;
-  where: Contracts_Metadata_Bool_Exp;
-};
-
 /** aggregate var_pop on columns */
 export type Contracts_Metadata_Var_Pop_Fields = {
   __typename?: 'contracts_metadata_var_pop_fields';
@@ -3960,61 +679,6 @@ export type Contracts_Metadata_Variance_Fields = {
   render_provider_secondary_sales_bps?: Maybe<Scalars['Float']>;
 };
 
-/** fields of action: "createApplication" */
-export type CreateApplication = {
-  __typename?: 'createApplication';
-  /** the time at which this action was created */
-  created_at: Scalars['timestamptz'];
-  /** errors related to the invocation */
-  errors?: Maybe<Scalars['json']>;
-  /** the unique id of an action */
-  id: Scalars['uuid'];
-  /** the output fields of this action */
-  output?: Maybe<CreateApplicationOutput>;
-};
-
-/** columns and relationships of "curation_statuses" */
-export type Curation_Statuses = {
-  __typename?: 'curation_statuses';
-  value: Scalars['String'];
-};
-
-/** aggregated selection of "curation_statuses" */
-export type Curation_Statuses_Aggregate = {
-  __typename?: 'curation_statuses_aggregate';
-  aggregate?: Maybe<Curation_Statuses_Aggregate_Fields>;
-  nodes: Array<Curation_Statuses>;
-};
-
-/** aggregate fields of "curation_statuses" */
-export type Curation_Statuses_Aggregate_Fields = {
-  __typename?: 'curation_statuses_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Curation_Statuses_Max_Fields>;
-  min?: Maybe<Curation_Statuses_Min_Fields>;
-};
-
-
-/** aggregate fields of "curation_statuses" */
-export type Curation_Statuses_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Curation_Statuses_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** Boolean expression to filter rows from the table "curation_statuses". All fields are combined with a logical 'AND'. */
-export type Curation_Statuses_Bool_Exp = {
-  _and?: InputMaybe<Array<Curation_Statuses_Bool_Exp>>;
-  _not?: InputMaybe<Curation_Statuses_Bool_Exp>;
-  _or?: InputMaybe<Array<Curation_Statuses_Bool_Exp>>;
-  value?: InputMaybe<String_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "curation_statuses" */
-export enum Curation_Statuses_Constraint {
-  /** unique or primary key constraint on columns "value" */
-  CurationStatusesPkey = 'curation_statuses_pkey'
-}
-
 export enum Curation_Statuses_Enum {
   Collaboration = 'collaboration',
   Curated = 'curated',
@@ -4029,85 +693,6 @@ export type Curation_Statuses_Enum_Comparison_Exp = {
   _is_null?: InputMaybe<Scalars['Boolean']>;
   _neq?: InputMaybe<Curation_Statuses_Enum>;
   _nin?: InputMaybe<Array<Curation_Statuses_Enum>>;
-};
-
-/** input type for inserting data into table "curation_statuses" */
-export type Curation_Statuses_Insert_Input = {
-  value?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Curation_Statuses_Max_Fields = {
-  __typename?: 'curation_statuses_max_fields';
-  value?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Curation_Statuses_Min_Fields = {
-  __typename?: 'curation_statuses_min_fields';
-  value?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "curation_statuses" */
-export type Curation_Statuses_Mutation_Response = {
-  __typename?: 'curation_statuses_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Curation_Statuses>;
-};
-
-/** on_conflict condition type for table "curation_statuses" */
-export type Curation_Statuses_On_Conflict = {
-  constraint: Curation_Statuses_Constraint;
-  update_columns?: Array<Curation_Statuses_Update_Column>;
-  where?: InputMaybe<Curation_Statuses_Bool_Exp>;
-};
-
-/** Ordering options when selecting data from "curation_statuses". */
-export type Curation_Statuses_Order_By = {
-  value?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: curation_statuses */
-export type Curation_Statuses_Pk_Columns_Input = {
-  value: Scalars['String'];
-};
-
-/** select columns of table "curation_statuses" */
-export enum Curation_Statuses_Select_Column {
-  /** column name */
-  Value = 'value'
-}
-
-/** input type for updating data in table "curation_statuses" */
-export type Curation_Statuses_Set_Input = {
-  value?: InputMaybe<Scalars['String']>;
-};
-
-/** Streaming cursor of the table "curation_statuses" */
-export type Curation_Statuses_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Curation_Statuses_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Curation_Statuses_Stream_Cursor_Value_Input = {
-  value?: InputMaybe<Scalars['String']>;
-};
-
-/** update columns of table "curation_statuses" */
-export enum Curation_Statuses_Update_Column {
-  /** column name */
-  Value = 'value'
-}
-
-export type Curation_Statuses_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Curation_Statuses_Set_Input>;
-  where: Curation_Statuses_Bool_Exp;
 };
 
 /** ordering argument of a cursor */
@@ -4133,36 +718,6 @@ export type Entity_Tags = {
   user_address?: Maybe<Scalars['String']>;
 };
 
-/** aggregated selection of "entity_tags" */
-export type Entity_Tags_Aggregate = {
-  __typename?: 'entity_tags_aggregate';
-  aggregate?: Maybe<Entity_Tags_Aggregate_Fields>;
-  nodes: Array<Entity_Tags>;
-};
-
-/** aggregate fields of "entity_tags" */
-export type Entity_Tags_Aggregate_Fields = {
-  __typename?: 'entity_tags_aggregate_fields';
-  avg?: Maybe<Entity_Tags_Avg_Fields>;
-  count: Scalars['Int'];
-  max?: Maybe<Entity_Tags_Max_Fields>;
-  min?: Maybe<Entity_Tags_Min_Fields>;
-  stddev?: Maybe<Entity_Tags_Stddev_Fields>;
-  stddev_pop?: Maybe<Entity_Tags_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Entity_Tags_Stddev_Samp_Fields>;
-  sum?: Maybe<Entity_Tags_Sum_Fields>;
-  var_pop?: Maybe<Entity_Tags_Var_Pop_Fields>;
-  var_samp?: Maybe<Entity_Tags_Var_Samp_Fields>;
-  variance?: Maybe<Entity_Tags_Variance_Fields>;
-};
-
-
-/** aggregate fields of "entity_tags" */
-export type Entity_Tags_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Entity_Tags_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
 /** order by aggregate values of table "entity_tags" */
 export type Entity_Tags_Aggregate_Order_By = {
   avg?: InputMaybe<Entity_Tags_Avg_Order_By>;
@@ -4176,19 +731,6 @@ export type Entity_Tags_Aggregate_Order_By = {
   var_pop?: InputMaybe<Entity_Tags_Var_Pop_Order_By>;
   var_samp?: InputMaybe<Entity_Tags_Var_Samp_Order_By>;
   variance?: InputMaybe<Entity_Tags_Variance_Order_By>;
-};
-
-/** input type for inserting array relation for remote table "entity_tags" */
-export type Entity_Tags_Arr_Rel_Insert_Input = {
-  data: Array<Entity_Tags_Insert_Input>;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Entity_Tags_On_Conflict>;
-};
-
-/** aggregate avg on columns */
-export type Entity_Tags_Avg_Fields = {
-  __typename?: 'entity_tags_avg_fields';
-  id?: Maybe<Scalars['Float']>;
 };
 
 /** order by avg() on columns of table "entity_tags" */
@@ -4210,37 +752,6 @@ export type Entity_Tags_Bool_Exp = {
   user_address?: InputMaybe<String_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "entity_tags" */
-export enum Entity_Tags_Constraint {
-  /** unique or primary key constraint on columns "id" */
-  EntityTagsPkey = 'entity_tags_pkey'
-}
-
-/** input type for incrementing numeric columns in table "entity_tags" */
-export type Entity_Tags_Inc_Input = {
-  id?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "entity_tags" */
-export type Entity_Tags_Insert_Input = {
-  id?: InputMaybe<Scalars['Int']>;
-  project?: InputMaybe<Projects_Metadata_Obj_Rel_Insert_Input>;
-  project_id?: InputMaybe<Scalars['String']>;
-  tag?: InputMaybe<Tags_Obj_Rel_Insert_Input>;
-  tag_name?: InputMaybe<Scalars['String']>;
-  user?: InputMaybe<Users_Obj_Rel_Insert_Input>;
-  user_address?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Entity_Tags_Max_Fields = {
-  __typename?: 'entity_tags_max_fields';
-  id?: Maybe<Scalars['Int']>;
-  project_id?: Maybe<Scalars['String']>;
-  tag_name?: Maybe<Scalars['String']>;
-  user_address?: Maybe<Scalars['String']>;
-};
-
 /** order by max() on columns of table "entity_tags" */
 export type Entity_Tags_Max_Order_By = {
   id?: InputMaybe<Order_By>;
@@ -4249,37 +760,12 @@ export type Entity_Tags_Max_Order_By = {
   user_address?: InputMaybe<Order_By>;
 };
 
-/** aggregate min on columns */
-export type Entity_Tags_Min_Fields = {
-  __typename?: 'entity_tags_min_fields';
-  id?: Maybe<Scalars['Int']>;
-  project_id?: Maybe<Scalars['String']>;
-  tag_name?: Maybe<Scalars['String']>;
-  user_address?: Maybe<Scalars['String']>;
-};
-
 /** order by min() on columns of table "entity_tags" */
 export type Entity_Tags_Min_Order_By = {
   id?: InputMaybe<Order_By>;
   project_id?: InputMaybe<Order_By>;
   tag_name?: InputMaybe<Order_By>;
   user_address?: InputMaybe<Order_By>;
-};
-
-/** response of any mutation on the table "entity_tags" */
-export type Entity_Tags_Mutation_Response = {
-  __typename?: 'entity_tags_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Entity_Tags>;
-};
-
-/** on_conflict condition type for table "entity_tags" */
-export type Entity_Tags_On_Conflict = {
-  constraint: Entity_Tags_Constraint;
-  update_columns?: Array<Entity_Tags_Update_Column>;
-  where?: InputMaybe<Entity_Tags_Bool_Exp>;
 };
 
 /** Ordering options when selecting data from "entity_tags". */
@@ -4291,11 +777,6 @@ export type Entity_Tags_Order_By = {
   tag_name?: InputMaybe<Order_By>;
   user?: InputMaybe<Users_Order_By>;
   user_address?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: entity_tags */
-export type Entity_Tags_Pk_Columns_Input = {
-  id: Scalars['Int'];
 };
 
 /** select columns of table "entity_tags" */
@@ -4310,40 +791,14 @@ export enum Entity_Tags_Select_Column {
   UserAddress = 'user_address'
 }
 
-/** input type for updating data in table "entity_tags" */
-export type Entity_Tags_Set_Input = {
-  id?: InputMaybe<Scalars['Int']>;
-  project_id?: InputMaybe<Scalars['String']>;
-  tag_name?: InputMaybe<Scalars['String']>;
-  user_address?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate stddev on columns */
-export type Entity_Tags_Stddev_Fields = {
-  __typename?: 'entity_tags_stddev_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
 /** order by stddev() on columns of table "entity_tags" */
 export type Entity_Tags_Stddev_Order_By = {
   id?: InputMaybe<Order_By>;
 };
 
-/** aggregate stddev_pop on columns */
-export type Entity_Tags_Stddev_Pop_Fields = {
-  __typename?: 'entity_tags_stddev_pop_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
 /** order by stddev_pop() on columns of table "entity_tags" */
 export type Entity_Tags_Stddev_Pop_Order_By = {
   id?: InputMaybe<Order_By>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Entity_Tags_Stddev_Samp_Fields = {
-  __typename?: 'entity_tags_stddev_samp_fields';
-  id?: Maybe<Scalars['Float']>;
 };
 
 /** order by stddev_samp() on columns of table "entity_tags" */
@@ -4367,41 +822,9 @@ export type Entity_Tags_Stream_Cursor_Value_Input = {
   user_address?: InputMaybe<Scalars['String']>;
 };
 
-/** aggregate sum on columns */
-export type Entity_Tags_Sum_Fields = {
-  __typename?: 'entity_tags_sum_fields';
-  id?: Maybe<Scalars['Int']>;
-};
-
 /** order by sum() on columns of table "entity_tags" */
 export type Entity_Tags_Sum_Order_By = {
   id?: InputMaybe<Order_By>;
-};
-
-/** update columns of table "entity_tags" */
-export enum Entity_Tags_Update_Column {
-  /** column name */
-  Id = 'id',
-  /** column name */
-  ProjectId = 'project_id',
-  /** column name */
-  TagName = 'tag_name',
-  /** column name */
-  UserAddress = 'user_address'
-}
-
-export type Entity_Tags_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Entity_Tags_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Entity_Tags_Set_Input>;
-  where: Entity_Tags_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Entity_Tags_Var_Pop_Fields = {
-  __typename?: 'entity_tags_var_pop_fields';
-  id?: Maybe<Scalars['Float']>;
 };
 
 /** order by var_pop() on columns of table "entity_tags" */
@@ -4409,21 +832,9 @@ export type Entity_Tags_Var_Pop_Order_By = {
   id?: InputMaybe<Order_By>;
 };
 
-/** aggregate var_samp on columns */
-export type Entity_Tags_Var_Samp_Fields = {
-  __typename?: 'entity_tags_var_samp_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
 /** order by var_samp() on columns of table "entity_tags" */
 export type Entity_Tags_Var_Samp_Order_By = {
   id?: InputMaybe<Order_By>;
-};
-
-/** aggregate variance on columns */
-export type Entity_Tags_Variance_Fields = {
-  __typename?: 'entity_tags_variance_fields';
-  id?: Maybe<Scalars['Float']>;
 };
 
 /** order by variance() on columns of table "entity_tags" */
@@ -4454,6 +865,17 @@ export type Favorites_Aggregate = {
   __typename?: 'favorites_aggregate';
   aggregate?: Maybe<Favorites_Aggregate_Fields>;
   nodes: Array<Favorites>;
+};
+
+export type Favorites_Aggregate_Bool_Exp = {
+  count?: InputMaybe<Favorites_Aggregate_Bool_Exp_Count>;
+};
+
+export type Favorites_Aggregate_Bool_Exp_Count = {
+  arguments?: InputMaybe<Array<Favorites_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Favorites_Bool_Exp>;
+  predicate: Int_Comparison_Exp;
 };
 
 /** aggregate fields of "favorites" */
@@ -4494,13 +916,6 @@ export type Favorites_Aggregate_Order_By = {
   variance?: InputMaybe<Favorites_Variance_Order_By>;
 };
 
-/** input type for inserting array relation for remote table "favorites" */
-export type Favorites_Arr_Rel_Insert_Input = {
-  data: Array<Favorites_Insert_Input>;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Favorites_On_Conflict>;
-};
-
 /** aggregate avg on columns */
 export type Favorites_Avg_Fields = {
   __typename?: 'favorites_avg_fields';
@@ -4526,30 +941,6 @@ export type Favorites_Bool_Exp = {
   token_metadata?: InputMaybe<Tokens_Metadata_Bool_Exp>;
   user?: InputMaybe<Users_Bool_Exp>;
   user_public_address?: InputMaybe<String_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "favorites" */
-export enum Favorites_Constraint {
-  /** unique or primary key constraint on columns "id" */
-  FavoritesPkey = 'favorites_pkey'
-}
-
-/** input type for incrementing numeric columns in table "favorites" */
-export type Favorites_Inc_Input = {
-  id?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "favorites" */
-export type Favorites_Insert_Input = {
-  favorited_project_id?: InputMaybe<Scalars['String']>;
-  favorited_token_id?: InputMaybe<Scalars['String']>;
-  favorited_user?: InputMaybe<Users_Obj_Rel_Insert_Input>;
-  favorited_user_address?: InputMaybe<Scalars['String']>;
-  id?: InputMaybe<Scalars['Int']>;
-  project_metadata?: InputMaybe<Projects_Metadata_Obj_Rel_Insert_Input>;
-  token_metadata?: InputMaybe<Tokens_Metadata_Obj_Rel_Insert_Input>;
-  user?: InputMaybe<Users_Obj_Rel_Insert_Input>;
-  user_public_address?: InputMaybe<Scalars['String']>;
 };
 
 /** aggregate max on columns */
@@ -4590,22 +981,6 @@ export type Favorites_Min_Order_By = {
   user_public_address?: InputMaybe<Order_By>;
 };
 
-/** response of any mutation on the table "favorites" */
-export type Favorites_Mutation_Response = {
-  __typename?: 'favorites_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Favorites>;
-};
-
-/** on_conflict condition type for table "favorites" */
-export type Favorites_On_Conflict = {
-  constraint: Favorites_Constraint;
-  update_columns?: Array<Favorites_Update_Column>;
-  where?: InputMaybe<Favorites_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "favorites". */
 export type Favorites_Order_By = {
   favorited_project_id?: InputMaybe<Order_By>;
@@ -4617,11 +992,6 @@ export type Favorites_Order_By = {
   token_metadata?: InputMaybe<Tokens_Metadata_Order_By>;
   user?: InputMaybe<Users_Order_By>;
   user_public_address?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: favorites */
-export type Favorites_Pk_Columns_Input = {
-  id: Scalars['Int'];
 };
 
 /** select columns of table "favorites" */
@@ -4637,15 +1007,6 @@ export enum Favorites_Select_Column {
   /** column name */
   UserPublicAddress = 'user_public_address'
 }
-
-/** input type for updating data in table "favorites" */
-export type Favorites_Set_Input = {
-  favorited_project_id?: InputMaybe<Scalars['String']>;
-  favorited_token_id?: InputMaybe<Scalars['String']>;
-  favorited_user_address?: InputMaybe<Scalars['String']>;
-  id?: InputMaybe<Scalars['Int']>;
-  user_public_address?: InputMaybe<Scalars['String']>;
-};
 
 /** aggregate stddev on columns */
 export type Favorites_Stddev_Fields = {
@@ -4708,28 +1069,6 @@ export type Favorites_Sum_Order_By = {
   id?: InputMaybe<Order_By>;
 };
 
-/** update columns of table "favorites" */
-export enum Favorites_Update_Column {
-  /** column name */
-  FavoritedProjectId = 'favorited_project_id',
-  /** column name */
-  FavoritedTokenId = 'favorited_token_id',
-  /** column name */
-  FavoritedUserAddress = 'favorited_user_address',
-  /** column name */
-  Id = 'id',
-  /** column name */
-  UserPublicAddress = 'user_public_address'
-}
-
-export type Favorites_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Favorites_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Favorites_Set_Input>;
-  where: Favorites_Bool_Exp;
-};
-
 /** aggregate var_pop on columns */
 export type Favorites_Var_Pop_Fields = {
   __typename?: 'favorites_var_pop_fields';
@@ -4763,204 +1102,11 @@ export type Favorites_Variance_Order_By = {
   id?: InputMaybe<Order_By>;
 };
 
-/** columns and relationships of "feature_field_values_counts" */
-export type Feature_Field_Values_Counts = {
-  __typename?: 'feature_field_values_counts';
-  count: Scalars['bigint'];
-  value: Scalars['String'];
-};
-
-/** aggregated selection of "feature_field_values_counts" */
-export type Feature_Field_Values_Counts_Aggregate = {
-  __typename?: 'feature_field_values_counts_aggregate';
-  aggregate?: Maybe<Feature_Field_Values_Counts_Aggregate_Fields>;
-  nodes: Array<Feature_Field_Values_Counts>;
-};
-
-/** aggregate fields of "feature_field_values_counts" */
-export type Feature_Field_Values_Counts_Aggregate_Fields = {
-  __typename?: 'feature_field_values_counts_aggregate_fields';
-  avg?: Maybe<Feature_Field_Values_Counts_Avg_Fields>;
-  count: Scalars['Int'];
-  max?: Maybe<Feature_Field_Values_Counts_Max_Fields>;
-  min?: Maybe<Feature_Field_Values_Counts_Min_Fields>;
-  stddev?: Maybe<Feature_Field_Values_Counts_Stddev_Fields>;
-  stddev_pop?: Maybe<Feature_Field_Values_Counts_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Feature_Field_Values_Counts_Stddev_Samp_Fields>;
-  sum?: Maybe<Feature_Field_Values_Counts_Sum_Fields>;
-  var_pop?: Maybe<Feature_Field_Values_Counts_Var_Pop_Fields>;
-  var_samp?: Maybe<Feature_Field_Values_Counts_Var_Samp_Fields>;
-  variance?: Maybe<Feature_Field_Values_Counts_Variance_Fields>;
-};
-
-
-/** aggregate fields of "feature_field_values_counts" */
-export type Feature_Field_Values_Counts_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Feature_Field_Values_Counts_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** aggregate avg on columns */
-export type Feature_Field_Values_Counts_Avg_Fields = {
-  __typename?: 'feature_field_values_counts_avg_fields';
-  count?: Maybe<Scalars['Float']>;
-};
-
-/** Boolean expression to filter rows from the table "feature_field_values_counts". All fields are combined with a logical 'AND'. */
-export type Feature_Field_Values_Counts_Bool_Exp = {
-  _and?: InputMaybe<Array<Feature_Field_Values_Counts_Bool_Exp>>;
-  _not?: InputMaybe<Feature_Field_Values_Counts_Bool_Exp>;
-  _or?: InputMaybe<Array<Feature_Field_Values_Counts_Bool_Exp>>;
-  count?: InputMaybe<Bigint_Comparison_Exp>;
-  value?: InputMaybe<String_Comparison_Exp>;
-};
-
-/** input type for incrementing numeric columns in table "feature_field_values_counts" */
-export type Feature_Field_Values_Counts_Inc_Input = {
-  count?: InputMaybe<Scalars['bigint']>;
-};
-
-/** input type for inserting data into table "feature_field_values_counts" */
-export type Feature_Field_Values_Counts_Insert_Input = {
-  count?: InputMaybe<Scalars['bigint']>;
-  value?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Feature_Field_Values_Counts_Max_Fields = {
-  __typename?: 'feature_field_values_counts_max_fields';
-  count?: Maybe<Scalars['bigint']>;
-  value?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Feature_Field_Values_Counts_Min_Fields = {
-  __typename?: 'feature_field_values_counts_min_fields';
-  count?: Maybe<Scalars['bigint']>;
-  value?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "feature_field_values_counts" */
-export type Feature_Field_Values_Counts_Mutation_Response = {
-  __typename?: 'feature_field_values_counts_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Feature_Field_Values_Counts>;
-};
-
-/** Ordering options when selecting data from "feature_field_values_counts". */
-export type Feature_Field_Values_Counts_Order_By = {
-  count?: InputMaybe<Order_By>;
-  value?: InputMaybe<Order_By>;
-};
-
-/** select columns of table "feature_field_values_counts" */
-export enum Feature_Field_Values_Counts_Select_Column {
-  /** column name */
-  Count = 'count',
-  /** column name */
-  Value = 'value'
-}
-
-/** input type for updating data in table "feature_field_values_counts" */
-export type Feature_Field_Values_Counts_Set_Input = {
-  count?: InputMaybe<Scalars['bigint']>;
-  value?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate stddev on columns */
-export type Feature_Field_Values_Counts_Stddev_Fields = {
-  __typename?: 'feature_field_values_counts_stddev_fields';
-  count?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_pop on columns */
-export type Feature_Field_Values_Counts_Stddev_Pop_Fields = {
-  __typename?: 'feature_field_values_counts_stddev_pop_fields';
-  count?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Feature_Field_Values_Counts_Stddev_Samp_Fields = {
-  __typename?: 'feature_field_values_counts_stddev_samp_fields';
-  count?: Maybe<Scalars['Float']>;
-};
-
-/** Streaming cursor of the table "feature_field_values_counts" */
-export type Feature_Field_Values_Counts_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Feature_Field_Values_Counts_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Feature_Field_Values_Counts_Stream_Cursor_Value_Input = {
-  count?: InputMaybe<Scalars['bigint']>;
-  value?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate sum on columns */
-export type Feature_Field_Values_Counts_Sum_Fields = {
-  __typename?: 'feature_field_values_counts_sum_fields';
-  count?: Maybe<Scalars['bigint']>;
-};
-
-export type Feature_Field_Values_Counts_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Feature_Field_Values_Counts_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Feature_Field_Values_Counts_Set_Input>;
-  where: Feature_Field_Values_Counts_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Feature_Field_Values_Counts_Var_Pop_Fields = {
-  __typename?: 'feature_field_values_counts_var_pop_fields';
-  count?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate var_samp on columns */
-export type Feature_Field_Values_Counts_Var_Samp_Fields = {
-  __typename?: 'feature_field_values_counts_var_samp_fields';
-  count?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate variance on columns */
-export type Feature_Field_Values_Counts_Variance_Fields = {
-  __typename?: 'feature_field_values_counts_variance_fields';
-  count?: Maybe<Scalars['Float']>;
-};
-
 /** columns and relationships of "feature_flags" */
 export type Feature_Flags = {
   __typename?: 'feature_flags';
-  address_allowlist?: Maybe<Scalars['String']>;
   flag_name: Scalars['String'];
   globally_enabled: Scalars['Boolean'];
-};
-
-/** aggregated selection of "feature_flags" */
-export type Feature_Flags_Aggregate = {
-  __typename?: 'feature_flags_aggregate';
-  aggregate?: Maybe<Feature_Flags_Aggregate_Fields>;
-  nodes: Array<Feature_Flags>;
-};
-
-/** aggregate fields of "feature_flags" */
-export type Feature_Flags_Aggregate_Fields = {
-  __typename?: 'feature_flags_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Feature_Flags_Max_Fields>;
-  min?: Maybe<Feature_Flags_Min_Fields>;
-};
-
-
-/** aggregate fields of "feature_flags" */
-export type Feature_Flags_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Feature_Flags_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
 };
 
 /** Boolean expression to filter rows from the table "feature_flags". All fields are combined with a logical 'AND'. */
@@ -4968,82 +1114,23 @@ export type Feature_Flags_Bool_Exp = {
   _and?: InputMaybe<Array<Feature_Flags_Bool_Exp>>;
   _not?: InputMaybe<Feature_Flags_Bool_Exp>;
   _or?: InputMaybe<Array<Feature_Flags_Bool_Exp>>;
-  address_allowlist?: InputMaybe<String_Comparison_Exp>;
   flag_name?: InputMaybe<String_Comparison_Exp>;
   globally_enabled?: InputMaybe<Boolean_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "feature_flags" */
-export enum Feature_Flags_Constraint {
-  /** unique or primary key constraint on columns "flag_name" */
-  FeatureFlagsPkey = 'feature_flags_pkey'
-}
-
-/** input type for inserting data into table "feature_flags" */
-export type Feature_Flags_Insert_Input = {
-  address_allowlist?: InputMaybe<Scalars['String']>;
-  flag_name?: InputMaybe<Scalars['String']>;
-  globally_enabled?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** aggregate max on columns */
-export type Feature_Flags_Max_Fields = {
-  __typename?: 'feature_flags_max_fields';
-  address_allowlist?: Maybe<Scalars['String']>;
-  flag_name?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Feature_Flags_Min_Fields = {
-  __typename?: 'feature_flags_min_fields';
-  address_allowlist?: Maybe<Scalars['String']>;
-  flag_name?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "feature_flags" */
-export type Feature_Flags_Mutation_Response = {
-  __typename?: 'feature_flags_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Feature_Flags>;
-};
-
-/** on_conflict condition type for table "feature_flags" */
-export type Feature_Flags_On_Conflict = {
-  constraint: Feature_Flags_Constraint;
-  update_columns?: Array<Feature_Flags_Update_Column>;
-  where?: InputMaybe<Feature_Flags_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "feature_flags". */
 export type Feature_Flags_Order_By = {
-  address_allowlist?: InputMaybe<Order_By>;
   flag_name?: InputMaybe<Order_By>;
   globally_enabled?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: feature_flags */
-export type Feature_Flags_Pk_Columns_Input = {
-  flag_name: Scalars['String'];
 };
 
 /** select columns of table "feature_flags" */
 export enum Feature_Flags_Select_Column {
   /** column name */
-  AddressAllowlist = 'address_allowlist',
-  /** column name */
   FlagName = 'flag_name',
   /** column name */
   GloballyEnabled = 'globally_enabled'
 }
-
-/** input type for updating data in table "feature_flags" */
-export type Feature_Flags_Set_Input = {
-  address_allowlist?: InputMaybe<Scalars['String']>;
-  flag_name?: InputMaybe<Scalars['String']>;
-  globally_enabled?: InputMaybe<Scalars['Boolean']>;
-};
 
 /** Streaming cursor of the table "feature_flags" */
 export type Feature_Flags_Stream_Cursor_Input = {
@@ -5055,25 +1142,8 @@ export type Feature_Flags_Stream_Cursor_Input = {
 
 /** Initial value of the column from where the streaming should start */
 export type Feature_Flags_Stream_Cursor_Value_Input = {
-  address_allowlist?: InputMaybe<Scalars['String']>;
   flag_name?: InputMaybe<Scalars['String']>;
   globally_enabled?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** update columns of table "feature_flags" */
-export enum Feature_Flags_Update_Column {
-  /** column name */
-  AddressAllowlist = 'address_allowlist',
-  /** column name */
-  FlagName = 'flag_name',
-  /** column name */
-  GloballyEnabled = 'globally_enabled'
-}
-
-export type Feature_Flags_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Feature_Flags_Set_Input>;
-  where: Feature_Flags_Bool_Exp;
 };
 
 export type Featured_Token_Projects_Metadata_Args = {
@@ -5095,11 +1165,6 @@ export type Float8_Comparison_Exp = {
   _lte?: InputMaybe<Scalars['float8']>;
   _neq?: InputMaybe<Scalars['float8']>;
   _nin?: InputMaybe<Array<Scalars['float8']>>;
-};
-
-export type Get_Projects_Metadata_Feature_Field_Value_Counts_Args = {
-  _feature_field?: InputMaybe<Scalars['String']>;
-  _project_id?: InputMaybe<Scalars['String']>;
 };
 
 export type Jsonb_Cast_Exp = {
@@ -5152,47 +1217,6 @@ export type MediaMetadataArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
 
-/** aggregated selection of "media" */
-export type Media_Aggregate = {
-  __typename?: 'media_aggregate';
-  aggregate?: Maybe<Media_Aggregate_Fields>;
-  nodes: Array<Media>;
-};
-
-/** aggregate fields of "media" */
-export type Media_Aggregate_Fields = {
-  __typename?: 'media_aggregate_fields';
-  avg?: Maybe<Media_Avg_Fields>;
-  count: Scalars['Int'];
-  max?: Maybe<Media_Max_Fields>;
-  min?: Maybe<Media_Min_Fields>;
-  stddev?: Maybe<Media_Stddev_Fields>;
-  stddev_pop?: Maybe<Media_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Media_Stddev_Samp_Fields>;
-  sum?: Maybe<Media_Sum_Fields>;
-  var_pop?: Maybe<Media_Var_Pop_Fields>;
-  var_samp?: Maybe<Media_Var_Samp_Fields>;
-  variance?: Maybe<Media_Variance_Fields>;
-};
-
-
-/** aggregate fields of "media" */
-export type Media_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Media_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** append existing jsonb value of filtered columns with new jsonb value */
-export type Media_Append_Input = {
-  metadata?: InputMaybe<Scalars['jsonb']>;
-};
-
-/** aggregate avg on columns */
-export type Media_Avg_Fields = {
-  __typename?: 'media_avg_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
 /** Boolean expression to filter rows from the table "media". All fields are combined with a logical 'AND'. */
 export type Media_Bool_Exp = {
   _and?: InputMaybe<Array<Media_Bool_Exp>>;
@@ -5206,84 +1230,6 @@ export type Media_Bool_Exp = {
   url?: InputMaybe<String_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "media" */
-export enum Media_Constraint {
-  /** unique or primary key constraint on columns "file_path", "bucket_name" */
-  MediaBucketNameFilePathKey = 'media_bucket_name_file_path_key',
-  /** unique or primary key constraint on columns "id" */
-  MediaPkey = 'media_pkey'
-}
-
-/** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-export type Media_Delete_At_Path_Input = {
-  metadata?: InputMaybe<Array<Scalars['String']>>;
-};
-
-/** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-export type Media_Delete_Elem_Input = {
-  metadata?: InputMaybe<Scalars['Int']>;
-};
-
-/** delete key/value pair or string element. key/value pairs are matched based on their key value */
-export type Media_Delete_Key_Input = {
-  metadata?: InputMaybe<Scalars['String']>;
-};
-
-/** input type for incrementing numeric columns in table "media" */
-export type Media_Inc_Input = {
-  id?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "media" */
-export type Media_Insert_Input = {
-  bucket_name?: InputMaybe<Scalars['String']>;
-  file_path?: InputMaybe<Scalars['String']>;
-  id?: InputMaybe<Scalars['Int']>;
-  metadata?: InputMaybe<Scalars['jsonb']>;
-  owner_id?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Media_Max_Fields = {
-  __typename?: 'media_max_fields';
-  bucket_name?: Maybe<Scalars['String']>;
-  file_path?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['Int']>;
-  owner_id?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Media_Min_Fields = {
-  __typename?: 'media_min_fields';
-  bucket_name?: Maybe<Scalars['String']>;
-  file_path?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['Int']>;
-  owner_id?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "media" */
-export type Media_Mutation_Response = {
-  __typename?: 'media_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Media>;
-};
-
-/** input type for inserting object relation for remote table "media" */
-export type Media_Obj_Rel_Insert_Input = {
-  data: Media_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Media_On_Conflict>;
-};
-
-/** on_conflict condition type for table "media" */
-export type Media_On_Conflict = {
-  constraint: Media_Constraint;
-  update_columns?: Array<Media_Update_Column>;
-  where?: InputMaybe<Media_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "media". */
 export type Media_Order_By = {
   bucket_name?: InputMaybe<Order_By>;
@@ -5292,16 +1238,6 @@ export type Media_Order_By = {
   metadata?: InputMaybe<Order_By>;
   owner_id?: InputMaybe<Order_By>;
   url?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: media */
-export type Media_Pk_Columns_Input = {
-  id: Scalars['Int'];
-};
-
-/** prepend existing jsonb value of filtered columns with new jsonb value */
-export type Media_Prepend_Input = {
-  metadata?: InputMaybe<Scalars['jsonb']>;
 };
 
 /** select columns of table "media" */
@@ -5317,33 +1253,6 @@ export enum Media_Select_Column {
   /** column name */
   OwnerId = 'owner_id'
 }
-
-/** input type for updating data in table "media" */
-export type Media_Set_Input = {
-  bucket_name?: InputMaybe<Scalars['String']>;
-  file_path?: InputMaybe<Scalars['String']>;
-  id?: InputMaybe<Scalars['Int']>;
-  metadata?: InputMaybe<Scalars['jsonb']>;
-  owner_id?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate stddev on columns */
-export type Media_Stddev_Fields = {
-  __typename?: 'media_stddev_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_pop on columns */
-export type Media_Stddev_Pop_Fields = {
-  __typename?: 'media_stddev_pop_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Media_Stddev_Samp_Fields = {
-  __typename?: 'media_stddev_samp_fields';
-  id?: Maybe<Scalars['Float']>;
-};
 
 /** Streaming cursor of the table "media" */
 export type Media_Stream_Cursor_Input = {
@@ -5362,70 +1271,12 @@ export type Media_Stream_Cursor_Value_Input = {
   owner_id?: InputMaybe<Scalars['String']>;
 };
 
-/** aggregate sum on columns */
-export type Media_Sum_Fields = {
-  __typename?: 'media_sum_fields';
-  id?: Maybe<Scalars['Int']>;
-};
-
-/** update columns of table "media" */
-export enum Media_Update_Column {
-  /** column name */
-  BucketName = 'bucket_name',
-  /** column name */
-  FilePath = 'file_path',
-  /** column name */
-  Id = 'id',
-  /** column name */
-  Metadata = 'metadata',
-  /** column name */
-  OwnerId = 'owner_id'
-}
-
-export type Media_Updates = {
-  /** append existing jsonb value of filtered columns with new jsonb value */
-  _append?: InputMaybe<Media_Append_Input>;
-  /** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-  _delete_at_path?: InputMaybe<Media_Delete_At_Path_Input>;
-  /** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-  _delete_elem?: InputMaybe<Media_Delete_Elem_Input>;
-  /** delete key/value pair or string element. key/value pairs are matched based on their key value */
-  _delete_key?: InputMaybe<Media_Delete_Key_Input>;
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Media_Inc_Input>;
-  /** prepend existing jsonb value of filtered columns with new jsonb value */
-  _prepend?: InputMaybe<Media_Prepend_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Media_Set_Input>;
-  where: Media_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Media_Var_Pop_Fields = {
-  __typename?: 'media_var_pop_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate var_samp on columns */
-export type Media_Var_Samp_Fields = {
-  __typename?: 'media_var_samp_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate variance on columns */
-export type Media_Variance_Fields = {
-  __typename?: 'media_variance_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
 /** columns and relationships of "minter_filters_metadata" */
 export type Minter_Filters_Metadata = {
   __typename?: 'minter_filters_metadata';
   address: Scalars['String'];
   /** An array relationship */
   allowed_minters: Array<Minters_Metadata>;
-  /** An aggregate relationship */
-  allowed_minters_aggregate: Minters_Metadata_Aggregate;
 };
 
 
@@ -5438,38 +1289,6 @@ export type Minter_Filters_MetadataAllowed_MintersArgs = {
   where?: InputMaybe<Minters_Metadata_Bool_Exp>;
 };
 
-
-/** columns and relationships of "minter_filters_metadata" */
-export type Minter_Filters_MetadataAllowed_Minters_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Minters_Metadata_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Minters_Metadata_Order_By>>;
-  where?: InputMaybe<Minters_Metadata_Bool_Exp>;
-};
-
-/** aggregated selection of "minter_filters_metadata" */
-export type Minter_Filters_Metadata_Aggregate = {
-  __typename?: 'minter_filters_metadata_aggregate';
-  aggregate?: Maybe<Minter_Filters_Metadata_Aggregate_Fields>;
-  nodes: Array<Minter_Filters_Metadata>;
-};
-
-/** aggregate fields of "minter_filters_metadata" */
-export type Minter_Filters_Metadata_Aggregate_Fields = {
-  __typename?: 'minter_filters_metadata_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Minter_Filters_Metadata_Max_Fields>;
-  min?: Maybe<Minter_Filters_Metadata_Min_Fields>;
-};
-
-
-/** aggregate fields of "minter_filters_metadata" */
-export type Minter_Filters_Metadata_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Minter_Filters_Metadata_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
 /** Boolean expression to filter rows from the table "minter_filters_metadata". All fields are combined with a logical 'AND'. */
 export type Minter_Filters_Metadata_Bool_Exp = {
   _and?: InputMaybe<Array<Minter_Filters_Metadata_Bool_Exp>>;
@@ -5479,62 +1298,10 @@ export type Minter_Filters_Metadata_Bool_Exp = {
   allowed_minters?: InputMaybe<Minters_Metadata_Bool_Exp>;
 };
 
-/** unique or primary key constraints on table "minter_filters_metadata" */
-export enum Minter_Filters_Metadata_Constraint {
-  /** unique or primary key constraint on columns "address" */
-  MinterFiltersMetadataPkey = 'minter_filters_metadata_pkey'
-}
-
-/** input type for inserting data into table "minter_filters_metadata" */
-export type Minter_Filters_Metadata_Insert_Input = {
-  address?: InputMaybe<Scalars['String']>;
-  allowed_minters?: InputMaybe<Minters_Metadata_Arr_Rel_Insert_Input>;
-};
-
-/** aggregate max on columns */
-export type Minter_Filters_Metadata_Max_Fields = {
-  __typename?: 'minter_filters_metadata_max_fields';
-  address?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Minter_Filters_Metadata_Min_Fields = {
-  __typename?: 'minter_filters_metadata_min_fields';
-  address?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "minter_filters_metadata" */
-export type Minter_Filters_Metadata_Mutation_Response = {
-  __typename?: 'minter_filters_metadata_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Minter_Filters_Metadata>;
-};
-
-/** input type for inserting object relation for remote table "minter_filters_metadata" */
-export type Minter_Filters_Metadata_Obj_Rel_Insert_Input = {
-  data: Minter_Filters_Metadata_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Minter_Filters_Metadata_On_Conflict>;
-};
-
-/** on_conflict condition type for table "minter_filters_metadata" */
-export type Minter_Filters_Metadata_On_Conflict = {
-  constraint: Minter_Filters_Metadata_Constraint;
-  update_columns?: Array<Minter_Filters_Metadata_Update_Column>;
-  where?: InputMaybe<Minter_Filters_Metadata_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "minter_filters_metadata". */
 export type Minter_Filters_Metadata_Order_By = {
   address?: InputMaybe<Order_By>;
   allowed_minters_aggregate?: InputMaybe<Minters_Metadata_Aggregate_Order_By>;
-};
-
-/** primary key columns input for table: minter_filters_metadata */
-export type Minter_Filters_Metadata_Pk_Columns_Input = {
-  address: Scalars['String'];
 };
 
 /** select columns of table "minter_filters_metadata" */
@@ -5542,11 +1309,6 @@ export enum Minter_Filters_Metadata_Select_Column {
   /** column name */
   Address = 'address'
 }
-
-/** input type for updating data in table "minter_filters_metadata" */
-export type Minter_Filters_Metadata_Set_Input = {
-  address?: InputMaybe<Scalars['String']>;
-};
 
 /** Streaming cursor of the table "minter_filters_metadata" */
 export type Minter_Filters_Metadata_Stream_Cursor_Input = {
@@ -5560,60 +1322,6 @@ export type Minter_Filters_Metadata_Stream_Cursor_Input = {
 export type Minter_Filters_Metadata_Stream_Cursor_Value_Input = {
   address?: InputMaybe<Scalars['String']>;
 };
-
-/** update columns of table "minter_filters_metadata" */
-export enum Minter_Filters_Metadata_Update_Column {
-  /** column name */
-  Address = 'address'
-}
-
-export type Minter_Filters_Metadata_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Minter_Filters_Metadata_Set_Input>;
-  where: Minter_Filters_Metadata_Bool_Exp;
-};
-
-/** columns and relationships of "minter_type_names" */
-export type Minter_Type_Names = {
-  __typename?: 'minter_type_names';
-  name: Scalars['String'];
-};
-
-/** aggregated selection of "minter_type_names" */
-export type Minter_Type_Names_Aggregate = {
-  __typename?: 'minter_type_names_aggregate';
-  aggregate?: Maybe<Minter_Type_Names_Aggregate_Fields>;
-  nodes: Array<Minter_Type_Names>;
-};
-
-/** aggregate fields of "minter_type_names" */
-export type Minter_Type_Names_Aggregate_Fields = {
-  __typename?: 'minter_type_names_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Minter_Type_Names_Max_Fields>;
-  min?: Maybe<Minter_Type_Names_Min_Fields>;
-};
-
-
-/** aggregate fields of "minter_type_names" */
-export type Minter_Type_Names_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Minter_Type_Names_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** Boolean expression to filter rows from the table "minter_type_names". All fields are combined with a logical 'AND'. */
-export type Minter_Type_Names_Bool_Exp = {
-  _and?: InputMaybe<Array<Minter_Type_Names_Bool_Exp>>;
-  _not?: InputMaybe<Minter_Type_Names_Bool_Exp>;
-  _or?: InputMaybe<Array<Minter_Type_Names_Bool_Exp>>;
-  name?: InputMaybe<String_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "minter_type_names" */
-export enum Minter_Type_Names_Constraint {
-  /** unique or primary key constraint on columns "name" */
-  MinterTypeNamesPkey = 'minter_type_names_pkey'
-}
 
 export enum Minter_Type_Names_Enum {
   MinterDaExpV0 = 'MinterDAExpV0',
@@ -5644,85 +1352,6 @@ export type Minter_Type_Names_Enum_Comparison_Exp = {
   _nin?: InputMaybe<Array<Minter_Type_Names_Enum>>;
 };
 
-/** input type for inserting data into table "minter_type_names" */
-export type Minter_Type_Names_Insert_Input = {
-  name?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Minter_Type_Names_Max_Fields = {
-  __typename?: 'minter_type_names_max_fields';
-  name?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Minter_Type_Names_Min_Fields = {
-  __typename?: 'minter_type_names_min_fields';
-  name?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "minter_type_names" */
-export type Minter_Type_Names_Mutation_Response = {
-  __typename?: 'minter_type_names_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Minter_Type_Names>;
-};
-
-/** on_conflict condition type for table "minter_type_names" */
-export type Minter_Type_Names_On_Conflict = {
-  constraint: Minter_Type_Names_Constraint;
-  update_columns?: Array<Minter_Type_Names_Update_Column>;
-  where?: InputMaybe<Minter_Type_Names_Bool_Exp>;
-};
-
-/** Ordering options when selecting data from "minter_type_names". */
-export type Minter_Type_Names_Order_By = {
-  name?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: minter_type_names */
-export type Minter_Type_Names_Pk_Columns_Input = {
-  name: Scalars['String'];
-};
-
-/** select columns of table "minter_type_names" */
-export enum Minter_Type_Names_Select_Column {
-  /** column name */
-  Name = 'name'
-}
-
-/** input type for updating data in table "minter_type_names" */
-export type Minter_Type_Names_Set_Input = {
-  name?: InputMaybe<Scalars['String']>;
-};
-
-/** Streaming cursor of the table "minter_type_names" */
-export type Minter_Type_Names_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Minter_Type_Names_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Minter_Type_Names_Stream_Cursor_Value_Input = {
-  name?: InputMaybe<Scalars['String']>;
-};
-
-/** update columns of table "minter_type_names" */
-export enum Minter_Type_Names_Update_Column {
-  /** column name */
-  Name = 'name'
-}
-
-export type Minter_Type_Names_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Minter_Type_Names_Set_Input>;
-  where: Minter_Type_Names_Bool_Exp;
-};
-
 /** columns and relationships of "minter_types" */
 export type Minter_Types = {
   __typename?: 'minter_types';
@@ -5733,28 +1362,6 @@ export type Minter_Types = {
   unversioned_type?: Maybe<Scalars['String']>;
   /** A computed field, executes function "minter_type_version_number" */
   version_number?: Maybe<Scalars['Int']>;
-};
-
-/** aggregated selection of "minter_types" */
-export type Minter_Types_Aggregate = {
-  __typename?: 'minter_types_aggregate';
-  aggregate?: Maybe<Minter_Types_Aggregate_Fields>;
-  nodes: Array<Minter_Types>;
-};
-
-/** aggregate fields of "minter_types" */
-export type Minter_Types_Aggregate_Fields = {
-  __typename?: 'minter_types_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Minter_Types_Max_Fields>;
-  min?: Maybe<Minter_Types_Min_Fields>;
-};
-
-
-/** aggregate fields of "minter_types" */
-export type Minter_Types_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Minter_Types_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
 };
 
 /** Boolean expression to filter rows from the table "minter_types". All fields are combined with a logical 'AND'. */
@@ -5769,56 +1376,6 @@ export type Minter_Types_Bool_Exp = {
   version_number?: InputMaybe<Int_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "minter_types" */
-export enum Minter_Types_Constraint {
-  /** unique or primary key constraint on columns "type" */
-  MinterTypesPkey = 'minter_types_pkey'
-}
-
-/** input type for inserting data into table "minter_types" */
-export type Minter_Types_Insert_Input = {
-  description_template?: InputMaybe<Scalars['String']>;
-  label?: InputMaybe<Scalars['String']>;
-  type?: InputMaybe<Minter_Type_Names_Enum>;
-};
-
-/** aggregate max on columns */
-export type Minter_Types_Max_Fields = {
-  __typename?: 'minter_types_max_fields';
-  description_template?: Maybe<Scalars['String']>;
-  label?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Minter_Types_Min_Fields = {
-  __typename?: 'minter_types_min_fields';
-  description_template?: Maybe<Scalars['String']>;
-  label?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "minter_types" */
-export type Minter_Types_Mutation_Response = {
-  __typename?: 'minter_types_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Minter_Types>;
-};
-
-/** input type for inserting object relation for remote table "minter_types" */
-export type Minter_Types_Obj_Rel_Insert_Input = {
-  data: Minter_Types_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Minter_Types_On_Conflict>;
-};
-
-/** on_conflict condition type for table "minter_types" */
-export type Minter_Types_On_Conflict = {
-  constraint: Minter_Types_Constraint;
-  update_columns?: Array<Minter_Types_Update_Column>;
-  where?: InputMaybe<Minter_Types_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "minter_types". */
 export type Minter_Types_Order_By = {
   description_template?: InputMaybe<Order_By>;
@@ -5826,11 +1383,6 @@ export type Minter_Types_Order_By = {
   type?: InputMaybe<Order_By>;
   unversioned_type?: InputMaybe<Order_By>;
   version_number?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: minter_types */
-export type Minter_Types_Pk_Columns_Input = {
-  type: Minter_Type_Names_Enum;
 };
 
 /** select columns of table "minter_types" */
@@ -5842,13 +1394,6 @@ export enum Minter_Types_Select_Column {
   /** column name */
   Type = 'type'
 }
-
-/** input type for updating data in table "minter_types" */
-export type Minter_Types_Set_Input = {
-  description_template?: InputMaybe<Scalars['String']>;
-  label?: InputMaybe<Scalars['String']>;
-  type?: InputMaybe<Minter_Type_Names_Enum>;
-};
 
 /** Streaming cursor of the table "minter_types" */
 export type Minter_Types_Stream_Cursor_Input = {
@@ -5863,22 +1408,6 @@ export type Minter_Types_Stream_Cursor_Value_Input = {
   description_template?: InputMaybe<Scalars['String']>;
   label?: InputMaybe<Scalars['String']>;
   type?: InputMaybe<Minter_Type_Names_Enum>;
-};
-
-/** update columns of table "minter_types" */
-export enum Minter_Types_Update_Column {
-  /** column name */
-  DescriptionTemplate = 'description_template',
-  /** column name */
-  Label = 'label',
-  /** column name */
-  Type = 'type'
-}
-
-export type Minter_Types_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Minter_Types_Set_Input>;
-  where: Minter_Types_Bool_Exp;
 };
 
 /** columns and relationships of "minters_metadata" */
@@ -5906,36 +1435,6 @@ export type Minters_MetadataExtra_Minter_DetailsArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
 
-/** aggregated selection of "minters_metadata" */
-export type Minters_Metadata_Aggregate = {
-  __typename?: 'minters_metadata_aggregate';
-  aggregate?: Maybe<Minters_Metadata_Aggregate_Fields>;
-  nodes: Array<Minters_Metadata>;
-};
-
-/** aggregate fields of "minters_metadata" */
-export type Minters_Metadata_Aggregate_Fields = {
-  __typename?: 'minters_metadata_aggregate_fields';
-  avg?: Maybe<Minters_Metadata_Avg_Fields>;
-  count: Scalars['Int'];
-  max?: Maybe<Minters_Metadata_Max_Fields>;
-  min?: Maybe<Minters_Metadata_Min_Fields>;
-  stddev?: Maybe<Minters_Metadata_Stddev_Fields>;
-  stddev_pop?: Maybe<Minters_Metadata_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Minters_Metadata_Stddev_Samp_Fields>;
-  sum?: Maybe<Minters_Metadata_Sum_Fields>;
-  var_pop?: Maybe<Minters_Metadata_Var_Pop_Fields>;
-  var_samp?: Maybe<Minters_Metadata_Var_Samp_Fields>;
-  variance?: Maybe<Minters_Metadata_Variance_Fields>;
-};
-
-
-/** aggregate fields of "minters_metadata" */
-export type Minters_Metadata_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Minters_Metadata_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
 /** order by aggregate values of table "minters_metadata" */
 export type Minters_Metadata_Aggregate_Order_By = {
   avg?: InputMaybe<Minters_Metadata_Avg_Order_By>;
@@ -5949,26 +1448,6 @@ export type Minters_Metadata_Aggregate_Order_By = {
   var_pop?: InputMaybe<Minters_Metadata_Var_Pop_Order_By>;
   var_samp?: InputMaybe<Minters_Metadata_Var_Samp_Order_By>;
   variance?: InputMaybe<Minters_Metadata_Variance_Order_By>;
-};
-
-/** append existing jsonb value of filtered columns with new jsonb value */
-export type Minters_Metadata_Append_Input = {
-  extra_minter_details?: InputMaybe<Scalars['jsonb']>;
-};
-
-/** input type for inserting array relation for remote table "minters_metadata" */
-export type Minters_Metadata_Arr_Rel_Insert_Input = {
-  data: Array<Minters_Metadata_Insert_Input>;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Minters_Metadata_On_Conflict>;
-};
-
-/** aggregate avg on columns */
-export type Minters_Metadata_Avg_Fields = {
-  __typename?: 'minters_metadata_avg_fields';
-  maximum_price_decay_half_life_in_seconds?: Maybe<Scalars['Float']>;
-  minimum_auction_length_in_seconds?: Maybe<Scalars['Float']>;
-  minimum_price_decay_half_life_in_seconds?: Maybe<Scalars['Float']>;
 };
 
 /** order by avg() on columns of table "minters_metadata" */
@@ -5996,60 +1475,6 @@ export type Minters_Metadata_Bool_Exp = {
   type?: InputMaybe<Minter_Types_Bool_Exp>;
 };
 
-/** unique or primary key constraints on table "minters_metadata" */
-export enum Minters_Metadata_Constraint {
-  /** unique or primary key constraint on columns "address" */
-  MintersMetadataPkey = 'minters_metadata_pkey'
-}
-
-/** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-export type Minters_Metadata_Delete_At_Path_Input = {
-  extra_minter_details?: InputMaybe<Array<Scalars['String']>>;
-};
-
-/** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-export type Minters_Metadata_Delete_Elem_Input = {
-  extra_minter_details?: InputMaybe<Scalars['Int']>;
-};
-
-/** delete key/value pair or string element. key/value pairs are matched based on their key value */
-export type Minters_Metadata_Delete_Key_Input = {
-  extra_minter_details?: InputMaybe<Scalars['String']>;
-};
-
-/** input type for incrementing numeric columns in table "minters_metadata" */
-export type Minters_Metadata_Inc_Input = {
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Scalars['Int']>;
-  minimum_auction_length_in_seconds?: InputMaybe<Scalars['Int']>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "minters_metadata" */
-export type Minters_Metadata_Insert_Input = {
-  address?: InputMaybe<Scalars['String']>;
-  core_contract?: InputMaybe<Contracts_Metadata_Obj_Rel_Insert_Input>;
-  core_contract_address?: InputMaybe<Scalars['String']>;
-  extra_minter_details?: InputMaybe<Scalars['jsonb']>;
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Scalars['Int']>;
-  minimum_auction_length_in_seconds?: InputMaybe<Scalars['Int']>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Scalars['Int']>;
-  minter_filter?: InputMaybe<Minter_Filters_Metadata_Obj_Rel_Insert_Input>;
-  minter_filter_address?: InputMaybe<Scalars['String']>;
-  minter_type?: InputMaybe<Minter_Type_Names_Enum>;
-  type?: InputMaybe<Minter_Types_Obj_Rel_Insert_Input>;
-};
-
-/** aggregate max on columns */
-export type Minters_Metadata_Max_Fields = {
-  __typename?: 'minters_metadata_max_fields';
-  address?: Maybe<Scalars['String']>;
-  core_contract_address?: Maybe<Scalars['String']>;
-  maximum_price_decay_half_life_in_seconds?: Maybe<Scalars['Int']>;
-  minimum_auction_length_in_seconds?: Maybe<Scalars['Int']>;
-  minimum_price_decay_half_life_in_seconds?: Maybe<Scalars['Int']>;
-  minter_filter_address?: Maybe<Scalars['String']>;
-};
-
 /** order by max() on columns of table "minters_metadata" */
 export type Minters_Metadata_Max_Order_By = {
   address?: InputMaybe<Order_By>;
@@ -6060,17 +1485,6 @@ export type Minters_Metadata_Max_Order_By = {
   minter_filter_address?: InputMaybe<Order_By>;
 };
 
-/** aggregate min on columns */
-export type Minters_Metadata_Min_Fields = {
-  __typename?: 'minters_metadata_min_fields';
-  address?: Maybe<Scalars['String']>;
-  core_contract_address?: Maybe<Scalars['String']>;
-  maximum_price_decay_half_life_in_seconds?: Maybe<Scalars['Int']>;
-  minimum_auction_length_in_seconds?: Maybe<Scalars['Int']>;
-  minimum_price_decay_half_life_in_seconds?: Maybe<Scalars['Int']>;
-  minter_filter_address?: Maybe<Scalars['String']>;
-};
-
 /** order by min() on columns of table "minters_metadata" */
 export type Minters_Metadata_Min_Order_By = {
   address?: InputMaybe<Order_By>;
@@ -6079,29 +1493,6 @@ export type Minters_Metadata_Min_Order_By = {
   minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
   minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
   minter_filter_address?: InputMaybe<Order_By>;
-};
-
-/** response of any mutation on the table "minters_metadata" */
-export type Minters_Metadata_Mutation_Response = {
-  __typename?: 'minters_metadata_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Minters_Metadata>;
-};
-
-/** input type for inserting object relation for remote table "minters_metadata" */
-export type Minters_Metadata_Obj_Rel_Insert_Input = {
-  data: Minters_Metadata_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Minters_Metadata_On_Conflict>;
-};
-
-/** on_conflict condition type for table "minters_metadata" */
-export type Minters_Metadata_On_Conflict = {
-  constraint: Minters_Metadata_Constraint;
-  update_columns?: Array<Minters_Metadata_Update_Column>;
-  where?: InputMaybe<Minters_Metadata_Bool_Exp>;
 };
 
 /** Ordering options when selecting data from "minters_metadata". */
@@ -6117,16 +1508,6 @@ export type Minters_Metadata_Order_By = {
   minter_filter_address?: InputMaybe<Order_By>;
   minter_type?: InputMaybe<Order_By>;
   type?: InputMaybe<Minter_Types_Order_By>;
-};
-
-/** primary key columns input for table: minters_metadata */
-export type Minters_Metadata_Pk_Columns_Input = {
-  address: Scalars['String'];
-};
-
-/** prepend existing jsonb value of filtered columns with new jsonb value */
-export type Minters_Metadata_Prepend_Input = {
-  extra_minter_details?: InputMaybe<Scalars['jsonb']>;
 };
 
 /** select columns of table "minters_metadata" */
@@ -6149,26 +1530,6 @@ export enum Minters_Metadata_Select_Column {
   MinterType = 'minter_type'
 }
 
-/** input type for updating data in table "minters_metadata" */
-export type Minters_Metadata_Set_Input = {
-  address?: InputMaybe<Scalars['String']>;
-  core_contract_address?: InputMaybe<Scalars['String']>;
-  extra_minter_details?: InputMaybe<Scalars['jsonb']>;
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Scalars['Int']>;
-  minimum_auction_length_in_seconds?: InputMaybe<Scalars['Int']>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Scalars['Int']>;
-  minter_filter_address?: InputMaybe<Scalars['String']>;
-  minter_type?: InputMaybe<Minter_Type_Names_Enum>;
-};
-
-/** aggregate stddev on columns */
-export type Minters_Metadata_Stddev_Fields = {
-  __typename?: 'minters_metadata_stddev_fields';
-  maximum_price_decay_half_life_in_seconds?: Maybe<Scalars['Float']>;
-  minimum_auction_length_in_seconds?: Maybe<Scalars['Float']>;
-  minimum_price_decay_half_life_in_seconds?: Maybe<Scalars['Float']>;
-};
-
 /** order by stddev() on columns of table "minters_metadata" */
 export type Minters_Metadata_Stddev_Order_By = {
   maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
@@ -6176,27 +1537,11 @@ export type Minters_Metadata_Stddev_Order_By = {
   minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
 };
 
-/** aggregate stddev_pop on columns */
-export type Minters_Metadata_Stddev_Pop_Fields = {
-  __typename?: 'minters_metadata_stddev_pop_fields';
-  maximum_price_decay_half_life_in_seconds?: Maybe<Scalars['Float']>;
-  minimum_auction_length_in_seconds?: Maybe<Scalars['Float']>;
-  minimum_price_decay_half_life_in_seconds?: Maybe<Scalars['Float']>;
-};
-
 /** order by stddev_pop() on columns of table "minters_metadata" */
 export type Minters_Metadata_Stddev_Pop_Order_By = {
   maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
   minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
   minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Minters_Metadata_Stddev_Samp_Fields = {
-  __typename?: 'minters_metadata_stddev_samp_fields';
-  maximum_price_decay_half_life_in_seconds?: Maybe<Scalars['Float']>;
-  minimum_auction_length_in_seconds?: Maybe<Scalars['Float']>;
-  minimum_price_decay_half_life_in_seconds?: Maybe<Scalars['Float']>;
 };
 
 /** order by stddev_samp() on columns of table "minters_metadata" */
@@ -6226,65 +1571,11 @@ export type Minters_Metadata_Stream_Cursor_Value_Input = {
   minter_type?: InputMaybe<Minter_Type_Names_Enum>;
 };
 
-/** aggregate sum on columns */
-export type Minters_Metadata_Sum_Fields = {
-  __typename?: 'minters_metadata_sum_fields';
-  maximum_price_decay_half_life_in_seconds?: Maybe<Scalars['Int']>;
-  minimum_auction_length_in_seconds?: Maybe<Scalars['Int']>;
-  minimum_price_decay_half_life_in_seconds?: Maybe<Scalars['Int']>;
-};
-
 /** order by sum() on columns of table "minters_metadata" */
 export type Minters_Metadata_Sum_Order_By = {
   maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
   minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
   minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-};
-
-/** update columns of table "minters_metadata" */
-export enum Minters_Metadata_Update_Column {
-  /** column name */
-  Address = 'address',
-  /** column name */
-  CoreContractAddress = 'core_contract_address',
-  /** column name */
-  ExtraMinterDetails = 'extra_minter_details',
-  /** column name */
-  MaximumPriceDecayHalfLifeInSeconds = 'maximum_price_decay_half_life_in_seconds',
-  /** column name */
-  MinimumAuctionLengthInSeconds = 'minimum_auction_length_in_seconds',
-  /** column name */
-  MinimumPriceDecayHalfLifeInSeconds = 'minimum_price_decay_half_life_in_seconds',
-  /** column name */
-  MinterFilterAddress = 'minter_filter_address',
-  /** column name */
-  MinterType = 'minter_type'
-}
-
-export type Minters_Metadata_Updates = {
-  /** append existing jsonb value of filtered columns with new jsonb value */
-  _append?: InputMaybe<Minters_Metadata_Append_Input>;
-  /** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-  _delete_at_path?: InputMaybe<Minters_Metadata_Delete_At_Path_Input>;
-  /** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-  _delete_elem?: InputMaybe<Minters_Metadata_Delete_Elem_Input>;
-  /** delete key/value pair or string element. key/value pairs are matched based on their key value */
-  _delete_key?: InputMaybe<Minters_Metadata_Delete_Key_Input>;
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Minters_Metadata_Inc_Input>;
-  /** prepend existing jsonb value of filtered columns with new jsonb value */
-  _prepend?: InputMaybe<Minters_Metadata_Prepend_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Minters_Metadata_Set_Input>;
-  where: Minters_Metadata_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Minters_Metadata_Var_Pop_Fields = {
-  __typename?: 'minters_metadata_var_pop_fields';
-  maximum_price_decay_half_life_in_seconds?: Maybe<Scalars['Float']>;
-  minimum_auction_length_in_seconds?: Maybe<Scalars['Float']>;
-  minimum_price_decay_half_life_in_seconds?: Maybe<Scalars['Float']>;
 };
 
 /** order by var_pop() on columns of table "minters_metadata" */
@@ -6294,14 +1585,6 @@ export type Minters_Metadata_Var_Pop_Order_By = {
   minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
 };
 
-/** aggregate var_samp on columns */
-export type Minters_Metadata_Var_Samp_Fields = {
-  __typename?: 'minters_metadata_var_samp_fields';
-  maximum_price_decay_half_life_in_seconds?: Maybe<Scalars['Float']>;
-  minimum_auction_length_in_seconds?: Maybe<Scalars['Float']>;
-  minimum_price_decay_half_life_in_seconds?: Maybe<Scalars['Float']>;
-};
-
 /** order by var_samp() on columns of table "minters_metadata" */
 export type Minters_Metadata_Var_Samp_Order_By = {
   maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
@@ -6309,2927 +1592,11 @@ export type Minters_Metadata_Var_Samp_Order_By = {
   minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
 };
 
-/** aggregate variance on columns */
-export type Minters_Metadata_Variance_Fields = {
-  __typename?: 'minters_metadata_variance_fields';
-  maximum_price_decay_half_life_in_seconds?: Maybe<Scalars['Float']>;
-  minimum_auction_length_in_seconds?: Maybe<Scalars['Float']>;
-  minimum_price_decay_half_life_in_seconds?: Maybe<Scalars['Float']>;
-};
-
 /** order by variance() on columns of table "minters_metadata" */
 export type Minters_Metadata_Variance_Order_By = {
   maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
   minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
   minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-};
-
-/** mutation root */
-export type Mutation_Root = {
-  __typename?: 'mutation_root';
-  createApplication: Scalars['uuid'];
-  /** delete data from the table: "categories" */
-  delete_categories?: Maybe<Categories_Mutation_Response>;
-  /** delete single row from the table: "categories" */
-  delete_categories_by_pk?: Maybe<Categories>;
-  /** delete data from the table: "contract_allowlistings" */
-  delete_contract_allowlistings?: Maybe<Contract_Allowlistings_Mutation_Response>;
-  /** delete single row from the table: "contract_allowlistings" */
-  delete_contract_allowlistings_by_pk?: Maybe<Contract_Allowlistings>;
-  /** delete data from the table: "contract_type_names" */
-  delete_contract_type_names?: Maybe<Contract_Type_Names_Mutation_Response>;
-  /** delete single row from the table: "contract_type_names" */
-  delete_contract_type_names_by_pk?: Maybe<Contract_Type_Names>;
-  /** delete data from the table: "contract_types" */
-  delete_contract_types?: Maybe<Contract_Types_Mutation_Response>;
-  /** delete single row from the table: "contract_types" */
-  delete_contract_types_by_pk?: Maybe<Contract_Types>;
-  /** delete data from the table: "contracts_metadata" */
-  delete_contracts_metadata?: Maybe<Contracts_Metadata_Mutation_Response>;
-  /** delete single row from the table: "contracts_metadata" */
-  delete_contracts_metadata_by_pk?: Maybe<Contracts_Metadata>;
-  /** delete data from the table: "curation_statuses" */
-  delete_curation_statuses?: Maybe<Curation_Statuses_Mutation_Response>;
-  /** delete single row from the table: "curation_statuses" */
-  delete_curation_statuses_by_pk?: Maybe<Curation_Statuses>;
-  /** delete data from the table: "entity_tags" */
-  delete_entity_tags?: Maybe<Entity_Tags_Mutation_Response>;
-  /** delete single row from the table: "entity_tags" */
-  delete_entity_tags_by_pk?: Maybe<Entity_Tags>;
-  /** delete data from the table: "favorites" */
-  delete_favorites?: Maybe<Favorites_Mutation_Response>;
-  /** delete single row from the table: "favorites" */
-  delete_favorites_by_pk?: Maybe<Favorites>;
-  /** delete data from the table: "feature_field_values_counts" */
-  delete_feature_field_values_counts?: Maybe<Feature_Field_Values_Counts_Mutation_Response>;
-  /** delete data from the table: "feature_flags" */
-  delete_feature_flags?: Maybe<Feature_Flags_Mutation_Response>;
-  /** delete single row from the table: "feature_flags" */
-  delete_feature_flags_by_pk?: Maybe<Feature_Flags>;
-  /** delete data from the table: "media" */
-  delete_media?: Maybe<Media_Mutation_Response>;
-  /** delete single row from the table: "media" */
-  delete_media_by_pk?: Maybe<Media>;
-  /** delete data from the table: "minter_filters_metadata" */
-  delete_minter_filters_metadata?: Maybe<Minter_Filters_Metadata_Mutation_Response>;
-  /** delete single row from the table: "minter_filters_metadata" */
-  delete_minter_filters_metadata_by_pk?: Maybe<Minter_Filters_Metadata>;
-  /** delete data from the table: "minter_type_names" */
-  delete_minter_type_names?: Maybe<Minter_Type_Names_Mutation_Response>;
-  /** delete single row from the table: "minter_type_names" */
-  delete_minter_type_names_by_pk?: Maybe<Minter_Type_Names>;
-  /** delete data from the table: "minter_types" */
-  delete_minter_types?: Maybe<Minter_Types_Mutation_Response>;
-  /** delete single row from the table: "minter_types" */
-  delete_minter_types_by_pk?: Maybe<Minter_Types>;
-  /** delete data from the table: "minters_metadata" */
-  delete_minters_metadata?: Maybe<Minters_Metadata_Mutation_Response>;
-  /** delete single row from the table: "minters_metadata" */
-  delete_minters_metadata_by_pk?: Maybe<Minters_Metadata>;
-  /** delete data from the table: "notifications" */
-  delete_notifications?: Maybe<Notifications_Mutation_Response>;
-  /** delete single row from the table: "notifications" */
-  delete_notifications_by_pk?: Maybe<Notifications>;
-  /** delete data from the table: "project_external_asset_dependencies" */
-  delete_project_external_asset_dependencies?: Maybe<Project_External_Asset_Dependencies_Mutation_Response>;
-  /** delete single row from the table: "project_external_asset_dependencies" */
-  delete_project_external_asset_dependencies_by_pk?: Maybe<Project_External_Asset_Dependencies>;
-  /** delete data from the table: "project_external_asset_dependency_types" */
-  delete_project_external_asset_dependency_types?: Maybe<Project_External_Asset_Dependency_Types_Mutation_Response>;
-  /** delete single row from the table: "project_external_asset_dependency_types" */
-  delete_project_external_asset_dependency_types_by_pk?: Maybe<Project_External_Asset_Dependency_Types>;
-  /** delete data from the table: "project_minter_configurations" */
-  delete_project_minter_configurations?: Maybe<Project_Minter_Configurations_Mutation_Response>;
-  /** delete single row from the table: "project_minter_configurations" */
-  delete_project_minter_configurations_by_pk?: Maybe<Project_Minter_Configurations>;
-  /** delete data from the table: "project_scripts" */
-  delete_project_scripts?: Maybe<Project_Scripts_Mutation_Response>;
-  /** delete single row from the table: "project_scripts" */
-  delete_project_scripts_by_pk?: Maybe<Project_Scripts>;
-  /** delete data from the table: "project_series" */
-  delete_project_series?: Maybe<Project_Series_Mutation_Response>;
-  /** delete single row from the table: "project_series" */
-  delete_project_series_by_pk?: Maybe<Project_Series>;
-  /** delete data from the table: "project_vertical_categories" */
-  delete_project_vertical_categories?: Maybe<Project_Vertical_Categories_Mutation_Response>;
-  /** delete single row from the table: "project_vertical_categories" */
-  delete_project_vertical_categories_by_pk?: Maybe<Project_Vertical_Categories>;
-  /** delete data from the table: "project_verticals" */
-  delete_project_verticals?: Maybe<Project_Verticals_Mutation_Response>;
-  /** delete single row from the table: "project_verticals" */
-  delete_project_verticals_by_pk?: Maybe<Project_Verticals>;
-  /** delete data from the table: "projects_features" */
-  delete_projects_features?: Maybe<Projects_Features_Mutation_Response>;
-  /** delete single row from the table: "projects_features" */
-  delete_projects_features_by_pk?: Maybe<Projects_Features>;
-  /** delete data from the table: "projects_features_private" */
-  delete_projects_features_private?: Maybe<Projects_Features_Private_Mutation_Response>;
-  /** delete data from the table: "projects_metadata" */
-  delete_projects_metadata?: Maybe<Projects_Metadata_Mutation_Response>;
-  /** delete single row from the table: "projects_metadata" */
-  delete_projects_metadata_by_pk?: Maybe<Projects_Metadata>;
-  /** delete data from the table: "proposed_artist_addresses_and_splits" */
-  delete_proposed_artist_addresses_and_splits?: Maybe<Proposed_Artist_Addresses_And_Splits_Mutation_Response>;
-  /** delete single row from the table: "proposed_artist_addresses_and_splits" */
-  delete_proposed_artist_addresses_and_splits_by_pk?: Maybe<Proposed_Artist_Addresses_And_Splits>;
-  /** delete data from the table: "screenings" */
-  delete_screenings?: Maybe<Screenings_Mutation_Response>;
-  /** delete single row from the table: "screenings" */
-  delete_screenings_by_pk?: Maybe<Screenings>;
-  /** delete data from the table: "sync_status" */
-  delete_sync_status?: Maybe<Sync_Status_Mutation_Response>;
-  /** delete single row from the table: "sync_status" */
-  delete_sync_status_by_pk?: Maybe<Sync_Status>;
-  /** delete data from the table: "tag_groupings" */
-  delete_tag_groupings?: Maybe<Tag_Groupings_Mutation_Response>;
-  /** delete single row from the table: "tag_groupings" */
-  delete_tag_groupings_by_pk?: Maybe<Tag_Groupings>;
-  /** delete data from the table: "tag_status" */
-  delete_tag_status?: Maybe<Tag_Status_Mutation_Response>;
-  /** delete single row from the table: "tag_status" */
-  delete_tag_status_by_pk?: Maybe<Tag_Status>;
-  /** delete data from the table: "tag_types" */
-  delete_tag_types?: Maybe<Tag_Types_Mutation_Response>;
-  /** delete single row from the table: "tag_types" */
-  delete_tag_types_by_pk?: Maybe<Tag_Types>;
-  /** delete data from the table: "tags" */
-  delete_tags?: Maybe<Tags_Mutation_Response>;
-  /** delete single row from the table: "tags" */
-  delete_tags_by_pk?: Maybe<Tags>;
-  /** delete data from the table: "terms_of_service" */
-  delete_terms_of_service?: Maybe<Terms_Of_Service_Mutation_Response>;
-  /** delete single row from the table: "terms_of_service" */
-  delete_terms_of_service_by_pk?: Maybe<Terms_Of_Service>;
-  /** delete data from the table: "tokens_metadata" */
-  delete_tokens_metadata?: Maybe<Tokens_Metadata_Mutation_Response>;
-  /** delete single row from the table: "tokens_metadata" */
-  delete_tokens_metadata_by_pk?: Maybe<Tokens_Metadata>;
-  /** delete data from the table: "user_profiles" */
-  delete_user_profiles?: Maybe<User_Profiles_Mutation_Response>;
-  /** delete single row from the table: "user_profiles" */
-  delete_user_profiles_by_pk?: Maybe<User_Profiles>;
-  /** delete data from the table: "users" */
-  delete_users?: Maybe<Users_Mutation_Response>;
-  /** delete single row from the table: "users" */
-  delete_users_by_pk?: Maybe<Users>;
-  /** delete data from the table: "verticals" */
-  delete_verticals?: Maybe<Verticals_Mutation_Response>;
-  /** delete single row from the table: "verticals" */
-  delete_verticals_by_pk?: Maybe<Verticals>;
-  /** delete data from the table: "webflow_artist_info" */
-  delete_webflow_artist_info?: Maybe<Webflow_Artist_Info_Mutation_Response>;
-  /** delete single row from the table: "webflow_artist_info" */
-  delete_webflow_artist_info_by_pk?: Maybe<Webflow_Artist_Info>;
-  /** delete data from the table: "webflow_spectrum_articles" */
-  delete_webflow_spectrum_articles?: Maybe<Webflow_Spectrum_Articles_Mutation_Response>;
-  /** delete single row from the table: "webflow_spectrum_articles" */
-  delete_webflow_spectrum_articles_by_pk?: Maybe<Webflow_Spectrum_Articles>;
-  /** insert data into the table: "categories" */
-  insert_categories?: Maybe<Categories_Mutation_Response>;
-  /** insert a single row into the table: "categories" */
-  insert_categories_one?: Maybe<Categories>;
-  /** insert data into the table: "contract_allowlistings" */
-  insert_contract_allowlistings?: Maybe<Contract_Allowlistings_Mutation_Response>;
-  /** insert a single row into the table: "contract_allowlistings" */
-  insert_contract_allowlistings_one?: Maybe<Contract_Allowlistings>;
-  /** insert data into the table: "contract_type_names" */
-  insert_contract_type_names?: Maybe<Contract_Type_Names_Mutation_Response>;
-  /** insert a single row into the table: "contract_type_names" */
-  insert_contract_type_names_one?: Maybe<Contract_Type_Names>;
-  /** insert data into the table: "contract_types" */
-  insert_contract_types?: Maybe<Contract_Types_Mutation_Response>;
-  /** insert a single row into the table: "contract_types" */
-  insert_contract_types_one?: Maybe<Contract_Types>;
-  /** insert data into the table: "contracts_metadata" */
-  insert_contracts_metadata?: Maybe<Contracts_Metadata_Mutation_Response>;
-  /** insert a single row into the table: "contracts_metadata" */
-  insert_contracts_metadata_one?: Maybe<Contracts_Metadata>;
-  /** insert data into the table: "curation_statuses" */
-  insert_curation_statuses?: Maybe<Curation_Statuses_Mutation_Response>;
-  /** insert a single row into the table: "curation_statuses" */
-  insert_curation_statuses_one?: Maybe<Curation_Statuses>;
-  /** insert data into the table: "entity_tags" */
-  insert_entity_tags?: Maybe<Entity_Tags_Mutation_Response>;
-  /** insert a single row into the table: "entity_tags" */
-  insert_entity_tags_one?: Maybe<Entity_Tags>;
-  /** insert data into the table: "favorites" */
-  insert_favorites?: Maybe<Favorites_Mutation_Response>;
-  /** insert a single row into the table: "favorites" */
-  insert_favorites_one?: Maybe<Favorites>;
-  /** insert data into the table: "feature_field_values_counts" */
-  insert_feature_field_values_counts?: Maybe<Feature_Field_Values_Counts_Mutation_Response>;
-  /** insert a single row into the table: "feature_field_values_counts" */
-  insert_feature_field_values_counts_one?: Maybe<Feature_Field_Values_Counts>;
-  /** insert data into the table: "feature_flags" */
-  insert_feature_flags?: Maybe<Feature_Flags_Mutation_Response>;
-  /** insert a single row into the table: "feature_flags" */
-  insert_feature_flags_one?: Maybe<Feature_Flags>;
-  /** insert data into the table: "media" */
-  insert_media?: Maybe<Media_Mutation_Response>;
-  /** insert a single row into the table: "media" */
-  insert_media_one?: Maybe<Media>;
-  /** insert data into the table: "minter_filters_metadata" */
-  insert_minter_filters_metadata?: Maybe<Minter_Filters_Metadata_Mutation_Response>;
-  /** insert a single row into the table: "minter_filters_metadata" */
-  insert_minter_filters_metadata_one?: Maybe<Minter_Filters_Metadata>;
-  /** insert data into the table: "minter_type_names" */
-  insert_minter_type_names?: Maybe<Minter_Type_Names_Mutation_Response>;
-  /** insert a single row into the table: "minter_type_names" */
-  insert_minter_type_names_one?: Maybe<Minter_Type_Names>;
-  /** insert data into the table: "minter_types" */
-  insert_minter_types?: Maybe<Minter_Types_Mutation_Response>;
-  /** insert a single row into the table: "minter_types" */
-  insert_minter_types_one?: Maybe<Minter_Types>;
-  /** insert data into the table: "minters_metadata" */
-  insert_minters_metadata?: Maybe<Minters_Metadata_Mutation_Response>;
-  /** insert a single row into the table: "minters_metadata" */
-  insert_minters_metadata_one?: Maybe<Minters_Metadata>;
-  /** insert data into the table: "notifications" */
-  insert_notifications?: Maybe<Notifications_Mutation_Response>;
-  /** insert a single row into the table: "notifications" */
-  insert_notifications_one?: Maybe<Notifications>;
-  /** insert data into the table: "project_external_asset_dependencies" */
-  insert_project_external_asset_dependencies?: Maybe<Project_External_Asset_Dependencies_Mutation_Response>;
-  /** insert a single row into the table: "project_external_asset_dependencies" */
-  insert_project_external_asset_dependencies_one?: Maybe<Project_External_Asset_Dependencies>;
-  /** insert data into the table: "project_external_asset_dependency_types" */
-  insert_project_external_asset_dependency_types?: Maybe<Project_External_Asset_Dependency_Types_Mutation_Response>;
-  /** insert a single row into the table: "project_external_asset_dependency_types" */
-  insert_project_external_asset_dependency_types_one?: Maybe<Project_External_Asset_Dependency_Types>;
-  /** insert data into the table: "project_minter_configurations" */
-  insert_project_minter_configurations?: Maybe<Project_Minter_Configurations_Mutation_Response>;
-  /** insert a single row into the table: "project_minter_configurations" */
-  insert_project_minter_configurations_one?: Maybe<Project_Minter_Configurations>;
-  /** insert data into the table: "project_scripts" */
-  insert_project_scripts?: Maybe<Project_Scripts_Mutation_Response>;
-  /** insert a single row into the table: "project_scripts" */
-  insert_project_scripts_one?: Maybe<Project_Scripts>;
-  /** insert data into the table: "project_series" */
-  insert_project_series?: Maybe<Project_Series_Mutation_Response>;
-  /** insert a single row into the table: "project_series" */
-  insert_project_series_one?: Maybe<Project_Series>;
-  /** insert data into the table: "project_vertical_categories" */
-  insert_project_vertical_categories?: Maybe<Project_Vertical_Categories_Mutation_Response>;
-  /** insert a single row into the table: "project_vertical_categories" */
-  insert_project_vertical_categories_one?: Maybe<Project_Vertical_Categories>;
-  /** insert data into the table: "project_verticals" */
-  insert_project_verticals?: Maybe<Project_Verticals_Mutation_Response>;
-  /** insert a single row into the table: "project_verticals" */
-  insert_project_verticals_one?: Maybe<Project_Verticals>;
-  /** insert data into the table: "projects_features" */
-  insert_projects_features?: Maybe<Projects_Features_Mutation_Response>;
-  /** insert a single row into the table: "projects_features" */
-  insert_projects_features_one?: Maybe<Projects_Features>;
-  /** insert data into the table: "projects_features_private" */
-  insert_projects_features_private?: Maybe<Projects_Features_Private_Mutation_Response>;
-  /** insert a single row into the table: "projects_features_private" */
-  insert_projects_features_private_one?: Maybe<Projects_Features_Private>;
-  /** insert data into the table: "projects_metadata" */
-  insert_projects_metadata?: Maybe<Projects_Metadata_Mutation_Response>;
-  /** insert a single row into the table: "projects_metadata" */
-  insert_projects_metadata_one?: Maybe<Projects_Metadata>;
-  /** insert data into the table: "proposed_artist_addresses_and_splits" */
-  insert_proposed_artist_addresses_and_splits?: Maybe<Proposed_Artist_Addresses_And_Splits_Mutation_Response>;
-  /** insert a single row into the table: "proposed_artist_addresses_and_splits" */
-  insert_proposed_artist_addresses_and_splits_one?: Maybe<Proposed_Artist_Addresses_And_Splits>;
-  /** insert data into the table: "screenings" */
-  insert_screenings?: Maybe<Screenings_Mutation_Response>;
-  /** insert a single row into the table: "screenings" */
-  insert_screenings_one?: Maybe<Screenings>;
-  /** insert data into the table: "sync_status" */
-  insert_sync_status?: Maybe<Sync_Status_Mutation_Response>;
-  /** insert a single row into the table: "sync_status" */
-  insert_sync_status_one?: Maybe<Sync_Status>;
-  /** insert data into the table: "tag_groupings" */
-  insert_tag_groupings?: Maybe<Tag_Groupings_Mutation_Response>;
-  /** insert a single row into the table: "tag_groupings" */
-  insert_tag_groupings_one?: Maybe<Tag_Groupings>;
-  /** insert data into the table: "tag_status" */
-  insert_tag_status?: Maybe<Tag_Status_Mutation_Response>;
-  /** insert a single row into the table: "tag_status" */
-  insert_tag_status_one?: Maybe<Tag_Status>;
-  /** insert data into the table: "tag_types" */
-  insert_tag_types?: Maybe<Tag_Types_Mutation_Response>;
-  /** insert a single row into the table: "tag_types" */
-  insert_tag_types_one?: Maybe<Tag_Types>;
-  /** insert data into the table: "tags" */
-  insert_tags?: Maybe<Tags_Mutation_Response>;
-  /** insert a single row into the table: "tags" */
-  insert_tags_one?: Maybe<Tags>;
-  /** insert data into the table: "terms_of_service" */
-  insert_terms_of_service?: Maybe<Terms_Of_Service_Mutation_Response>;
-  /** insert a single row into the table: "terms_of_service" */
-  insert_terms_of_service_one?: Maybe<Terms_Of_Service>;
-  /** insert data into the table: "tokens_metadata" */
-  insert_tokens_metadata?: Maybe<Tokens_Metadata_Mutation_Response>;
-  /** insert a single row into the table: "tokens_metadata" */
-  insert_tokens_metadata_one?: Maybe<Tokens_Metadata>;
-  /** insert data into the table: "user_profiles" */
-  insert_user_profiles?: Maybe<User_Profiles_Mutation_Response>;
-  /** insert a single row into the table: "user_profiles" */
-  insert_user_profiles_one?: Maybe<User_Profiles>;
-  /** insert data into the table: "users" */
-  insert_users?: Maybe<Users_Mutation_Response>;
-  /** insert a single row into the table: "users" */
-  insert_users_one?: Maybe<Users>;
-  /** insert data into the table: "verticals" */
-  insert_verticals?: Maybe<Verticals_Mutation_Response>;
-  /** insert a single row into the table: "verticals" */
-  insert_verticals_one?: Maybe<Verticals>;
-  /** insert data into the table: "webflow_artist_info" */
-  insert_webflow_artist_info?: Maybe<Webflow_Artist_Info_Mutation_Response>;
-  /** insert a single row into the table: "webflow_artist_info" */
-  insert_webflow_artist_info_one?: Maybe<Webflow_Artist_Info>;
-  /** insert data into the table: "webflow_spectrum_articles" */
-  insert_webflow_spectrum_articles?: Maybe<Webflow_Spectrum_Articles_Mutation_Response>;
-  /** insert a single row into the table: "webflow_spectrum_articles" */
-  insert_webflow_spectrum_articles_one?: Maybe<Webflow_Spectrum_Articles>;
-  updateFeatures?: Maybe<UpdateFeaturesScriptOutput>;
-  updateProjectMedia?: Maybe<UpdateProjectMediaScriptOutput>;
-  updateTokenMedia?: Maybe<UpdateTokenMediaScriptOutput>;
-  /** update data of the table: "categories" */
-  update_categories?: Maybe<Categories_Mutation_Response>;
-  /** update single row of the table: "categories" */
-  update_categories_by_pk?: Maybe<Categories>;
-  /** update multiples rows of table: "categories" */
-  update_categories_many?: Maybe<Array<Maybe<Categories_Mutation_Response>>>;
-  /** update data of the table: "contract_allowlistings" */
-  update_contract_allowlistings?: Maybe<Contract_Allowlistings_Mutation_Response>;
-  /** update single row of the table: "contract_allowlistings" */
-  update_contract_allowlistings_by_pk?: Maybe<Contract_Allowlistings>;
-  /** update multiples rows of table: "contract_allowlistings" */
-  update_contract_allowlistings_many?: Maybe<Array<Maybe<Contract_Allowlistings_Mutation_Response>>>;
-  /** update data of the table: "contract_type_names" */
-  update_contract_type_names?: Maybe<Contract_Type_Names_Mutation_Response>;
-  /** update single row of the table: "contract_type_names" */
-  update_contract_type_names_by_pk?: Maybe<Contract_Type_Names>;
-  /** update multiples rows of table: "contract_type_names" */
-  update_contract_type_names_many?: Maybe<Array<Maybe<Contract_Type_Names_Mutation_Response>>>;
-  /** update data of the table: "contract_types" */
-  update_contract_types?: Maybe<Contract_Types_Mutation_Response>;
-  /** update single row of the table: "contract_types" */
-  update_contract_types_by_pk?: Maybe<Contract_Types>;
-  /** update multiples rows of table: "contract_types" */
-  update_contract_types_many?: Maybe<Array<Maybe<Contract_Types_Mutation_Response>>>;
-  /** update data of the table: "contracts_metadata" */
-  update_contracts_metadata?: Maybe<Contracts_Metadata_Mutation_Response>;
-  /** update single row of the table: "contracts_metadata" */
-  update_contracts_metadata_by_pk?: Maybe<Contracts_Metadata>;
-  /** update multiples rows of table: "contracts_metadata" */
-  update_contracts_metadata_many?: Maybe<Array<Maybe<Contracts_Metadata_Mutation_Response>>>;
-  /** update data of the table: "curation_statuses" */
-  update_curation_statuses?: Maybe<Curation_Statuses_Mutation_Response>;
-  /** update single row of the table: "curation_statuses" */
-  update_curation_statuses_by_pk?: Maybe<Curation_Statuses>;
-  /** update multiples rows of table: "curation_statuses" */
-  update_curation_statuses_many?: Maybe<Array<Maybe<Curation_Statuses_Mutation_Response>>>;
-  /** update data of the table: "entity_tags" */
-  update_entity_tags?: Maybe<Entity_Tags_Mutation_Response>;
-  /** update single row of the table: "entity_tags" */
-  update_entity_tags_by_pk?: Maybe<Entity_Tags>;
-  /** update multiples rows of table: "entity_tags" */
-  update_entity_tags_many?: Maybe<Array<Maybe<Entity_Tags_Mutation_Response>>>;
-  /** update data of the table: "favorites" */
-  update_favorites?: Maybe<Favorites_Mutation_Response>;
-  /** update single row of the table: "favorites" */
-  update_favorites_by_pk?: Maybe<Favorites>;
-  /** update multiples rows of table: "favorites" */
-  update_favorites_many?: Maybe<Array<Maybe<Favorites_Mutation_Response>>>;
-  /** update data of the table: "feature_field_values_counts" */
-  update_feature_field_values_counts?: Maybe<Feature_Field_Values_Counts_Mutation_Response>;
-  /** update multiples rows of table: "feature_field_values_counts" */
-  update_feature_field_values_counts_many?: Maybe<Array<Maybe<Feature_Field_Values_Counts_Mutation_Response>>>;
-  /** update data of the table: "feature_flags" */
-  update_feature_flags?: Maybe<Feature_Flags_Mutation_Response>;
-  /** update single row of the table: "feature_flags" */
-  update_feature_flags_by_pk?: Maybe<Feature_Flags>;
-  /** update multiples rows of table: "feature_flags" */
-  update_feature_flags_many?: Maybe<Array<Maybe<Feature_Flags_Mutation_Response>>>;
-  /** update data of the table: "media" */
-  update_media?: Maybe<Media_Mutation_Response>;
-  /** update single row of the table: "media" */
-  update_media_by_pk?: Maybe<Media>;
-  /** update multiples rows of table: "media" */
-  update_media_many?: Maybe<Array<Maybe<Media_Mutation_Response>>>;
-  /** update data of the table: "minter_filters_metadata" */
-  update_minter_filters_metadata?: Maybe<Minter_Filters_Metadata_Mutation_Response>;
-  /** update single row of the table: "minter_filters_metadata" */
-  update_minter_filters_metadata_by_pk?: Maybe<Minter_Filters_Metadata>;
-  /** update multiples rows of table: "minter_filters_metadata" */
-  update_minter_filters_metadata_many?: Maybe<Array<Maybe<Minter_Filters_Metadata_Mutation_Response>>>;
-  /** update data of the table: "minter_type_names" */
-  update_minter_type_names?: Maybe<Minter_Type_Names_Mutation_Response>;
-  /** update single row of the table: "minter_type_names" */
-  update_minter_type_names_by_pk?: Maybe<Minter_Type_Names>;
-  /** update multiples rows of table: "minter_type_names" */
-  update_minter_type_names_many?: Maybe<Array<Maybe<Minter_Type_Names_Mutation_Response>>>;
-  /** update data of the table: "minter_types" */
-  update_minter_types?: Maybe<Minter_Types_Mutation_Response>;
-  /** update single row of the table: "minter_types" */
-  update_minter_types_by_pk?: Maybe<Minter_Types>;
-  /** update multiples rows of table: "minter_types" */
-  update_minter_types_many?: Maybe<Array<Maybe<Minter_Types_Mutation_Response>>>;
-  /** update data of the table: "minters_metadata" */
-  update_minters_metadata?: Maybe<Minters_Metadata_Mutation_Response>;
-  /** update single row of the table: "minters_metadata" */
-  update_minters_metadata_by_pk?: Maybe<Minters_Metadata>;
-  /** update multiples rows of table: "minters_metadata" */
-  update_minters_metadata_many?: Maybe<Array<Maybe<Minters_Metadata_Mutation_Response>>>;
-  /** update data of the table: "notifications" */
-  update_notifications?: Maybe<Notifications_Mutation_Response>;
-  /** update single row of the table: "notifications" */
-  update_notifications_by_pk?: Maybe<Notifications>;
-  /** update multiples rows of table: "notifications" */
-  update_notifications_many?: Maybe<Array<Maybe<Notifications_Mutation_Response>>>;
-  /** update data of the table: "project_external_asset_dependencies" */
-  update_project_external_asset_dependencies?: Maybe<Project_External_Asset_Dependencies_Mutation_Response>;
-  /** update single row of the table: "project_external_asset_dependencies" */
-  update_project_external_asset_dependencies_by_pk?: Maybe<Project_External_Asset_Dependencies>;
-  /** update multiples rows of table: "project_external_asset_dependencies" */
-  update_project_external_asset_dependencies_many?: Maybe<Array<Maybe<Project_External_Asset_Dependencies_Mutation_Response>>>;
-  /** update data of the table: "project_external_asset_dependency_types" */
-  update_project_external_asset_dependency_types?: Maybe<Project_External_Asset_Dependency_Types_Mutation_Response>;
-  /** update single row of the table: "project_external_asset_dependency_types" */
-  update_project_external_asset_dependency_types_by_pk?: Maybe<Project_External_Asset_Dependency_Types>;
-  /** update multiples rows of table: "project_external_asset_dependency_types" */
-  update_project_external_asset_dependency_types_many?: Maybe<Array<Maybe<Project_External_Asset_Dependency_Types_Mutation_Response>>>;
-  /** update data of the table: "project_minter_configurations" */
-  update_project_minter_configurations?: Maybe<Project_Minter_Configurations_Mutation_Response>;
-  /** update single row of the table: "project_minter_configurations" */
-  update_project_minter_configurations_by_pk?: Maybe<Project_Minter_Configurations>;
-  /** update multiples rows of table: "project_minter_configurations" */
-  update_project_minter_configurations_many?: Maybe<Array<Maybe<Project_Minter_Configurations_Mutation_Response>>>;
-  /** update data of the table: "project_scripts" */
-  update_project_scripts?: Maybe<Project_Scripts_Mutation_Response>;
-  /** update single row of the table: "project_scripts" */
-  update_project_scripts_by_pk?: Maybe<Project_Scripts>;
-  /** update multiples rows of table: "project_scripts" */
-  update_project_scripts_many?: Maybe<Array<Maybe<Project_Scripts_Mutation_Response>>>;
-  /** update data of the table: "project_series" */
-  update_project_series?: Maybe<Project_Series_Mutation_Response>;
-  /** update single row of the table: "project_series" */
-  update_project_series_by_pk?: Maybe<Project_Series>;
-  /** update multiples rows of table: "project_series" */
-  update_project_series_many?: Maybe<Array<Maybe<Project_Series_Mutation_Response>>>;
-  /** update data of the table: "project_vertical_categories" */
-  update_project_vertical_categories?: Maybe<Project_Vertical_Categories_Mutation_Response>;
-  /** update single row of the table: "project_vertical_categories" */
-  update_project_vertical_categories_by_pk?: Maybe<Project_Vertical_Categories>;
-  /** update multiples rows of table: "project_vertical_categories" */
-  update_project_vertical_categories_many?: Maybe<Array<Maybe<Project_Vertical_Categories_Mutation_Response>>>;
-  /** update data of the table: "project_verticals" */
-  update_project_verticals?: Maybe<Project_Verticals_Mutation_Response>;
-  /** update single row of the table: "project_verticals" */
-  update_project_verticals_by_pk?: Maybe<Project_Verticals>;
-  /** update multiples rows of table: "project_verticals" */
-  update_project_verticals_many?: Maybe<Array<Maybe<Project_Verticals_Mutation_Response>>>;
-  /** update data of the table: "projects_features" */
-  update_projects_features?: Maybe<Projects_Features_Mutation_Response>;
-  /** update single row of the table: "projects_features" */
-  update_projects_features_by_pk?: Maybe<Projects_Features>;
-  /** update multiples rows of table: "projects_features" */
-  update_projects_features_many?: Maybe<Array<Maybe<Projects_Features_Mutation_Response>>>;
-  /** update data of the table: "projects_features_private" */
-  update_projects_features_private?: Maybe<Projects_Features_Private_Mutation_Response>;
-  /** update multiples rows of table: "projects_features_private" */
-  update_projects_features_private_many?: Maybe<Array<Maybe<Projects_Features_Private_Mutation_Response>>>;
-  /** update data of the table: "projects_metadata" */
-  update_projects_metadata?: Maybe<Projects_Metadata_Mutation_Response>;
-  /** update single row of the table: "projects_metadata" */
-  update_projects_metadata_by_pk?: Maybe<Projects_Metadata>;
-  /** update multiples rows of table: "projects_metadata" */
-  update_projects_metadata_many?: Maybe<Array<Maybe<Projects_Metadata_Mutation_Response>>>;
-  /** update data of the table: "proposed_artist_addresses_and_splits" */
-  update_proposed_artist_addresses_and_splits?: Maybe<Proposed_Artist_Addresses_And_Splits_Mutation_Response>;
-  /** update single row of the table: "proposed_artist_addresses_and_splits" */
-  update_proposed_artist_addresses_and_splits_by_pk?: Maybe<Proposed_Artist_Addresses_And_Splits>;
-  /** update multiples rows of table: "proposed_artist_addresses_and_splits" */
-  update_proposed_artist_addresses_and_splits_many?: Maybe<Array<Maybe<Proposed_Artist_Addresses_And_Splits_Mutation_Response>>>;
-  /** update data of the table: "screenings" */
-  update_screenings?: Maybe<Screenings_Mutation_Response>;
-  /** update single row of the table: "screenings" */
-  update_screenings_by_pk?: Maybe<Screenings>;
-  /** update multiples rows of table: "screenings" */
-  update_screenings_many?: Maybe<Array<Maybe<Screenings_Mutation_Response>>>;
-  /** update data of the table: "sync_status" */
-  update_sync_status?: Maybe<Sync_Status_Mutation_Response>;
-  /** update single row of the table: "sync_status" */
-  update_sync_status_by_pk?: Maybe<Sync_Status>;
-  /** update multiples rows of table: "sync_status" */
-  update_sync_status_many?: Maybe<Array<Maybe<Sync_Status_Mutation_Response>>>;
-  /** update data of the table: "tag_groupings" */
-  update_tag_groupings?: Maybe<Tag_Groupings_Mutation_Response>;
-  /** update single row of the table: "tag_groupings" */
-  update_tag_groupings_by_pk?: Maybe<Tag_Groupings>;
-  /** update multiples rows of table: "tag_groupings" */
-  update_tag_groupings_many?: Maybe<Array<Maybe<Tag_Groupings_Mutation_Response>>>;
-  /** update data of the table: "tag_status" */
-  update_tag_status?: Maybe<Tag_Status_Mutation_Response>;
-  /** update single row of the table: "tag_status" */
-  update_tag_status_by_pk?: Maybe<Tag_Status>;
-  /** update multiples rows of table: "tag_status" */
-  update_tag_status_many?: Maybe<Array<Maybe<Tag_Status_Mutation_Response>>>;
-  /** update data of the table: "tag_types" */
-  update_tag_types?: Maybe<Tag_Types_Mutation_Response>;
-  /** update single row of the table: "tag_types" */
-  update_tag_types_by_pk?: Maybe<Tag_Types>;
-  /** update multiples rows of table: "tag_types" */
-  update_tag_types_many?: Maybe<Array<Maybe<Tag_Types_Mutation_Response>>>;
-  /** update data of the table: "tags" */
-  update_tags?: Maybe<Tags_Mutation_Response>;
-  /** update single row of the table: "tags" */
-  update_tags_by_pk?: Maybe<Tags>;
-  /** update multiples rows of table: "tags" */
-  update_tags_many?: Maybe<Array<Maybe<Tags_Mutation_Response>>>;
-  /** update data of the table: "terms_of_service" */
-  update_terms_of_service?: Maybe<Terms_Of_Service_Mutation_Response>;
-  /** update single row of the table: "terms_of_service" */
-  update_terms_of_service_by_pk?: Maybe<Terms_Of_Service>;
-  /** update multiples rows of table: "terms_of_service" */
-  update_terms_of_service_many?: Maybe<Array<Maybe<Terms_Of_Service_Mutation_Response>>>;
-  /** update data of the table: "tokens_metadata" */
-  update_tokens_metadata?: Maybe<Tokens_Metadata_Mutation_Response>;
-  /** update single row of the table: "tokens_metadata" */
-  update_tokens_metadata_by_pk?: Maybe<Tokens_Metadata>;
-  /** update multiples rows of table: "tokens_metadata" */
-  update_tokens_metadata_many?: Maybe<Array<Maybe<Tokens_Metadata_Mutation_Response>>>;
-  /** update data of the table: "user_profiles" */
-  update_user_profiles?: Maybe<User_Profiles_Mutation_Response>;
-  /** update single row of the table: "user_profiles" */
-  update_user_profiles_by_pk?: Maybe<User_Profiles>;
-  /** update multiples rows of table: "user_profiles" */
-  update_user_profiles_many?: Maybe<Array<Maybe<User_Profiles_Mutation_Response>>>;
-  /** update data of the table: "users" */
-  update_users?: Maybe<Users_Mutation_Response>;
-  /** update single row of the table: "users" */
-  update_users_by_pk?: Maybe<Users>;
-  /** update multiples rows of table: "users" */
-  update_users_many?: Maybe<Array<Maybe<Users_Mutation_Response>>>;
-  /** update data of the table: "verticals" */
-  update_verticals?: Maybe<Verticals_Mutation_Response>;
-  /** update single row of the table: "verticals" */
-  update_verticals_by_pk?: Maybe<Verticals>;
-  /** update multiples rows of table: "verticals" */
-  update_verticals_many?: Maybe<Array<Maybe<Verticals_Mutation_Response>>>;
-  /** update data of the table: "webflow_artist_info" */
-  update_webflow_artist_info?: Maybe<Webflow_Artist_Info_Mutation_Response>;
-  /** update single row of the table: "webflow_artist_info" */
-  update_webflow_artist_info_by_pk?: Maybe<Webflow_Artist_Info>;
-  /** update multiples rows of table: "webflow_artist_info" */
-  update_webflow_artist_info_many?: Maybe<Array<Maybe<Webflow_Artist_Info_Mutation_Response>>>;
-  /** update data of the table: "webflow_spectrum_articles" */
-  update_webflow_spectrum_articles?: Maybe<Webflow_Spectrum_Articles_Mutation_Response>;
-  /** update single row of the table: "webflow_spectrum_articles" */
-  update_webflow_spectrum_articles_by_pk?: Maybe<Webflow_Spectrum_Articles>;
-  /** update multiples rows of table: "webflow_spectrum_articles" */
-  update_webflow_spectrum_articles_many?: Maybe<Array<Maybe<Webflow_Spectrum_Articles_Mutation_Response>>>;
-};
-
-
-/** mutation root */
-export type Mutation_RootCreateApplicationArgs = {
-  formData?: InputMaybe<CreateApplicationInput>;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_CategoriesArgs = {
-  where: Categories_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Categories_By_PkArgs = {
-  name: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Contract_AllowlistingsArgs = {
-  where: Contract_Allowlistings_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Contract_Allowlistings_By_PkArgs = {
-  contract_address: Scalars['String'];
-  user_address: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Contract_Type_NamesArgs = {
-  where: Contract_Type_Names_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Contract_Type_Names_By_PkArgs = {
-  name: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Contract_TypesArgs = {
-  where: Contract_Types_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Contract_Types_By_PkArgs = {
-  type: Contract_Type_Names_Enum;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Contracts_MetadataArgs = {
-  where: Contracts_Metadata_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Contracts_Metadata_By_PkArgs = {
-  address: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Curation_StatusesArgs = {
-  where: Curation_Statuses_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Curation_Statuses_By_PkArgs = {
-  value: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Entity_TagsArgs = {
-  where: Entity_Tags_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Entity_Tags_By_PkArgs = {
-  id: Scalars['Int'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_FavoritesArgs = {
-  where: Favorites_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Favorites_By_PkArgs = {
-  id: Scalars['Int'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Feature_Field_Values_CountsArgs = {
-  where: Feature_Field_Values_Counts_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Feature_FlagsArgs = {
-  where: Feature_Flags_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Feature_Flags_By_PkArgs = {
-  flag_name: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_MediaArgs = {
-  where: Media_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Media_By_PkArgs = {
-  id: Scalars['Int'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Minter_Filters_MetadataArgs = {
-  where: Minter_Filters_Metadata_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Minter_Filters_Metadata_By_PkArgs = {
-  address: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Minter_Type_NamesArgs = {
-  where: Minter_Type_Names_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Minter_Type_Names_By_PkArgs = {
-  name: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Minter_TypesArgs = {
-  where: Minter_Types_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Minter_Types_By_PkArgs = {
-  type: Minter_Type_Names_Enum;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Minters_MetadataArgs = {
-  where: Minters_Metadata_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Minters_Metadata_By_PkArgs = {
-  address: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_NotificationsArgs = {
-  where: Notifications_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Notifications_By_PkArgs = {
-  trigger_key: Scalars['String'];
-  trigger_time: Scalars['timestamptz'];
-  user_address: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Project_External_Asset_DependenciesArgs = {
-  where: Project_External_Asset_Dependencies_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Project_External_Asset_Dependencies_By_PkArgs = {
-  index: Scalars['Int'];
-  project_id: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Project_External_Asset_Dependency_TypesArgs = {
-  where: Project_External_Asset_Dependency_Types_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Project_External_Asset_Dependency_Types_By_PkArgs = {
-  type: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Project_Minter_ConfigurationsArgs = {
-  where: Project_Minter_Configurations_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Project_Minter_Configurations_By_PkArgs = {
-  id: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Project_ScriptsArgs = {
-  where: Project_Scripts_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Project_Scripts_By_PkArgs = {
-  index: Scalars['Int'];
-  project_id: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Project_SeriesArgs = {
-  where: Project_Series_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Project_Series_By_PkArgs = {
-  id: Scalars['Int'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Project_Vertical_CategoriesArgs = {
-  where: Project_Vertical_Categories_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Project_Vertical_Categories_By_PkArgs = {
-  name: Categories_Enum;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Project_VerticalsArgs = {
-  where: Project_Verticals_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Project_Verticals_By_PkArgs = {
-  name: Verticals_Enum;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Projects_FeaturesArgs = {
-  where: Projects_Features_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Projects_Features_By_PkArgs = {
-  id: Scalars['Int'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Projects_Features_PrivateArgs = {
-  where: Projects_Features_Private_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Projects_MetadataArgs = {
-  where: Projects_Metadata_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Projects_Metadata_By_PkArgs = {
-  id: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Proposed_Artist_Addresses_And_SplitsArgs = {
-  where: Proposed_Artist_Addresses_And_Splits_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Proposed_Artist_Addresses_And_Splits_By_PkArgs = {
-  project_id: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_ScreeningsArgs = {
-  where: Screenings_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Screenings_By_PkArgs = {
-  id: Scalars['Int'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Sync_StatusArgs = {
-  where: Sync_Status_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Sync_Status_By_PkArgs = {
-  id: Scalars['Boolean'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Tag_GroupingsArgs = {
-  where: Tag_Groupings_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Tag_Groupings_By_PkArgs = {
-  name: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Tag_StatusArgs = {
-  where: Tag_Status_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Tag_Status_By_PkArgs = {
-  value: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Tag_TypesArgs = {
-  where: Tag_Types_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Tag_Types_By_PkArgs = {
-  value: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_TagsArgs = {
-  where: Tags_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Tags_By_PkArgs = {
-  name: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Terms_Of_ServiceArgs = {
-  where: Terms_Of_Service_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Terms_Of_Service_By_PkArgs = {
-  id: Scalars['Int'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Tokens_MetadataArgs = {
-  where: Tokens_Metadata_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Tokens_Metadata_By_PkArgs = {
-  id: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_User_ProfilesArgs = {
-  where: User_Profiles_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_User_Profiles_By_PkArgs = {
-  id: Scalars['Int'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_UsersArgs = {
-  where: Users_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Users_By_PkArgs = {
-  public_address: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_VerticalsArgs = {
-  where: Verticals_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Verticals_By_PkArgs = {
-  name: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Webflow_Artist_InfoArgs = {
-  where: Webflow_Artist_Info_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Webflow_Artist_Info_By_PkArgs = {
-  webflow_item_id: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Webflow_Spectrum_ArticlesArgs = {
-  where: Webflow_Spectrum_Articles_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootDelete_Webflow_Spectrum_Articles_By_PkArgs = {
-  webflow_item_id: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_CategoriesArgs = {
-  objects: Array<Categories_Insert_Input>;
-  on_conflict?: InputMaybe<Categories_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Categories_OneArgs = {
-  object: Categories_Insert_Input;
-  on_conflict?: InputMaybe<Categories_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Contract_AllowlistingsArgs = {
-  objects: Array<Contract_Allowlistings_Insert_Input>;
-  on_conflict?: InputMaybe<Contract_Allowlistings_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Contract_Allowlistings_OneArgs = {
-  object: Contract_Allowlistings_Insert_Input;
-  on_conflict?: InputMaybe<Contract_Allowlistings_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Contract_Type_NamesArgs = {
-  objects: Array<Contract_Type_Names_Insert_Input>;
-  on_conflict?: InputMaybe<Contract_Type_Names_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Contract_Type_Names_OneArgs = {
-  object: Contract_Type_Names_Insert_Input;
-  on_conflict?: InputMaybe<Contract_Type_Names_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Contract_TypesArgs = {
-  objects: Array<Contract_Types_Insert_Input>;
-  on_conflict?: InputMaybe<Contract_Types_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Contract_Types_OneArgs = {
-  object: Contract_Types_Insert_Input;
-  on_conflict?: InputMaybe<Contract_Types_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Contracts_MetadataArgs = {
-  objects: Array<Contracts_Metadata_Insert_Input>;
-  on_conflict?: InputMaybe<Contracts_Metadata_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Contracts_Metadata_OneArgs = {
-  object: Contracts_Metadata_Insert_Input;
-  on_conflict?: InputMaybe<Contracts_Metadata_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Curation_StatusesArgs = {
-  objects: Array<Curation_Statuses_Insert_Input>;
-  on_conflict?: InputMaybe<Curation_Statuses_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Curation_Statuses_OneArgs = {
-  object: Curation_Statuses_Insert_Input;
-  on_conflict?: InputMaybe<Curation_Statuses_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Entity_TagsArgs = {
-  objects: Array<Entity_Tags_Insert_Input>;
-  on_conflict?: InputMaybe<Entity_Tags_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Entity_Tags_OneArgs = {
-  object: Entity_Tags_Insert_Input;
-  on_conflict?: InputMaybe<Entity_Tags_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_FavoritesArgs = {
-  objects: Array<Favorites_Insert_Input>;
-  on_conflict?: InputMaybe<Favorites_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Favorites_OneArgs = {
-  object: Favorites_Insert_Input;
-  on_conflict?: InputMaybe<Favorites_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Feature_Field_Values_CountsArgs = {
-  objects: Array<Feature_Field_Values_Counts_Insert_Input>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Feature_Field_Values_Counts_OneArgs = {
-  object: Feature_Field_Values_Counts_Insert_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Feature_FlagsArgs = {
-  objects: Array<Feature_Flags_Insert_Input>;
-  on_conflict?: InputMaybe<Feature_Flags_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Feature_Flags_OneArgs = {
-  object: Feature_Flags_Insert_Input;
-  on_conflict?: InputMaybe<Feature_Flags_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_MediaArgs = {
-  objects: Array<Media_Insert_Input>;
-  on_conflict?: InputMaybe<Media_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Media_OneArgs = {
-  object: Media_Insert_Input;
-  on_conflict?: InputMaybe<Media_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Minter_Filters_MetadataArgs = {
-  objects: Array<Minter_Filters_Metadata_Insert_Input>;
-  on_conflict?: InputMaybe<Minter_Filters_Metadata_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Minter_Filters_Metadata_OneArgs = {
-  object: Minter_Filters_Metadata_Insert_Input;
-  on_conflict?: InputMaybe<Minter_Filters_Metadata_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Minter_Type_NamesArgs = {
-  objects: Array<Minter_Type_Names_Insert_Input>;
-  on_conflict?: InputMaybe<Minter_Type_Names_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Minter_Type_Names_OneArgs = {
-  object: Minter_Type_Names_Insert_Input;
-  on_conflict?: InputMaybe<Minter_Type_Names_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Minter_TypesArgs = {
-  objects: Array<Minter_Types_Insert_Input>;
-  on_conflict?: InputMaybe<Minter_Types_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Minter_Types_OneArgs = {
-  object: Minter_Types_Insert_Input;
-  on_conflict?: InputMaybe<Minter_Types_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Minters_MetadataArgs = {
-  objects: Array<Minters_Metadata_Insert_Input>;
-  on_conflict?: InputMaybe<Minters_Metadata_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Minters_Metadata_OneArgs = {
-  object: Minters_Metadata_Insert_Input;
-  on_conflict?: InputMaybe<Minters_Metadata_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_NotificationsArgs = {
-  objects: Array<Notifications_Insert_Input>;
-  on_conflict?: InputMaybe<Notifications_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Notifications_OneArgs = {
-  object: Notifications_Insert_Input;
-  on_conflict?: InputMaybe<Notifications_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Project_External_Asset_DependenciesArgs = {
-  objects: Array<Project_External_Asset_Dependencies_Insert_Input>;
-  on_conflict?: InputMaybe<Project_External_Asset_Dependencies_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Project_External_Asset_Dependencies_OneArgs = {
-  object: Project_External_Asset_Dependencies_Insert_Input;
-  on_conflict?: InputMaybe<Project_External_Asset_Dependencies_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Project_External_Asset_Dependency_TypesArgs = {
-  objects: Array<Project_External_Asset_Dependency_Types_Insert_Input>;
-  on_conflict?: InputMaybe<Project_External_Asset_Dependency_Types_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Project_External_Asset_Dependency_Types_OneArgs = {
-  object: Project_External_Asset_Dependency_Types_Insert_Input;
-  on_conflict?: InputMaybe<Project_External_Asset_Dependency_Types_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Project_Minter_ConfigurationsArgs = {
-  objects: Array<Project_Minter_Configurations_Insert_Input>;
-  on_conflict?: InputMaybe<Project_Minter_Configurations_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Project_Minter_Configurations_OneArgs = {
-  object: Project_Minter_Configurations_Insert_Input;
-  on_conflict?: InputMaybe<Project_Minter_Configurations_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Project_ScriptsArgs = {
-  objects: Array<Project_Scripts_Insert_Input>;
-  on_conflict?: InputMaybe<Project_Scripts_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Project_Scripts_OneArgs = {
-  object: Project_Scripts_Insert_Input;
-  on_conflict?: InputMaybe<Project_Scripts_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Project_SeriesArgs = {
-  objects: Array<Project_Series_Insert_Input>;
-  on_conflict?: InputMaybe<Project_Series_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Project_Series_OneArgs = {
-  object: Project_Series_Insert_Input;
-  on_conflict?: InputMaybe<Project_Series_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Project_Vertical_CategoriesArgs = {
-  objects: Array<Project_Vertical_Categories_Insert_Input>;
-  on_conflict?: InputMaybe<Project_Vertical_Categories_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Project_Vertical_Categories_OneArgs = {
-  object: Project_Vertical_Categories_Insert_Input;
-  on_conflict?: InputMaybe<Project_Vertical_Categories_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Project_VerticalsArgs = {
-  objects: Array<Project_Verticals_Insert_Input>;
-  on_conflict?: InputMaybe<Project_Verticals_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Project_Verticals_OneArgs = {
-  object: Project_Verticals_Insert_Input;
-  on_conflict?: InputMaybe<Project_Verticals_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Projects_FeaturesArgs = {
-  objects: Array<Projects_Features_Insert_Input>;
-  on_conflict?: InputMaybe<Projects_Features_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Projects_Features_OneArgs = {
-  object: Projects_Features_Insert_Input;
-  on_conflict?: InputMaybe<Projects_Features_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Projects_Features_PrivateArgs = {
-  objects: Array<Projects_Features_Private_Insert_Input>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Projects_Features_Private_OneArgs = {
-  object: Projects_Features_Private_Insert_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Projects_MetadataArgs = {
-  objects: Array<Projects_Metadata_Insert_Input>;
-  on_conflict?: InputMaybe<Projects_Metadata_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Projects_Metadata_OneArgs = {
-  object: Projects_Metadata_Insert_Input;
-  on_conflict?: InputMaybe<Projects_Metadata_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Proposed_Artist_Addresses_And_SplitsArgs = {
-  objects: Array<Proposed_Artist_Addresses_And_Splits_Insert_Input>;
-  on_conflict?: InputMaybe<Proposed_Artist_Addresses_And_Splits_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Proposed_Artist_Addresses_And_Splits_OneArgs = {
-  object: Proposed_Artist_Addresses_And_Splits_Insert_Input;
-  on_conflict?: InputMaybe<Proposed_Artist_Addresses_And_Splits_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_ScreeningsArgs = {
-  objects: Array<Screenings_Insert_Input>;
-  on_conflict?: InputMaybe<Screenings_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Screenings_OneArgs = {
-  object: Screenings_Insert_Input;
-  on_conflict?: InputMaybe<Screenings_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Sync_StatusArgs = {
-  objects: Array<Sync_Status_Insert_Input>;
-  on_conflict?: InputMaybe<Sync_Status_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Sync_Status_OneArgs = {
-  object: Sync_Status_Insert_Input;
-  on_conflict?: InputMaybe<Sync_Status_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Tag_GroupingsArgs = {
-  objects: Array<Tag_Groupings_Insert_Input>;
-  on_conflict?: InputMaybe<Tag_Groupings_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Tag_Groupings_OneArgs = {
-  object: Tag_Groupings_Insert_Input;
-  on_conflict?: InputMaybe<Tag_Groupings_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Tag_StatusArgs = {
-  objects: Array<Tag_Status_Insert_Input>;
-  on_conflict?: InputMaybe<Tag_Status_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Tag_Status_OneArgs = {
-  object: Tag_Status_Insert_Input;
-  on_conflict?: InputMaybe<Tag_Status_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Tag_TypesArgs = {
-  objects: Array<Tag_Types_Insert_Input>;
-  on_conflict?: InputMaybe<Tag_Types_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Tag_Types_OneArgs = {
-  object: Tag_Types_Insert_Input;
-  on_conflict?: InputMaybe<Tag_Types_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_TagsArgs = {
-  objects: Array<Tags_Insert_Input>;
-  on_conflict?: InputMaybe<Tags_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Tags_OneArgs = {
-  object: Tags_Insert_Input;
-  on_conflict?: InputMaybe<Tags_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Terms_Of_ServiceArgs = {
-  objects: Array<Terms_Of_Service_Insert_Input>;
-  on_conflict?: InputMaybe<Terms_Of_Service_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Terms_Of_Service_OneArgs = {
-  object: Terms_Of_Service_Insert_Input;
-  on_conflict?: InputMaybe<Terms_Of_Service_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Tokens_MetadataArgs = {
-  objects: Array<Tokens_Metadata_Insert_Input>;
-  on_conflict?: InputMaybe<Tokens_Metadata_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Tokens_Metadata_OneArgs = {
-  object: Tokens_Metadata_Insert_Input;
-  on_conflict?: InputMaybe<Tokens_Metadata_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_User_ProfilesArgs = {
-  objects: Array<User_Profiles_Insert_Input>;
-  on_conflict?: InputMaybe<User_Profiles_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_User_Profiles_OneArgs = {
-  object: User_Profiles_Insert_Input;
-  on_conflict?: InputMaybe<User_Profiles_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_UsersArgs = {
-  objects: Array<Users_Insert_Input>;
-  on_conflict?: InputMaybe<Users_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Users_OneArgs = {
-  object: Users_Insert_Input;
-  on_conflict?: InputMaybe<Users_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_VerticalsArgs = {
-  objects: Array<Verticals_Insert_Input>;
-  on_conflict?: InputMaybe<Verticals_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Verticals_OneArgs = {
-  object: Verticals_Insert_Input;
-  on_conflict?: InputMaybe<Verticals_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Webflow_Artist_InfoArgs = {
-  objects: Array<Webflow_Artist_Info_Insert_Input>;
-  on_conflict?: InputMaybe<Webflow_Artist_Info_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Webflow_Artist_Info_OneArgs = {
-  object: Webflow_Artist_Info_Insert_Input;
-  on_conflict?: InputMaybe<Webflow_Artist_Info_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Webflow_Spectrum_ArticlesArgs = {
-  objects: Array<Webflow_Spectrum_Articles_Insert_Input>;
-  on_conflict?: InputMaybe<Webflow_Spectrum_Articles_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootInsert_Webflow_Spectrum_Articles_OneArgs = {
-  object: Webflow_Spectrum_Articles_Insert_Input;
-  on_conflict?: InputMaybe<Webflow_Spectrum_Articles_On_Conflict>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdateFeaturesArgs = {
-  featureFields: Scalars['jsonb'];
-  featuresScript: Scalars['String'];
-  projectId: Scalars['String'];
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdateProjectMediaArgs = {
-  features?: InputMaybe<Scalars['Boolean']>;
-  projectId: Scalars['String'];
-  render?: InputMaybe<Scalars['Boolean']>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdateTokenMediaArgs = {
-  tokenIds?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_CategoriesArgs = {
-  _set?: InputMaybe<Categories_Set_Input>;
-  where: Categories_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Categories_By_PkArgs = {
-  _set?: InputMaybe<Categories_Set_Input>;
-  pk_columns: Categories_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Categories_ManyArgs = {
-  updates: Array<Categories_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Contract_AllowlistingsArgs = {
-  _set?: InputMaybe<Contract_Allowlistings_Set_Input>;
-  where: Contract_Allowlistings_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Contract_Allowlistings_By_PkArgs = {
-  _set?: InputMaybe<Contract_Allowlistings_Set_Input>;
-  pk_columns: Contract_Allowlistings_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Contract_Allowlistings_ManyArgs = {
-  updates: Array<Contract_Allowlistings_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Contract_Type_NamesArgs = {
-  _set?: InputMaybe<Contract_Type_Names_Set_Input>;
-  where: Contract_Type_Names_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Contract_Type_Names_By_PkArgs = {
-  _set?: InputMaybe<Contract_Type_Names_Set_Input>;
-  pk_columns: Contract_Type_Names_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Contract_Type_Names_ManyArgs = {
-  updates: Array<Contract_Type_Names_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Contract_TypesArgs = {
-  _append?: InputMaybe<Contract_Types_Append_Input>;
-  _delete_at_path?: InputMaybe<Contract_Types_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Contract_Types_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Contract_Types_Delete_Key_Input>;
-  _prepend?: InputMaybe<Contract_Types_Prepend_Input>;
-  _set?: InputMaybe<Contract_Types_Set_Input>;
-  where: Contract_Types_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Contract_Types_By_PkArgs = {
-  _append?: InputMaybe<Contract_Types_Append_Input>;
-  _delete_at_path?: InputMaybe<Contract_Types_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Contract_Types_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Contract_Types_Delete_Key_Input>;
-  _prepend?: InputMaybe<Contract_Types_Prepend_Input>;
-  _set?: InputMaybe<Contract_Types_Set_Input>;
-  pk_columns: Contract_Types_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Contract_Types_ManyArgs = {
-  updates: Array<Contract_Types_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Contracts_MetadataArgs = {
-  _inc?: InputMaybe<Contracts_Metadata_Inc_Input>;
-  _set?: InputMaybe<Contracts_Metadata_Set_Input>;
-  where: Contracts_Metadata_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Contracts_Metadata_By_PkArgs = {
-  _inc?: InputMaybe<Contracts_Metadata_Inc_Input>;
-  _set?: InputMaybe<Contracts_Metadata_Set_Input>;
-  pk_columns: Contracts_Metadata_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Contracts_Metadata_ManyArgs = {
-  updates: Array<Contracts_Metadata_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Curation_StatusesArgs = {
-  _set?: InputMaybe<Curation_Statuses_Set_Input>;
-  where: Curation_Statuses_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Curation_Statuses_By_PkArgs = {
-  _set?: InputMaybe<Curation_Statuses_Set_Input>;
-  pk_columns: Curation_Statuses_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Curation_Statuses_ManyArgs = {
-  updates: Array<Curation_Statuses_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Entity_TagsArgs = {
-  _inc?: InputMaybe<Entity_Tags_Inc_Input>;
-  _set?: InputMaybe<Entity_Tags_Set_Input>;
-  where: Entity_Tags_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Entity_Tags_By_PkArgs = {
-  _inc?: InputMaybe<Entity_Tags_Inc_Input>;
-  _set?: InputMaybe<Entity_Tags_Set_Input>;
-  pk_columns: Entity_Tags_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Entity_Tags_ManyArgs = {
-  updates: Array<Entity_Tags_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_FavoritesArgs = {
-  _inc?: InputMaybe<Favorites_Inc_Input>;
-  _set?: InputMaybe<Favorites_Set_Input>;
-  where: Favorites_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Favorites_By_PkArgs = {
-  _inc?: InputMaybe<Favorites_Inc_Input>;
-  _set?: InputMaybe<Favorites_Set_Input>;
-  pk_columns: Favorites_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Favorites_ManyArgs = {
-  updates: Array<Favorites_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Feature_Field_Values_CountsArgs = {
-  _inc?: InputMaybe<Feature_Field_Values_Counts_Inc_Input>;
-  _set?: InputMaybe<Feature_Field_Values_Counts_Set_Input>;
-  where: Feature_Field_Values_Counts_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Feature_Field_Values_Counts_ManyArgs = {
-  updates: Array<Feature_Field_Values_Counts_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Feature_FlagsArgs = {
-  _set?: InputMaybe<Feature_Flags_Set_Input>;
-  where: Feature_Flags_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Feature_Flags_By_PkArgs = {
-  _set?: InputMaybe<Feature_Flags_Set_Input>;
-  pk_columns: Feature_Flags_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Feature_Flags_ManyArgs = {
-  updates: Array<Feature_Flags_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_MediaArgs = {
-  _append?: InputMaybe<Media_Append_Input>;
-  _delete_at_path?: InputMaybe<Media_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Media_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Media_Delete_Key_Input>;
-  _inc?: InputMaybe<Media_Inc_Input>;
-  _prepend?: InputMaybe<Media_Prepend_Input>;
-  _set?: InputMaybe<Media_Set_Input>;
-  where: Media_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Media_By_PkArgs = {
-  _append?: InputMaybe<Media_Append_Input>;
-  _delete_at_path?: InputMaybe<Media_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Media_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Media_Delete_Key_Input>;
-  _inc?: InputMaybe<Media_Inc_Input>;
-  _prepend?: InputMaybe<Media_Prepend_Input>;
-  _set?: InputMaybe<Media_Set_Input>;
-  pk_columns: Media_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Media_ManyArgs = {
-  updates: Array<Media_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Minter_Filters_MetadataArgs = {
-  _set?: InputMaybe<Minter_Filters_Metadata_Set_Input>;
-  where: Minter_Filters_Metadata_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Minter_Filters_Metadata_By_PkArgs = {
-  _set?: InputMaybe<Minter_Filters_Metadata_Set_Input>;
-  pk_columns: Minter_Filters_Metadata_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Minter_Filters_Metadata_ManyArgs = {
-  updates: Array<Minter_Filters_Metadata_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Minter_Type_NamesArgs = {
-  _set?: InputMaybe<Minter_Type_Names_Set_Input>;
-  where: Minter_Type_Names_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Minter_Type_Names_By_PkArgs = {
-  _set?: InputMaybe<Minter_Type_Names_Set_Input>;
-  pk_columns: Minter_Type_Names_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Minter_Type_Names_ManyArgs = {
-  updates: Array<Minter_Type_Names_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Minter_TypesArgs = {
-  _set?: InputMaybe<Minter_Types_Set_Input>;
-  where: Minter_Types_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Minter_Types_By_PkArgs = {
-  _set?: InputMaybe<Minter_Types_Set_Input>;
-  pk_columns: Minter_Types_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Minter_Types_ManyArgs = {
-  updates: Array<Minter_Types_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Minters_MetadataArgs = {
-  _append?: InputMaybe<Minters_Metadata_Append_Input>;
-  _delete_at_path?: InputMaybe<Minters_Metadata_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Minters_Metadata_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Minters_Metadata_Delete_Key_Input>;
-  _inc?: InputMaybe<Minters_Metadata_Inc_Input>;
-  _prepend?: InputMaybe<Minters_Metadata_Prepend_Input>;
-  _set?: InputMaybe<Minters_Metadata_Set_Input>;
-  where: Minters_Metadata_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Minters_Metadata_By_PkArgs = {
-  _append?: InputMaybe<Minters_Metadata_Append_Input>;
-  _delete_at_path?: InputMaybe<Minters_Metadata_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Minters_Metadata_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Minters_Metadata_Delete_Key_Input>;
-  _inc?: InputMaybe<Minters_Metadata_Inc_Input>;
-  _prepend?: InputMaybe<Minters_Metadata_Prepend_Input>;
-  _set?: InputMaybe<Minters_Metadata_Set_Input>;
-  pk_columns: Minters_Metadata_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Minters_Metadata_ManyArgs = {
-  updates: Array<Minters_Metadata_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_NotificationsArgs = {
-  _inc?: InputMaybe<Notifications_Inc_Input>;
-  _set?: InputMaybe<Notifications_Set_Input>;
-  where: Notifications_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Notifications_By_PkArgs = {
-  _inc?: InputMaybe<Notifications_Inc_Input>;
-  _set?: InputMaybe<Notifications_Set_Input>;
-  pk_columns: Notifications_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Notifications_ManyArgs = {
-  updates: Array<Notifications_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_External_Asset_DependenciesArgs = {
-  _inc?: InputMaybe<Project_External_Asset_Dependencies_Inc_Input>;
-  _set?: InputMaybe<Project_External_Asset_Dependencies_Set_Input>;
-  where: Project_External_Asset_Dependencies_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_External_Asset_Dependencies_By_PkArgs = {
-  _inc?: InputMaybe<Project_External_Asset_Dependencies_Inc_Input>;
-  _set?: InputMaybe<Project_External_Asset_Dependencies_Set_Input>;
-  pk_columns: Project_External_Asset_Dependencies_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_External_Asset_Dependencies_ManyArgs = {
-  updates: Array<Project_External_Asset_Dependencies_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_External_Asset_Dependency_TypesArgs = {
-  _set?: InputMaybe<Project_External_Asset_Dependency_Types_Set_Input>;
-  where: Project_External_Asset_Dependency_Types_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_External_Asset_Dependency_Types_By_PkArgs = {
-  _set?: InputMaybe<Project_External_Asset_Dependency_Types_Set_Input>;
-  pk_columns: Project_External_Asset_Dependency_Types_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_External_Asset_Dependency_Types_ManyArgs = {
-  updates: Array<Project_External_Asset_Dependency_Types_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_Minter_ConfigurationsArgs = {
-  _append?: InputMaybe<Project_Minter_Configurations_Append_Input>;
-  _delete_at_path?: InputMaybe<Project_Minter_Configurations_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Project_Minter_Configurations_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Project_Minter_Configurations_Delete_Key_Input>;
-  _prepend?: InputMaybe<Project_Minter_Configurations_Prepend_Input>;
-  _set?: InputMaybe<Project_Minter_Configurations_Set_Input>;
-  where: Project_Minter_Configurations_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_Minter_Configurations_By_PkArgs = {
-  _append?: InputMaybe<Project_Minter_Configurations_Append_Input>;
-  _delete_at_path?: InputMaybe<Project_Minter_Configurations_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Project_Minter_Configurations_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Project_Minter_Configurations_Delete_Key_Input>;
-  _prepend?: InputMaybe<Project_Minter_Configurations_Prepend_Input>;
-  _set?: InputMaybe<Project_Minter_Configurations_Set_Input>;
-  pk_columns: Project_Minter_Configurations_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_Minter_Configurations_ManyArgs = {
-  updates: Array<Project_Minter_Configurations_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_ScriptsArgs = {
-  _inc?: InputMaybe<Project_Scripts_Inc_Input>;
-  _set?: InputMaybe<Project_Scripts_Set_Input>;
-  where: Project_Scripts_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_Scripts_By_PkArgs = {
-  _inc?: InputMaybe<Project_Scripts_Inc_Input>;
-  _set?: InputMaybe<Project_Scripts_Set_Input>;
-  pk_columns: Project_Scripts_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_Scripts_ManyArgs = {
-  updates: Array<Project_Scripts_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_SeriesArgs = {
-  _inc?: InputMaybe<Project_Series_Inc_Input>;
-  _set?: InputMaybe<Project_Series_Set_Input>;
-  where: Project_Series_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_Series_By_PkArgs = {
-  _inc?: InputMaybe<Project_Series_Inc_Input>;
-  _set?: InputMaybe<Project_Series_Set_Input>;
-  pk_columns: Project_Series_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_Series_ManyArgs = {
-  updates: Array<Project_Series_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_Vertical_CategoriesArgs = {
-  _set?: InputMaybe<Project_Vertical_Categories_Set_Input>;
-  where: Project_Vertical_Categories_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_Vertical_Categories_By_PkArgs = {
-  _set?: InputMaybe<Project_Vertical_Categories_Set_Input>;
-  pk_columns: Project_Vertical_Categories_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_Vertical_Categories_ManyArgs = {
-  updates: Array<Project_Vertical_Categories_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_VerticalsArgs = {
-  _set?: InputMaybe<Project_Verticals_Set_Input>;
-  where: Project_Verticals_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_Verticals_By_PkArgs = {
-  _set?: InputMaybe<Project_Verticals_Set_Input>;
-  pk_columns: Project_Verticals_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Project_Verticals_ManyArgs = {
-  updates: Array<Project_Verticals_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Projects_FeaturesArgs = {
-  _append?: InputMaybe<Projects_Features_Append_Input>;
-  _delete_at_path?: InputMaybe<Projects_Features_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Projects_Features_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Projects_Features_Delete_Key_Input>;
-  _inc?: InputMaybe<Projects_Features_Inc_Input>;
-  _prepend?: InputMaybe<Projects_Features_Prepend_Input>;
-  _set?: InputMaybe<Projects_Features_Set_Input>;
-  where: Projects_Features_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Projects_Features_By_PkArgs = {
-  _append?: InputMaybe<Projects_Features_Append_Input>;
-  _delete_at_path?: InputMaybe<Projects_Features_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Projects_Features_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Projects_Features_Delete_Key_Input>;
-  _inc?: InputMaybe<Projects_Features_Inc_Input>;
-  _prepend?: InputMaybe<Projects_Features_Prepend_Input>;
-  _set?: InputMaybe<Projects_Features_Set_Input>;
-  pk_columns: Projects_Features_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Projects_Features_ManyArgs = {
-  updates: Array<Projects_Features_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Projects_Features_PrivateArgs = {
-  _inc?: InputMaybe<Projects_Features_Private_Inc_Input>;
-  _set?: InputMaybe<Projects_Features_Private_Set_Input>;
-  where: Projects_Features_Private_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Projects_Features_Private_ManyArgs = {
-  updates: Array<Projects_Features_Private_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Projects_MetadataArgs = {
-  _append?: InputMaybe<Projects_Metadata_Append_Input>;
-  _delete_at_path?: InputMaybe<Projects_Metadata_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Projects_Metadata_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Projects_Metadata_Delete_Key_Input>;
-  _inc?: InputMaybe<Projects_Metadata_Inc_Input>;
-  _prepend?: InputMaybe<Projects_Metadata_Prepend_Input>;
-  _set?: InputMaybe<Projects_Metadata_Set_Input>;
-  where: Projects_Metadata_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Projects_Metadata_By_PkArgs = {
-  _append?: InputMaybe<Projects_Metadata_Append_Input>;
-  _delete_at_path?: InputMaybe<Projects_Metadata_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Projects_Metadata_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Projects_Metadata_Delete_Key_Input>;
-  _inc?: InputMaybe<Projects_Metadata_Inc_Input>;
-  _prepend?: InputMaybe<Projects_Metadata_Prepend_Input>;
-  _set?: InputMaybe<Projects_Metadata_Set_Input>;
-  pk_columns: Projects_Metadata_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Projects_Metadata_ManyArgs = {
-  updates: Array<Projects_Metadata_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Proposed_Artist_Addresses_And_SplitsArgs = {
-  _inc?: InputMaybe<Proposed_Artist_Addresses_And_Splits_Inc_Input>;
-  _set?: InputMaybe<Proposed_Artist_Addresses_And_Splits_Set_Input>;
-  where: Proposed_Artist_Addresses_And_Splits_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Proposed_Artist_Addresses_And_Splits_By_PkArgs = {
-  _inc?: InputMaybe<Proposed_Artist_Addresses_And_Splits_Inc_Input>;
-  _set?: InputMaybe<Proposed_Artist_Addresses_And_Splits_Set_Input>;
-  pk_columns: Proposed_Artist_Addresses_And_Splits_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Proposed_Artist_Addresses_And_Splits_ManyArgs = {
-  updates: Array<Proposed_Artist_Addresses_And_Splits_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_ScreeningsArgs = {
-  _inc?: InputMaybe<Screenings_Inc_Input>;
-  _set?: InputMaybe<Screenings_Set_Input>;
-  where: Screenings_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Screenings_By_PkArgs = {
-  _inc?: InputMaybe<Screenings_Inc_Input>;
-  _set?: InputMaybe<Screenings_Set_Input>;
-  pk_columns: Screenings_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Screenings_ManyArgs = {
-  updates: Array<Screenings_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Sync_StatusArgs = {
-  _set?: InputMaybe<Sync_Status_Set_Input>;
-  where: Sync_Status_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Sync_Status_By_PkArgs = {
-  _set?: InputMaybe<Sync_Status_Set_Input>;
-  pk_columns: Sync_Status_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Sync_Status_ManyArgs = {
-  updates: Array<Sync_Status_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Tag_GroupingsArgs = {
-  _set?: InputMaybe<Tag_Groupings_Set_Input>;
-  where: Tag_Groupings_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Tag_Groupings_By_PkArgs = {
-  _set?: InputMaybe<Tag_Groupings_Set_Input>;
-  pk_columns: Tag_Groupings_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Tag_Groupings_ManyArgs = {
-  updates: Array<Tag_Groupings_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Tag_StatusArgs = {
-  _set?: InputMaybe<Tag_Status_Set_Input>;
-  where: Tag_Status_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Tag_Status_By_PkArgs = {
-  _set?: InputMaybe<Tag_Status_Set_Input>;
-  pk_columns: Tag_Status_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Tag_Status_ManyArgs = {
-  updates: Array<Tag_Status_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Tag_TypesArgs = {
-  _set?: InputMaybe<Tag_Types_Set_Input>;
-  where: Tag_Types_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Tag_Types_By_PkArgs = {
-  _set?: InputMaybe<Tag_Types_Set_Input>;
-  pk_columns: Tag_Types_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Tag_Types_ManyArgs = {
-  updates: Array<Tag_Types_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_TagsArgs = {
-  _inc?: InputMaybe<Tags_Inc_Input>;
-  _set?: InputMaybe<Tags_Set_Input>;
-  where: Tags_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Tags_By_PkArgs = {
-  _inc?: InputMaybe<Tags_Inc_Input>;
-  _set?: InputMaybe<Tags_Set_Input>;
-  pk_columns: Tags_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Tags_ManyArgs = {
-  updates: Array<Tags_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Terms_Of_ServiceArgs = {
-  _inc?: InputMaybe<Terms_Of_Service_Inc_Input>;
-  _set?: InputMaybe<Terms_Of_Service_Set_Input>;
-  where: Terms_Of_Service_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Terms_Of_Service_By_PkArgs = {
-  _inc?: InputMaybe<Terms_Of_Service_Inc_Input>;
-  _set?: InputMaybe<Terms_Of_Service_Set_Input>;
-  pk_columns: Terms_Of_Service_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Terms_Of_Service_ManyArgs = {
-  updates: Array<Terms_Of_Service_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Tokens_MetadataArgs = {
-  _append?: InputMaybe<Tokens_Metadata_Append_Input>;
-  _delete_at_path?: InputMaybe<Tokens_Metadata_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Tokens_Metadata_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Tokens_Metadata_Delete_Key_Input>;
-  _inc?: InputMaybe<Tokens_Metadata_Inc_Input>;
-  _prepend?: InputMaybe<Tokens_Metadata_Prepend_Input>;
-  _set?: InputMaybe<Tokens_Metadata_Set_Input>;
-  where: Tokens_Metadata_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Tokens_Metadata_By_PkArgs = {
-  _append?: InputMaybe<Tokens_Metadata_Append_Input>;
-  _delete_at_path?: InputMaybe<Tokens_Metadata_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Tokens_Metadata_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Tokens_Metadata_Delete_Key_Input>;
-  _inc?: InputMaybe<Tokens_Metadata_Inc_Input>;
-  _prepend?: InputMaybe<Tokens_Metadata_Prepend_Input>;
-  _set?: InputMaybe<Tokens_Metadata_Set_Input>;
-  pk_columns: Tokens_Metadata_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Tokens_Metadata_ManyArgs = {
-  updates: Array<Tokens_Metadata_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_User_ProfilesArgs = {
-  _inc?: InputMaybe<User_Profiles_Inc_Input>;
-  _set?: InputMaybe<User_Profiles_Set_Input>;
-  where: User_Profiles_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_User_Profiles_By_PkArgs = {
-  _inc?: InputMaybe<User_Profiles_Inc_Input>;
-  _set?: InputMaybe<User_Profiles_Set_Input>;
-  pk_columns: User_Profiles_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_User_Profiles_ManyArgs = {
-  updates: Array<User_Profiles_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_UsersArgs = {
-  _inc?: InputMaybe<Users_Inc_Input>;
-  _set?: InputMaybe<Users_Set_Input>;
-  where: Users_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Users_By_PkArgs = {
-  _inc?: InputMaybe<Users_Inc_Input>;
-  _set?: InputMaybe<Users_Set_Input>;
-  pk_columns: Users_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Users_ManyArgs = {
-  updates: Array<Users_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_VerticalsArgs = {
-  _set?: InputMaybe<Verticals_Set_Input>;
-  where: Verticals_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Verticals_By_PkArgs = {
-  _set?: InputMaybe<Verticals_Set_Input>;
-  pk_columns: Verticals_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Verticals_ManyArgs = {
-  updates: Array<Verticals_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Webflow_Artist_InfoArgs = {
-  _append?: InputMaybe<Webflow_Artist_Info_Append_Input>;
-  _delete_at_path?: InputMaybe<Webflow_Artist_Info_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Webflow_Artist_Info_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Webflow_Artist_Info_Delete_Key_Input>;
-  _prepend?: InputMaybe<Webflow_Artist_Info_Prepend_Input>;
-  _set?: InputMaybe<Webflow_Artist_Info_Set_Input>;
-  where: Webflow_Artist_Info_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Webflow_Artist_Info_By_PkArgs = {
-  _append?: InputMaybe<Webflow_Artist_Info_Append_Input>;
-  _delete_at_path?: InputMaybe<Webflow_Artist_Info_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Webflow_Artist_Info_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Webflow_Artist_Info_Delete_Key_Input>;
-  _prepend?: InputMaybe<Webflow_Artist_Info_Prepend_Input>;
-  _set?: InputMaybe<Webflow_Artist_Info_Set_Input>;
-  pk_columns: Webflow_Artist_Info_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Webflow_Artist_Info_ManyArgs = {
-  updates: Array<Webflow_Artist_Info_Updates>;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Webflow_Spectrum_ArticlesArgs = {
-  _append?: InputMaybe<Webflow_Spectrum_Articles_Append_Input>;
-  _delete_at_path?: InputMaybe<Webflow_Spectrum_Articles_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Webflow_Spectrum_Articles_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Webflow_Spectrum_Articles_Delete_Key_Input>;
-  _prepend?: InputMaybe<Webflow_Spectrum_Articles_Prepend_Input>;
-  _set?: InputMaybe<Webflow_Spectrum_Articles_Set_Input>;
-  where: Webflow_Spectrum_Articles_Bool_Exp;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Webflow_Spectrum_Articles_By_PkArgs = {
-  _append?: InputMaybe<Webflow_Spectrum_Articles_Append_Input>;
-  _delete_at_path?: InputMaybe<Webflow_Spectrum_Articles_Delete_At_Path_Input>;
-  _delete_elem?: InputMaybe<Webflow_Spectrum_Articles_Delete_Elem_Input>;
-  _delete_key?: InputMaybe<Webflow_Spectrum_Articles_Delete_Key_Input>;
-  _prepend?: InputMaybe<Webflow_Spectrum_Articles_Prepend_Input>;
-  _set?: InputMaybe<Webflow_Spectrum_Articles_Set_Input>;
-  pk_columns: Webflow_Spectrum_Articles_Pk_Columns_Input;
-};
-
-
-/** mutation root */
-export type Mutation_RootUpdate_Webflow_Spectrum_Articles_ManyArgs = {
-  updates: Array<Webflow_Spectrum_Articles_Updates>;
-};
-
-/** columns and relationships of "notifications" */
-export type Notifications = {
-  __typename?: 'notifications';
-  action_text?: Maybe<Scalars['String']>;
-  action_url?: Maybe<Scalars['String']>;
-  body?: Maybe<Scalars['String']>;
-  dismissed: Scalars['Boolean'];
-  /** An object relationship */
-  image?: Maybe<Media>;
-  image_id?: Maybe<Scalars['Int']>;
-  title: Scalars['String'];
-  trigger_key: Scalars['String'];
-  trigger_time: Scalars['timestamptz'];
-  /** An object relationship */
-  user: Users;
-  user_address: Scalars['String'];
-};
-
-/** aggregated selection of "notifications" */
-export type Notifications_Aggregate = {
-  __typename?: 'notifications_aggregate';
-  aggregate?: Maybe<Notifications_Aggregate_Fields>;
-  nodes: Array<Notifications>;
-};
-
-/** aggregate fields of "notifications" */
-export type Notifications_Aggregate_Fields = {
-  __typename?: 'notifications_aggregate_fields';
-  avg?: Maybe<Notifications_Avg_Fields>;
-  count: Scalars['Int'];
-  max?: Maybe<Notifications_Max_Fields>;
-  min?: Maybe<Notifications_Min_Fields>;
-  stddev?: Maybe<Notifications_Stddev_Fields>;
-  stddev_pop?: Maybe<Notifications_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Notifications_Stddev_Samp_Fields>;
-  sum?: Maybe<Notifications_Sum_Fields>;
-  var_pop?: Maybe<Notifications_Var_Pop_Fields>;
-  var_samp?: Maybe<Notifications_Var_Samp_Fields>;
-  variance?: Maybe<Notifications_Variance_Fields>;
-};
-
-
-/** aggregate fields of "notifications" */
-export type Notifications_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Notifications_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** order by aggregate values of table "notifications" */
-export type Notifications_Aggregate_Order_By = {
-  avg?: InputMaybe<Notifications_Avg_Order_By>;
-  count?: InputMaybe<Order_By>;
-  max?: InputMaybe<Notifications_Max_Order_By>;
-  min?: InputMaybe<Notifications_Min_Order_By>;
-  stddev?: InputMaybe<Notifications_Stddev_Order_By>;
-  stddev_pop?: InputMaybe<Notifications_Stddev_Pop_Order_By>;
-  stddev_samp?: InputMaybe<Notifications_Stddev_Samp_Order_By>;
-  sum?: InputMaybe<Notifications_Sum_Order_By>;
-  var_pop?: InputMaybe<Notifications_Var_Pop_Order_By>;
-  var_samp?: InputMaybe<Notifications_Var_Samp_Order_By>;
-  variance?: InputMaybe<Notifications_Variance_Order_By>;
-};
-
-/** input type for inserting array relation for remote table "notifications" */
-export type Notifications_Arr_Rel_Insert_Input = {
-  data: Array<Notifications_Insert_Input>;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Notifications_On_Conflict>;
-};
-
-/** aggregate avg on columns */
-export type Notifications_Avg_Fields = {
-  __typename?: 'notifications_avg_fields';
-  image_id?: Maybe<Scalars['Float']>;
-};
-
-/** order by avg() on columns of table "notifications" */
-export type Notifications_Avg_Order_By = {
-  image_id?: InputMaybe<Order_By>;
-};
-
-/** Boolean expression to filter rows from the table "notifications". All fields are combined with a logical 'AND'. */
-export type Notifications_Bool_Exp = {
-  _and?: InputMaybe<Array<Notifications_Bool_Exp>>;
-  _not?: InputMaybe<Notifications_Bool_Exp>;
-  _or?: InputMaybe<Array<Notifications_Bool_Exp>>;
-  action_text?: InputMaybe<String_Comparison_Exp>;
-  action_url?: InputMaybe<String_Comparison_Exp>;
-  body?: InputMaybe<String_Comparison_Exp>;
-  dismissed?: InputMaybe<Boolean_Comparison_Exp>;
-  image?: InputMaybe<Media_Bool_Exp>;
-  image_id?: InputMaybe<Int_Comparison_Exp>;
-  title?: InputMaybe<String_Comparison_Exp>;
-  trigger_key?: InputMaybe<String_Comparison_Exp>;
-  trigger_time?: InputMaybe<Timestamptz_Comparison_Exp>;
-  user?: InputMaybe<Users_Bool_Exp>;
-  user_address?: InputMaybe<String_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "notifications" */
-export enum Notifications_Constraint {
-  /** unique or primary key constraint on columns "trigger_key", "user_address", "trigger_time" */
-  NotificationsPkey = 'notifications_pkey'
-}
-
-/** input type for incrementing numeric columns in table "notifications" */
-export type Notifications_Inc_Input = {
-  image_id?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "notifications" */
-export type Notifications_Insert_Input = {
-  action_text?: InputMaybe<Scalars['String']>;
-  action_url?: InputMaybe<Scalars['String']>;
-  body?: InputMaybe<Scalars['String']>;
-  dismissed?: InputMaybe<Scalars['Boolean']>;
-  image?: InputMaybe<Media_Obj_Rel_Insert_Input>;
-  image_id?: InputMaybe<Scalars['Int']>;
-  title?: InputMaybe<Scalars['String']>;
-  trigger_key?: InputMaybe<Scalars['String']>;
-  trigger_time?: InputMaybe<Scalars['timestamptz']>;
-  user?: InputMaybe<Users_Obj_Rel_Insert_Input>;
-  user_address?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Notifications_Max_Fields = {
-  __typename?: 'notifications_max_fields';
-  action_text?: Maybe<Scalars['String']>;
-  action_url?: Maybe<Scalars['String']>;
-  body?: Maybe<Scalars['String']>;
-  image_id?: Maybe<Scalars['Int']>;
-  title?: Maybe<Scalars['String']>;
-  trigger_key?: Maybe<Scalars['String']>;
-  trigger_time?: Maybe<Scalars['timestamptz']>;
-  user_address?: Maybe<Scalars['String']>;
-};
-
-/** order by max() on columns of table "notifications" */
-export type Notifications_Max_Order_By = {
-  action_text?: InputMaybe<Order_By>;
-  action_url?: InputMaybe<Order_By>;
-  body?: InputMaybe<Order_By>;
-  image_id?: InputMaybe<Order_By>;
-  title?: InputMaybe<Order_By>;
-  trigger_key?: InputMaybe<Order_By>;
-  trigger_time?: InputMaybe<Order_By>;
-  user_address?: InputMaybe<Order_By>;
-};
-
-/** aggregate min on columns */
-export type Notifications_Min_Fields = {
-  __typename?: 'notifications_min_fields';
-  action_text?: Maybe<Scalars['String']>;
-  action_url?: Maybe<Scalars['String']>;
-  body?: Maybe<Scalars['String']>;
-  image_id?: Maybe<Scalars['Int']>;
-  title?: Maybe<Scalars['String']>;
-  trigger_key?: Maybe<Scalars['String']>;
-  trigger_time?: Maybe<Scalars['timestamptz']>;
-  user_address?: Maybe<Scalars['String']>;
-};
-
-/** order by min() on columns of table "notifications" */
-export type Notifications_Min_Order_By = {
-  action_text?: InputMaybe<Order_By>;
-  action_url?: InputMaybe<Order_By>;
-  body?: InputMaybe<Order_By>;
-  image_id?: InputMaybe<Order_By>;
-  title?: InputMaybe<Order_By>;
-  trigger_key?: InputMaybe<Order_By>;
-  trigger_time?: InputMaybe<Order_By>;
-  user_address?: InputMaybe<Order_By>;
-};
-
-/** response of any mutation on the table "notifications" */
-export type Notifications_Mutation_Response = {
-  __typename?: 'notifications_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Notifications>;
-};
-
-/** on_conflict condition type for table "notifications" */
-export type Notifications_On_Conflict = {
-  constraint: Notifications_Constraint;
-  update_columns?: Array<Notifications_Update_Column>;
-  where?: InputMaybe<Notifications_Bool_Exp>;
-};
-
-/** Ordering options when selecting data from "notifications". */
-export type Notifications_Order_By = {
-  action_text?: InputMaybe<Order_By>;
-  action_url?: InputMaybe<Order_By>;
-  body?: InputMaybe<Order_By>;
-  dismissed?: InputMaybe<Order_By>;
-  image?: InputMaybe<Media_Order_By>;
-  image_id?: InputMaybe<Order_By>;
-  title?: InputMaybe<Order_By>;
-  trigger_key?: InputMaybe<Order_By>;
-  trigger_time?: InputMaybe<Order_By>;
-  user?: InputMaybe<Users_Order_By>;
-  user_address?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: notifications */
-export type Notifications_Pk_Columns_Input = {
-  trigger_key: Scalars['String'];
-  trigger_time: Scalars['timestamptz'];
-  user_address: Scalars['String'];
-};
-
-/** select columns of table "notifications" */
-export enum Notifications_Select_Column {
-  /** column name */
-  ActionText = 'action_text',
-  /** column name */
-  ActionUrl = 'action_url',
-  /** column name */
-  Body = 'body',
-  /** column name */
-  Dismissed = 'dismissed',
-  /** column name */
-  ImageId = 'image_id',
-  /** column name */
-  Title = 'title',
-  /** column name */
-  TriggerKey = 'trigger_key',
-  /** column name */
-  TriggerTime = 'trigger_time',
-  /** column name */
-  UserAddress = 'user_address'
-}
-
-/** input type for updating data in table "notifications" */
-export type Notifications_Set_Input = {
-  action_text?: InputMaybe<Scalars['String']>;
-  action_url?: InputMaybe<Scalars['String']>;
-  body?: InputMaybe<Scalars['String']>;
-  dismissed?: InputMaybe<Scalars['Boolean']>;
-  image_id?: InputMaybe<Scalars['Int']>;
-  title?: InputMaybe<Scalars['String']>;
-  trigger_key?: InputMaybe<Scalars['String']>;
-  trigger_time?: InputMaybe<Scalars['timestamptz']>;
-  user_address?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate stddev on columns */
-export type Notifications_Stddev_Fields = {
-  __typename?: 'notifications_stddev_fields';
-  image_id?: Maybe<Scalars['Float']>;
-};
-
-/** order by stddev() on columns of table "notifications" */
-export type Notifications_Stddev_Order_By = {
-  image_id?: InputMaybe<Order_By>;
-};
-
-/** aggregate stddev_pop on columns */
-export type Notifications_Stddev_Pop_Fields = {
-  __typename?: 'notifications_stddev_pop_fields';
-  image_id?: Maybe<Scalars['Float']>;
-};
-
-/** order by stddev_pop() on columns of table "notifications" */
-export type Notifications_Stddev_Pop_Order_By = {
-  image_id?: InputMaybe<Order_By>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Notifications_Stddev_Samp_Fields = {
-  __typename?: 'notifications_stddev_samp_fields';
-  image_id?: Maybe<Scalars['Float']>;
-};
-
-/** order by stddev_samp() on columns of table "notifications" */
-export type Notifications_Stddev_Samp_Order_By = {
-  image_id?: InputMaybe<Order_By>;
-};
-
-/** Streaming cursor of the table "notifications" */
-export type Notifications_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Notifications_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Notifications_Stream_Cursor_Value_Input = {
-  action_text?: InputMaybe<Scalars['String']>;
-  action_url?: InputMaybe<Scalars['String']>;
-  body?: InputMaybe<Scalars['String']>;
-  dismissed?: InputMaybe<Scalars['Boolean']>;
-  image_id?: InputMaybe<Scalars['Int']>;
-  title?: InputMaybe<Scalars['String']>;
-  trigger_key?: InputMaybe<Scalars['String']>;
-  trigger_time?: InputMaybe<Scalars['timestamptz']>;
-  user_address?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate sum on columns */
-export type Notifications_Sum_Fields = {
-  __typename?: 'notifications_sum_fields';
-  image_id?: Maybe<Scalars['Int']>;
-};
-
-/** order by sum() on columns of table "notifications" */
-export type Notifications_Sum_Order_By = {
-  image_id?: InputMaybe<Order_By>;
-};
-
-/** update columns of table "notifications" */
-export enum Notifications_Update_Column {
-  /** column name */
-  ActionText = 'action_text',
-  /** column name */
-  ActionUrl = 'action_url',
-  /** column name */
-  Body = 'body',
-  /** column name */
-  Dismissed = 'dismissed',
-  /** column name */
-  ImageId = 'image_id',
-  /** column name */
-  Title = 'title',
-  /** column name */
-  TriggerKey = 'trigger_key',
-  /** column name */
-  TriggerTime = 'trigger_time',
-  /** column name */
-  UserAddress = 'user_address'
-}
-
-export type Notifications_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Notifications_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Notifications_Set_Input>;
-  where: Notifications_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Notifications_Var_Pop_Fields = {
-  __typename?: 'notifications_var_pop_fields';
-  image_id?: Maybe<Scalars['Float']>;
-};
-
-/** order by var_pop() on columns of table "notifications" */
-export type Notifications_Var_Pop_Order_By = {
-  image_id?: InputMaybe<Order_By>;
-};
-
-/** aggregate var_samp on columns */
-export type Notifications_Var_Samp_Fields = {
-  __typename?: 'notifications_var_samp_fields';
-  image_id?: Maybe<Scalars['Float']>;
-};
-
-/** order by var_samp() on columns of table "notifications" */
-export type Notifications_Var_Samp_Order_By = {
-  image_id?: InputMaybe<Order_By>;
-};
-
-/** aggregate variance on columns */
-export type Notifications_Variance_Fields = {
-  __typename?: 'notifications_variance_fields';
-  image_id?: Maybe<Scalars['Float']>;
-};
-
-/** order by variance() on columns of table "notifications" */
-export type Notifications_Variance_Order_By = {
-  image_id?: InputMaybe<Order_By>;
 };
 
 /** Boolean expression to compare columns of type "numeric". All fields are combined with logical 'AND'. */
@@ -9272,36 +1639,6 @@ export type Project_External_Asset_Dependencies = {
   project_id: Scalars['String'];
 };
 
-/** aggregated selection of "project_external_asset_dependencies" */
-export type Project_External_Asset_Dependencies_Aggregate = {
-  __typename?: 'project_external_asset_dependencies_aggregate';
-  aggregate?: Maybe<Project_External_Asset_Dependencies_Aggregate_Fields>;
-  nodes: Array<Project_External_Asset_Dependencies>;
-};
-
-/** aggregate fields of "project_external_asset_dependencies" */
-export type Project_External_Asset_Dependencies_Aggregate_Fields = {
-  __typename?: 'project_external_asset_dependencies_aggregate_fields';
-  avg?: Maybe<Project_External_Asset_Dependencies_Avg_Fields>;
-  count: Scalars['Int'];
-  max?: Maybe<Project_External_Asset_Dependencies_Max_Fields>;
-  min?: Maybe<Project_External_Asset_Dependencies_Min_Fields>;
-  stddev?: Maybe<Project_External_Asset_Dependencies_Stddev_Fields>;
-  stddev_pop?: Maybe<Project_External_Asset_Dependencies_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Project_External_Asset_Dependencies_Stddev_Samp_Fields>;
-  sum?: Maybe<Project_External_Asset_Dependencies_Sum_Fields>;
-  var_pop?: Maybe<Project_External_Asset_Dependencies_Var_Pop_Fields>;
-  var_samp?: Maybe<Project_External_Asset_Dependencies_Var_Samp_Fields>;
-  variance?: Maybe<Project_External_Asset_Dependencies_Variance_Fields>;
-};
-
-
-/** aggregate fields of "project_external_asset_dependencies" */
-export type Project_External_Asset_Dependencies_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Project_External_Asset_Dependencies_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
 /** order by aggregate values of table "project_external_asset_dependencies" */
 export type Project_External_Asset_Dependencies_Aggregate_Order_By = {
   avg?: InputMaybe<Project_External_Asset_Dependencies_Avg_Order_By>;
@@ -9315,19 +1652,6 @@ export type Project_External_Asset_Dependencies_Aggregate_Order_By = {
   var_pop?: InputMaybe<Project_External_Asset_Dependencies_Var_Pop_Order_By>;
   var_samp?: InputMaybe<Project_External_Asset_Dependencies_Var_Samp_Order_By>;
   variance?: InputMaybe<Project_External_Asset_Dependencies_Variance_Order_By>;
-};
-
-/** input type for inserting array relation for remote table "project_external_asset_dependencies" */
-export type Project_External_Asset_Dependencies_Arr_Rel_Insert_Input = {
-  data: Array<Project_External_Asset_Dependencies_Insert_Input>;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Project_External_Asset_Dependencies_On_Conflict>;
-};
-
-/** aggregate avg on columns */
-export type Project_External_Asset_Dependencies_Avg_Fields = {
-  __typename?: 'project_external_asset_dependencies_avg_fields';
-  index?: Maybe<Scalars['Float']>;
 };
 
 /** order by avg() on columns of table "project_external_asset_dependencies" */
@@ -9347,47 +1671,11 @@ export type Project_External_Asset_Dependencies_Bool_Exp = {
   project_id?: InputMaybe<String_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "project_external_asset_dependencies" */
-export enum Project_External_Asset_Dependencies_Constraint {
-  /** unique or primary key constraint on columns "index", "project_id" */
-  ProjectExternalAssetDependenciesPkey = 'project_external_asset_dependencies_pkey'
-}
-
-/** input type for incrementing numeric columns in table "project_external_asset_dependencies" */
-export type Project_External_Asset_Dependencies_Inc_Input = {
-  index?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "project_external_asset_dependencies" */
-export type Project_External_Asset_Dependencies_Insert_Input = {
-  cid?: InputMaybe<Scalars['String']>;
-  dependency_type?: InputMaybe<Project_External_Asset_Dependency_Types_Enum>;
-  index?: InputMaybe<Scalars['Int']>;
-  project?: InputMaybe<Projects_Metadata_Obj_Rel_Insert_Input>;
-  project_id?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Project_External_Asset_Dependencies_Max_Fields = {
-  __typename?: 'project_external_asset_dependencies_max_fields';
-  cid?: Maybe<Scalars['String']>;
-  index?: Maybe<Scalars['Int']>;
-  project_id?: Maybe<Scalars['String']>;
-};
-
 /** order by max() on columns of table "project_external_asset_dependencies" */
 export type Project_External_Asset_Dependencies_Max_Order_By = {
   cid?: InputMaybe<Order_By>;
   index?: InputMaybe<Order_By>;
   project_id?: InputMaybe<Order_By>;
-};
-
-/** aggregate min on columns */
-export type Project_External_Asset_Dependencies_Min_Fields = {
-  __typename?: 'project_external_asset_dependencies_min_fields';
-  cid?: Maybe<Scalars['String']>;
-  index?: Maybe<Scalars['Int']>;
-  project_id?: Maybe<Scalars['String']>;
 };
 
 /** order by min() on columns of table "project_external_asset_dependencies" */
@@ -9397,22 +1685,6 @@ export type Project_External_Asset_Dependencies_Min_Order_By = {
   project_id?: InputMaybe<Order_By>;
 };
 
-/** response of any mutation on the table "project_external_asset_dependencies" */
-export type Project_External_Asset_Dependencies_Mutation_Response = {
-  __typename?: 'project_external_asset_dependencies_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Project_External_Asset_Dependencies>;
-};
-
-/** on_conflict condition type for table "project_external_asset_dependencies" */
-export type Project_External_Asset_Dependencies_On_Conflict = {
-  constraint: Project_External_Asset_Dependencies_Constraint;
-  update_columns?: Array<Project_External_Asset_Dependencies_Update_Column>;
-  where?: InputMaybe<Project_External_Asset_Dependencies_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "project_external_asset_dependencies". */
 export type Project_External_Asset_Dependencies_Order_By = {
   cid?: InputMaybe<Order_By>;
@@ -9420,12 +1692,6 @@ export type Project_External_Asset_Dependencies_Order_By = {
   index?: InputMaybe<Order_By>;
   project?: InputMaybe<Projects_Metadata_Order_By>;
   project_id?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: project_external_asset_dependencies */
-export type Project_External_Asset_Dependencies_Pk_Columns_Input = {
-  index: Scalars['Int'];
-  project_id: Scalars['String'];
 };
 
 /** select columns of table "project_external_asset_dependencies" */
@@ -9440,40 +1706,14 @@ export enum Project_External_Asset_Dependencies_Select_Column {
   ProjectId = 'project_id'
 }
 
-/** input type for updating data in table "project_external_asset_dependencies" */
-export type Project_External_Asset_Dependencies_Set_Input = {
-  cid?: InputMaybe<Scalars['String']>;
-  dependency_type?: InputMaybe<Project_External_Asset_Dependency_Types_Enum>;
-  index?: InputMaybe<Scalars['Int']>;
-  project_id?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate stddev on columns */
-export type Project_External_Asset_Dependencies_Stddev_Fields = {
-  __typename?: 'project_external_asset_dependencies_stddev_fields';
-  index?: Maybe<Scalars['Float']>;
-};
-
 /** order by stddev() on columns of table "project_external_asset_dependencies" */
 export type Project_External_Asset_Dependencies_Stddev_Order_By = {
   index?: InputMaybe<Order_By>;
 };
 
-/** aggregate stddev_pop on columns */
-export type Project_External_Asset_Dependencies_Stddev_Pop_Fields = {
-  __typename?: 'project_external_asset_dependencies_stddev_pop_fields';
-  index?: Maybe<Scalars['Float']>;
-};
-
 /** order by stddev_pop() on columns of table "project_external_asset_dependencies" */
 export type Project_External_Asset_Dependencies_Stddev_Pop_Order_By = {
   index?: InputMaybe<Order_By>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Project_External_Asset_Dependencies_Stddev_Samp_Fields = {
-  __typename?: 'project_external_asset_dependencies_stddev_samp_fields';
-  index?: Maybe<Scalars['Float']>;
 };
 
 /** order by stddev_samp() on columns of table "project_external_asset_dependencies" */
@@ -9497,41 +1737,9 @@ export type Project_External_Asset_Dependencies_Stream_Cursor_Value_Input = {
   project_id?: InputMaybe<Scalars['String']>;
 };
 
-/** aggregate sum on columns */
-export type Project_External_Asset_Dependencies_Sum_Fields = {
-  __typename?: 'project_external_asset_dependencies_sum_fields';
-  index?: Maybe<Scalars['Int']>;
-};
-
 /** order by sum() on columns of table "project_external_asset_dependencies" */
 export type Project_External_Asset_Dependencies_Sum_Order_By = {
   index?: InputMaybe<Order_By>;
-};
-
-/** update columns of table "project_external_asset_dependencies" */
-export enum Project_External_Asset_Dependencies_Update_Column {
-  /** column name */
-  Cid = 'cid',
-  /** column name */
-  DependencyType = 'dependency_type',
-  /** column name */
-  Index = 'index',
-  /** column name */
-  ProjectId = 'project_id'
-}
-
-export type Project_External_Asset_Dependencies_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Project_External_Asset_Dependencies_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Project_External_Asset_Dependencies_Set_Input>;
-  where: Project_External_Asset_Dependencies_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Project_External_Asset_Dependencies_Var_Pop_Fields = {
-  __typename?: 'project_external_asset_dependencies_var_pop_fields';
-  index?: Maybe<Scalars['Float']>;
 };
 
 /** order by var_pop() on columns of table "project_external_asset_dependencies" */
@@ -9539,69 +1747,15 @@ export type Project_External_Asset_Dependencies_Var_Pop_Order_By = {
   index?: InputMaybe<Order_By>;
 };
 
-/** aggregate var_samp on columns */
-export type Project_External_Asset_Dependencies_Var_Samp_Fields = {
-  __typename?: 'project_external_asset_dependencies_var_samp_fields';
-  index?: Maybe<Scalars['Float']>;
-};
-
 /** order by var_samp() on columns of table "project_external_asset_dependencies" */
 export type Project_External_Asset_Dependencies_Var_Samp_Order_By = {
   index?: InputMaybe<Order_By>;
-};
-
-/** aggregate variance on columns */
-export type Project_External_Asset_Dependencies_Variance_Fields = {
-  __typename?: 'project_external_asset_dependencies_variance_fields';
-  index?: Maybe<Scalars['Float']>;
 };
 
 /** order by variance() on columns of table "project_external_asset_dependencies" */
 export type Project_External_Asset_Dependencies_Variance_Order_By = {
   index?: InputMaybe<Order_By>;
 };
-
-/** columns and relationships of "project_external_asset_dependency_types" */
-export type Project_External_Asset_Dependency_Types = {
-  __typename?: 'project_external_asset_dependency_types';
-  type: Scalars['String'];
-};
-
-/** aggregated selection of "project_external_asset_dependency_types" */
-export type Project_External_Asset_Dependency_Types_Aggregate = {
-  __typename?: 'project_external_asset_dependency_types_aggregate';
-  aggregate?: Maybe<Project_External_Asset_Dependency_Types_Aggregate_Fields>;
-  nodes: Array<Project_External_Asset_Dependency_Types>;
-};
-
-/** aggregate fields of "project_external_asset_dependency_types" */
-export type Project_External_Asset_Dependency_Types_Aggregate_Fields = {
-  __typename?: 'project_external_asset_dependency_types_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Project_External_Asset_Dependency_Types_Max_Fields>;
-  min?: Maybe<Project_External_Asset_Dependency_Types_Min_Fields>;
-};
-
-
-/** aggregate fields of "project_external_asset_dependency_types" */
-export type Project_External_Asset_Dependency_Types_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Project_External_Asset_Dependency_Types_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** Boolean expression to filter rows from the table "project_external_asset_dependency_types". All fields are combined with a logical 'AND'. */
-export type Project_External_Asset_Dependency_Types_Bool_Exp = {
-  _and?: InputMaybe<Array<Project_External_Asset_Dependency_Types_Bool_Exp>>;
-  _not?: InputMaybe<Project_External_Asset_Dependency_Types_Bool_Exp>;
-  _or?: InputMaybe<Array<Project_External_Asset_Dependency_Types_Bool_Exp>>;
-  type?: InputMaybe<String_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "project_external_asset_dependency_types" */
-export enum Project_External_Asset_Dependency_Types_Constraint {
-  /** unique or primary key constraint on columns "type" */
-  ProjectExternalAssetDependencyTypesPkey = 'project_external_asset_dependency_types_pkey'
-}
 
 export enum Project_External_Asset_Dependency_Types_Enum {
   Arweave = 'ARWEAVE',
@@ -9615,85 +1769,6 @@ export type Project_External_Asset_Dependency_Types_Enum_Comparison_Exp = {
   _is_null?: InputMaybe<Scalars['Boolean']>;
   _neq?: InputMaybe<Project_External_Asset_Dependency_Types_Enum>;
   _nin?: InputMaybe<Array<Project_External_Asset_Dependency_Types_Enum>>;
-};
-
-/** input type for inserting data into table "project_external_asset_dependency_types" */
-export type Project_External_Asset_Dependency_Types_Insert_Input = {
-  type?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Project_External_Asset_Dependency_Types_Max_Fields = {
-  __typename?: 'project_external_asset_dependency_types_max_fields';
-  type?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Project_External_Asset_Dependency_Types_Min_Fields = {
-  __typename?: 'project_external_asset_dependency_types_min_fields';
-  type?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "project_external_asset_dependency_types" */
-export type Project_External_Asset_Dependency_Types_Mutation_Response = {
-  __typename?: 'project_external_asset_dependency_types_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Project_External_Asset_Dependency_Types>;
-};
-
-/** on_conflict condition type for table "project_external_asset_dependency_types" */
-export type Project_External_Asset_Dependency_Types_On_Conflict = {
-  constraint: Project_External_Asset_Dependency_Types_Constraint;
-  update_columns?: Array<Project_External_Asset_Dependency_Types_Update_Column>;
-  where?: InputMaybe<Project_External_Asset_Dependency_Types_Bool_Exp>;
-};
-
-/** Ordering options when selecting data from "project_external_asset_dependency_types". */
-export type Project_External_Asset_Dependency_Types_Order_By = {
-  type?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: project_external_asset_dependency_types */
-export type Project_External_Asset_Dependency_Types_Pk_Columns_Input = {
-  type: Scalars['String'];
-};
-
-/** select columns of table "project_external_asset_dependency_types" */
-export enum Project_External_Asset_Dependency_Types_Select_Column {
-  /** column name */
-  Type = 'type'
-}
-
-/** input type for updating data in table "project_external_asset_dependency_types" */
-export type Project_External_Asset_Dependency_Types_Set_Input = {
-  type?: InputMaybe<Scalars['String']>;
-};
-
-/** Streaming cursor of the table "project_external_asset_dependency_types" */
-export type Project_External_Asset_Dependency_Types_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Project_External_Asset_Dependency_Types_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Project_External_Asset_Dependency_Types_Stream_Cursor_Value_Input = {
-  type?: InputMaybe<Scalars['String']>;
-};
-
-/** update columns of table "project_external_asset_dependency_types" */
-export enum Project_External_Asset_Dependency_Types_Update_Column {
-  /** column name */
-  Type = 'type'
-}
-
-export type Project_External_Asset_Dependency_Types_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Project_External_Asset_Dependency_Types_Set_Input>;
-  where: Project_External_Asset_Dependency_Types_Bool_Exp;
 };
 
 /** columns and relationships of "project_minter_configurations" */
@@ -9733,34 +1808,6 @@ export type Project_Minter_ConfigurationsOffchain_Extra_Minter_DetailsArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
 
-/** aggregated selection of "project_minter_configurations" */
-export type Project_Minter_Configurations_Aggregate = {
-  __typename?: 'project_minter_configurations_aggregate';
-  aggregate?: Maybe<Project_Minter_Configurations_Aggregate_Fields>;
-  nodes: Array<Project_Minter_Configurations>;
-};
-
-/** aggregate fields of "project_minter_configurations" */
-export type Project_Minter_Configurations_Aggregate_Fields = {
-  __typename?: 'project_minter_configurations_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Project_Minter_Configurations_Max_Fields>;
-  min?: Maybe<Project_Minter_Configurations_Min_Fields>;
-};
-
-
-/** aggregate fields of "project_minter_configurations" */
-export type Project_Minter_Configurations_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Project_Minter_Configurations_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** append existing jsonb value of filtered columns with new jsonb value */
-export type Project_Minter_Configurations_Append_Input = {
-  extra_minter_details?: InputMaybe<Scalars['jsonb']>;
-  offchain_extra_minter_details?: InputMaybe<Scalars['jsonb']>;
-};
-
 /** Boolean expression to filter rows from the table "project_minter_configurations". All fields are combined with a logical 'AND'. */
 export type Project_Minter_Configurations_Bool_Exp = {
   _and?: InputMaybe<Array<Project_Minter_Configurations_Bool_Exp>>;
@@ -9785,103 +1832,6 @@ export type Project_Minter_Configurations_Bool_Exp = {
   start_time?: InputMaybe<Timestamptz_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "project_minter_configurations" */
-export enum Project_Minter_Configurations_Constraint {
-  /** unique or primary key constraint on columns "id" */
-  ProjectMinterConfigurationsPkey = 'project_minter_configurations_pkey'
-}
-
-/** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-export type Project_Minter_Configurations_Delete_At_Path_Input = {
-  extra_minter_details?: InputMaybe<Array<Scalars['String']>>;
-  offchain_extra_minter_details?: InputMaybe<Array<Scalars['String']>>;
-};
-
-/** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-export type Project_Minter_Configurations_Delete_Elem_Input = {
-  extra_minter_details?: InputMaybe<Scalars['Int']>;
-  offchain_extra_minter_details?: InputMaybe<Scalars['Int']>;
-};
-
-/** delete key/value pair or string element. key/value pairs are matched based on their key value */
-export type Project_Minter_Configurations_Delete_Key_Input = {
-  extra_minter_details?: InputMaybe<Scalars['String']>;
-  offchain_extra_minter_details?: InputMaybe<Scalars['String']>;
-};
-
-/** input type for inserting data into table "project_minter_configurations" */
-export type Project_Minter_Configurations_Insert_Input = {
-  base_price?: InputMaybe<Scalars['String']>;
-  currency_address?: InputMaybe<Scalars['String']>;
-  currency_symbol?: InputMaybe<Scalars['String']>;
-  end_time?: InputMaybe<Scalars['timestamptz']>;
-  extra_minter_details?: InputMaybe<Scalars['jsonb']>;
-  half_life_in_seconds?: InputMaybe<Scalars['String']>;
-  id?: InputMaybe<Scalars['String']>;
-  minter?: InputMaybe<Minters_Metadata_Obj_Rel_Insert_Input>;
-  minter_id?: InputMaybe<Scalars['String']>;
-  offchain_extra_minter_details?: InputMaybe<Scalars['jsonb']>;
-  price_is_configured?: InputMaybe<Scalars['Boolean']>;
-  project?: InputMaybe<Projects_Metadata_Obj_Rel_Insert_Input>;
-  project_id?: InputMaybe<Scalars['String']>;
-  purchase_to_disabled?: InputMaybe<Scalars['Boolean']>;
-  start_price?: InputMaybe<Scalars['String']>;
-  start_time?: InputMaybe<Scalars['timestamptz']>;
-};
-
-/** aggregate max on columns */
-export type Project_Minter_Configurations_Max_Fields = {
-  __typename?: 'project_minter_configurations_max_fields';
-  base_price?: Maybe<Scalars['String']>;
-  currency_address?: Maybe<Scalars['String']>;
-  currency_symbol?: Maybe<Scalars['String']>;
-  end_time?: Maybe<Scalars['timestamptz']>;
-  half_life_in_seconds?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['String']>;
-  minter_id?: Maybe<Scalars['String']>;
-  project_id?: Maybe<Scalars['String']>;
-  start_price?: Maybe<Scalars['String']>;
-  start_time?: Maybe<Scalars['timestamptz']>;
-};
-
-/** aggregate min on columns */
-export type Project_Minter_Configurations_Min_Fields = {
-  __typename?: 'project_minter_configurations_min_fields';
-  base_price?: Maybe<Scalars['String']>;
-  currency_address?: Maybe<Scalars['String']>;
-  currency_symbol?: Maybe<Scalars['String']>;
-  end_time?: Maybe<Scalars['timestamptz']>;
-  half_life_in_seconds?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['String']>;
-  minter_id?: Maybe<Scalars['String']>;
-  project_id?: Maybe<Scalars['String']>;
-  start_price?: Maybe<Scalars['String']>;
-  start_time?: Maybe<Scalars['timestamptz']>;
-};
-
-/** response of any mutation on the table "project_minter_configurations" */
-export type Project_Minter_Configurations_Mutation_Response = {
-  __typename?: 'project_minter_configurations_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Project_Minter_Configurations>;
-};
-
-/** input type for inserting object relation for remote table "project_minter_configurations" */
-export type Project_Minter_Configurations_Obj_Rel_Insert_Input = {
-  data: Project_Minter_Configurations_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Project_Minter_Configurations_On_Conflict>;
-};
-
-/** on_conflict condition type for table "project_minter_configurations" */
-export type Project_Minter_Configurations_On_Conflict = {
-  constraint: Project_Minter_Configurations_Constraint;
-  update_columns?: Array<Project_Minter_Configurations_Update_Column>;
-  where?: InputMaybe<Project_Minter_Configurations_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "project_minter_configurations". */
 export type Project_Minter_Configurations_Order_By = {
   approximate_exp_da_end_time?: InputMaybe<Order_By>;
@@ -9901,17 +1851,6 @@ export type Project_Minter_Configurations_Order_By = {
   purchase_to_disabled?: InputMaybe<Order_By>;
   start_price?: InputMaybe<Order_By>;
   start_time?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: project_minter_configurations */
-export type Project_Minter_Configurations_Pk_Columns_Input = {
-  id: Scalars['String'];
-};
-
-/** prepend existing jsonb value of filtered columns with new jsonb value */
-export type Project_Minter_Configurations_Prepend_Input = {
-  extra_minter_details?: InputMaybe<Scalars['jsonb']>;
-  offchain_extra_minter_details?: InputMaybe<Scalars['jsonb']>;
 };
 
 /** select columns of table "project_minter_configurations" */
@@ -9946,24 +1885,6 @@ export enum Project_Minter_Configurations_Select_Column {
   StartTime = 'start_time'
 }
 
-/** input type for updating data in table "project_minter_configurations" */
-export type Project_Minter_Configurations_Set_Input = {
-  base_price?: InputMaybe<Scalars['String']>;
-  currency_address?: InputMaybe<Scalars['String']>;
-  currency_symbol?: InputMaybe<Scalars['String']>;
-  end_time?: InputMaybe<Scalars['timestamptz']>;
-  extra_minter_details?: InputMaybe<Scalars['jsonb']>;
-  half_life_in_seconds?: InputMaybe<Scalars['String']>;
-  id?: InputMaybe<Scalars['String']>;
-  minter_id?: InputMaybe<Scalars['String']>;
-  offchain_extra_minter_details?: InputMaybe<Scalars['jsonb']>;
-  price_is_configured?: InputMaybe<Scalars['Boolean']>;
-  project_id?: InputMaybe<Scalars['String']>;
-  purchase_to_disabled?: InputMaybe<Scalars['Boolean']>;
-  start_price?: InputMaybe<Scalars['String']>;
-  start_time?: InputMaybe<Scalars['timestamptz']>;
-};
-
 /** Streaming cursor of the table "project_minter_configurations" */
 export type Project_Minter_Configurations_Stream_Cursor_Input = {
   /** Stream column input with initial value */
@@ -9990,54 +1911,6 @@ export type Project_Minter_Configurations_Stream_Cursor_Value_Input = {
   start_time?: InputMaybe<Scalars['timestamptz']>;
 };
 
-/** update columns of table "project_minter_configurations" */
-export enum Project_Minter_Configurations_Update_Column {
-  /** column name */
-  BasePrice = 'base_price',
-  /** column name */
-  CurrencyAddress = 'currency_address',
-  /** column name */
-  CurrencySymbol = 'currency_symbol',
-  /** column name */
-  EndTime = 'end_time',
-  /** column name */
-  ExtraMinterDetails = 'extra_minter_details',
-  /** column name */
-  HalfLifeInSeconds = 'half_life_in_seconds',
-  /** column name */
-  Id = 'id',
-  /** column name */
-  MinterId = 'minter_id',
-  /** column name */
-  OffchainExtraMinterDetails = 'offchain_extra_minter_details',
-  /** column name */
-  PriceIsConfigured = 'price_is_configured',
-  /** column name */
-  ProjectId = 'project_id',
-  /** column name */
-  PurchaseToDisabled = 'purchase_to_disabled',
-  /** column name */
-  StartPrice = 'start_price',
-  /** column name */
-  StartTime = 'start_time'
-}
-
-export type Project_Minter_Configurations_Updates = {
-  /** append existing jsonb value of filtered columns with new jsonb value */
-  _append?: InputMaybe<Project_Minter_Configurations_Append_Input>;
-  /** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-  _delete_at_path?: InputMaybe<Project_Minter_Configurations_Delete_At_Path_Input>;
-  /** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-  _delete_elem?: InputMaybe<Project_Minter_Configurations_Delete_Elem_Input>;
-  /** delete key/value pair or string element. key/value pairs are matched based on their key value */
-  _delete_key?: InputMaybe<Project_Minter_Configurations_Delete_Key_Input>;
-  /** prepend existing jsonb value of filtered columns with new jsonb value */
-  _prepend?: InputMaybe<Project_Minter_Configurations_Prepend_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Project_Minter_Configurations_Set_Input>;
-  where: Project_Minter_Configurations_Bool_Exp;
-};
-
 /** columns and relationships of "project_scripts" */
 export type Project_Scripts = {
   __typename?: 'project_scripts';
@@ -10046,36 +1919,6 @@ export type Project_Scripts = {
   project?: Maybe<Projects_Metadata>;
   project_id: Scalars['String'];
   script: Scalars['String'];
-};
-
-/** aggregated selection of "project_scripts" */
-export type Project_Scripts_Aggregate = {
-  __typename?: 'project_scripts_aggregate';
-  aggregate?: Maybe<Project_Scripts_Aggregate_Fields>;
-  nodes: Array<Project_Scripts>;
-};
-
-/** aggregate fields of "project_scripts" */
-export type Project_Scripts_Aggregate_Fields = {
-  __typename?: 'project_scripts_aggregate_fields';
-  avg?: Maybe<Project_Scripts_Avg_Fields>;
-  count: Scalars['Int'];
-  max?: Maybe<Project_Scripts_Max_Fields>;
-  min?: Maybe<Project_Scripts_Min_Fields>;
-  stddev?: Maybe<Project_Scripts_Stddev_Fields>;
-  stddev_pop?: Maybe<Project_Scripts_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Project_Scripts_Stddev_Samp_Fields>;
-  sum?: Maybe<Project_Scripts_Sum_Fields>;
-  var_pop?: Maybe<Project_Scripts_Var_Pop_Fields>;
-  var_samp?: Maybe<Project_Scripts_Var_Samp_Fields>;
-  variance?: Maybe<Project_Scripts_Variance_Fields>;
-};
-
-
-/** aggregate fields of "project_scripts" */
-export type Project_Scripts_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Project_Scripts_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
 };
 
 /** order by aggregate values of table "project_scripts" */
@@ -10091,19 +1934,6 @@ export type Project_Scripts_Aggregate_Order_By = {
   var_pop?: InputMaybe<Project_Scripts_Var_Pop_Order_By>;
   var_samp?: InputMaybe<Project_Scripts_Var_Samp_Order_By>;
   variance?: InputMaybe<Project_Scripts_Variance_Order_By>;
-};
-
-/** input type for inserting array relation for remote table "project_scripts" */
-export type Project_Scripts_Arr_Rel_Insert_Input = {
-  data: Array<Project_Scripts_Insert_Input>;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Project_Scripts_On_Conflict>;
-};
-
-/** aggregate avg on columns */
-export type Project_Scripts_Avg_Fields = {
-  __typename?: 'project_scripts_avg_fields';
-  index?: Maybe<Scalars['Float']>;
 };
 
 /** order by avg() on columns of table "project_scripts" */
@@ -10122,46 +1952,11 @@ export type Project_Scripts_Bool_Exp = {
   script?: InputMaybe<String_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "project_scripts" */
-export enum Project_Scripts_Constraint {
-  /** unique or primary key constraint on columns "index", "project_id" */
-  ProjectScriptsPkey = 'project_scripts_pkey'
-}
-
-/** input type for incrementing numeric columns in table "project_scripts" */
-export type Project_Scripts_Inc_Input = {
-  index?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "project_scripts" */
-export type Project_Scripts_Insert_Input = {
-  index?: InputMaybe<Scalars['Int']>;
-  project?: InputMaybe<Projects_Metadata_Obj_Rel_Insert_Input>;
-  project_id?: InputMaybe<Scalars['String']>;
-  script?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Project_Scripts_Max_Fields = {
-  __typename?: 'project_scripts_max_fields';
-  index?: Maybe<Scalars['Int']>;
-  project_id?: Maybe<Scalars['String']>;
-  script?: Maybe<Scalars['String']>;
-};
-
 /** order by max() on columns of table "project_scripts" */
 export type Project_Scripts_Max_Order_By = {
   index?: InputMaybe<Order_By>;
   project_id?: InputMaybe<Order_By>;
   script?: InputMaybe<Order_By>;
-};
-
-/** aggregate min on columns */
-export type Project_Scripts_Min_Fields = {
-  __typename?: 'project_scripts_min_fields';
-  index?: Maybe<Scalars['Int']>;
-  project_id?: Maybe<Scalars['String']>;
-  script?: Maybe<Scalars['String']>;
 };
 
 /** order by min() on columns of table "project_scripts" */
@@ -10171,34 +1966,12 @@ export type Project_Scripts_Min_Order_By = {
   script?: InputMaybe<Order_By>;
 };
 
-/** response of any mutation on the table "project_scripts" */
-export type Project_Scripts_Mutation_Response = {
-  __typename?: 'project_scripts_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Project_Scripts>;
-};
-
-/** on_conflict condition type for table "project_scripts" */
-export type Project_Scripts_On_Conflict = {
-  constraint: Project_Scripts_Constraint;
-  update_columns?: Array<Project_Scripts_Update_Column>;
-  where?: InputMaybe<Project_Scripts_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "project_scripts". */
 export type Project_Scripts_Order_By = {
   index?: InputMaybe<Order_By>;
   project?: InputMaybe<Projects_Metadata_Order_By>;
   project_id?: InputMaybe<Order_By>;
   script?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: project_scripts */
-export type Project_Scripts_Pk_Columns_Input = {
-  index: Scalars['Int'];
-  project_id: Scalars['String'];
 };
 
 /** select columns of table "project_scripts" */
@@ -10211,39 +1984,14 @@ export enum Project_Scripts_Select_Column {
   Script = 'script'
 }
 
-/** input type for updating data in table "project_scripts" */
-export type Project_Scripts_Set_Input = {
-  index?: InputMaybe<Scalars['Int']>;
-  project_id?: InputMaybe<Scalars['String']>;
-  script?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate stddev on columns */
-export type Project_Scripts_Stddev_Fields = {
-  __typename?: 'project_scripts_stddev_fields';
-  index?: Maybe<Scalars['Float']>;
-};
-
 /** order by stddev() on columns of table "project_scripts" */
 export type Project_Scripts_Stddev_Order_By = {
   index?: InputMaybe<Order_By>;
 };
 
-/** aggregate stddev_pop on columns */
-export type Project_Scripts_Stddev_Pop_Fields = {
-  __typename?: 'project_scripts_stddev_pop_fields';
-  index?: Maybe<Scalars['Float']>;
-};
-
 /** order by stddev_pop() on columns of table "project_scripts" */
 export type Project_Scripts_Stddev_Pop_Order_By = {
   index?: InputMaybe<Order_By>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Project_Scripts_Stddev_Samp_Fields = {
-  __typename?: 'project_scripts_stddev_samp_fields';
-  index?: Maybe<Scalars['Float']>;
 };
 
 /** order by stddev_samp() on columns of table "project_scripts" */
@@ -10266,39 +2014,9 @@ export type Project_Scripts_Stream_Cursor_Value_Input = {
   script?: InputMaybe<Scalars['String']>;
 };
 
-/** aggregate sum on columns */
-export type Project_Scripts_Sum_Fields = {
-  __typename?: 'project_scripts_sum_fields';
-  index?: Maybe<Scalars['Int']>;
-};
-
 /** order by sum() on columns of table "project_scripts" */
 export type Project_Scripts_Sum_Order_By = {
   index?: InputMaybe<Order_By>;
-};
-
-/** update columns of table "project_scripts" */
-export enum Project_Scripts_Update_Column {
-  /** column name */
-  Index = 'index',
-  /** column name */
-  ProjectId = 'project_id',
-  /** column name */
-  Script = 'script'
-}
-
-export type Project_Scripts_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Project_Scripts_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Project_Scripts_Set_Input>;
-  where: Project_Scripts_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Project_Scripts_Var_Pop_Fields = {
-  __typename?: 'project_scripts_var_pop_fields';
-  index?: Maybe<Scalars['Float']>;
 };
 
 /** order by var_pop() on columns of table "project_scripts" */
@@ -10306,21 +2024,9 @@ export type Project_Scripts_Var_Pop_Order_By = {
   index?: InputMaybe<Order_By>;
 };
 
-/** aggregate var_samp on columns */
-export type Project_Scripts_Var_Samp_Fields = {
-  __typename?: 'project_scripts_var_samp_fields';
-  index?: Maybe<Scalars['Float']>;
-};
-
 /** order by var_samp() on columns of table "project_scripts" */
 export type Project_Scripts_Var_Samp_Order_By = {
   index?: InputMaybe<Order_By>;
-};
-
-/** aggregate variance on columns */
-export type Project_Scripts_Variance_Fields = {
-  __typename?: 'project_scripts_variance_fields';
-  index?: Maybe<Scalars['Float']>;
 };
 
 /** order by variance() on columns of table "project_scripts" */
@@ -10401,23 +2107,7 @@ export type Project_Series_Bool_Exp = {
   _or?: InputMaybe<Array<Project_Series_Bool_Exp>>;
   id?: InputMaybe<Int_Comparison_Exp>;
   projects?: InputMaybe<Projects_Metadata_Bool_Exp>;
-};
-
-/** unique or primary key constraints on table "project_series" */
-export enum Project_Series_Constraint {
-  /** unique or primary key constraint on columns "id" */
-  ProjectSeriesPkey = 'project_series_pkey'
-}
-
-/** input type for incrementing numeric columns in table "project_series" */
-export type Project_Series_Inc_Input = {
-  id?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "project_series" */
-export type Project_Series_Insert_Input = {
-  id?: InputMaybe<Scalars['Int']>;
-  projects?: InputMaybe<Projects_Metadata_Arr_Rel_Insert_Input>;
+  projects_aggregate?: InputMaybe<Projects_Metadata_Aggregate_Bool_Exp>;
 };
 
 /** aggregate max on columns */
@@ -10432,38 +2122,10 @@ export type Project_Series_Min_Fields = {
   id?: Maybe<Scalars['Int']>;
 };
 
-/** response of any mutation on the table "project_series" */
-export type Project_Series_Mutation_Response = {
-  __typename?: 'project_series_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Project_Series>;
-};
-
-/** input type for inserting object relation for remote table "project_series" */
-export type Project_Series_Obj_Rel_Insert_Input = {
-  data: Project_Series_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Project_Series_On_Conflict>;
-};
-
-/** on_conflict condition type for table "project_series" */
-export type Project_Series_On_Conflict = {
-  constraint: Project_Series_Constraint;
-  update_columns?: Array<Project_Series_Update_Column>;
-  where?: InputMaybe<Project_Series_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "project_series". */
 export type Project_Series_Order_By = {
   id?: InputMaybe<Order_By>;
   projects_aggregate?: InputMaybe<Projects_Metadata_Aggregate_Order_By>;
-};
-
-/** primary key columns input for table: project_series */
-export type Project_Series_Pk_Columns_Input = {
-  id: Scalars['Int'];
 };
 
 /** select columns of table "project_series" */
@@ -10471,11 +2133,6 @@ export enum Project_Series_Select_Column {
   /** column name */
   Id = 'id'
 }
-
-/** input type for updating data in table "project_series" */
-export type Project_Series_Set_Input = {
-  id?: InputMaybe<Scalars['Int']>;
-};
 
 /** aggregate stddev on columns */
 export type Project_Series_Stddev_Fields = {
@@ -10514,20 +2171,6 @@ export type Project_Series_Sum_Fields = {
   id?: Maybe<Scalars['Int']>;
 };
 
-/** update columns of table "project_series" */
-export enum Project_Series_Update_Column {
-  /** column name */
-  Id = 'id'
-}
-
-export type Project_Series_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Project_Series_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Project_Series_Set_Input>;
-  where: Project_Series_Bool_Exp;
-};
-
 /** aggregate var_pop on columns */
 export type Project_Series_Var_Pop_Fields = {
   __typename?: 'project_series_var_pop_fields';
@@ -10552,12 +2195,9 @@ export type Project_Vertical_Categories = {
   /** An object relationship */
   category: Categories;
   hosted: Scalars['Boolean'];
-  is_artblocks?: Maybe<Scalars['Boolean']>;
   name: Categories_Enum;
   /** An array relationship */
   verticals: Array<Project_Verticals>;
-  /** An aggregate relationship */
-  verticals_aggregate: Project_Verticals_Aggregate;
 };
 
 
@@ -10570,36 +2210,6 @@ export type Project_Vertical_CategoriesVerticalsArgs = {
   where?: InputMaybe<Project_Verticals_Bool_Exp>;
 };
 
-
-/** columns and relationships of "project_vertical_categories" */
-export type Project_Vertical_CategoriesVerticals_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Project_Verticals_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_Verticals_Order_By>>;
-  where?: InputMaybe<Project_Verticals_Bool_Exp>;
-};
-
-/** aggregated selection of "project_vertical_categories" */
-export type Project_Vertical_Categories_Aggregate = {
-  __typename?: 'project_vertical_categories_aggregate';
-  aggregate?: Maybe<Project_Vertical_Categories_Aggregate_Fields>;
-  nodes: Array<Project_Vertical_Categories>;
-};
-
-/** aggregate fields of "project_vertical_categories" */
-export type Project_Vertical_Categories_Aggregate_Fields = {
-  __typename?: 'project_vertical_categories_aggregate_fields';
-  count: Scalars['Int'];
-};
-
-
-/** aggregate fields of "project_vertical_categories" */
-export type Project_Vertical_Categories_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Project_Vertical_Categories_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
 /** Boolean expression to filter rows from the table "project_vertical_categories". All fields are combined with a logical 'AND'. */
 export type Project_Vertical_Categories_Bool_Exp = {
   _and?: InputMaybe<Array<Project_Vertical_Categories_Bool_Exp>>;
@@ -10607,61 +2217,16 @@ export type Project_Vertical_Categories_Bool_Exp = {
   _or?: InputMaybe<Array<Project_Vertical_Categories_Bool_Exp>>;
   category?: InputMaybe<Categories_Bool_Exp>;
   hosted?: InputMaybe<Boolean_Comparison_Exp>;
-  is_artblocks?: InputMaybe<Boolean_Comparison_Exp>;
   name?: InputMaybe<Categories_Enum_Comparison_Exp>;
   verticals?: InputMaybe<Project_Verticals_Bool_Exp>;
-};
-
-/** unique or primary key constraints on table "project_vertical_categories" */
-export enum Project_Vertical_Categories_Constraint {
-  /** unique or primary key constraint on columns "name" */
-  ProjectVerticalCategoriesPkey = 'project_vertical_categories_pkey'
-}
-
-/** input type for inserting data into table "project_vertical_categories" */
-export type Project_Vertical_Categories_Insert_Input = {
-  category?: InputMaybe<Categories_Obj_Rel_Insert_Input>;
-  hosted?: InputMaybe<Scalars['Boolean']>;
-  is_artblocks?: InputMaybe<Scalars['Boolean']>;
-  name?: InputMaybe<Categories_Enum>;
-  verticals?: InputMaybe<Project_Verticals_Arr_Rel_Insert_Input>;
-};
-
-/** response of any mutation on the table "project_vertical_categories" */
-export type Project_Vertical_Categories_Mutation_Response = {
-  __typename?: 'project_vertical_categories_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Project_Vertical_Categories>;
-};
-
-/** input type for inserting object relation for remote table "project_vertical_categories" */
-export type Project_Vertical_Categories_Obj_Rel_Insert_Input = {
-  data: Project_Vertical_Categories_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Project_Vertical_Categories_On_Conflict>;
-};
-
-/** on_conflict condition type for table "project_vertical_categories" */
-export type Project_Vertical_Categories_On_Conflict = {
-  constraint: Project_Vertical_Categories_Constraint;
-  update_columns?: Array<Project_Vertical_Categories_Update_Column>;
-  where?: InputMaybe<Project_Vertical_Categories_Bool_Exp>;
 };
 
 /** Ordering options when selecting data from "project_vertical_categories". */
 export type Project_Vertical_Categories_Order_By = {
   category?: InputMaybe<Categories_Order_By>;
   hosted?: InputMaybe<Order_By>;
-  is_artblocks?: InputMaybe<Order_By>;
   name?: InputMaybe<Order_By>;
   verticals_aggregate?: InputMaybe<Project_Verticals_Aggregate_Order_By>;
-};
-
-/** primary key columns input for table: project_vertical_categories */
-export type Project_Vertical_Categories_Pk_Columns_Input = {
-  name: Categories_Enum;
 };
 
 /** select columns of table "project_vertical_categories" */
@@ -10669,17 +2234,8 @@ export enum Project_Vertical_Categories_Select_Column {
   /** column name */
   Hosted = 'hosted',
   /** column name */
-  IsArtblocks = 'is_artblocks',
-  /** column name */
   Name = 'name'
 }
-
-/** input type for updating data in table "project_vertical_categories" */
-export type Project_Vertical_Categories_Set_Input = {
-  hosted?: InputMaybe<Scalars['Boolean']>;
-  is_artblocks?: InputMaybe<Scalars['Boolean']>;
-  name?: InputMaybe<Categories_Enum>;
-};
 
 /** Streaming cursor of the table "project_vertical_categories" */
 export type Project_Vertical_Categories_Stream_Cursor_Input = {
@@ -10692,24 +2248,7 @@ export type Project_Vertical_Categories_Stream_Cursor_Input = {
 /** Initial value of the column from where the streaming should start */
 export type Project_Vertical_Categories_Stream_Cursor_Value_Input = {
   hosted?: InputMaybe<Scalars['Boolean']>;
-  is_artblocks?: InputMaybe<Scalars['Boolean']>;
   name?: InputMaybe<Categories_Enum>;
-};
-
-/** update columns of table "project_vertical_categories" */
-export enum Project_Vertical_Categories_Update_Column {
-  /** column name */
-  Hosted = 'hosted',
-  /** column name */
-  IsArtblocks = 'is_artblocks',
-  /** column name */
-  Name = 'name'
-}
-
-export type Project_Vertical_Categories_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Project_Vertical_Categories_Set_Input>;
-  where: Project_Vertical_Categories_Bool_Exp;
 };
 
 /** columns and relationships of "project_verticals" */
@@ -10750,40 +2289,11 @@ export type Project_VerticalsProjects_AggregateArgs = {
   where?: InputMaybe<Projects_Metadata_Bool_Exp>;
 };
 
-/** aggregated selection of "project_verticals" */
-export type Project_Verticals_Aggregate = {
-  __typename?: 'project_verticals_aggregate';
-  aggregate?: Maybe<Project_Verticals_Aggregate_Fields>;
-  nodes: Array<Project_Verticals>;
-};
-
-/** aggregate fields of "project_verticals" */
-export type Project_Verticals_Aggregate_Fields = {
-  __typename?: 'project_verticals_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Project_Verticals_Max_Fields>;
-  min?: Maybe<Project_Verticals_Min_Fields>;
-};
-
-
-/** aggregate fields of "project_verticals" */
-export type Project_Verticals_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Project_Verticals_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
 /** order by aggregate values of table "project_verticals" */
 export type Project_Verticals_Aggregate_Order_By = {
   count?: InputMaybe<Order_By>;
   max?: InputMaybe<Project_Verticals_Max_Order_By>;
   min?: InputMaybe<Project_Verticals_Min_Order_By>;
-};
-
-/** input type for inserting array relation for remote table "project_verticals" */
-export type Project_Verticals_Arr_Rel_Insert_Input = {
-  data: Array<Project_Verticals_Insert_Input>;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Project_Verticals_On_Conflict>;
 };
 
 /** Boolean expression to filter rows from the table "project_verticals". All fields are combined with a logical 'AND'. */
@@ -10798,33 +2308,8 @@ export type Project_Verticals_Bool_Exp = {
   display_name?: InputMaybe<String_Comparison_Exp>;
   name?: InputMaybe<Verticals_Enum_Comparison_Exp>;
   projects?: InputMaybe<Projects_Metadata_Bool_Exp>;
+  projects_aggregate?: InputMaybe<Projects_Metadata_Aggregate_Bool_Exp>;
   vertical?: InputMaybe<Verticals_Bool_Exp>;
-};
-
-/** unique or primary key constraints on table "project_verticals" */
-export enum Project_Verticals_Constraint {
-  /** unique or primary key constraint on columns "name" */
-  ProjectVerticalsPkey = 'project_verticals_pkey'
-}
-
-/** input type for inserting data into table "project_verticals" */
-export type Project_Verticals_Insert_Input = {
-  active?: InputMaybe<Scalars['Boolean']>;
-  category?: InputMaybe<Project_Vertical_Categories_Obj_Rel_Insert_Input>;
-  category_name?: InputMaybe<Scalars['String']>;
-  description?: InputMaybe<Scalars['String']>;
-  display_name?: InputMaybe<Scalars['String']>;
-  name?: InputMaybe<Verticals_Enum>;
-  projects?: InputMaybe<Projects_Metadata_Arr_Rel_Insert_Input>;
-  vertical?: InputMaybe<Verticals_Obj_Rel_Insert_Input>;
-};
-
-/** aggregate max on columns */
-export type Project_Verticals_Max_Fields = {
-  __typename?: 'project_verticals_max_fields';
-  category_name?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  display_name?: Maybe<Scalars['String']>;
 };
 
 /** order by max() on columns of table "project_verticals" */
@@ -10834,42 +2319,11 @@ export type Project_Verticals_Max_Order_By = {
   display_name?: InputMaybe<Order_By>;
 };
 
-/** aggregate min on columns */
-export type Project_Verticals_Min_Fields = {
-  __typename?: 'project_verticals_min_fields';
-  category_name?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  display_name?: Maybe<Scalars['String']>;
-};
-
 /** order by min() on columns of table "project_verticals" */
 export type Project_Verticals_Min_Order_By = {
   category_name?: InputMaybe<Order_By>;
   description?: InputMaybe<Order_By>;
   display_name?: InputMaybe<Order_By>;
-};
-
-/** response of any mutation on the table "project_verticals" */
-export type Project_Verticals_Mutation_Response = {
-  __typename?: 'project_verticals_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Project_Verticals>;
-};
-
-/** input type for inserting object relation for remote table "project_verticals" */
-export type Project_Verticals_Obj_Rel_Insert_Input = {
-  data: Project_Verticals_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Project_Verticals_On_Conflict>;
-};
-
-/** on_conflict condition type for table "project_verticals" */
-export type Project_Verticals_On_Conflict = {
-  constraint: Project_Verticals_Constraint;
-  update_columns?: Array<Project_Verticals_Update_Column>;
-  where?: InputMaybe<Project_Verticals_Bool_Exp>;
 };
 
 /** Ordering options when selecting data from "project_verticals". */
@@ -10882,11 +2336,6 @@ export type Project_Verticals_Order_By = {
   name?: InputMaybe<Order_By>;
   projects_aggregate?: InputMaybe<Projects_Metadata_Aggregate_Order_By>;
   vertical?: InputMaybe<Verticals_Order_By>;
-};
-
-/** primary key columns input for table: project_verticals */
-export type Project_Verticals_Pk_Columns_Input = {
-  name: Verticals_Enum;
 };
 
 /** select columns of table "project_verticals" */
@@ -10902,15 +2351,6 @@ export enum Project_Verticals_Select_Column {
   /** column name */
   Name = 'name'
 }
-
-/** input type for updating data in table "project_verticals" */
-export type Project_Verticals_Set_Input = {
-  active?: InputMaybe<Scalars['Boolean']>;
-  category_name?: InputMaybe<Scalars['String']>;
-  description?: InputMaybe<Scalars['String']>;
-  display_name?: InputMaybe<Scalars['String']>;
-  name?: InputMaybe<Verticals_Enum>;
-};
 
 /** Streaming cursor of the table "project_verticals" */
 export type Project_Verticals_Stream_Cursor_Input = {
@@ -10929,36 +2369,13 @@ export type Project_Verticals_Stream_Cursor_Value_Input = {
   name?: InputMaybe<Verticals_Enum>;
 };
 
-/** update columns of table "project_verticals" */
-export enum Project_Verticals_Update_Column {
-  /** column name */
-  Active = 'active',
-  /** column name */
-  CategoryName = 'category_name',
-  /** column name */
-  Description = 'description',
-  /** column name */
-  DisplayName = 'display_name',
-  /** column name */
-  Name = 'name'
-}
-
-export type Project_Verticals_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Project_Verticals_Set_Input>;
-  where: Project_Verticals_Bool_Exp;
-};
-
 /** columns and relationships of "projects_features" */
 export type Projects_Features = {
   __typename?: 'projects_features';
   enable_artist_update_after_completion: Scalars['Boolean'];
   feature_fields?: Maybe<Scalars['jsonb']>;
   feature_fields_counts?: Maybe<Scalars['jsonb']>;
-  features_script?: Maybe<Scalars['String']>;
   id: Scalars['Int'];
-  /** An object relationship */
-  private_data?: Maybe<Projects_Features_Private>;
   /** An object relationship */
   project: Projects_Metadata;
   project_id: Scalars['String'];
@@ -10976,48 +2393,6 @@ export type Projects_FeaturesFeature_Fields_CountsArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
 
-/** aggregated selection of "projects_features" */
-export type Projects_Features_Aggregate = {
-  __typename?: 'projects_features_aggregate';
-  aggregate?: Maybe<Projects_Features_Aggregate_Fields>;
-  nodes: Array<Projects_Features>;
-};
-
-/** aggregate fields of "projects_features" */
-export type Projects_Features_Aggregate_Fields = {
-  __typename?: 'projects_features_aggregate_fields';
-  avg?: Maybe<Projects_Features_Avg_Fields>;
-  count: Scalars['Int'];
-  max?: Maybe<Projects_Features_Max_Fields>;
-  min?: Maybe<Projects_Features_Min_Fields>;
-  stddev?: Maybe<Projects_Features_Stddev_Fields>;
-  stddev_pop?: Maybe<Projects_Features_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Projects_Features_Stddev_Samp_Fields>;
-  sum?: Maybe<Projects_Features_Sum_Fields>;
-  var_pop?: Maybe<Projects_Features_Var_Pop_Fields>;
-  var_samp?: Maybe<Projects_Features_Var_Samp_Fields>;
-  variance?: Maybe<Projects_Features_Variance_Fields>;
-};
-
-
-/** aggregate fields of "projects_features" */
-export type Projects_Features_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Projects_Features_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** append existing jsonb value of filtered columns with new jsonb value */
-export type Projects_Features_Append_Input = {
-  feature_fields?: InputMaybe<Scalars['jsonb']>;
-  feature_fields_counts?: InputMaybe<Scalars['jsonb']>;
-};
-
-/** aggregate avg on columns */
-export type Projects_Features_Avg_Fields = {
-  __typename?: 'projects_features_avg_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
 /** Boolean expression to filter rows from the table "projects_features". All fields are combined with a logical 'AND'. */
 export type Projects_Features_Bool_Exp = {
   _and?: InputMaybe<Array<Projects_Features_Bool_Exp>>;
@@ -11026,93 +2401,9 @@ export type Projects_Features_Bool_Exp = {
   enable_artist_update_after_completion?: InputMaybe<Boolean_Comparison_Exp>;
   feature_fields?: InputMaybe<Jsonb_Comparison_Exp>;
   feature_fields_counts?: InputMaybe<Jsonb_Comparison_Exp>;
-  features_script?: InputMaybe<String_Comparison_Exp>;
   id?: InputMaybe<Int_Comparison_Exp>;
-  private_data?: InputMaybe<Projects_Features_Private_Bool_Exp>;
   project?: InputMaybe<Projects_Metadata_Bool_Exp>;
   project_id?: InputMaybe<String_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "projects_features" */
-export enum Projects_Features_Constraint {
-  /** unique or primary key constraint on columns "id" */
-  ProjectsFeaturesPkey = 'projects_features_pkey',
-  /** unique or primary key constraint on columns "project_id" */
-  ProjectsFeaturesProjectIdKey = 'projects_features_project_id_key'
-}
-
-/** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-export type Projects_Features_Delete_At_Path_Input = {
-  feature_fields?: InputMaybe<Array<Scalars['String']>>;
-  feature_fields_counts?: InputMaybe<Array<Scalars['String']>>;
-};
-
-/** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-export type Projects_Features_Delete_Elem_Input = {
-  feature_fields?: InputMaybe<Scalars['Int']>;
-  feature_fields_counts?: InputMaybe<Scalars['Int']>;
-};
-
-/** delete key/value pair or string element. key/value pairs are matched based on their key value */
-export type Projects_Features_Delete_Key_Input = {
-  feature_fields?: InputMaybe<Scalars['String']>;
-  feature_fields_counts?: InputMaybe<Scalars['String']>;
-};
-
-/** input type for incrementing numeric columns in table "projects_features" */
-export type Projects_Features_Inc_Input = {
-  id?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "projects_features" */
-export type Projects_Features_Insert_Input = {
-  enable_artist_update_after_completion?: InputMaybe<Scalars['Boolean']>;
-  feature_fields?: InputMaybe<Scalars['jsonb']>;
-  feature_fields_counts?: InputMaybe<Scalars['jsonb']>;
-  features_script?: InputMaybe<Scalars['String']>;
-  id?: InputMaybe<Scalars['Int']>;
-  private_data?: InputMaybe<Projects_Features_Private_Obj_Rel_Insert_Input>;
-  project?: InputMaybe<Projects_Metadata_Obj_Rel_Insert_Input>;
-  project_id?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Projects_Features_Max_Fields = {
-  __typename?: 'projects_features_max_fields';
-  features_script?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['Int']>;
-  project_id?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Projects_Features_Min_Fields = {
-  __typename?: 'projects_features_min_fields';
-  features_script?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['Int']>;
-  project_id?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "projects_features" */
-export type Projects_Features_Mutation_Response = {
-  __typename?: 'projects_features_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Projects_Features>;
-};
-
-/** input type for inserting object relation for remote table "projects_features" */
-export type Projects_Features_Obj_Rel_Insert_Input = {
-  data: Projects_Features_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Projects_Features_On_Conflict>;
-};
-
-/** on_conflict condition type for table "projects_features" */
-export type Projects_Features_On_Conflict = {
-  constraint: Projects_Features_Constraint;
-  update_columns?: Array<Projects_Features_Update_Column>;
-  where?: InputMaybe<Projects_Features_Bool_Exp>;
 };
 
 /** Ordering options when selecting data from "projects_features". */
@@ -11120,202 +2411,9 @@ export type Projects_Features_Order_By = {
   enable_artist_update_after_completion?: InputMaybe<Order_By>;
   feature_fields?: InputMaybe<Order_By>;
   feature_fields_counts?: InputMaybe<Order_By>;
-  features_script?: InputMaybe<Order_By>;
   id?: InputMaybe<Order_By>;
-  private_data?: InputMaybe<Projects_Features_Private_Order_By>;
   project?: InputMaybe<Projects_Metadata_Order_By>;
   project_id?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: projects_features */
-export type Projects_Features_Pk_Columns_Input = {
-  id: Scalars['Int'];
-};
-
-/** prepend existing jsonb value of filtered columns with new jsonb value */
-export type Projects_Features_Prepend_Input = {
-  feature_fields?: InputMaybe<Scalars['jsonb']>;
-  feature_fields_counts?: InputMaybe<Scalars['jsonb']>;
-};
-
-/** columns and relationships of "projects_features_private" */
-export type Projects_Features_Private = {
-  __typename?: 'projects_features_private';
-  features_script?: Maybe<Scalars['String']>;
-  /** An object relationship */
-  project_features?: Maybe<Projects_Features>;
-  project_features_id?: Maybe<Scalars['Int']>;
-};
-
-/** aggregated selection of "projects_features_private" */
-export type Projects_Features_Private_Aggregate = {
-  __typename?: 'projects_features_private_aggregate';
-  aggregate?: Maybe<Projects_Features_Private_Aggregate_Fields>;
-  nodes: Array<Projects_Features_Private>;
-};
-
-/** aggregate fields of "projects_features_private" */
-export type Projects_Features_Private_Aggregate_Fields = {
-  __typename?: 'projects_features_private_aggregate_fields';
-  avg?: Maybe<Projects_Features_Private_Avg_Fields>;
-  count: Scalars['Int'];
-  max?: Maybe<Projects_Features_Private_Max_Fields>;
-  min?: Maybe<Projects_Features_Private_Min_Fields>;
-  stddev?: Maybe<Projects_Features_Private_Stddev_Fields>;
-  stddev_pop?: Maybe<Projects_Features_Private_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Projects_Features_Private_Stddev_Samp_Fields>;
-  sum?: Maybe<Projects_Features_Private_Sum_Fields>;
-  var_pop?: Maybe<Projects_Features_Private_Var_Pop_Fields>;
-  var_samp?: Maybe<Projects_Features_Private_Var_Samp_Fields>;
-  variance?: Maybe<Projects_Features_Private_Variance_Fields>;
-};
-
-
-/** aggregate fields of "projects_features_private" */
-export type Projects_Features_Private_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Projects_Features_Private_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** aggregate avg on columns */
-export type Projects_Features_Private_Avg_Fields = {
-  __typename?: 'projects_features_private_avg_fields';
-  project_features_id?: Maybe<Scalars['Float']>;
-};
-
-/** Boolean expression to filter rows from the table "projects_features_private". All fields are combined with a logical 'AND'. */
-export type Projects_Features_Private_Bool_Exp = {
-  _and?: InputMaybe<Array<Projects_Features_Private_Bool_Exp>>;
-  _not?: InputMaybe<Projects_Features_Private_Bool_Exp>;
-  _or?: InputMaybe<Array<Projects_Features_Private_Bool_Exp>>;
-  features_script?: InputMaybe<String_Comparison_Exp>;
-  project_features?: InputMaybe<Projects_Features_Bool_Exp>;
-  project_features_id?: InputMaybe<Int_Comparison_Exp>;
-};
-
-/** input type for incrementing numeric columns in table "projects_features_private" */
-export type Projects_Features_Private_Inc_Input = {
-  project_features_id?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "projects_features_private" */
-export type Projects_Features_Private_Insert_Input = {
-  features_script?: InputMaybe<Scalars['String']>;
-  project_features?: InputMaybe<Projects_Features_Obj_Rel_Insert_Input>;
-  project_features_id?: InputMaybe<Scalars['Int']>;
-};
-
-/** aggregate max on columns */
-export type Projects_Features_Private_Max_Fields = {
-  __typename?: 'projects_features_private_max_fields';
-  features_script?: Maybe<Scalars['String']>;
-  project_features_id?: Maybe<Scalars['Int']>;
-};
-
-/** aggregate min on columns */
-export type Projects_Features_Private_Min_Fields = {
-  __typename?: 'projects_features_private_min_fields';
-  features_script?: Maybe<Scalars['String']>;
-  project_features_id?: Maybe<Scalars['Int']>;
-};
-
-/** response of any mutation on the table "projects_features_private" */
-export type Projects_Features_Private_Mutation_Response = {
-  __typename?: 'projects_features_private_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Projects_Features_Private>;
-};
-
-/** input type for inserting object relation for remote table "projects_features_private" */
-export type Projects_Features_Private_Obj_Rel_Insert_Input = {
-  data: Projects_Features_Private_Insert_Input;
-};
-
-/** Ordering options when selecting data from "projects_features_private". */
-export type Projects_Features_Private_Order_By = {
-  features_script?: InputMaybe<Order_By>;
-  project_features?: InputMaybe<Projects_Features_Order_By>;
-  project_features_id?: InputMaybe<Order_By>;
-};
-
-/** select columns of table "projects_features_private" */
-export enum Projects_Features_Private_Select_Column {
-  /** column name */
-  FeaturesScript = 'features_script',
-  /** column name */
-  ProjectFeaturesId = 'project_features_id'
-}
-
-/** input type for updating data in table "projects_features_private" */
-export type Projects_Features_Private_Set_Input = {
-  features_script?: InputMaybe<Scalars['String']>;
-  project_features_id?: InputMaybe<Scalars['Int']>;
-};
-
-/** aggregate stddev on columns */
-export type Projects_Features_Private_Stddev_Fields = {
-  __typename?: 'projects_features_private_stddev_fields';
-  project_features_id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_pop on columns */
-export type Projects_Features_Private_Stddev_Pop_Fields = {
-  __typename?: 'projects_features_private_stddev_pop_fields';
-  project_features_id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Projects_Features_Private_Stddev_Samp_Fields = {
-  __typename?: 'projects_features_private_stddev_samp_fields';
-  project_features_id?: Maybe<Scalars['Float']>;
-};
-
-/** Streaming cursor of the table "projects_features_private" */
-export type Projects_Features_Private_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Projects_Features_Private_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Projects_Features_Private_Stream_Cursor_Value_Input = {
-  features_script?: InputMaybe<Scalars['String']>;
-  project_features_id?: InputMaybe<Scalars['Int']>;
-};
-
-/** aggregate sum on columns */
-export type Projects_Features_Private_Sum_Fields = {
-  __typename?: 'projects_features_private_sum_fields';
-  project_features_id?: Maybe<Scalars['Int']>;
-};
-
-export type Projects_Features_Private_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Projects_Features_Private_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Projects_Features_Private_Set_Input>;
-  where: Projects_Features_Private_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Projects_Features_Private_Var_Pop_Fields = {
-  __typename?: 'projects_features_private_var_pop_fields';
-  project_features_id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate var_samp on columns */
-export type Projects_Features_Private_Var_Samp_Fields = {
-  __typename?: 'projects_features_private_var_samp_fields';
-  project_features_id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate variance on columns */
-export type Projects_Features_Private_Variance_Fields = {
-  __typename?: 'projects_features_private_variance_fields';
-  project_features_id?: Maybe<Scalars['Float']>;
 };
 
 /** select columns of table "projects_features" */
@@ -11327,40 +2425,10 @@ export enum Projects_Features_Select_Column {
   /** column name */
   FeatureFieldsCounts = 'feature_fields_counts',
   /** column name */
-  FeaturesScript = 'features_script',
-  /** column name */
   Id = 'id',
   /** column name */
   ProjectId = 'project_id'
 }
-
-/** input type for updating data in table "projects_features" */
-export type Projects_Features_Set_Input = {
-  enable_artist_update_after_completion?: InputMaybe<Scalars['Boolean']>;
-  feature_fields?: InputMaybe<Scalars['jsonb']>;
-  feature_fields_counts?: InputMaybe<Scalars['jsonb']>;
-  features_script?: InputMaybe<Scalars['String']>;
-  id?: InputMaybe<Scalars['Int']>;
-  project_id?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate stddev on columns */
-export type Projects_Features_Stddev_Fields = {
-  __typename?: 'projects_features_stddev_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_pop on columns */
-export type Projects_Features_Stddev_Pop_Fields = {
-  __typename?: 'projects_features_stddev_pop_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Projects_Features_Stddev_Samp_Fields = {
-  __typename?: 'projects_features_stddev_samp_fields';
-  id?: Maybe<Scalars['Float']>;
-};
 
 /** Streaming cursor of the table "projects_features" */
 export type Projects_Features_Stream_Cursor_Input = {
@@ -11375,67 +2443,8 @@ export type Projects_Features_Stream_Cursor_Value_Input = {
   enable_artist_update_after_completion?: InputMaybe<Scalars['Boolean']>;
   feature_fields?: InputMaybe<Scalars['jsonb']>;
   feature_fields_counts?: InputMaybe<Scalars['jsonb']>;
-  features_script?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['Int']>;
   project_id?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate sum on columns */
-export type Projects_Features_Sum_Fields = {
-  __typename?: 'projects_features_sum_fields';
-  id?: Maybe<Scalars['Int']>;
-};
-
-/** update columns of table "projects_features" */
-export enum Projects_Features_Update_Column {
-  /** column name */
-  EnableArtistUpdateAfterCompletion = 'enable_artist_update_after_completion',
-  /** column name */
-  FeatureFields = 'feature_fields',
-  /** column name */
-  FeatureFieldsCounts = 'feature_fields_counts',
-  /** column name */
-  FeaturesScript = 'features_script',
-  /** column name */
-  Id = 'id',
-  /** column name */
-  ProjectId = 'project_id'
-}
-
-export type Projects_Features_Updates = {
-  /** append existing jsonb value of filtered columns with new jsonb value */
-  _append?: InputMaybe<Projects_Features_Append_Input>;
-  /** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-  _delete_at_path?: InputMaybe<Projects_Features_Delete_At_Path_Input>;
-  /** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-  _delete_elem?: InputMaybe<Projects_Features_Delete_Elem_Input>;
-  /** delete key/value pair or string element. key/value pairs are matched based on their key value */
-  _delete_key?: InputMaybe<Projects_Features_Delete_Key_Input>;
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Projects_Features_Inc_Input>;
-  /** prepend existing jsonb value of filtered columns with new jsonb value */
-  _prepend?: InputMaybe<Projects_Features_Prepend_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Projects_Features_Set_Input>;
-  where: Projects_Features_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Projects_Features_Var_Pop_Fields = {
-  __typename?: 'projects_features_var_pop_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate var_samp on columns */
-export type Projects_Features_Var_Samp_Fields = {
-  __typename?: 'projects_features_var_samp_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate variance on columns */
-export type Projects_Features_Variance_Fields = {
-  __typename?: 'projects_features_variance_fields';
-  id?: Maybe<Scalars['Float']>;
 };
 
 /** columns and relationships of "projects_metadata" */
@@ -11477,8 +2486,6 @@ export type Projects_Metadata = {
   display_static: Scalars['Boolean'];
   /** An array relationship */
   external_asset_dependencies: Array<Project_External_Asset_Dependencies>;
-  /** An aggregate relationship */
-  external_asset_dependencies_aggregate: Project_External_Asset_Dependencies_Aggregate;
   external_asset_dependencies_locked?: Maybe<Scalars['Boolean']>;
   /** A computed field, executes function "project_external_asset_dependency_count" */
   external_asset_dependency_count?: Maybe<Scalars['bigint']>;
@@ -11507,7 +2514,6 @@ export type Projects_Metadata = {
   link_to_license?: Maybe<Scalars['String']>;
   /** A computed field, executes function "calc_locked" */
   locked?: Maybe<Scalars['Boolean']>;
-  locked_pre_v3?: Maybe<Scalars['Boolean']>;
   /** A computed field, executes function "project_lowest_listing" */
   lowest_listing?: Maybe<Scalars['float8']>;
   max_invocations: Scalars['Int'];
@@ -11515,10 +2521,8 @@ export type Projects_Metadata = {
   minter_configuration?: Maybe<Project_Minter_Configurations>;
   minter_configuration_id?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
-  open_for_review: Scalars['Boolean'];
   paused: Scalars['Boolean'];
   price_per_token_in_wei?: Maybe<Scalars['String']>;
-  project?: Maybe<Project>;
   project_id: Scalars['String'];
   /** An object relationship */
   proposed_artist_addresses_and_split?: Maybe<Proposed_Artist_Addresses_And_Splits>;
@@ -11536,8 +2540,6 @@ export type Projects_Metadata = {
   script_type_and_version?: Maybe<Scalars['String']>;
   /** An array relationship */
   scripts: Array<Project_Scripts>;
-  /** An aggregate relationship */
-  scripts_aggregate: Project_Scripts_Aggregate;
   /** A computed field, executes function "second_token_minted_at" */
   second_token_minted_at?: Maybe<Scalars['timestamptz']>;
   /** An object relationship */
@@ -11546,8 +2548,6 @@ export type Projects_Metadata = {
   start_datetime?: Maybe<Scalars['timestamptz']>;
   /** An array relationship */
   tags: Array<Entity_Tags>;
-  /** An aggregate relationship */
-  tags_aggregate: Entity_Tags_Aggregate;
   /** An array relationship */
   tokens: Array<Tokens_Metadata>;
   /** An aggregate relationship */
@@ -11564,16 +2564,6 @@ export type Projects_Metadata = {
 
 /** columns and relationships of "projects_metadata" */
 export type Projects_MetadataExternal_Asset_DependenciesArgs = {
-  distinct_on?: InputMaybe<Array<Project_External_Asset_Dependencies_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_External_Asset_Dependencies_Order_By>>;
-  where?: InputMaybe<Project_External_Asset_Dependencies_Bool_Exp>;
-};
-
-
-/** columns and relationships of "projects_metadata" */
-export type Projects_MetadataExternal_Asset_Dependencies_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Project_External_Asset_Dependencies_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -11614,13 +2604,6 @@ export type Projects_MetadataFeatured_TokenArgs = {
 
 
 /** columns and relationships of "projects_metadata" */
-export type Projects_MetadataProjectArgs = {
-  block?: InputMaybe<Block_Height>;
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-/** columns and relationships of "projects_metadata" */
 export type Projects_MetadataScript_JsonArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
@@ -11637,27 +2620,7 @@ export type Projects_MetadataScriptsArgs = {
 
 
 /** columns and relationships of "projects_metadata" */
-export type Projects_MetadataScripts_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Project_Scripts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_Scripts_Order_By>>;
-  where?: InputMaybe<Project_Scripts_Bool_Exp>;
-};
-
-
-/** columns and relationships of "projects_metadata" */
 export type Projects_MetadataTagsArgs = {
-  distinct_on?: InputMaybe<Array<Entity_Tags_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Entity_Tags_Order_By>>;
-  where?: InputMaybe<Entity_Tags_Bool_Exp>;
-};
-
-
-/** columns and relationships of "projects_metadata" */
-export type Projects_MetadataTags_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Entity_Tags_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -11690,6 +2653,33 @@ export type Projects_Metadata_Aggregate = {
   __typename?: 'projects_metadata_aggregate';
   aggregate?: Maybe<Projects_Metadata_Aggregate_Fields>;
   nodes: Array<Projects_Metadata>;
+};
+
+export type Projects_Metadata_Aggregate_Bool_Exp = {
+  bool_and?: InputMaybe<Projects_Metadata_Aggregate_Bool_Exp_Bool_And>;
+  bool_or?: InputMaybe<Projects_Metadata_Aggregate_Bool_Exp_Bool_Or>;
+  count?: InputMaybe<Projects_Metadata_Aggregate_Bool_Exp_Count>;
+};
+
+export type Projects_Metadata_Aggregate_Bool_Exp_Bool_And = {
+  arguments: Projects_Metadata_Select_Column_Projects_Metadata_Aggregate_Bool_Exp_Bool_And_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Projects_Metadata_Bool_Exp>;
+  predicate: Boolean_Comparison_Exp;
+};
+
+export type Projects_Metadata_Aggregate_Bool_Exp_Bool_Or = {
+  arguments: Projects_Metadata_Select_Column_Projects_Metadata_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Projects_Metadata_Bool_Exp>;
+  predicate: Boolean_Comparison_Exp;
+};
+
+export type Projects_Metadata_Aggregate_Bool_Exp_Count = {
+  arguments?: InputMaybe<Array<Projects_Metadata_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Projects_Metadata_Bool_Exp>;
+  predicate: Int_Comparison_Exp;
 };
 
 /** aggregate fields of "projects_metadata" */
@@ -11728,18 +2718,6 @@ export type Projects_Metadata_Aggregate_Order_By = {
   var_pop?: InputMaybe<Projects_Metadata_Var_Pop_Order_By>;
   var_samp?: InputMaybe<Projects_Metadata_Var_Samp_Order_By>;
   variance?: InputMaybe<Projects_Metadata_Variance_Order_By>;
-};
-
-/** append existing jsonb value of filtered columns with new jsonb value */
-export type Projects_Metadata_Append_Input = {
-  script_json?: InputMaybe<Scalars['jsonb']>;
-};
-
-/** input type for inserting array relation for remote table "projects_metadata" */
-export type Projects_Metadata_Arr_Rel_Insert_Input = {
-  data: Array<Projects_Metadata_Insert_Input>;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Projects_Metadata_On_Conflict>;
 };
 
 /** aggregate avg on columns */
@@ -11809,6 +2787,7 @@ export type Projects_Metadata_Bool_Exp = {
   external_asset_dependency_count?: InputMaybe<Bigint_Comparison_Exp>;
   favorited_by_user?: InputMaybe<Boolean_Comparison_Exp>;
   favorites?: InputMaybe<Favorites_Bool_Exp>;
+  favorites_aggregate?: InputMaybe<Favorites_Aggregate_Bool_Exp>;
   features?: InputMaybe<Projects_Features_Bool_Exp>;
   first_token_minted_at?: InputMaybe<Timestamptz_Comparison_Exp>;
   heritage_curation_status?: InputMaybe<String_Comparison_Exp>;
@@ -11820,13 +2799,11 @@ export type Projects_Metadata_Bool_Exp = {
   license?: InputMaybe<String_Comparison_Exp>;
   link_to_license?: InputMaybe<String_Comparison_Exp>;
   locked?: InputMaybe<Boolean_Comparison_Exp>;
-  locked_pre_v3?: InputMaybe<Boolean_Comparison_Exp>;
   lowest_listing?: InputMaybe<Float8_Comparison_Exp>;
   max_invocations?: InputMaybe<Int_Comparison_Exp>;
   minter_configuration?: InputMaybe<Project_Minter_Configurations_Bool_Exp>;
   minter_configuration_id?: InputMaybe<String_Comparison_Exp>;
   name?: InputMaybe<String_Comparison_Exp>;
-  open_for_review?: InputMaybe<Boolean_Comparison_Exp>;
   paused?: InputMaybe<Boolean_Comparison_Exp>;
   price_per_token_in_wei?: InputMaybe<String_Comparison_Exp>;
   project_id?: InputMaybe<String_Comparison_Exp>;
@@ -11848,118 +2825,12 @@ export type Projects_Metadata_Bool_Exp = {
   start_datetime?: InputMaybe<Timestamptz_Comparison_Exp>;
   tags?: InputMaybe<Entity_Tags_Bool_Exp>;
   tokens?: InputMaybe<Tokens_Metadata_Bool_Exp>;
+  tokens_aggregate?: InputMaybe<Tokens_Metadata_Aggregate_Bool_Exp>;
   updated_at?: InputMaybe<Timestamp_Comparison_Exp>;
   user_is_artist?: InputMaybe<Boolean_Comparison_Exp>;
   vertical?: InputMaybe<Project_Verticals_Bool_Exp>;
   vertical_name?: InputMaybe<String_Comparison_Exp>;
   website?: InputMaybe<String_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "projects_metadata" */
-export enum Projects_Metadata_Constraint {
-  /** unique or primary key constraint on columns "id" */
-  ProjectsMetaPkey = 'projects_meta_pkey',
-  /** unique or primary key constraint on columns "project_id", "contract_address" */
-  ProjectsMetadataProjectIdContractAddressKey = 'projects_metadata_project_id_contract_address_key',
-  /** unique or primary key constraint on columns "proposed_artists_and_splits_id" */
-  ProjectsMetadataProposedArtistsAndSplitsIdKey = 'projects_metadata_proposed_artists_and_splits_id_key'
-}
-
-/** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-export type Projects_Metadata_Delete_At_Path_Input = {
-  script_json?: InputMaybe<Array<Scalars['String']>>;
-};
-
-/** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-export type Projects_Metadata_Delete_Elem_Input = {
-  script_json?: InputMaybe<Scalars['Int']>;
-};
-
-/** delete key/value pair or string element. key/value pairs are matched based on their key value */
-export type Projects_Metadata_Delete_Key_Input = {
-  script_json?: InputMaybe<Scalars['String']>;
-};
-
-/** input type for incrementing numeric columns in table "projects_metadata" */
-export type Projects_Metadata_Inc_Input = {
-  additional_payee_percentage?: InputMaybe<Scalars['Int']>;
-  additional_payee_secondary_sales_percentage?: InputMaybe<Scalars['Int']>;
-  aspect_ratio?: InputMaybe<Scalars['numeric']>;
-  currency_decimals?: InputMaybe<Scalars['Int']>;
-  index?: InputMaybe<Scalars['Int']>;
-  max_invocations?: InputMaybe<Scalars['Int']>;
-  render_delay?: InputMaybe<Scalars['Int']>;
-  royalty_percentage?: InputMaybe<Scalars['Int']>;
-  series_id?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "projects_metadata" */
-export type Projects_Metadata_Insert_Input = {
-  activated_at?: InputMaybe<Scalars['timestamptz']>;
-  active?: InputMaybe<Scalars['Boolean']>;
-  additional_payee?: InputMaybe<Scalars['String']>;
-  additional_payee_percentage?: InputMaybe<Scalars['Int']>;
-  additional_payee_secondary_sales_address?: InputMaybe<Scalars['String']>;
-  additional_payee_secondary_sales_percentage?: InputMaybe<Scalars['Int']>;
-  artist?: InputMaybe<Users_Obj_Rel_Insert_Input>;
-  artist_address?: InputMaybe<Scalars['String']>;
-  artist_display_notes?: InputMaybe<Scalars['String']>;
-  artist_featured_token_id?: InputMaybe<Scalars['String']>;
-  artist_interview?: InputMaybe<Scalars['String']>;
-  artist_name?: InputMaybe<Scalars['String']>;
-  aspect_ratio?: InputMaybe<Scalars['numeric']>;
-  base_uri?: InputMaybe<Scalars['String']>;
-  charitable_giving_details?: InputMaybe<Scalars['String']>;
-  complete?: InputMaybe<Scalars['Boolean']>;
-  contract?: InputMaybe<Contracts_Metadata_Obj_Rel_Insert_Input>;
-  contract_address?: InputMaybe<Scalars['String']>;
-  creative_credit?: InputMaybe<Scalars['String']>;
-  curation_status?: InputMaybe<Curation_Statuses_Enum>;
-  curation_status_override?: InputMaybe<Curation_Statuses_Enum>;
-  currency_address?: InputMaybe<Scalars['String']>;
-  currency_decimals?: InputMaybe<Scalars['Int']>;
-  currency_symbol?: InputMaybe<Scalars['String']>;
-  description?: InputMaybe<Scalars['String']>;
-  disable_auto_image_format?: InputMaybe<Scalars['Boolean']>;
-  disable_sample_generator?: InputMaybe<Scalars['Boolean']>;
-  display_static?: InputMaybe<Scalars['Boolean']>;
-  external_asset_dependencies?: InputMaybe<Project_External_Asset_Dependencies_Arr_Rel_Insert_Input>;
-  external_asset_dependencies_locked?: InputMaybe<Scalars['Boolean']>;
-  favorites?: InputMaybe<Favorites_Arr_Rel_Insert_Input>;
-  features?: InputMaybe<Projects_Features_Obj_Rel_Insert_Input>;
-  id?: InputMaybe<Scalars['String']>;
-  index?: InputMaybe<Scalars['Int']>;
-  ipfs_hash?: InputMaybe<Scalars['String']>;
-  license?: InputMaybe<Scalars['String']>;
-  link_to_license?: InputMaybe<Scalars['String']>;
-  locked_pre_v3?: InputMaybe<Scalars['Boolean']>;
-  max_invocations?: InputMaybe<Scalars['Int']>;
-  minter_configuration?: InputMaybe<Project_Minter_Configurations_Obj_Rel_Insert_Input>;
-  minter_configuration_id?: InputMaybe<Scalars['String']>;
-  name?: InputMaybe<Scalars['String']>;
-  open_for_review?: InputMaybe<Scalars['Boolean']>;
-  paused?: InputMaybe<Scalars['Boolean']>;
-  price_per_token_in_wei?: InputMaybe<Scalars['String']>;
-  project_id?: InputMaybe<Scalars['String']>;
-  proposed_artist_addresses_and_split?: InputMaybe<Proposed_Artist_Addresses_And_Splits_Obj_Rel_Insert_Input>;
-  proposed_artists_and_splits_id?: InputMaybe<Scalars['String']>;
-  render_delay?: InputMaybe<Scalars['Int']>;
-  render_with_gpu?: InputMaybe<Scalars['Boolean']>;
-  royalty_percentage?: InputMaybe<Scalars['Int']>;
-  sales_notes?: InputMaybe<Scalars['String']>;
-  script?: InputMaybe<Scalars['String']>;
-  script_json?: InputMaybe<Scalars['jsonb']>;
-  script_type_and_version?: InputMaybe<Scalars['String']>;
-  scripts?: InputMaybe<Project_Scripts_Arr_Rel_Insert_Input>;
-  series?: InputMaybe<Project_Series_Obj_Rel_Insert_Input>;
-  series_id?: InputMaybe<Scalars['Int']>;
-  start_datetime?: InputMaybe<Scalars['timestamptz']>;
-  tags?: InputMaybe<Entity_Tags_Arr_Rel_Insert_Input>;
-  tokens?: InputMaybe<Tokens_Metadata_Arr_Rel_Insert_Input>;
-  updated_at?: InputMaybe<Scalars['timestamp']>;
-  vertical?: InputMaybe<Project_Verticals_Obj_Rel_Insert_Input>;
-  vertical_name?: InputMaybe<Scalars['String']>;
-  website?: InputMaybe<Scalars['String']>;
 };
 
 /** aggregate max on columns */
@@ -12140,29 +3011,6 @@ export type Projects_Metadata_Min_Order_By = {
   website?: InputMaybe<Order_By>;
 };
 
-/** response of any mutation on the table "projects_metadata" */
-export type Projects_Metadata_Mutation_Response = {
-  __typename?: 'projects_metadata_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Projects_Metadata>;
-};
-
-/** input type for inserting object relation for remote table "projects_metadata" */
-export type Projects_Metadata_Obj_Rel_Insert_Input = {
-  data: Projects_Metadata_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Projects_Metadata_On_Conflict>;
-};
-
-/** on_conflict condition type for table "projects_metadata" */
-export type Projects_Metadata_On_Conflict = {
-  constraint: Projects_Metadata_Constraint;
-  update_columns?: Array<Projects_Metadata_Update_Column>;
-  where?: InputMaybe<Projects_Metadata_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "projects_metadata". */
 export type Projects_Metadata_Order_By = {
   activated_at?: InputMaybe<Order_By>;
@@ -12211,13 +3059,11 @@ export type Projects_Metadata_Order_By = {
   license?: InputMaybe<Order_By>;
   link_to_license?: InputMaybe<Order_By>;
   locked?: InputMaybe<Order_By>;
-  locked_pre_v3?: InputMaybe<Order_By>;
   lowest_listing?: InputMaybe<Order_By>;
   max_invocations?: InputMaybe<Order_By>;
   minter_configuration?: InputMaybe<Project_Minter_Configurations_Order_By>;
   minter_configuration_id?: InputMaybe<Order_By>;
   name?: InputMaybe<Order_By>;
-  open_for_review?: InputMaybe<Order_By>;
   paused?: InputMaybe<Order_By>;
   price_per_token_in_wei?: InputMaybe<Order_By>;
   project_id?: InputMaybe<Order_By>;
@@ -12244,16 +3090,6 @@ export type Projects_Metadata_Order_By = {
   vertical?: InputMaybe<Project_Verticals_Order_By>;
   vertical_name?: InputMaybe<Order_By>;
   website?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: projects_metadata */
-export type Projects_Metadata_Pk_Columns_Input = {
-  id: Scalars['String'];
-};
-
-/** prepend existing jsonb value of filtered columns with new jsonb value */
-export type Projects_Metadata_Prepend_Input = {
-  script_json?: InputMaybe<Scalars['jsonb']>;
 };
 
 /** select columns of table "projects_metadata" */
@@ -12323,15 +3159,11 @@ export enum Projects_Metadata_Select_Column {
   /** column name */
   LinkToLicense = 'link_to_license',
   /** column name */
-  LockedPreV3 = 'locked_pre_v3',
-  /** column name */
   MaxInvocations = 'max_invocations',
   /** column name */
   MinterConfigurationId = 'minter_configuration_id',
   /** column name */
   Name = 'name',
-  /** column name */
-  OpenForReview = 'open_for_review',
   /** column name */
   Paused = 'paused',
   /** column name */
@@ -12366,62 +3198,45 @@ export enum Projects_Metadata_Select_Column {
   Website = 'website'
 }
 
-/** input type for updating data in table "projects_metadata" */
-export type Projects_Metadata_Set_Input = {
-  activated_at?: InputMaybe<Scalars['timestamptz']>;
-  active?: InputMaybe<Scalars['Boolean']>;
-  additional_payee?: InputMaybe<Scalars['String']>;
-  additional_payee_percentage?: InputMaybe<Scalars['Int']>;
-  additional_payee_secondary_sales_address?: InputMaybe<Scalars['String']>;
-  additional_payee_secondary_sales_percentage?: InputMaybe<Scalars['Int']>;
-  artist_address?: InputMaybe<Scalars['String']>;
-  artist_display_notes?: InputMaybe<Scalars['String']>;
-  artist_featured_token_id?: InputMaybe<Scalars['String']>;
-  artist_interview?: InputMaybe<Scalars['String']>;
-  artist_name?: InputMaybe<Scalars['String']>;
-  aspect_ratio?: InputMaybe<Scalars['numeric']>;
-  base_uri?: InputMaybe<Scalars['String']>;
-  charitable_giving_details?: InputMaybe<Scalars['String']>;
-  complete?: InputMaybe<Scalars['Boolean']>;
-  contract_address?: InputMaybe<Scalars['String']>;
-  creative_credit?: InputMaybe<Scalars['String']>;
-  curation_status?: InputMaybe<Curation_Statuses_Enum>;
-  curation_status_override?: InputMaybe<Curation_Statuses_Enum>;
-  currency_address?: InputMaybe<Scalars['String']>;
-  currency_decimals?: InputMaybe<Scalars['Int']>;
-  currency_symbol?: InputMaybe<Scalars['String']>;
-  description?: InputMaybe<Scalars['String']>;
-  disable_auto_image_format?: InputMaybe<Scalars['Boolean']>;
-  disable_sample_generator?: InputMaybe<Scalars['Boolean']>;
-  display_static?: InputMaybe<Scalars['Boolean']>;
-  external_asset_dependencies_locked?: InputMaybe<Scalars['Boolean']>;
-  id?: InputMaybe<Scalars['String']>;
-  index?: InputMaybe<Scalars['Int']>;
-  ipfs_hash?: InputMaybe<Scalars['String']>;
-  license?: InputMaybe<Scalars['String']>;
-  link_to_license?: InputMaybe<Scalars['String']>;
-  locked_pre_v3?: InputMaybe<Scalars['Boolean']>;
-  max_invocations?: InputMaybe<Scalars['Int']>;
-  minter_configuration_id?: InputMaybe<Scalars['String']>;
-  name?: InputMaybe<Scalars['String']>;
-  open_for_review?: InputMaybe<Scalars['Boolean']>;
-  paused?: InputMaybe<Scalars['Boolean']>;
-  price_per_token_in_wei?: InputMaybe<Scalars['String']>;
-  project_id?: InputMaybe<Scalars['String']>;
-  proposed_artists_and_splits_id?: InputMaybe<Scalars['String']>;
-  render_delay?: InputMaybe<Scalars['Int']>;
-  render_with_gpu?: InputMaybe<Scalars['Boolean']>;
-  royalty_percentage?: InputMaybe<Scalars['Int']>;
-  sales_notes?: InputMaybe<Scalars['String']>;
-  script?: InputMaybe<Scalars['String']>;
-  script_json?: InputMaybe<Scalars['jsonb']>;
-  script_type_and_version?: InputMaybe<Scalars['String']>;
-  series_id?: InputMaybe<Scalars['Int']>;
-  start_datetime?: InputMaybe<Scalars['timestamptz']>;
-  updated_at?: InputMaybe<Scalars['timestamp']>;
-  vertical_name?: InputMaybe<Scalars['String']>;
-  website?: InputMaybe<Scalars['String']>;
-};
+/** select "projects_metadata_aggregate_bool_exp_bool_and_arguments_columns" columns of table "projects_metadata" */
+export enum Projects_Metadata_Select_Column_Projects_Metadata_Aggregate_Bool_Exp_Bool_And_Arguments_Columns {
+  /** column name */
+  Active = 'active',
+  /** column name */
+  Complete = 'complete',
+  /** column name */
+  DisableAutoImageFormat = 'disable_auto_image_format',
+  /** column name */
+  DisableSampleGenerator = 'disable_sample_generator',
+  /** column name */
+  DisplayStatic = 'display_static',
+  /** column name */
+  ExternalAssetDependenciesLocked = 'external_asset_dependencies_locked',
+  /** column name */
+  Paused = 'paused',
+  /** column name */
+  RenderWithGpu = 'render_with_gpu'
+}
+
+/** select "projects_metadata_aggregate_bool_exp_bool_or_arguments_columns" columns of table "projects_metadata" */
+export enum Projects_Metadata_Select_Column_Projects_Metadata_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns {
+  /** column name */
+  Active = 'active',
+  /** column name */
+  Complete = 'complete',
+  /** column name */
+  DisableAutoImageFormat = 'disable_auto_image_format',
+  /** column name */
+  DisableSampleGenerator = 'disable_sample_generator',
+  /** column name */
+  DisplayStatic = 'display_static',
+  /** column name */
+  ExternalAssetDependenciesLocked = 'external_asset_dependencies_locked',
+  /** column name */
+  Paused = 'paused',
+  /** column name */
+  RenderWithGpu = 'render_with_gpu'
+}
 
 /** aggregate stddev on columns */
 export type Projects_Metadata_Stddev_Fields = {
@@ -12546,11 +3361,9 @@ export type Projects_Metadata_Stream_Cursor_Value_Input = {
   ipfs_hash?: InputMaybe<Scalars['String']>;
   license?: InputMaybe<Scalars['String']>;
   link_to_license?: InputMaybe<Scalars['String']>;
-  locked_pre_v3?: InputMaybe<Scalars['Boolean']>;
   max_invocations?: InputMaybe<Scalars['Int']>;
   minter_configuration_id?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
-  open_for_review?: InputMaybe<Scalars['Boolean']>;
   paused?: InputMaybe<Scalars['Boolean']>;
   price_per_token_in_wei?: InputMaybe<Scalars['String']>;
   project_id?: InputMaybe<Scalars['String']>;
@@ -12594,134 +3407,6 @@ export type Projects_Metadata_Sum_Order_By = {
   render_delay?: InputMaybe<Order_By>;
   royalty_percentage?: InputMaybe<Order_By>;
   series_id?: InputMaybe<Order_By>;
-};
-
-/** update columns of table "projects_metadata" */
-export enum Projects_Metadata_Update_Column {
-  /** column name */
-  ActivatedAt = 'activated_at',
-  /** column name */
-  Active = 'active',
-  /** column name */
-  AdditionalPayee = 'additional_payee',
-  /** column name */
-  AdditionalPayeePercentage = 'additional_payee_percentage',
-  /** column name */
-  AdditionalPayeeSecondarySalesAddress = 'additional_payee_secondary_sales_address',
-  /** column name */
-  AdditionalPayeeSecondarySalesPercentage = 'additional_payee_secondary_sales_percentage',
-  /** column name */
-  ArtistAddress = 'artist_address',
-  /** column name */
-  ArtistDisplayNotes = 'artist_display_notes',
-  /** column name */
-  ArtistFeaturedTokenId = 'artist_featured_token_id',
-  /** column name */
-  ArtistInterview = 'artist_interview',
-  /** column name */
-  ArtistName = 'artist_name',
-  /** column name */
-  AspectRatio = 'aspect_ratio',
-  /** column name */
-  BaseUri = 'base_uri',
-  /** column name */
-  CharitableGivingDetails = 'charitable_giving_details',
-  /** column name */
-  Complete = 'complete',
-  /** column name */
-  ContractAddress = 'contract_address',
-  /** column name */
-  CreativeCredit = 'creative_credit',
-  /** column name */
-  CurationStatus = 'curation_status',
-  /** column name */
-  CurationStatusOverride = 'curation_status_override',
-  /** column name */
-  CurrencyAddress = 'currency_address',
-  /** column name */
-  CurrencyDecimals = 'currency_decimals',
-  /** column name */
-  CurrencySymbol = 'currency_symbol',
-  /** column name */
-  Description = 'description',
-  /** column name */
-  DisableAutoImageFormat = 'disable_auto_image_format',
-  /** column name */
-  DisableSampleGenerator = 'disable_sample_generator',
-  /** column name */
-  DisplayStatic = 'display_static',
-  /** column name */
-  ExternalAssetDependenciesLocked = 'external_asset_dependencies_locked',
-  /** column name */
-  Id = 'id',
-  /** column name */
-  Index = 'index',
-  /** column name */
-  IpfsHash = 'ipfs_hash',
-  /** column name */
-  License = 'license',
-  /** column name */
-  LinkToLicense = 'link_to_license',
-  /** column name */
-  LockedPreV3 = 'locked_pre_v3',
-  /** column name */
-  MaxInvocations = 'max_invocations',
-  /** column name */
-  MinterConfigurationId = 'minter_configuration_id',
-  /** column name */
-  Name = 'name',
-  /** column name */
-  OpenForReview = 'open_for_review',
-  /** column name */
-  Paused = 'paused',
-  /** column name */
-  PricePerTokenInWei = 'price_per_token_in_wei',
-  /** column name */
-  ProjectId = 'project_id',
-  /** column name */
-  ProposedArtistsAndSplitsId = 'proposed_artists_and_splits_id',
-  /** column name */
-  RenderDelay = 'render_delay',
-  /** column name */
-  RenderWithGpu = 'render_with_gpu',
-  /** column name */
-  RoyaltyPercentage = 'royalty_percentage',
-  /** column name */
-  SalesNotes = 'sales_notes',
-  /** column name */
-  Script = 'script',
-  /** column name */
-  ScriptJson = 'script_json',
-  /** column name */
-  ScriptTypeAndVersion = 'script_type_and_version',
-  /** column name */
-  SeriesId = 'series_id',
-  /** column name */
-  StartDatetime = 'start_datetime',
-  /** column name */
-  UpdatedAt = 'updated_at',
-  /** column name */
-  VerticalName = 'vertical_name',
-  /** column name */
-  Website = 'website'
-}
-
-export type Projects_Metadata_Updates = {
-  /** append existing jsonb value of filtered columns with new jsonb value */
-  _append?: InputMaybe<Projects_Metadata_Append_Input>;
-  /** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-  _delete_at_path?: InputMaybe<Projects_Metadata_Delete_At_Path_Input>;
-  /** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-  _delete_elem?: InputMaybe<Projects_Metadata_Delete_Elem_Input>;
-  /** delete key/value pair or string element. key/value pairs are matched based on their key value */
-  _delete_key?: InputMaybe<Projects_Metadata_Delete_Key_Input>;
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Projects_Metadata_Inc_Input>;
-  /** prepend existing jsonb value of filtered columns with new jsonb value */
-  _prepend?: InputMaybe<Projects_Metadata_Prepend_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Projects_Metadata_Set_Input>;
-  where: Projects_Metadata_Bool_Exp;
 };
 
 /** aggregate var_pop on columns */
@@ -12818,43 +3503,6 @@ export type Proposed_Artist_Addresses_And_Splits = {
   project_id: Scalars['String'];
 };
 
-/** aggregated selection of "proposed_artist_addresses_and_splits" */
-export type Proposed_Artist_Addresses_And_Splits_Aggregate = {
-  __typename?: 'proposed_artist_addresses_and_splits_aggregate';
-  aggregate?: Maybe<Proposed_Artist_Addresses_And_Splits_Aggregate_Fields>;
-  nodes: Array<Proposed_Artist_Addresses_And_Splits>;
-};
-
-/** aggregate fields of "proposed_artist_addresses_and_splits" */
-export type Proposed_Artist_Addresses_And_Splits_Aggregate_Fields = {
-  __typename?: 'proposed_artist_addresses_and_splits_aggregate_fields';
-  avg?: Maybe<Proposed_Artist_Addresses_And_Splits_Avg_Fields>;
-  count: Scalars['Int'];
-  max?: Maybe<Proposed_Artist_Addresses_And_Splits_Max_Fields>;
-  min?: Maybe<Proposed_Artist_Addresses_And_Splits_Min_Fields>;
-  stddev?: Maybe<Proposed_Artist_Addresses_And_Splits_Stddev_Fields>;
-  stddev_pop?: Maybe<Proposed_Artist_Addresses_And_Splits_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Proposed_Artist_Addresses_And_Splits_Stddev_Samp_Fields>;
-  sum?: Maybe<Proposed_Artist_Addresses_And_Splits_Sum_Fields>;
-  var_pop?: Maybe<Proposed_Artist_Addresses_And_Splits_Var_Pop_Fields>;
-  var_samp?: Maybe<Proposed_Artist_Addresses_And_Splits_Var_Samp_Fields>;
-  variance?: Maybe<Proposed_Artist_Addresses_And_Splits_Variance_Fields>;
-};
-
-
-/** aggregate fields of "proposed_artist_addresses_and_splits" */
-export type Proposed_Artist_Addresses_And_Splits_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Proposed_Artist_Addresses_And_Splits_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** aggregate avg on columns */
-export type Proposed_Artist_Addresses_And_Splits_Avg_Fields = {
-  __typename?: 'proposed_artist_addresses_and_splits_avg_fields';
-  additional_payee_primary_sales_percentage?: Maybe<Scalars['Float']>;
-  additional_payee_secondary_sales_percentage?: Maybe<Scalars['Float']>;
-};
-
 /** Boolean expression to filter rows from the table "proposed_artist_addresses_and_splits". All fields are combined with a logical 'AND'. */
 export type Proposed_Artist_Addresses_And_Splits_Bool_Exp = {
   _and?: InputMaybe<Array<Proposed_Artist_Addresses_And_Splits_Bool_Exp>>;
@@ -12869,74 +3517,6 @@ export type Proposed_Artist_Addresses_And_Splits_Bool_Exp = {
   project_id?: InputMaybe<String_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "proposed_artist_addresses_and_splits" */
-export enum Proposed_Artist_Addresses_And_Splits_Constraint {
-  /** unique or primary key constraint on columns "project_id" */
-  ProposedArtistAddressesAndSplitsPkey = 'proposed_artist_addresses_and_splits_pkey'
-}
-
-/** input type for incrementing numeric columns in table "proposed_artist_addresses_and_splits" */
-export type Proposed_Artist_Addresses_And_Splits_Inc_Input = {
-  additional_payee_primary_sales_percentage?: InputMaybe<Scalars['Int']>;
-  additional_payee_secondary_sales_percentage?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "proposed_artist_addresses_and_splits" */
-export type Proposed_Artist_Addresses_And_Splits_Insert_Input = {
-  additional_payee_primary_sales?: InputMaybe<Scalars['String']>;
-  additional_payee_primary_sales_percentage?: InputMaybe<Scalars['Int']>;
-  additional_payee_secondary_sales?: InputMaybe<Scalars['String']>;
-  additional_payee_secondary_sales_percentage?: InputMaybe<Scalars['Int']>;
-  artist_address?: InputMaybe<Scalars['String']>;
-  project?: InputMaybe<Projects_Metadata_Obj_Rel_Insert_Input>;
-  project_id?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Proposed_Artist_Addresses_And_Splits_Max_Fields = {
-  __typename?: 'proposed_artist_addresses_and_splits_max_fields';
-  additional_payee_primary_sales?: Maybe<Scalars['String']>;
-  additional_payee_primary_sales_percentage?: Maybe<Scalars['Int']>;
-  additional_payee_secondary_sales?: Maybe<Scalars['String']>;
-  additional_payee_secondary_sales_percentage?: Maybe<Scalars['Int']>;
-  artist_address?: Maybe<Scalars['String']>;
-  project_id?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Proposed_Artist_Addresses_And_Splits_Min_Fields = {
-  __typename?: 'proposed_artist_addresses_and_splits_min_fields';
-  additional_payee_primary_sales?: Maybe<Scalars['String']>;
-  additional_payee_primary_sales_percentage?: Maybe<Scalars['Int']>;
-  additional_payee_secondary_sales?: Maybe<Scalars['String']>;
-  additional_payee_secondary_sales_percentage?: Maybe<Scalars['Int']>;
-  artist_address?: Maybe<Scalars['String']>;
-  project_id?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "proposed_artist_addresses_and_splits" */
-export type Proposed_Artist_Addresses_And_Splits_Mutation_Response = {
-  __typename?: 'proposed_artist_addresses_and_splits_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Proposed_Artist_Addresses_And_Splits>;
-};
-
-/** input type for inserting object relation for remote table "proposed_artist_addresses_and_splits" */
-export type Proposed_Artist_Addresses_And_Splits_Obj_Rel_Insert_Input = {
-  data: Proposed_Artist_Addresses_And_Splits_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Proposed_Artist_Addresses_And_Splits_On_Conflict>;
-};
-
-/** on_conflict condition type for table "proposed_artist_addresses_and_splits" */
-export type Proposed_Artist_Addresses_And_Splits_On_Conflict = {
-  constraint: Proposed_Artist_Addresses_And_Splits_Constraint;
-  update_columns?: Array<Proposed_Artist_Addresses_And_Splits_Update_Column>;
-  where?: InputMaybe<Proposed_Artist_Addresses_And_Splits_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "proposed_artist_addresses_and_splits". */
 export type Proposed_Artist_Addresses_And_Splits_Order_By = {
   additional_payee_primary_sales?: InputMaybe<Order_By>;
@@ -12946,11 +3526,6 @@ export type Proposed_Artist_Addresses_And_Splits_Order_By = {
   artist_address?: InputMaybe<Order_By>;
   project?: InputMaybe<Projects_Metadata_Order_By>;
   project_id?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: proposed_artist_addresses_and_splits */
-export type Proposed_Artist_Addresses_And_Splits_Pk_Columns_Input = {
-  project_id: Scalars['String'];
 };
 
 /** select columns of table "proposed_artist_addresses_and_splits" */
@@ -12968,37 +3543,6 @@ export enum Proposed_Artist_Addresses_And_Splits_Select_Column {
   /** column name */
   ProjectId = 'project_id'
 }
-
-/** input type for updating data in table "proposed_artist_addresses_and_splits" */
-export type Proposed_Artist_Addresses_And_Splits_Set_Input = {
-  additional_payee_primary_sales?: InputMaybe<Scalars['String']>;
-  additional_payee_primary_sales_percentage?: InputMaybe<Scalars['Int']>;
-  additional_payee_secondary_sales?: InputMaybe<Scalars['String']>;
-  additional_payee_secondary_sales_percentage?: InputMaybe<Scalars['Int']>;
-  artist_address?: InputMaybe<Scalars['String']>;
-  project_id?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate stddev on columns */
-export type Proposed_Artist_Addresses_And_Splits_Stddev_Fields = {
-  __typename?: 'proposed_artist_addresses_and_splits_stddev_fields';
-  additional_payee_primary_sales_percentage?: Maybe<Scalars['Float']>;
-  additional_payee_secondary_sales_percentage?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_pop on columns */
-export type Proposed_Artist_Addresses_And_Splits_Stddev_Pop_Fields = {
-  __typename?: 'proposed_artist_addresses_and_splits_stddev_pop_fields';
-  additional_payee_primary_sales_percentage?: Maybe<Scalars['Float']>;
-  additional_payee_secondary_sales_percentage?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Proposed_Artist_Addresses_And_Splits_Stddev_Samp_Fields = {
-  __typename?: 'proposed_artist_addresses_and_splits_stddev_samp_fields';
-  additional_payee_primary_sales_percentage?: Maybe<Scalars['Float']>;
-  additional_payee_secondary_sales_percentage?: Maybe<Scalars['Float']>;
-};
 
 /** Streaming cursor of the table "proposed_artist_addresses_and_splits" */
 export type Proposed_Artist_Addresses_And_Splits_Stream_Cursor_Input = {
@@ -13018,109 +3562,32 @@ export type Proposed_Artist_Addresses_And_Splits_Stream_Cursor_Value_Input = {
   project_id?: InputMaybe<Scalars['String']>;
 };
 
-/** aggregate sum on columns */
-export type Proposed_Artist_Addresses_And_Splits_Sum_Fields = {
-  __typename?: 'proposed_artist_addresses_and_splits_sum_fields';
-  additional_payee_primary_sales_percentage?: Maybe<Scalars['Int']>;
-  additional_payee_secondary_sales_percentage?: Maybe<Scalars['Int']>;
-};
-
-/** update columns of table "proposed_artist_addresses_and_splits" */
-export enum Proposed_Artist_Addresses_And_Splits_Update_Column {
-  /** column name */
-  AdditionalPayeePrimarySales = 'additional_payee_primary_sales',
-  /** column name */
-  AdditionalPayeePrimarySalesPercentage = 'additional_payee_primary_sales_percentage',
-  /** column name */
-  AdditionalPayeeSecondarySales = 'additional_payee_secondary_sales',
-  /** column name */
-  AdditionalPayeeSecondarySalesPercentage = 'additional_payee_secondary_sales_percentage',
-  /** column name */
-  ArtistAddress = 'artist_address',
-  /** column name */
-  ProjectId = 'project_id'
-}
-
-export type Proposed_Artist_Addresses_And_Splits_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Proposed_Artist_Addresses_And_Splits_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Proposed_Artist_Addresses_And_Splits_Set_Input>;
-  where: Proposed_Artist_Addresses_And_Splits_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Proposed_Artist_Addresses_And_Splits_Var_Pop_Fields = {
-  __typename?: 'proposed_artist_addresses_and_splits_var_pop_fields';
-  additional_payee_primary_sales_percentage?: Maybe<Scalars['Float']>;
-  additional_payee_secondary_sales_percentage?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate var_samp on columns */
-export type Proposed_Artist_Addresses_And_Splits_Var_Samp_Fields = {
-  __typename?: 'proposed_artist_addresses_and_splits_var_samp_fields';
-  additional_payee_primary_sales_percentage?: Maybe<Scalars['Float']>;
-  additional_payee_secondary_sales_percentage?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate variance on columns */
-export type Proposed_Artist_Addresses_And_Splits_Variance_Fields = {
-  __typename?: 'proposed_artist_addresses_and_splits_variance_fields';
-  additional_payee_primary_sales_percentage?: Maybe<Scalars['Float']>;
-  additional_payee_secondary_sales_percentage?: Maybe<Scalars['Float']>;
-};
-
 export type Query_Root = {
   __typename?: 'query_root';
-  /** Access to subgraph metadata */
-  _meta?: Maybe<_Meta_>;
-  account?: Maybe<Account>;
-  accountProject?: Maybe<AccountProject>;
-  accountProjects: Array<AccountProject>;
-  accounts: Array<Account>;
   /** fetch data from the table: "categories" */
   categories: Array<Categories>;
-  /** fetch aggregated fields from the table: "categories" */
-  categories_aggregate: Categories_Aggregate;
   /** fetch data from the table: "categories" using primary key columns */
   categories_by_pk?: Maybe<Categories>;
-  contract?: Maybe<Contract>;
   /** fetch data from the table: "contract_allowlistings" */
   contract_allowlistings: Array<Contract_Allowlistings>;
-  /** fetch aggregated fields from the table: "contract_allowlistings" */
-  contract_allowlistings_aggregate: Contract_Allowlistings_Aggregate;
   /** fetch data from the table: "contract_allowlistings" using primary key columns */
   contract_allowlistings_by_pk?: Maybe<Contract_Allowlistings>;
   /** fetch data from the table: "contract_type_names" */
   contract_type_names: Array<Contract_Type_Names>;
-  /** fetch aggregated fields from the table: "contract_type_names" */
-  contract_type_names_aggregate: Contract_Type_Names_Aggregate;
   /** fetch data from the table: "contract_type_names" using primary key columns */
   contract_type_names_by_pk?: Maybe<Contract_Type_Names>;
   /** fetch data from the table: "contract_types" */
   contract_types: Array<Contract_Types>;
-  /** fetch aggregated fields from the table: "contract_types" */
-  contract_types_aggregate: Contract_Types_Aggregate;
   /** fetch data from the table: "contract_types" using primary key columns */
   contract_types_by_pk?: Maybe<Contract_Types>;
-  contracts: Array<Contract>;
   /** fetch data from the table: "contracts_metadata" */
   contracts_metadata: Array<Contracts_Metadata>;
   /** fetch aggregated fields from the table: "contracts_metadata" */
   contracts_metadata_aggregate: Contracts_Metadata_Aggregate;
   /** fetch data from the table: "contracts_metadata" using primary key columns */
   contracts_metadata_by_pk?: Maybe<Contracts_Metadata>;
-  createApplication?: Maybe<CreateApplication>;
-  /** fetch data from the table: "curation_statuses" */
-  curation_statuses: Array<Curation_Statuses>;
-  /** fetch aggregated fields from the table: "curation_statuses" */
-  curation_statuses_aggregate: Curation_Statuses_Aggregate;
-  /** fetch data from the table: "curation_statuses" using primary key columns */
-  curation_statuses_by_pk?: Maybe<Curation_Statuses>;
   /** An array relationship */
   entity_tags: Array<Entity_Tags>;
-  /** An aggregate relationship */
-  entity_tags_aggregate: Entity_Tags_Aggregate;
   /** fetch data from the table: "entity_tags" using primary key columns */
   entity_tags_by_pk?: Maybe<Entity_Tags>;
   /** An array relationship */
@@ -13129,14 +3596,8 @@ export type Query_Root = {
   favorites_aggregate: Favorites_Aggregate;
   /** fetch data from the table: "favorites" using primary key columns */
   favorites_by_pk?: Maybe<Favorites>;
-  /** fetch data from the table: "feature_field_values_counts" */
-  feature_field_values_counts: Array<Feature_Field_Values_Counts>;
-  /** fetch aggregated fields from the table: "feature_field_values_counts" */
-  feature_field_values_counts_aggregate: Feature_Field_Values_Counts_Aggregate;
   /** fetch data from the table: "feature_flags" */
   feature_flags: Array<Feature_Flags>;
-  /** fetch aggregated fields from the table: "feature_flags" */
-  feature_flags_aggregate: Feature_Flags_Aggregate;
   /** fetch data from the table: "feature_flags" using primary key columns */
   feature_flags_by_pk?: Maybe<Feature_Flags>;
   /** execute function "filter_tokens_metadata_by_features" which returns "tokens_metadata" */
@@ -13144,10 +3605,6 @@ export type Query_Root = {
   /** execute function "filter_tokens_metadata_by_features" and query aggregates on result of table type "tokens_metadata" */
   filter_tokens_metadata_by_features_aggregate: Tokens_Metadata_Aggregate;
   getOpenseaCollectionURL?: Maybe<OpenseaCollectionData>;
-  /** execute function "get_projects_metadata_feature_field_value_counts" which returns "feature_field_values_counts" */
-  get_projects_metadata_feature_field_value_counts: Array<Feature_Field_Values_Counts>;
-  /** execute function "get_projects_metadata_feature_field_value_counts" and query aggregates on result of table type "feature_field_values_counts" */
-  get_projects_metadata_feature_field_value_counts_aggregate: Feature_Field_Values_Counts_Aggregate;
   isTokenFlagged?: Maybe<Scalars['Boolean']>;
   /** execute function "list_projects_metadata_random" which returns "projects_metadata" */
   list_projects_metadata_random: Array<Projects_Metadata>;
@@ -13155,75 +3612,30 @@ export type Query_Root = {
   list_projects_metadata_random_aggregate: Projects_Metadata_Aggregate;
   /** fetch data from the table: "media" */
   media: Array<Media>;
-  /** fetch aggregated fields from the table: "media" */
-  media_aggregate: Media_Aggregate;
   /** fetch data from the table: "media" using primary key columns */
   media_by_pk?: Maybe<Media>;
-  minter?: Maybe<Minter>;
-  minterFilter?: Maybe<MinterFilter>;
-  minterFilters: Array<MinterFilter>;
   /** fetch data from the table: "minter_filters_metadata" */
   minter_filters_metadata: Array<Minter_Filters_Metadata>;
-  /** fetch aggregated fields from the table: "minter_filters_metadata" */
-  minter_filters_metadata_aggregate: Minter_Filters_Metadata_Aggregate;
   /** fetch data from the table: "minter_filters_metadata" using primary key columns */
   minter_filters_metadata_by_pk?: Maybe<Minter_Filters_Metadata>;
-  /** fetch data from the table: "minter_type_names" */
-  minter_type_names: Array<Minter_Type_Names>;
-  /** fetch aggregated fields from the table: "minter_type_names" */
-  minter_type_names_aggregate: Minter_Type_Names_Aggregate;
-  /** fetch data from the table: "minter_type_names" using primary key columns */
-  minter_type_names_by_pk?: Maybe<Minter_Type_Names>;
   /** fetch data from the table: "minter_types" */
   minter_types: Array<Minter_Types>;
-  /** fetch aggregated fields from the table: "minter_types" */
-  minter_types_aggregate: Minter_Types_Aggregate;
   /** fetch data from the table: "minter_types" using primary key columns */
   minter_types_by_pk?: Maybe<Minter_Types>;
-  minters: Array<Minter>;
   /** fetch data from the table: "minters_metadata" */
   minters_metadata: Array<Minters_Metadata>;
-  /** fetch aggregated fields from the table: "minters_metadata" */
-  minters_metadata_aggregate: Minters_Metadata_Aggregate;
   /** fetch data from the table: "minters_metadata" using primary key columns */
   minters_metadata_by_pk?: Maybe<Minters_Metadata>;
-  /** An array relationship */
-  notifications: Array<Notifications>;
-  /** An aggregate relationship */
-  notifications_aggregate: Notifications_Aggregate;
-  /** fetch data from the table: "notifications" using primary key columns */
-  notifications_by_pk?: Maybe<Notifications>;
-  payment?: Maybe<Payment>;
-  payments: Array<Payment>;
-  project?: Maybe<Project>;
-  projectExternalAssetDependencies: Array<ProjectExternalAssetDependency>;
-  projectExternalAssetDependency?: Maybe<ProjectExternalAssetDependency>;
-  projectMinterConfiguration?: Maybe<ProjectMinterConfiguration>;
-  projectMinterConfigurations: Array<ProjectMinterConfiguration>;
-  projectScript?: Maybe<ProjectScript>;
-  projectScripts: Array<ProjectScript>;
   /** fetch data from the table: "project_external_asset_dependencies" */
   project_external_asset_dependencies: Array<Project_External_Asset_Dependencies>;
-  /** fetch aggregated fields from the table: "project_external_asset_dependencies" */
-  project_external_asset_dependencies_aggregate: Project_External_Asset_Dependencies_Aggregate;
   /** fetch data from the table: "project_external_asset_dependencies" using primary key columns */
   project_external_asset_dependencies_by_pk?: Maybe<Project_External_Asset_Dependencies>;
-  /** fetch data from the table: "project_external_asset_dependency_types" */
-  project_external_asset_dependency_types: Array<Project_External_Asset_Dependency_Types>;
-  /** fetch aggregated fields from the table: "project_external_asset_dependency_types" */
-  project_external_asset_dependency_types_aggregate: Project_External_Asset_Dependency_Types_Aggregate;
-  /** fetch data from the table: "project_external_asset_dependency_types" using primary key columns */
-  project_external_asset_dependency_types_by_pk?: Maybe<Project_External_Asset_Dependency_Types>;
   /** fetch data from the table: "project_minter_configurations" */
   project_minter_configurations: Array<Project_Minter_Configurations>;
-  /** fetch aggregated fields from the table: "project_minter_configurations" */
-  project_minter_configurations_aggregate: Project_Minter_Configurations_Aggregate;
   /** fetch data from the table: "project_minter_configurations" using primary key columns */
   project_minter_configurations_by_pk?: Maybe<Project_Minter_Configurations>;
   /** fetch data from the table: "project_scripts" */
   project_scripts: Array<Project_Scripts>;
-  /** fetch aggregated fields from the table: "project_scripts" */
-  project_scripts_aggregate: Project_Scripts_Aggregate;
   /** fetch data from the table: "project_scripts" using primary key columns */
   project_scripts_by_pk?: Maybe<Project_Scripts>;
   /** fetch data from the table: "project_series" */
@@ -13234,59 +3646,32 @@ export type Query_Root = {
   project_series_by_pk?: Maybe<Project_Series>;
   /** fetch data from the table: "project_vertical_categories" */
   project_vertical_categories: Array<Project_Vertical_Categories>;
-  /** fetch aggregated fields from the table: "project_vertical_categories" */
-  project_vertical_categories_aggregate: Project_Vertical_Categories_Aggregate;
   /** fetch data from the table: "project_vertical_categories" using primary key columns */
   project_vertical_categories_by_pk?: Maybe<Project_Vertical_Categories>;
   /** fetch data from the table: "project_verticals" */
   project_verticals: Array<Project_Verticals>;
-  /** fetch aggregated fields from the table: "project_verticals" */
-  project_verticals_aggregate: Project_Verticals_Aggregate;
   /** fetch data from the table: "project_verticals" using primary key columns */
   project_verticals_by_pk?: Maybe<Project_Verticals>;
-  projects: Array<Project>;
   /** fetch data from the table: "projects_features" */
   projects_features: Array<Projects_Features>;
-  /** fetch aggregated fields from the table: "projects_features" */
-  projects_features_aggregate: Projects_Features_Aggregate;
   /** fetch data from the table: "projects_features" using primary key columns */
   projects_features_by_pk?: Maybe<Projects_Features>;
-  /** fetch data from the table: "projects_features_private" */
-  projects_features_private: Array<Projects_Features_Private>;
-  /** fetch aggregated fields from the table: "projects_features_private" */
-  projects_features_private_aggregate: Projects_Features_Private_Aggregate;
   /** fetch data from the table: "projects_metadata" */
   projects_metadata: Array<Projects_Metadata>;
   /** fetch aggregated fields from the table: "projects_metadata" */
   projects_metadata_aggregate: Projects_Metadata_Aggregate;
   /** fetch data from the table: "projects_metadata" using primary key columns */
   projects_metadata_by_pk?: Maybe<Projects_Metadata>;
-  proposedArtistAddressesAndSplit?: Maybe<ProposedArtistAddressesAndSplit>;
-  proposedArtistAddressesAndSplits: Array<ProposedArtistAddressesAndSplit>;
   /** fetch data from the table: "proposed_artist_addresses_and_splits" */
   proposed_artist_addresses_and_splits: Array<Proposed_Artist_Addresses_And_Splits>;
-  /** fetch aggregated fields from the table: "proposed_artist_addresses_and_splits" */
-  proposed_artist_addresses_and_splits_aggregate: Proposed_Artist_Addresses_And_Splits_Aggregate;
   /** fetch data from the table: "proposed_artist_addresses_and_splits" using primary key columns */
   proposed_artist_addresses_and_splits_by_pk?: Maybe<Proposed_Artist_Addresses_And_Splits>;
-  sale?: Maybe<Sale>;
-  saleLookupTable?: Maybe<SaleLookupTable>;
-  saleLookupTables: Array<SaleLookupTable>;
-  sales: Array<Sale>;
-  /** fetch data from the table: "screenings" */
-  screenings: Array<Screenings>;
-  /** fetch aggregated fields from the table: "screenings" */
-  screenings_aggregate: Screenings_Aggregate;
-  /** fetch data from the table: "screenings" using primary key columns */
-  screenings_by_pk?: Maybe<Screenings>;
   /** execute function "search_projects" which returns "projects_metadata" */
   search_projects: Array<Projects_Metadata>;
   /** execute function "search_projects" and query aggregates on result of table type "projects_metadata" */
   search_projects_aggregate: Projects_Metadata_Aggregate;
   /** execute function "search_tags" which returns "tags" */
   search_tags: Array<Tags>;
-  /** execute function "search_tags" and query aggregates on result of table type "tags" */
-  search_tags_aggregate: Tags_Aggregate;
   /** execute function "search_tokens" which returns "tokens_metadata" */
   search_tokens: Array<Tokens_Metadata>;
   /** execute function "search_tokens" and query aggregates on result of table type "tokens_metadata" */
@@ -13295,34 +3680,8 @@ export type Query_Root = {
   search_users: Array<User_Profiles>;
   /** execute function "search_users" and query aggregates on result of table type "user_profiles" */
   search_users_aggregate: User_Profiles_Aggregate;
-  /** fetch data from the table: "sync_status" */
-  sync_status: Array<Sync_Status>;
-  /** fetch aggregated fields from the table: "sync_status" */
-  sync_status_aggregate: Sync_Status_Aggregate;
-  /** fetch data from the table: "sync_status" using primary key columns */
-  sync_status_by_pk?: Maybe<Sync_Status>;
-  /** fetch data from the table: "tag_groupings" */
-  tag_groupings: Array<Tag_Groupings>;
-  /** fetch aggregated fields from the table: "tag_groupings" */
-  tag_groupings_aggregate: Tag_Groupings_Aggregate;
-  /** fetch data from the table: "tag_groupings" using primary key columns */
-  tag_groupings_by_pk?: Maybe<Tag_Groupings>;
-  /** fetch data from the table: "tag_status" */
-  tag_status: Array<Tag_Status>;
-  /** fetch aggregated fields from the table: "tag_status" */
-  tag_status_aggregate: Tag_Status_Aggregate;
-  /** fetch data from the table: "tag_status" using primary key columns */
-  tag_status_by_pk?: Maybe<Tag_Status>;
-  /** fetch data from the table: "tag_types" */
-  tag_types: Array<Tag_Types>;
-  /** fetch aggregated fields from the table: "tag_types" */
-  tag_types_aggregate: Tag_Types_Aggregate;
-  /** fetch data from the table: "tag_types" using primary key columns */
-  tag_types_by_pk?: Maybe<Tag_Types>;
   /** fetch data from the table: "tags" */
   tags: Array<Tags>;
-  /** fetch aggregated fields from the table: "tags" */
-  tags_aggregate: Tags_Aggregate;
   /** fetch data from the table: "tags" using primary key columns */
   tags_by_pk?: Maybe<Tags>;
   /** fetch data from the table: "terms_of_service" */
@@ -13331,16 +3690,12 @@ export type Query_Root = {
   terms_of_service_aggregate: Terms_Of_Service_Aggregate;
   /** fetch data from the table: "terms_of_service" using primary key columns */
   terms_of_service_by_pk?: Maybe<Terms_Of_Service>;
-  token?: Maybe<Token>;
-  tokens: Array<Token>;
   /** fetch data from the table: "tokens_metadata" */
   tokens_metadata: Array<Tokens_Metadata>;
   /** fetch aggregated fields from the table: "tokens_metadata" */
   tokens_metadata_aggregate: Tokens_Metadata_Aggregate;
   /** fetch data from the table: "tokens_metadata" using primary key columns */
   tokens_metadata_by_pk?: Maybe<Tokens_Metadata>;
-  transfer?: Maybe<Transfer>;
-  transfers: Array<Transfer>;
   /** fetch data from the table: "user_profiles" */
   user_profiles: Array<User_Profiles>;
   /** fetch aggregated fields from the table: "user_profiles" */
@@ -13355,78 +3710,20 @@ export type Query_Root = {
   users_by_pk?: Maybe<Users>;
   /** fetch data from the table: "verticals" */
   verticals: Array<Verticals>;
-  /** fetch aggregated fields from the table: "verticals" */
-  verticals_aggregate: Verticals_Aggregate;
   /** fetch data from the table: "verticals" using primary key columns */
   verticals_by_pk?: Maybe<Verticals>;
   /** fetch data from the table: "webflow_artist_info" */
   webflow_artist_info: Array<Webflow_Artist_Info>;
-  /** fetch aggregated fields from the table: "webflow_artist_info" */
-  webflow_artist_info_aggregate: Webflow_Artist_Info_Aggregate;
   /** fetch data from the table: "webflow_artist_info" using primary key columns */
   webflow_artist_info_by_pk?: Maybe<Webflow_Artist_Info>;
   /** fetch data from the table: "webflow_spectrum_articles" */
   webflow_spectrum_articles: Array<Webflow_Spectrum_Articles>;
-  /** fetch aggregated fields from the table: "webflow_spectrum_articles" */
-  webflow_spectrum_articles_aggregate: Webflow_Spectrum_Articles_Aggregate;
   /** fetch data from the table: "webflow_spectrum_articles" using primary key columns */
   webflow_spectrum_articles_by_pk?: Maybe<Webflow_Spectrum_Articles>;
-  whitelisting?: Maybe<Whitelisting>;
-  whitelistings: Array<Whitelisting>;
-};
-
-
-export type Query_Root_MetaArgs = {
-  block?: InputMaybe<Block_Height>;
-};
-
-
-export type Query_RootAccountArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootAccountProjectArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootAccountProjectsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<AccountProject_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<AccountProject_Filter>;
-};
-
-
-export type Query_RootAccountsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Account_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Account_Filter>;
 };
 
 
 export type Query_RootCategoriesArgs = {
-  distinct_on?: InputMaybe<Array<Categories_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Categories_Order_By>>;
-  where?: InputMaybe<Categories_Bool_Exp>;
-};
-
-
-export type Query_RootCategories_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Categories_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -13440,23 +3737,7 @@ export type Query_RootCategories_By_PkArgs = {
 };
 
 
-export type Query_RootContractArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
 export type Query_RootContract_AllowlistingsArgs = {
-  distinct_on?: InputMaybe<Array<Contract_Allowlistings_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Contract_Allowlistings_Order_By>>;
-  where?: InputMaybe<Contract_Allowlistings_Bool_Exp>;
-};
-
-
-export type Query_RootContract_Allowlistings_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Contract_Allowlistings_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -13480,15 +3761,6 @@ export type Query_RootContract_Type_NamesArgs = {
 };
 
 
-export type Query_RootContract_Type_Names_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Contract_Type_Names_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Contract_Type_Names_Order_By>>;
-  where?: InputMaybe<Contract_Type_Names_Bool_Exp>;
-};
-
-
 export type Query_RootContract_Type_Names_By_PkArgs = {
   name: Scalars['String'];
 };
@@ -13503,28 +3775,8 @@ export type Query_RootContract_TypesArgs = {
 };
 
 
-export type Query_RootContract_Types_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Contract_Types_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Contract_Types_Order_By>>;
-  where?: InputMaybe<Contract_Types_Bool_Exp>;
-};
-
-
 export type Query_RootContract_Types_By_PkArgs = {
   type: Contract_Type_Names_Enum;
-};
-
-
-export type Query_RootContractsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Contract_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Contract_Filter>;
 };
 
 
@@ -13551,44 +3803,7 @@ export type Query_RootContracts_Metadata_By_PkArgs = {
 };
 
 
-export type Query_RootCreateApplicationArgs = {
-  id: Scalars['uuid'];
-};
-
-
-export type Query_RootCuration_StatusesArgs = {
-  distinct_on?: InputMaybe<Array<Curation_Statuses_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Curation_Statuses_Order_By>>;
-  where?: InputMaybe<Curation_Statuses_Bool_Exp>;
-};
-
-
-export type Query_RootCuration_Statuses_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Curation_Statuses_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Curation_Statuses_Order_By>>;
-  where?: InputMaybe<Curation_Statuses_Bool_Exp>;
-};
-
-
-export type Query_RootCuration_Statuses_By_PkArgs = {
-  value: Scalars['String'];
-};
-
-
 export type Query_RootEntity_TagsArgs = {
-  distinct_on?: InputMaybe<Array<Entity_Tags_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Entity_Tags_Order_By>>;
-  where?: InputMaybe<Entity_Tags_Bool_Exp>;
-};
-
-
-export type Query_RootEntity_Tags_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Entity_Tags_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -13625,34 +3840,7 @@ export type Query_RootFavorites_By_PkArgs = {
 };
 
 
-export type Query_RootFeature_Field_Values_CountsArgs = {
-  distinct_on?: InputMaybe<Array<Feature_Field_Values_Counts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Feature_Field_Values_Counts_Order_By>>;
-  where?: InputMaybe<Feature_Field_Values_Counts_Bool_Exp>;
-};
-
-
-export type Query_RootFeature_Field_Values_Counts_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Feature_Field_Values_Counts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Feature_Field_Values_Counts_Order_By>>;
-  where?: InputMaybe<Feature_Field_Values_Counts_Bool_Exp>;
-};
-
-
 export type Query_RootFeature_FlagsArgs = {
-  distinct_on?: InputMaybe<Array<Feature_Flags_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Feature_Flags_Order_By>>;
-  where?: InputMaybe<Feature_Flags_Bool_Exp>;
-};
-
-
-export type Query_RootFeature_Flags_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Feature_Flags_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -13692,26 +3880,6 @@ export type Query_RootGetOpenseaCollectionUrlArgs = {
 };
 
 
-export type Query_RootGet_Projects_Metadata_Feature_Field_Value_CountsArgs = {
-  args: Get_Projects_Metadata_Feature_Field_Value_Counts_Args;
-  distinct_on?: InputMaybe<Array<Feature_Field_Values_Counts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Feature_Field_Values_Counts_Order_By>>;
-  where?: InputMaybe<Feature_Field_Values_Counts_Bool_Exp>;
-};
-
-
-export type Query_RootGet_Projects_Metadata_Feature_Field_Value_Counts_AggregateArgs = {
-  args: Get_Projects_Metadata_Feature_Field_Value_Counts_Args;
-  distinct_on?: InputMaybe<Array<Feature_Field_Values_Counts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Feature_Field_Values_Counts_Order_By>>;
-  where?: InputMaybe<Feature_Field_Values_Counts_Bool_Exp>;
-};
-
-
 export type Query_RootIsTokenFlaggedArgs = {
   contractAddress: Scalars['String'];
   tokenId: Scalars['String'];
@@ -13747,55 +3915,12 @@ export type Query_RootMediaArgs = {
 };
 
 
-export type Query_RootMedia_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Media_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Media_Order_By>>;
-  where?: InputMaybe<Media_Bool_Exp>;
-};
-
-
 export type Query_RootMedia_By_PkArgs = {
   id: Scalars['Int'];
 };
 
 
-export type Query_RootMinterArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootMinterFilterArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootMinterFiltersArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<MinterFilter_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<MinterFilter_Filter>;
-};
-
-
 export type Query_RootMinter_Filters_MetadataArgs = {
-  distinct_on?: InputMaybe<Array<Minter_Filters_Metadata_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Minter_Filters_Metadata_Order_By>>;
-  where?: InputMaybe<Minter_Filters_Metadata_Bool_Exp>;
-};
-
-
-export type Query_RootMinter_Filters_Metadata_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Minter_Filters_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -13809,39 +3934,7 @@ export type Query_RootMinter_Filters_Metadata_By_PkArgs = {
 };
 
 
-export type Query_RootMinter_Type_NamesArgs = {
-  distinct_on?: InputMaybe<Array<Minter_Type_Names_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Minter_Type_Names_Order_By>>;
-  where?: InputMaybe<Minter_Type_Names_Bool_Exp>;
-};
-
-
-export type Query_RootMinter_Type_Names_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Minter_Type_Names_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Minter_Type_Names_Order_By>>;
-  where?: InputMaybe<Minter_Type_Names_Bool_Exp>;
-};
-
-
-export type Query_RootMinter_Type_Names_By_PkArgs = {
-  name: Scalars['String'];
-};
-
-
 export type Query_RootMinter_TypesArgs = {
-  distinct_on?: InputMaybe<Array<Minter_Types_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Minter_Types_Order_By>>;
-  where?: InputMaybe<Minter_Types_Bool_Exp>;
-};
-
-
-export type Query_RootMinter_Types_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Minter_Types_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -13855,27 +3948,7 @@ export type Query_RootMinter_Types_By_PkArgs = {
 };
 
 
-export type Query_RootMintersArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Minter_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Minter_Filter>;
-};
-
-
 export type Query_RootMinters_MetadataArgs = {
-  distinct_on?: InputMaybe<Array<Minters_Metadata_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Minters_Metadata_Order_By>>;
-  where?: InputMaybe<Minters_Metadata_Bool_Exp>;
-};
-
-
-export type Query_RootMinters_Metadata_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Minters_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -13889,120 +3962,7 @@ export type Query_RootMinters_Metadata_By_PkArgs = {
 };
 
 
-export type Query_RootNotificationsArgs = {
-  distinct_on?: InputMaybe<Array<Notifications_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Notifications_Order_By>>;
-  where?: InputMaybe<Notifications_Bool_Exp>;
-};
-
-
-export type Query_RootNotifications_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Notifications_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Notifications_Order_By>>;
-  where?: InputMaybe<Notifications_Bool_Exp>;
-};
-
-
-export type Query_RootNotifications_By_PkArgs = {
-  trigger_key: Scalars['String'];
-  trigger_time: Scalars['timestamptz'];
-  user_address: Scalars['String'];
-};
-
-
-export type Query_RootPaymentArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootPaymentsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Payment_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Payment_Filter>;
-};
-
-
-export type Query_RootProjectArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootProjectExternalAssetDependenciesArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<ProjectExternalAssetDependency_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<ProjectExternalAssetDependency_Filter>;
-};
-
-
-export type Query_RootProjectExternalAssetDependencyArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootProjectMinterConfigurationArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootProjectMinterConfigurationsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<ProjectMinterConfiguration_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<ProjectMinterConfiguration_Filter>;
-};
-
-
-export type Query_RootProjectScriptArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootProjectScriptsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<ProjectScript_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<ProjectScript_Filter>;
-};
-
-
 export type Query_RootProject_External_Asset_DependenciesArgs = {
-  distinct_on?: InputMaybe<Array<Project_External_Asset_Dependencies_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_External_Asset_Dependencies_Order_By>>;
-  where?: InputMaybe<Project_External_Asset_Dependencies_Bool_Exp>;
-};
-
-
-export type Query_RootProject_External_Asset_Dependencies_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Project_External_Asset_Dependencies_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -14017,39 +3977,7 @@ export type Query_RootProject_External_Asset_Dependencies_By_PkArgs = {
 };
 
 
-export type Query_RootProject_External_Asset_Dependency_TypesArgs = {
-  distinct_on?: InputMaybe<Array<Project_External_Asset_Dependency_Types_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_External_Asset_Dependency_Types_Order_By>>;
-  where?: InputMaybe<Project_External_Asset_Dependency_Types_Bool_Exp>;
-};
-
-
-export type Query_RootProject_External_Asset_Dependency_Types_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Project_External_Asset_Dependency_Types_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_External_Asset_Dependency_Types_Order_By>>;
-  where?: InputMaybe<Project_External_Asset_Dependency_Types_Bool_Exp>;
-};
-
-
-export type Query_RootProject_External_Asset_Dependency_Types_By_PkArgs = {
-  type: Scalars['String'];
-};
-
-
 export type Query_RootProject_Minter_ConfigurationsArgs = {
-  distinct_on?: InputMaybe<Array<Project_Minter_Configurations_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_Minter_Configurations_Order_By>>;
-  where?: InputMaybe<Project_Minter_Configurations_Bool_Exp>;
-};
-
-
-export type Query_RootProject_Minter_Configurations_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Project_Minter_Configurations_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -14064,15 +3992,6 @@ export type Query_RootProject_Minter_Configurations_By_PkArgs = {
 
 
 export type Query_RootProject_ScriptsArgs = {
-  distinct_on?: InputMaybe<Array<Project_Scripts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_Scripts_Order_By>>;
-  where?: InputMaybe<Project_Scripts_Bool_Exp>;
-};
-
-
-export type Query_RootProject_Scripts_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Project_Scripts_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -14119,15 +4038,6 @@ export type Query_RootProject_Vertical_CategoriesArgs = {
 };
 
 
-export type Query_RootProject_Vertical_Categories_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Project_Vertical_Categories_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_Vertical_Categories_Order_By>>;
-  where?: InputMaybe<Project_Vertical_Categories_Bool_Exp>;
-};
-
-
 export type Query_RootProject_Vertical_Categories_By_PkArgs = {
   name: Categories_Enum;
 };
@@ -14142,28 +4052,8 @@ export type Query_RootProject_VerticalsArgs = {
 };
 
 
-export type Query_RootProject_Verticals_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Project_Verticals_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_Verticals_Order_By>>;
-  where?: InputMaybe<Project_Verticals_Bool_Exp>;
-};
-
-
 export type Query_RootProject_Verticals_By_PkArgs = {
   name: Verticals_Enum;
-};
-
-
-export type Query_RootProjectsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Project_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Project_Filter>;
 };
 
 
@@ -14176,35 +4066,8 @@ export type Query_RootProjects_FeaturesArgs = {
 };
 
 
-export type Query_RootProjects_Features_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Projects_Features_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Projects_Features_Order_By>>;
-  where?: InputMaybe<Projects_Features_Bool_Exp>;
-};
-
-
 export type Query_RootProjects_Features_By_PkArgs = {
   id: Scalars['Int'];
-};
-
-
-export type Query_RootProjects_Features_PrivateArgs = {
-  distinct_on?: InputMaybe<Array<Projects_Features_Private_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Projects_Features_Private_Order_By>>;
-  where?: InputMaybe<Projects_Features_Private_Bool_Exp>;
-};
-
-
-export type Query_RootProjects_Features_Private_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Projects_Features_Private_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Projects_Features_Private_Order_By>>;
-  where?: InputMaybe<Projects_Features_Private_Bool_Exp>;
 };
 
 
@@ -14231,34 +4094,7 @@ export type Query_RootProjects_Metadata_By_PkArgs = {
 };
 
 
-export type Query_RootProposedArtistAddressesAndSplitArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootProposedArtistAddressesAndSplitsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<ProposedArtistAddressesAndSplit_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<ProposedArtistAddressesAndSplit_Filter>;
-};
-
-
 export type Query_RootProposed_Artist_Addresses_And_SplitsArgs = {
-  distinct_on?: InputMaybe<Array<Proposed_Artist_Addresses_And_Splits_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Proposed_Artist_Addresses_And_Splits_Order_By>>;
-  where?: InputMaybe<Proposed_Artist_Addresses_And_Splits_Bool_Exp>;
-};
-
-
-export type Query_RootProposed_Artist_Addresses_And_Splits_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Proposed_Artist_Addresses_And_Splits_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -14269,65 +4105,6 @@ export type Query_RootProposed_Artist_Addresses_And_Splits_AggregateArgs = {
 
 export type Query_RootProposed_Artist_Addresses_And_Splits_By_PkArgs = {
   project_id: Scalars['String'];
-};
-
-
-export type Query_RootSaleArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootSaleLookupTableArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootSaleLookupTablesArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<SaleLookupTable_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<SaleLookupTable_Filter>;
-};
-
-
-export type Query_RootSalesArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Sale_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Sale_Filter>;
-};
-
-
-export type Query_RootScreeningsArgs = {
-  distinct_on?: InputMaybe<Array<Screenings_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Screenings_Order_By>>;
-  where?: InputMaybe<Screenings_Bool_Exp>;
-};
-
-
-export type Query_RootScreenings_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Screenings_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Screenings_Order_By>>;
-  where?: InputMaybe<Screenings_Bool_Exp>;
-};
-
-
-export type Query_RootScreenings_By_PkArgs = {
-  id: Scalars['Int'];
 };
 
 
@@ -14352,16 +4129,6 @@ export type Query_RootSearch_Projects_AggregateArgs = {
 
 
 export type Query_RootSearch_TagsArgs = {
-  args: Search_Tags_Args;
-  distinct_on?: InputMaybe<Array<Tags_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tags_Order_By>>;
-  where?: InputMaybe<Tags_Bool_Exp>;
-};
-
-
-export type Query_RootSearch_Tags_AggregateArgs = {
   args: Search_Tags_Args;
   distinct_on?: InputMaybe<Array<Tags_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -14411,108 +4178,7 @@ export type Query_RootSearch_Users_AggregateArgs = {
 };
 
 
-export type Query_RootSync_StatusArgs = {
-  distinct_on?: InputMaybe<Array<Sync_Status_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Sync_Status_Order_By>>;
-  where?: InputMaybe<Sync_Status_Bool_Exp>;
-};
-
-
-export type Query_RootSync_Status_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Sync_Status_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Sync_Status_Order_By>>;
-  where?: InputMaybe<Sync_Status_Bool_Exp>;
-};
-
-
-export type Query_RootSync_Status_By_PkArgs = {
-  id: Scalars['Boolean'];
-};
-
-
-export type Query_RootTag_GroupingsArgs = {
-  distinct_on?: InputMaybe<Array<Tag_Groupings_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tag_Groupings_Order_By>>;
-  where?: InputMaybe<Tag_Groupings_Bool_Exp>;
-};
-
-
-export type Query_RootTag_Groupings_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Tag_Groupings_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tag_Groupings_Order_By>>;
-  where?: InputMaybe<Tag_Groupings_Bool_Exp>;
-};
-
-
-export type Query_RootTag_Groupings_By_PkArgs = {
-  name: Scalars['String'];
-};
-
-
-export type Query_RootTag_StatusArgs = {
-  distinct_on?: InputMaybe<Array<Tag_Status_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tag_Status_Order_By>>;
-  where?: InputMaybe<Tag_Status_Bool_Exp>;
-};
-
-
-export type Query_RootTag_Status_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Tag_Status_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tag_Status_Order_By>>;
-  where?: InputMaybe<Tag_Status_Bool_Exp>;
-};
-
-
-export type Query_RootTag_Status_By_PkArgs = {
-  value: Scalars['String'];
-};
-
-
-export type Query_RootTag_TypesArgs = {
-  distinct_on?: InputMaybe<Array<Tag_Types_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tag_Types_Order_By>>;
-  where?: InputMaybe<Tag_Types_Bool_Exp>;
-};
-
-
-export type Query_RootTag_Types_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Tag_Types_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tag_Types_Order_By>>;
-  where?: InputMaybe<Tag_Types_Bool_Exp>;
-};
-
-
-export type Query_RootTag_Types_By_PkArgs = {
-  value: Scalars['String'];
-};
-
-
 export type Query_RootTagsArgs = {
-  distinct_on?: InputMaybe<Array<Tags_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tags_Order_By>>;
-  where?: InputMaybe<Tags_Bool_Exp>;
-};
-
-
-export type Query_RootTags_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Tags_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -14549,24 +4215,6 @@ export type Query_RootTerms_Of_Service_By_PkArgs = {
 };
 
 
-export type Query_RootTokenArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootTokensArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Token_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Token_Filter>;
-};
-
-
 export type Query_RootTokens_MetadataArgs = {
   distinct_on?: InputMaybe<Array<Tokens_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -14587,24 +4235,6 @@ export type Query_RootTokens_Metadata_AggregateArgs = {
 
 export type Query_RootTokens_Metadata_By_PkArgs = {
   id: Scalars['String'];
-};
-
-
-export type Query_RootTransferArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootTransfersArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Transfer_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Transfer_Filter>;
 };
 
 
@@ -14663,30 +4293,12 @@ export type Query_RootVerticalsArgs = {
 };
 
 
-export type Query_RootVerticals_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Verticals_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Verticals_Order_By>>;
-  where?: InputMaybe<Verticals_Bool_Exp>;
-};
-
-
 export type Query_RootVerticals_By_PkArgs = {
   name: Scalars['String'];
 };
 
 
 export type Query_RootWebflow_Artist_InfoArgs = {
-  distinct_on?: InputMaybe<Array<Webflow_Artist_Info_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Webflow_Artist_Info_Order_By>>;
-  where?: InputMaybe<Webflow_Artist_Info_Bool_Exp>;
-};
-
-
-export type Query_RootWebflow_Artist_Info_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Webflow_Artist_Info_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -14709,273 +4321,8 @@ export type Query_RootWebflow_Spectrum_ArticlesArgs = {
 };
 
 
-export type Query_RootWebflow_Spectrum_Articles_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Webflow_Spectrum_Articles_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Webflow_Spectrum_Articles_Order_By>>;
-  where?: InputMaybe<Webflow_Spectrum_Articles_Bool_Exp>;
-};
-
-
 export type Query_RootWebflow_Spectrum_Articles_By_PkArgs = {
   webflow_item_id: Scalars['String'];
-};
-
-
-export type Query_RootWhitelistingArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Query_RootWhitelistingsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Whitelisting_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Whitelisting_Filter>;
-};
-
-/** This is the results of the wallet and ip screenings we've performed */
-export type Screenings = {
-  __typename?: 'screenings';
-  blocked: Scalars['Boolean'];
-  id: Scalars['Int'];
-  ip_address?: Maybe<Scalars['String']>;
-  /** A computed field, that runs the "screening_is_valid" function that calculates if the attached screening is still valid. */
-  is_valid?: Maybe<Scalars['Boolean']>;
-  last_checked: Scalars['timestamptz'];
-  wallet_address?: Maybe<Scalars['String']>;
-};
-
-/** aggregated selection of "screenings" */
-export type Screenings_Aggregate = {
-  __typename?: 'screenings_aggregate';
-  aggregate?: Maybe<Screenings_Aggregate_Fields>;
-  nodes: Array<Screenings>;
-};
-
-/** aggregate fields of "screenings" */
-export type Screenings_Aggregate_Fields = {
-  __typename?: 'screenings_aggregate_fields';
-  avg?: Maybe<Screenings_Avg_Fields>;
-  count: Scalars['Int'];
-  max?: Maybe<Screenings_Max_Fields>;
-  min?: Maybe<Screenings_Min_Fields>;
-  stddev?: Maybe<Screenings_Stddev_Fields>;
-  stddev_pop?: Maybe<Screenings_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Screenings_Stddev_Samp_Fields>;
-  sum?: Maybe<Screenings_Sum_Fields>;
-  var_pop?: Maybe<Screenings_Var_Pop_Fields>;
-  var_samp?: Maybe<Screenings_Var_Samp_Fields>;
-  variance?: Maybe<Screenings_Variance_Fields>;
-};
-
-
-/** aggregate fields of "screenings" */
-export type Screenings_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Screenings_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** aggregate avg on columns */
-export type Screenings_Avg_Fields = {
-  __typename?: 'screenings_avg_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** Boolean expression to filter rows from the table "screenings". All fields are combined with a logical 'AND'. */
-export type Screenings_Bool_Exp = {
-  _and?: InputMaybe<Array<Screenings_Bool_Exp>>;
-  _not?: InputMaybe<Screenings_Bool_Exp>;
-  _or?: InputMaybe<Array<Screenings_Bool_Exp>>;
-  blocked?: InputMaybe<Boolean_Comparison_Exp>;
-  id?: InputMaybe<Int_Comparison_Exp>;
-  ip_address?: InputMaybe<String_Comparison_Exp>;
-  is_valid?: InputMaybe<Boolean_Comparison_Exp>;
-  last_checked?: InputMaybe<Timestamptz_Comparison_Exp>;
-  wallet_address?: InputMaybe<String_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "screenings" */
-export enum Screenings_Constraint {
-  /** unique or primary key constraint on columns "ip_address" */
-  ScreeningsIpAddressKey = 'screenings_ip_address_key',
-  /** unique or primary key constraint on columns "id" */
-  ScreeningsPkey = 'screenings_pkey',
-  /** unique or primary key constraint on columns "wallet_address" */
-  ScreeningsWalletAddressKey = 'screenings_wallet_address_key'
-}
-
-/** input type for incrementing numeric columns in table "screenings" */
-export type Screenings_Inc_Input = {
-  id?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "screenings" */
-export type Screenings_Insert_Input = {
-  blocked?: InputMaybe<Scalars['Boolean']>;
-  id?: InputMaybe<Scalars['Int']>;
-  ip_address?: InputMaybe<Scalars['String']>;
-  last_checked?: InputMaybe<Scalars['timestamptz']>;
-  wallet_address?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Screenings_Max_Fields = {
-  __typename?: 'screenings_max_fields';
-  id?: Maybe<Scalars['Int']>;
-  ip_address?: Maybe<Scalars['String']>;
-  last_checked?: Maybe<Scalars['timestamptz']>;
-  wallet_address?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Screenings_Min_Fields = {
-  __typename?: 'screenings_min_fields';
-  id?: Maybe<Scalars['Int']>;
-  ip_address?: Maybe<Scalars['String']>;
-  last_checked?: Maybe<Scalars['timestamptz']>;
-  wallet_address?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "screenings" */
-export type Screenings_Mutation_Response = {
-  __typename?: 'screenings_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Screenings>;
-};
-
-/** on_conflict condition type for table "screenings" */
-export type Screenings_On_Conflict = {
-  constraint: Screenings_Constraint;
-  update_columns?: Array<Screenings_Update_Column>;
-  where?: InputMaybe<Screenings_Bool_Exp>;
-};
-
-/** Ordering options when selecting data from "screenings". */
-export type Screenings_Order_By = {
-  blocked?: InputMaybe<Order_By>;
-  id?: InputMaybe<Order_By>;
-  ip_address?: InputMaybe<Order_By>;
-  is_valid?: InputMaybe<Order_By>;
-  last_checked?: InputMaybe<Order_By>;
-  wallet_address?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: screenings */
-export type Screenings_Pk_Columns_Input = {
-  id: Scalars['Int'];
-};
-
-/** select columns of table "screenings" */
-export enum Screenings_Select_Column {
-  /** column name */
-  Blocked = 'blocked',
-  /** column name */
-  Id = 'id',
-  /** column name */
-  IpAddress = 'ip_address',
-  /** column name */
-  LastChecked = 'last_checked',
-  /** column name */
-  WalletAddress = 'wallet_address'
-}
-
-/** input type for updating data in table "screenings" */
-export type Screenings_Set_Input = {
-  blocked?: InputMaybe<Scalars['Boolean']>;
-  id?: InputMaybe<Scalars['Int']>;
-  ip_address?: InputMaybe<Scalars['String']>;
-  last_checked?: InputMaybe<Scalars['timestamptz']>;
-  wallet_address?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate stddev on columns */
-export type Screenings_Stddev_Fields = {
-  __typename?: 'screenings_stddev_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_pop on columns */
-export type Screenings_Stddev_Pop_Fields = {
-  __typename?: 'screenings_stddev_pop_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Screenings_Stddev_Samp_Fields = {
-  __typename?: 'screenings_stddev_samp_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** Streaming cursor of the table "screenings" */
-export type Screenings_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Screenings_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Screenings_Stream_Cursor_Value_Input = {
-  blocked?: InputMaybe<Scalars['Boolean']>;
-  id?: InputMaybe<Scalars['Int']>;
-  ip_address?: InputMaybe<Scalars['String']>;
-  last_checked?: InputMaybe<Scalars['timestamptz']>;
-  wallet_address?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate sum on columns */
-export type Screenings_Sum_Fields = {
-  __typename?: 'screenings_sum_fields';
-  id?: Maybe<Scalars['Int']>;
-};
-
-/** update columns of table "screenings" */
-export enum Screenings_Update_Column {
-  /** column name */
-  Blocked = 'blocked',
-  /** column name */
-  Id = 'id',
-  /** column name */
-  IpAddress = 'ip_address',
-  /** column name */
-  LastChecked = 'last_checked',
-  /** column name */
-  WalletAddress = 'wallet_address'
-}
-
-export type Screenings_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Screenings_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Screenings_Set_Input>;
-  where: Screenings_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Screenings_Var_Pop_Fields = {
-  __typename?: 'screenings_var_pop_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate var_samp on columns */
-export type Screenings_Var_Samp_Fields = {
-  __typename?: 'screenings_var_samp_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate variance on columns */
-export type Screenings_Variance_Fields = {
-  __typename?: 'screenings_variance_fields';
-  id?: Maybe<Scalars['Float']>;
 };
 
 export type Search_Projects_Args = {
@@ -14996,70 +4343,43 @@ export type Search_Users_Args = {
 
 export type Subscription_Root = {
   __typename?: 'subscription_root';
-  /** Access to subgraph metadata */
-  _meta?: Maybe<_Meta_>;
-  account?: Maybe<Account>;
-  accountProject?: Maybe<AccountProject>;
-  accountProjects: Array<AccountProject>;
-  accounts: Array<Account>;
   /** fetch data from the table: "categories" */
   categories: Array<Categories>;
-  /** fetch aggregated fields from the table: "categories" */
-  categories_aggregate: Categories_Aggregate;
   /** fetch data from the table: "categories" using primary key columns */
   categories_by_pk?: Maybe<Categories>;
-  /** fetch data from the table in a streaming manner : "categories" */
+  /** fetch data from the table in a streaming manner: "categories" */
   categories_stream: Array<Categories>;
-  contract?: Maybe<Contract>;
   /** fetch data from the table: "contract_allowlistings" */
   contract_allowlistings: Array<Contract_Allowlistings>;
-  /** fetch aggregated fields from the table: "contract_allowlistings" */
-  contract_allowlistings_aggregate: Contract_Allowlistings_Aggregate;
   /** fetch data from the table: "contract_allowlistings" using primary key columns */
   contract_allowlistings_by_pk?: Maybe<Contract_Allowlistings>;
-  /** fetch data from the table in a streaming manner : "contract_allowlistings" */
+  /** fetch data from the table in a streaming manner: "contract_allowlistings" */
   contract_allowlistings_stream: Array<Contract_Allowlistings>;
   /** fetch data from the table: "contract_type_names" */
   contract_type_names: Array<Contract_Type_Names>;
-  /** fetch aggregated fields from the table: "contract_type_names" */
-  contract_type_names_aggregate: Contract_Type_Names_Aggregate;
   /** fetch data from the table: "contract_type_names" using primary key columns */
   contract_type_names_by_pk?: Maybe<Contract_Type_Names>;
-  /** fetch data from the table in a streaming manner : "contract_type_names" */
+  /** fetch data from the table in a streaming manner: "contract_type_names" */
   contract_type_names_stream: Array<Contract_Type_Names>;
   /** fetch data from the table: "contract_types" */
   contract_types: Array<Contract_Types>;
-  /** fetch aggregated fields from the table: "contract_types" */
-  contract_types_aggregate: Contract_Types_Aggregate;
   /** fetch data from the table: "contract_types" using primary key columns */
   contract_types_by_pk?: Maybe<Contract_Types>;
-  /** fetch data from the table in a streaming manner : "contract_types" */
+  /** fetch data from the table in a streaming manner: "contract_types" */
   contract_types_stream: Array<Contract_Types>;
-  contracts: Array<Contract>;
   /** fetch data from the table: "contracts_metadata" */
   contracts_metadata: Array<Contracts_Metadata>;
   /** fetch aggregated fields from the table: "contracts_metadata" */
   contracts_metadata_aggregate: Contracts_Metadata_Aggregate;
   /** fetch data from the table: "contracts_metadata" using primary key columns */
   contracts_metadata_by_pk?: Maybe<Contracts_Metadata>;
-  /** fetch data from the table in a streaming manner : "contracts_metadata" */
+  /** fetch data from the table in a streaming manner: "contracts_metadata" */
   contracts_metadata_stream: Array<Contracts_Metadata>;
-  createApplication?: Maybe<CreateApplication>;
-  /** fetch data from the table: "curation_statuses" */
-  curation_statuses: Array<Curation_Statuses>;
-  /** fetch aggregated fields from the table: "curation_statuses" */
-  curation_statuses_aggregate: Curation_Statuses_Aggregate;
-  /** fetch data from the table: "curation_statuses" using primary key columns */
-  curation_statuses_by_pk?: Maybe<Curation_Statuses>;
-  /** fetch data from the table in a streaming manner : "curation_statuses" */
-  curation_statuses_stream: Array<Curation_Statuses>;
   /** An array relationship */
   entity_tags: Array<Entity_Tags>;
-  /** An aggregate relationship */
-  entity_tags_aggregate: Entity_Tags_Aggregate;
   /** fetch data from the table: "entity_tags" using primary key columns */
   entity_tags_by_pk?: Maybe<Entity_Tags>;
-  /** fetch data from the table in a streaming manner : "entity_tags" */
+  /** fetch data from the table in a streaming manner: "entity_tags" */
   entity_tags_stream: Array<Entity_Tags>;
   /** An array relationship */
   favorites: Array<Favorites>;
@@ -15067,126 +4387,63 @@ export type Subscription_Root = {
   favorites_aggregate: Favorites_Aggregate;
   /** fetch data from the table: "favorites" using primary key columns */
   favorites_by_pk?: Maybe<Favorites>;
-  /** fetch data from the table in a streaming manner : "favorites" */
+  /** fetch data from the table in a streaming manner: "favorites" */
   favorites_stream: Array<Favorites>;
-  /** fetch data from the table: "feature_field_values_counts" */
-  feature_field_values_counts: Array<Feature_Field_Values_Counts>;
-  /** fetch aggregated fields from the table: "feature_field_values_counts" */
-  feature_field_values_counts_aggregate: Feature_Field_Values_Counts_Aggregate;
-  /** fetch data from the table in a streaming manner : "feature_field_values_counts" */
-  feature_field_values_counts_stream: Array<Feature_Field_Values_Counts>;
   /** fetch data from the table: "feature_flags" */
   feature_flags: Array<Feature_Flags>;
-  /** fetch aggregated fields from the table: "feature_flags" */
-  feature_flags_aggregate: Feature_Flags_Aggregate;
   /** fetch data from the table: "feature_flags" using primary key columns */
   feature_flags_by_pk?: Maybe<Feature_Flags>;
-  /** fetch data from the table in a streaming manner : "feature_flags" */
+  /** fetch data from the table in a streaming manner: "feature_flags" */
   feature_flags_stream: Array<Feature_Flags>;
   /** execute function "filter_tokens_metadata_by_features" which returns "tokens_metadata" */
   filter_tokens_metadata_by_features: Array<Tokens_Metadata>;
   /** execute function "filter_tokens_metadata_by_features" and query aggregates on result of table type "tokens_metadata" */
   filter_tokens_metadata_by_features_aggregate: Tokens_Metadata_Aggregate;
-  /** execute function "get_projects_metadata_feature_field_value_counts" which returns "feature_field_values_counts" */
-  get_projects_metadata_feature_field_value_counts: Array<Feature_Field_Values_Counts>;
-  /** execute function "get_projects_metadata_feature_field_value_counts" and query aggregates on result of table type "feature_field_values_counts" */
-  get_projects_metadata_feature_field_value_counts_aggregate: Feature_Field_Values_Counts_Aggregate;
   /** execute function "list_projects_metadata_random" which returns "projects_metadata" */
   list_projects_metadata_random: Array<Projects_Metadata>;
   /** execute function "list_projects_metadata_random" and query aggregates on result of table type "projects_metadata" */
   list_projects_metadata_random_aggregate: Projects_Metadata_Aggregate;
   /** fetch data from the table: "media" */
   media: Array<Media>;
-  /** fetch aggregated fields from the table: "media" */
-  media_aggregate: Media_Aggregate;
   /** fetch data from the table: "media" using primary key columns */
   media_by_pk?: Maybe<Media>;
-  /** fetch data from the table in a streaming manner : "media" */
+  /** fetch data from the table in a streaming manner: "media" */
   media_stream: Array<Media>;
-  minter?: Maybe<Minter>;
-  minterFilter?: Maybe<MinterFilter>;
-  minterFilters: Array<MinterFilter>;
   /** fetch data from the table: "minter_filters_metadata" */
   minter_filters_metadata: Array<Minter_Filters_Metadata>;
-  /** fetch aggregated fields from the table: "minter_filters_metadata" */
-  minter_filters_metadata_aggregate: Minter_Filters_Metadata_Aggregate;
   /** fetch data from the table: "minter_filters_metadata" using primary key columns */
   minter_filters_metadata_by_pk?: Maybe<Minter_Filters_Metadata>;
-  /** fetch data from the table in a streaming manner : "minter_filters_metadata" */
+  /** fetch data from the table in a streaming manner: "minter_filters_metadata" */
   minter_filters_metadata_stream: Array<Minter_Filters_Metadata>;
-  /** fetch data from the table: "minter_type_names" */
-  minter_type_names: Array<Minter_Type_Names>;
-  /** fetch aggregated fields from the table: "minter_type_names" */
-  minter_type_names_aggregate: Minter_Type_Names_Aggregate;
-  /** fetch data from the table: "minter_type_names" using primary key columns */
-  minter_type_names_by_pk?: Maybe<Minter_Type_Names>;
-  /** fetch data from the table in a streaming manner : "minter_type_names" */
-  minter_type_names_stream: Array<Minter_Type_Names>;
   /** fetch data from the table: "minter_types" */
   minter_types: Array<Minter_Types>;
-  /** fetch aggregated fields from the table: "minter_types" */
-  minter_types_aggregate: Minter_Types_Aggregate;
   /** fetch data from the table: "minter_types" using primary key columns */
   minter_types_by_pk?: Maybe<Minter_Types>;
-  /** fetch data from the table in a streaming manner : "minter_types" */
+  /** fetch data from the table in a streaming manner: "minter_types" */
   minter_types_stream: Array<Minter_Types>;
-  minters: Array<Minter>;
   /** fetch data from the table: "minters_metadata" */
   minters_metadata: Array<Minters_Metadata>;
-  /** fetch aggregated fields from the table: "minters_metadata" */
-  minters_metadata_aggregate: Minters_Metadata_Aggregate;
   /** fetch data from the table: "minters_metadata" using primary key columns */
   minters_metadata_by_pk?: Maybe<Minters_Metadata>;
-  /** fetch data from the table in a streaming manner : "minters_metadata" */
+  /** fetch data from the table in a streaming manner: "minters_metadata" */
   minters_metadata_stream: Array<Minters_Metadata>;
-  /** An array relationship */
-  notifications: Array<Notifications>;
-  /** An aggregate relationship */
-  notifications_aggregate: Notifications_Aggregate;
-  /** fetch data from the table: "notifications" using primary key columns */
-  notifications_by_pk?: Maybe<Notifications>;
-  /** fetch data from the table in a streaming manner : "notifications" */
-  notifications_stream: Array<Notifications>;
-  payment?: Maybe<Payment>;
-  payments: Array<Payment>;
-  project?: Maybe<Project>;
-  projectExternalAssetDependencies: Array<ProjectExternalAssetDependency>;
-  projectExternalAssetDependency?: Maybe<ProjectExternalAssetDependency>;
-  projectMinterConfiguration?: Maybe<ProjectMinterConfiguration>;
-  projectMinterConfigurations: Array<ProjectMinterConfiguration>;
-  projectScript?: Maybe<ProjectScript>;
-  projectScripts: Array<ProjectScript>;
   /** fetch data from the table: "project_external_asset_dependencies" */
   project_external_asset_dependencies: Array<Project_External_Asset_Dependencies>;
-  /** fetch aggregated fields from the table: "project_external_asset_dependencies" */
-  project_external_asset_dependencies_aggregate: Project_External_Asset_Dependencies_Aggregate;
   /** fetch data from the table: "project_external_asset_dependencies" using primary key columns */
   project_external_asset_dependencies_by_pk?: Maybe<Project_External_Asset_Dependencies>;
-  /** fetch data from the table in a streaming manner : "project_external_asset_dependencies" */
+  /** fetch data from the table in a streaming manner: "project_external_asset_dependencies" */
   project_external_asset_dependencies_stream: Array<Project_External_Asset_Dependencies>;
-  /** fetch data from the table: "project_external_asset_dependency_types" */
-  project_external_asset_dependency_types: Array<Project_External_Asset_Dependency_Types>;
-  /** fetch aggregated fields from the table: "project_external_asset_dependency_types" */
-  project_external_asset_dependency_types_aggregate: Project_External_Asset_Dependency_Types_Aggregate;
-  /** fetch data from the table: "project_external_asset_dependency_types" using primary key columns */
-  project_external_asset_dependency_types_by_pk?: Maybe<Project_External_Asset_Dependency_Types>;
-  /** fetch data from the table in a streaming manner : "project_external_asset_dependency_types" */
-  project_external_asset_dependency_types_stream: Array<Project_External_Asset_Dependency_Types>;
   /** fetch data from the table: "project_minter_configurations" */
   project_minter_configurations: Array<Project_Minter_Configurations>;
-  /** fetch aggregated fields from the table: "project_minter_configurations" */
-  project_minter_configurations_aggregate: Project_Minter_Configurations_Aggregate;
   /** fetch data from the table: "project_minter_configurations" using primary key columns */
   project_minter_configurations_by_pk?: Maybe<Project_Minter_Configurations>;
-  /** fetch data from the table in a streaming manner : "project_minter_configurations" */
+  /** fetch data from the table in a streaming manner: "project_minter_configurations" */
   project_minter_configurations_stream: Array<Project_Minter_Configurations>;
   /** fetch data from the table: "project_scripts" */
   project_scripts: Array<Project_Scripts>;
-  /** fetch aggregated fields from the table: "project_scripts" */
-  project_scripts_aggregate: Project_Scripts_Aggregate;
   /** fetch data from the table: "project_scripts" using primary key columns */
   project_scripts_by_pk?: Maybe<Project_Scripts>;
-  /** fetch data from the table in a streaming manner : "project_scripts" */
+  /** fetch data from the table in a streaming manner: "project_scripts" */
   project_scripts_stream: Array<Project_Scripts>;
   /** fetch data from the table: "project_series" */
   project_series: Array<Project_Series>;
@@ -15194,38 +4451,25 @@ export type Subscription_Root = {
   project_series_aggregate: Project_Series_Aggregate;
   /** fetch data from the table: "project_series" using primary key columns */
   project_series_by_pk?: Maybe<Project_Series>;
-  /** fetch data from the table in a streaming manner : "project_series" */
+  /** fetch data from the table in a streaming manner: "project_series" */
   project_series_stream: Array<Project_Series>;
   /** fetch data from the table: "project_vertical_categories" */
   project_vertical_categories: Array<Project_Vertical_Categories>;
-  /** fetch aggregated fields from the table: "project_vertical_categories" */
-  project_vertical_categories_aggregate: Project_Vertical_Categories_Aggregate;
   /** fetch data from the table: "project_vertical_categories" using primary key columns */
   project_vertical_categories_by_pk?: Maybe<Project_Vertical_Categories>;
-  /** fetch data from the table in a streaming manner : "project_vertical_categories" */
+  /** fetch data from the table in a streaming manner: "project_vertical_categories" */
   project_vertical_categories_stream: Array<Project_Vertical_Categories>;
   /** fetch data from the table: "project_verticals" */
   project_verticals: Array<Project_Verticals>;
-  /** fetch aggregated fields from the table: "project_verticals" */
-  project_verticals_aggregate: Project_Verticals_Aggregate;
   /** fetch data from the table: "project_verticals" using primary key columns */
   project_verticals_by_pk?: Maybe<Project_Verticals>;
-  /** fetch data from the table in a streaming manner : "project_verticals" */
+  /** fetch data from the table in a streaming manner: "project_verticals" */
   project_verticals_stream: Array<Project_Verticals>;
-  projects: Array<Project>;
   /** fetch data from the table: "projects_features" */
   projects_features: Array<Projects_Features>;
-  /** fetch aggregated fields from the table: "projects_features" */
-  projects_features_aggregate: Projects_Features_Aggregate;
   /** fetch data from the table: "projects_features" using primary key columns */
   projects_features_by_pk?: Maybe<Projects_Features>;
-  /** fetch data from the table: "projects_features_private" */
-  projects_features_private: Array<Projects_Features_Private>;
-  /** fetch aggregated fields from the table: "projects_features_private" */
-  projects_features_private_aggregate: Projects_Features_Private_Aggregate;
-  /** fetch data from the table in a streaming manner : "projects_features_private" */
-  projects_features_private_stream: Array<Projects_Features_Private>;
-  /** fetch data from the table in a streaming manner : "projects_features" */
+  /** fetch data from the table in a streaming manner: "projects_features" */
   projects_features_stream: Array<Projects_Features>;
   /** fetch data from the table: "projects_metadata" */
   projects_metadata: Array<Projects_Metadata>;
@@ -15233,38 +4477,20 @@ export type Subscription_Root = {
   projects_metadata_aggregate: Projects_Metadata_Aggregate;
   /** fetch data from the table: "projects_metadata" using primary key columns */
   projects_metadata_by_pk?: Maybe<Projects_Metadata>;
-  /** fetch data from the table in a streaming manner : "projects_metadata" */
+  /** fetch data from the table in a streaming manner: "projects_metadata" */
   projects_metadata_stream: Array<Projects_Metadata>;
-  proposedArtistAddressesAndSplit?: Maybe<ProposedArtistAddressesAndSplit>;
-  proposedArtistAddressesAndSplits: Array<ProposedArtistAddressesAndSplit>;
   /** fetch data from the table: "proposed_artist_addresses_and_splits" */
   proposed_artist_addresses_and_splits: Array<Proposed_Artist_Addresses_And_Splits>;
-  /** fetch aggregated fields from the table: "proposed_artist_addresses_and_splits" */
-  proposed_artist_addresses_and_splits_aggregate: Proposed_Artist_Addresses_And_Splits_Aggregate;
   /** fetch data from the table: "proposed_artist_addresses_and_splits" using primary key columns */
   proposed_artist_addresses_and_splits_by_pk?: Maybe<Proposed_Artist_Addresses_And_Splits>;
-  /** fetch data from the table in a streaming manner : "proposed_artist_addresses_and_splits" */
+  /** fetch data from the table in a streaming manner: "proposed_artist_addresses_and_splits" */
   proposed_artist_addresses_and_splits_stream: Array<Proposed_Artist_Addresses_And_Splits>;
-  sale?: Maybe<Sale>;
-  saleLookupTable?: Maybe<SaleLookupTable>;
-  saleLookupTables: Array<SaleLookupTable>;
-  sales: Array<Sale>;
-  /** fetch data from the table: "screenings" */
-  screenings: Array<Screenings>;
-  /** fetch aggregated fields from the table: "screenings" */
-  screenings_aggregate: Screenings_Aggregate;
-  /** fetch data from the table: "screenings" using primary key columns */
-  screenings_by_pk?: Maybe<Screenings>;
-  /** fetch data from the table in a streaming manner : "screenings" */
-  screenings_stream: Array<Screenings>;
   /** execute function "search_projects" which returns "projects_metadata" */
   search_projects: Array<Projects_Metadata>;
   /** execute function "search_projects" and query aggregates on result of table type "projects_metadata" */
   search_projects_aggregate: Projects_Metadata_Aggregate;
   /** execute function "search_tags" which returns "tags" */
   search_tags: Array<Tags>;
-  /** execute function "search_tags" and query aggregates on result of table type "tags" */
-  search_tags_aggregate: Tags_Aggregate;
   /** execute function "search_tokens" which returns "tokens_metadata" */
   search_tokens: Array<Tokens_Metadata>;
   /** execute function "search_tokens" and query aggregates on result of table type "tokens_metadata" */
@@ -15273,45 +4499,11 @@ export type Subscription_Root = {
   search_users: Array<User_Profiles>;
   /** execute function "search_users" and query aggregates on result of table type "user_profiles" */
   search_users_aggregate: User_Profiles_Aggregate;
-  /** fetch data from the table: "sync_status" */
-  sync_status: Array<Sync_Status>;
-  /** fetch aggregated fields from the table: "sync_status" */
-  sync_status_aggregate: Sync_Status_Aggregate;
-  /** fetch data from the table: "sync_status" using primary key columns */
-  sync_status_by_pk?: Maybe<Sync_Status>;
-  /** fetch data from the table in a streaming manner : "sync_status" */
-  sync_status_stream: Array<Sync_Status>;
-  /** fetch data from the table: "tag_groupings" */
-  tag_groupings: Array<Tag_Groupings>;
-  /** fetch aggregated fields from the table: "tag_groupings" */
-  tag_groupings_aggregate: Tag_Groupings_Aggregate;
-  /** fetch data from the table: "tag_groupings" using primary key columns */
-  tag_groupings_by_pk?: Maybe<Tag_Groupings>;
-  /** fetch data from the table in a streaming manner : "tag_groupings" */
-  tag_groupings_stream: Array<Tag_Groupings>;
-  /** fetch data from the table: "tag_status" */
-  tag_status: Array<Tag_Status>;
-  /** fetch aggregated fields from the table: "tag_status" */
-  tag_status_aggregate: Tag_Status_Aggregate;
-  /** fetch data from the table: "tag_status" using primary key columns */
-  tag_status_by_pk?: Maybe<Tag_Status>;
-  /** fetch data from the table in a streaming manner : "tag_status" */
-  tag_status_stream: Array<Tag_Status>;
-  /** fetch data from the table: "tag_types" */
-  tag_types: Array<Tag_Types>;
-  /** fetch aggregated fields from the table: "tag_types" */
-  tag_types_aggregate: Tag_Types_Aggregate;
-  /** fetch data from the table: "tag_types" using primary key columns */
-  tag_types_by_pk?: Maybe<Tag_Types>;
-  /** fetch data from the table in a streaming manner : "tag_types" */
-  tag_types_stream: Array<Tag_Types>;
   /** fetch data from the table: "tags" */
   tags: Array<Tags>;
-  /** fetch aggregated fields from the table: "tags" */
-  tags_aggregate: Tags_Aggregate;
   /** fetch data from the table: "tags" using primary key columns */
   tags_by_pk?: Maybe<Tags>;
-  /** fetch data from the table in a streaming manner : "tags" */
+  /** fetch data from the table in a streaming manner: "tags" */
   tags_stream: Array<Tags>;
   /** fetch data from the table: "terms_of_service" */
   terms_of_service: Array<Terms_Of_Service>;
@@ -15319,27 +4511,23 @@ export type Subscription_Root = {
   terms_of_service_aggregate: Terms_Of_Service_Aggregate;
   /** fetch data from the table: "terms_of_service" using primary key columns */
   terms_of_service_by_pk?: Maybe<Terms_Of_Service>;
-  /** fetch data from the table in a streaming manner : "terms_of_service" */
+  /** fetch data from the table in a streaming manner: "terms_of_service" */
   terms_of_service_stream: Array<Terms_Of_Service>;
-  token?: Maybe<Token>;
-  tokens: Array<Token>;
   /** fetch data from the table: "tokens_metadata" */
   tokens_metadata: Array<Tokens_Metadata>;
   /** fetch aggregated fields from the table: "tokens_metadata" */
   tokens_metadata_aggregate: Tokens_Metadata_Aggregate;
   /** fetch data from the table: "tokens_metadata" using primary key columns */
   tokens_metadata_by_pk?: Maybe<Tokens_Metadata>;
-  /** fetch data from the table in a streaming manner : "tokens_metadata" */
+  /** fetch data from the table in a streaming manner: "tokens_metadata" */
   tokens_metadata_stream: Array<Tokens_Metadata>;
-  transfer?: Maybe<Transfer>;
-  transfers: Array<Transfer>;
   /** fetch data from the table: "user_profiles" */
   user_profiles: Array<User_Profiles>;
   /** fetch aggregated fields from the table: "user_profiles" */
   user_profiles_aggregate: User_Profiles_Aggregate;
   /** fetch data from the table: "user_profiles" using primary key columns */
   user_profiles_by_pk?: Maybe<User_Profiles>;
-  /** fetch data from the table in a streaming manner : "user_profiles" */
+  /** fetch data from the table in a streaming manner: "user_profiles" */
   user_profiles_stream: Array<User_Profiles>;
   /** fetch data from the table: "users" */
   users: Array<Users>;
@@ -15347,88 +4535,30 @@ export type Subscription_Root = {
   users_aggregate: Users_Aggregate;
   /** fetch data from the table: "users" using primary key columns */
   users_by_pk?: Maybe<Users>;
-  /** fetch data from the table in a streaming manner : "users" */
+  /** fetch data from the table in a streaming manner: "users" */
   users_stream: Array<Users>;
   /** fetch data from the table: "verticals" */
   verticals: Array<Verticals>;
-  /** fetch aggregated fields from the table: "verticals" */
-  verticals_aggregate: Verticals_Aggregate;
   /** fetch data from the table: "verticals" using primary key columns */
   verticals_by_pk?: Maybe<Verticals>;
-  /** fetch data from the table in a streaming manner : "verticals" */
+  /** fetch data from the table in a streaming manner: "verticals" */
   verticals_stream: Array<Verticals>;
   /** fetch data from the table: "webflow_artist_info" */
   webflow_artist_info: Array<Webflow_Artist_Info>;
-  /** fetch aggregated fields from the table: "webflow_artist_info" */
-  webflow_artist_info_aggregate: Webflow_Artist_Info_Aggregate;
   /** fetch data from the table: "webflow_artist_info" using primary key columns */
   webflow_artist_info_by_pk?: Maybe<Webflow_Artist_Info>;
-  /** fetch data from the table in a streaming manner : "webflow_artist_info" */
+  /** fetch data from the table in a streaming manner: "webflow_artist_info" */
   webflow_artist_info_stream: Array<Webflow_Artist_Info>;
   /** fetch data from the table: "webflow_spectrum_articles" */
   webflow_spectrum_articles: Array<Webflow_Spectrum_Articles>;
-  /** fetch aggregated fields from the table: "webflow_spectrum_articles" */
-  webflow_spectrum_articles_aggregate: Webflow_Spectrum_Articles_Aggregate;
   /** fetch data from the table: "webflow_spectrum_articles" using primary key columns */
   webflow_spectrum_articles_by_pk?: Maybe<Webflow_Spectrum_Articles>;
-  /** fetch data from the table in a streaming manner : "webflow_spectrum_articles" */
+  /** fetch data from the table in a streaming manner: "webflow_spectrum_articles" */
   webflow_spectrum_articles_stream: Array<Webflow_Spectrum_Articles>;
-  whitelisting?: Maybe<Whitelisting>;
-  whitelistings: Array<Whitelisting>;
-};
-
-
-export type Subscription_Root_MetaArgs = {
-  block?: InputMaybe<Block_Height>;
-};
-
-
-export type Subscription_RootAccountArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootAccountProjectArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootAccountProjectsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<AccountProject_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<AccountProject_Filter>;
-};
-
-
-export type Subscription_RootAccountsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Account_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Account_Filter>;
 };
 
 
 export type Subscription_RootCategoriesArgs = {
-  distinct_on?: InputMaybe<Array<Categories_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Categories_Order_By>>;
-  where?: InputMaybe<Categories_Bool_Exp>;
-};
-
-
-export type Subscription_RootCategories_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Categories_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -15449,23 +4579,7 @@ export type Subscription_RootCategories_StreamArgs = {
 };
 
 
-export type Subscription_RootContractArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
 export type Subscription_RootContract_AllowlistingsArgs = {
-  distinct_on?: InputMaybe<Array<Contract_Allowlistings_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Contract_Allowlistings_Order_By>>;
-  where?: InputMaybe<Contract_Allowlistings_Bool_Exp>;
-};
-
-
-export type Subscription_RootContract_Allowlistings_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Contract_Allowlistings_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -15496,15 +4610,6 @@ export type Subscription_RootContract_Type_NamesArgs = {
 };
 
 
-export type Subscription_RootContract_Type_Names_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Contract_Type_Names_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Contract_Type_Names_Order_By>>;
-  where?: InputMaybe<Contract_Type_Names_Bool_Exp>;
-};
-
-
 export type Subscription_RootContract_Type_Names_By_PkArgs = {
   name: Scalars['String'];
 };
@@ -15526,15 +4631,6 @@ export type Subscription_RootContract_TypesArgs = {
 };
 
 
-export type Subscription_RootContract_Types_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Contract_Types_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Contract_Types_Order_By>>;
-  where?: InputMaybe<Contract_Types_Bool_Exp>;
-};
-
-
 export type Subscription_RootContract_Types_By_PkArgs = {
   type: Contract_Type_Names_Enum;
 };
@@ -15544,17 +4640,6 @@ export type Subscription_RootContract_Types_StreamArgs = {
   batch_size: Scalars['Int'];
   cursor: Array<InputMaybe<Contract_Types_Stream_Cursor_Input>>;
   where?: InputMaybe<Contract_Types_Bool_Exp>;
-};
-
-
-export type Subscription_RootContractsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Contract_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Contract_Filter>;
 };
 
 
@@ -15588,51 +4673,7 @@ export type Subscription_RootContracts_Metadata_StreamArgs = {
 };
 
 
-export type Subscription_RootCreateApplicationArgs = {
-  id: Scalars['uuid'];
-};
-
-
-export type Subscription_RootCuration_StatusesArgs = {
-  distinct_on?: InputMaybe<Array<Curation_Statuses_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Curation_Statuses_Order_By>>;
-  where?: InputMaybe<Curation_Statuses_Bool_Exp>;
-};
-
-
-export type Subscription_RootCuration_Statuses_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Curation_Statuses_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Curation_Statuses_Order_By>>;
-  where?: InputMaybe<Curation_Statuses_Bool_Exp>;
-};
-
-
-export type Subscription_RootCuration_Statuses_By_PkArgs = {
-  value: Scalars['String'];
-};
-
-
-export type Subscription_RootCuration_Statuses_StreamArgs = {
-  batch_size: Scalars['Int'];
-  cursor: Array<InputMaybe<Curation_Statuses_Stream_Cursor_Input>>;
-  where?: InputMaybe<Curation_Statuses_Bool_Exp>;
-};
-
-
 export type Subscription_RootEntity_TagsArgs = {
-  distinct_on?: InputMaybe<Array<Entity_Tags_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Entity_Tags_Order_By>>;
-  where?: InputMaybe<Entity_Tags_Bool_Exp>;
-};
-
-
-export type Subscription_RootEntity_Tags_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Entity_Tags_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -15683,41 +4724,7 @@ export type Subscription_RootFavorites_StreamArgs = {
 };
 
 
-export type Subscription_RootFeature_Field_Values_CountsArgs = {
-  distinct_on?: InputMaybe<Array<Feature_Field_Values_Counts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Feature_Field_Values_Counts_Order_By>>;
-  where?: InputMaybe<Feature_Field_Values_Counts_Bool_Exp>;
-};
-
-
-export type Subscription_RootFeature_Field_Values_Counts_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Feature_Field_Values_Counts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Feature_Field_Values_Counts_Order_By>>;
-  where?: InputMaybe<Feature_Field_Values_Counts_Bool_Exp>;
-};
-
-
-export type Subscription_RootFeature_Field_Values_Counts_StreamArgs = {
-  batch_size: Scalars['Int'];
-  cursor: Array<InputMaybe<Feature_Field_Values_Counts_Stream_Cursor_Input>>;
-  where?: InputMaybe<Feature_Field_Values_Counts_Bool_Exp>;
-};
-
-
 export type Subscription_RootFeature_FlagsArgs = {
-  distinct_on?: InputMaybe<Array<Feature_Flags_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Feature_Flags_Order_By>>;
-  where?: InputMaybe<Feature_Flags_Bool_Exp>;
-};
-
-
-export type Subscription_RootFeature_Flags_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Feature_Flags_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -15758,26 +4765,6 @@ export type Subscription_RootFilter_Tokens_Metadata_By_Features_AggregateArgs = 
 };
 
 
-export type Subscription_RootGet_Projects_Metadata_Feature_Field_Value_CountsArgs = {
-  args: Get_Projects_Metadata_Feature_Field_Value_Counts_Args;
-  distinct_on?: InputMaybe<Array<Feature_Field_Values_Counts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Feature_Field_Values_Counts_Order_By>>;
-  where?: InputMaybe<Feature_Field_Values_Counts_Bool_Exp>;
-};
-
-
-export type Subscription_RootGet_Projects_Metadata_Feature_Field_Value_Counts_AggregateArgs = {
-  args: Get_Projects_Metadata_Feature_Field_Value_Counts_Args;
-  distinct_on?: InputMaybe<Array<Feature_Field_Values_Counts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Feature_Field_Values_Counts_Order_By>>;
-  where?: InputMaybe<Feature_Field_Values_Counts_Bool_Exp>;
-};
-
-
 export type Subscription_RootList_Projects_Metadata_RandomArgs = {
   args: List_Projects_Metadata_Random_Args;
   distinct_on?: InputMaybe<Array<Projects_Metadata_Select_Column>>;
@@ -15807,15 +4794,6 @@ export type Subscription_RootMediaArgs = {
 };
 
 
-export type Subscription_RootMedia_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Media_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Media_Order_By>>;
-  where?: InputMaybe<Media_Bool_Exp>;
-};
-
-
 export type Subscription_RootMedia_By_PkArgs = {
   id: Scalars['Int'];
 };
@@ -15828,41 +4806,7 @@ export type Subscription_RootMedia_StreamArgs = {
 };
 
 
-export type Subscription_RootMinterArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootMinterFilterArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootMinterFiltersArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<MinterFilter_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<MinterFilter_Filter>;
-};
-
-
 export type Subscription_RootMinter_Filters_MetadataArgs = {
-  distinct_on?: InputMaybe<Array<Minter_Filters_Metadata_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Minter_Filters_Metadata_Order_By>>;
-  where?: InputMaybe<Minter_Filters_Metadata_Bool_Exp>;
-};
-
-
-export type Subscription_RootMinter_Filters_Metadata_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Minter_Filters_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -15883,46 +4827,7 @@ export type Subscription_RootMinter_Filters_Metadata_StreamArgs = {
 };
 
 
-export type Subscription_RootMinter_Type_NamesArgs = {
-  distinct_on?: InputMaybe<Array<Minter_Type_Names_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Minter_Type_Names_Order_By>>;
-  where?: InputMaybe<Minter_Type_Names_Bool_Exp>;
-};
-
-
-export type Subscription_RootMinter_Type_Names_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Minter_Type_Names_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Minter_Type_Names_Order_By>>;
-  where?: InputMaybe<Minter_Type_Names_Bool_Exp>;
-};
-
-
-export type Subscription_RootMinter_Type_Names_By_PkArgs = {
-  name: Scalars['String'];
-};
-
-
-export type Subscription_RootMinter_Type_Names_StreamArgs = {
-  batch_size: Scalars['Int'];
-  cursor: Array<InputMaybe<Minter_Type_Names_Stream_Cursor_Input>>;
-  where?: InputMaybe<Minter_Type_Names_Bool_Exp>;
-};
-
-
 export type Subscription_RootMinter_TypesArgs = {
-  distinct_on?: InputMaybe<Array<Minter_Types_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Minter_Types_Order_By>>;
-  where?: InputMaybe<Minter_Types_Bool_Exp>;
-};
-
-
-export type Subscription_RootMinter_Types_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Minter_Types_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -15943,27 +4848,7 @@ export type Subscription_RootMinter_Types_StreamArgs = {
 };
 
 
-export type Subscription_RootMintersArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Minter_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Minter_Filter>;
-};
-
-
 export type Subscription_RootMinters_MetadataArgs = {
-  distinct_on?: InputMaybe<Array<Minters_Metadata_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Minters_Metadata_Order_By>>;
-  where?: InputMaybe<Minters_Metadata_Bool_Exp>;
-};
-
-
-export type Subscription_RootMinters_Metadata_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Minters_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -15984,127 +4869,7 @@ export type Subscription_RootMinters_Metadata_StreamArgs = {
 };
 
 
-export type Subscription_RootNotificationsArgs = {
-  distinct_on?: InputMaybe<Array<Notifications_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Notifications_Order_By>>;
-  where?: InputMaybe<Notifications_Bool_Exp>;
-};
-
-
-export type Subscription_RootNotifications_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Notifications_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Notifications_Order_By>>;
-  where?: InputMaybe<Notifications_Bool_Exp>;
-};
-
-
-export type Subscription_RootNotifications_By_PkArgs = {
-  trigger_key: Scalars['String'];
-  trigger_time: Scalars['timestamptz'];
-  user_address: Scalars['String'];
-};
-
-
-export type Subscription_RootNotifications_StreamArgs = {
-  batch_size: Scalars['Int'];
-  cursor: Array<InputMaybe<Notifications_Stream_Cursor_Input>>;
-  where?: InputMaybe<Notifications_Bool_Exp>;
-};
-
-
-export type Subscription_RootPaymentArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootPaymentsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Payment_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Payment_Filter>;
-};
-
-
-export type Subscription_RootProjectArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootProjectExternalAssetDependenciesArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<ProjectExternalAssetDependency_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<ProjectExternalAssetDependency_Filter>;
-};
-
-
-export type Subscription_RootProjectExternalAssetDependencyArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootProjectMinterConfigurationArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootProjectMinterConfigurationsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<ProjectMinterConfiguration_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<ProjectMinterConfiguration_Filter>;
-};
-
-
-export type Subscription_RootProjectScriptArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootProjectScriptsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<ProjectScript_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<ProjectScript_Filter>;
-};
-
-
 export type Subscription_RootProject_External_Asset_DependenciesArgs = {
-  distinct_on?: InputMaybe<Array<Project_External_Asset_Dependencies_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_External_Asset_Dependencies_Order_By>>;
-  where?: InputMaybe<Project_External_Asset_Dependencies_Bool_Exp>;
-};
-
-
-export type Subscription_RootProject_External_Asset_Dependencies_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Project_External_Asset_Dependencies_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -16126,46 +4891,7 @@ export type Subscription_RootProject_External_Asset_Dependencies_StreamArgs = {
 };
 
 
-export type Subscription_RootProject_External_Asset_Dependency_TypesArgs = {
-  distinct_on?: InputMaybe<Array<Project_External_Asset_Dependency_Types_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_External_Asset_Dependency_Types_Order_By>>;
-  where?: InputMaybe<Project_External_Asset_Dependency_Types_Bool_Exp>;
-};
-
-
-export type Subscription_RootProject_External_Asset_Dependency_Types_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Project_External_Asset_Dependency_Types_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_External_Asset_Dependency_Types_Order_By>>;
-  where?: InputMaybe<Project_External_Asset_Dependency_Types_Bool_Exp>;
-};
-
-
-export type Subscription_RootProject_External_Asset_Dependency_Types_By_PkArgs = {
-  type: Scalars['String'];
-};
-
-
-export type Subscription_RootProject_External_Asset_Dependency_Types_StreamArgs = {
-  batch_size: Scalars['Int'];
-  cursor: Array<InputMaybe<Project_External_Asset_Dependency_Types_Stream_Cursor_Input>>;
-  where?: InputMaybe<Project_External_Asset_Dependency_Types_Bool_Exp>;
-};
-
-
 export type Subscription_RootProject_Minter_ConfigurationsArgs = {
-  distinct_on?: InputMaybe<Array<Project_Minter_Configurations_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_Minter_Configurations_Order_By>>;
-  where?: InputMaybe<Project_Minter_Configurations_Bool_Exp>;
-};
-
-
-export type Subscription_RootProject_Minter_Configurations_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Project_Minter_Configurations_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -16187,15 +4913,6 @@ export type Subscription_RootProject_Minter_Configurations_StreamArgs = {
 
 
 export type Subscription_RootProject_ScriptsArgs = {
-  distinct_on?: InputMaybe<Array<Project_Scripts_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_Scripts_Order_By>>;
-  where?: InputMaybe<Project_Scripts_Bool_Exp>;
-};
-
-
-export type Subscription_RootProject_Scripts_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Project_Scripts_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -16256,15 +4973,6 @@ export type Subscription_RootProject_Vertical_CategoriesArgs = {
 };
 
 
-export type Subscription_RootProject_Vertical_Categories_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Project_Vertical_Categories_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_Vertical_Categories_Order_By>>;
-  where?: InputMaybe<Project_Vertical_Categories_Bool_Exp>;
-};
-
-
 export type Subscription_RootProject_Vertical_Categories_By_PkArgs = {
   name: Categories_Enum;
 };
@@ -16286,15 +4994,6 @@ export type Subscription_RootProject_VerticalsArgs = {
 };
 
 
-export type Subscription_RootProject_Verticals_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Project_Verticals_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Project_Verticals_Order_By>>;
-  where?: InputMaybe<Project_Verticals_Bool_Exp>;
-};
-
-
 export type Subscription_RootProject_Verticals_By_PkArgs = {
   name: Verticals_Enum;
 };
@@ -16307,27 +5006,7 @@ export type Subscription_RootProject_Verticals_StreamArgs = {
 };
 
 
-export type Subscription_RootProjectsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Project_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Project_Filter>;
-};
-
-
 export type Subscription_RootProjects_FeaturesArgs = {
-  distinct_on?: InputMaybe<Array<Projects_Features_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Projects_Features_Order_By>>;
-  where?: InputMaybe<Projects_Features_Bool_Exp>;
-};
-
-
-export type Subscription_RootProjects_Features_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Projects_Features_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -16338,31 +5017,6 @@ export type Subscription_RootProjects_Features_AggregateArgs = {
 
 export type Subscription_RootProjects_Features_By_PkArgs = {
   id: Scalars['Int'];
-};
-
-
-export type Subscription_RootProjects_Features_PrivateArgs = {
-  distinct_on?: InputMaybe<Array<Projects_Features_Private_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Projects_Features_Private_Order_By>>;
-  where?: InputMaybe<Projects_Features_Private_Bool_Exp>;
-};
-
-
-export type Subscription_RootProjects_Features_Private_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Projects_Features_Private_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Projects_Features_Private_Order_By>>;
-  where?: InputMaybe<Projects_Features_Private_Bool_Exp>;
-};
-
-
-export type Subscription_RootProjects_Features_Private_StreamArgs = {
-  batch_size: Scalars['Int'];
-  cursor: Array<InputMaybe<Projects_Features_Private_Stream_Cursor_Input>>;
-  where?: InputMaybe<Projects_Features_Private_Bool_Exp>;
 };
 
 
@@ -16403,34 +5057,7 @@ export type Subscription_RootProjects_Metadata_StreamArgs = {
 };
 
 
-export type Subscription_RootProposedArtistAddressesAndSplitArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootProposedArtistAddressesAndSplitsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<ProposedArtistAddressesAndSplit_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<ProposedArtistAddressesAndSplit_Filter>;
-};
-
-
 export type Subscription_RootProposed_Artist_Addresses_And_SplitsArgs = {
-  distinct_on?: InputMaybe<Array<Proposed_Artist_Addresses_And_Splits_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Proposed_Artist_Addresses_And_Splits_Order_By>>;
-  where?: InputMaybe<Proposed_Artist_Addresses_And_Splits_Bool_Exp>;
-};
-
-
-export type Subscription_RootProposed_Artist_Addresses_And_Splits_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Proposed_Artist_Addresses_And_Splits_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -16448,72 +5075,6 @@ export type Subscription_RootProposed_Artist_Addresses_And_Splits_StreamArgs = {
   batch_size: Scalars['Int'];
   cursor: Array<InputMaybe<Proposed_Artist_Addresses_And_Splits_Stream_Cursor_Input>>;
   where?: InputMaybe<Proposed_Artist_Addresses_And_Splits_Bool_Exp>;
-};
-
-
-export type Subscription_RootSaleArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootSaleLookupTableArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootSaleLookupTablesArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<SaleLookupTable_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<SaleLookupTable_Filter>;
-};
-
-
-export type Subscription_RootSalesArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Sale_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Sale_Filter>;
-};
-
-
-export type Subscription_RootScreeningsArgs = {
-  distinct_on?: InputMaybe<Array<Screenings_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Screenings_Order_By>>;
-  where?: InputMaybe<Screenings_Bool_Exp>;
-};
-
-
-export type Subscription_RootScreenings_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Screenings_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Screenings_Order_By>>;
-  where?: InputMaybe<Screenings_Bool_Exp>;
-};
-
-
-export type Subscription_RootScreenings_By_PkArgs = {
-  id: Scalars['Int'];
-};
-
-
-export type Subscription_RootScreenings_StreamArgs = {
-  batch_size: Scalars['Int'];
-  cursor: Array<InputMaybe<Screenings_Stream_Cursor_Input>>;
-  where?: InputMaybe<Screenings_Bool_Exp>;
 };
 
 
@@ -16538,16 +5099,6 @@ export type Subscription_RootSearch_Projects_AggregateArgs = {
 
 
 export type Subscription_RootSearch_TagsArgs = {
-  args: Search_Tags_Args;
-  distinct_on?: InputMaybe<Array<Tags_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tags_Order_By>>;
-  where?: InputMaybe<Tags_Bool_Exp>;
-};
-
-
-export type Subscription_RootSearch_Tags_AggregateArgs = {
   args: Search_Tags_Args;
   distinct_on?: InputMaybe<Array<Tags_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -16597,136 +5148,7 @@ export type Subscription_RootSearch_Users_AggregateArgs = {
 };
 
 
-export type Subscription_RootSync_StatusArgs = {
-  distinct_on?: InputMaybe<Array<Sync_Status_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Sync_Status_Order_By>>;
-  where?: InputMaybe<Sync_Status_Bool_Exp>;
-};
-
-
-export type Subscription_RootSync_Status_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Sync_Status_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Sync_Status_Order_By>>;
-  where?: InputMaybe<Sync_Status_Bool_Exp>;
-};
-
-
-export type Subscription_RootSync_Status_By_PkArgs = {
-  id: Scalars['Boolean'];
-};
-
-
-export type Subscription_RootSync_Status_StreamArgs = {
-  batch_size: Scalars['Int'];
-  cursor: Array<InputMaybe<Sync_Status_Stream_Cursor_Input>>;
-  where?: InputMaybe<Sync_Status_Bool_Exp>;
-};
-
-
-export type Subscription_RootTag_GroupingsArgs = {
-  distinct_on?: InputMaybe<Array<Tag_Groupings_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tag_Groupings_Order_By>>;
-  where?: InputMaybe<Tag_Groupings_Bool_Exp>;
-};
-
-
-export type Subscription_RootTag_Groupings_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Tag_Groupings_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tag_Groupings_Order_By>>;
-  where?: InputMaybe<Tag_Groupings_Bool_Exp>;
-};
-
-
-export type Subscription_RootTag_Groupings_By_PkArgs = {
-  name: Scalars['String'];
-};
-
-
-export type Subscription_RootTag_Groupings_StreamArgs = {
-  batch_size: Scalars['Int'];
-  cursor: Array<InputMaybe<Tag_Groupings_Stream_Cursor_Input>>;
-  where?: InputMaybe<Tag_Groupings_Bool_Exp>;
-};
-
-
-export type Subscription_RootTag_StatusArgs = {
-  distinct_on?: InputMaybe<Array<Tag_Status_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tag_Status_Order_By>>;
-  where?: InputMaybe<Tag_Status_Bool_Exp>;
-};
-
-
-export type Subscription_RootTag_Status_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Tag_Status_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tag_Status_Order_By>>;
-  where?: InputMaybe<Tag_Status_Bool_Exp>;
-};
-
-
-export type Subscription_RootTag_Status_By_PkArgs = {
-  value: Scalars['String'];
-};
-
-
-export type Subscription_RootTag_Status_StreamArgs = {
-  batch_size: Scalars['Int'];
-  cursor: Array<InputMaybe<Tag_Status_Stream_Cursor_Input>>;
-  where?: InputMaybe<Tag_Status_Bool_Exp>;
-};
-
-
-export type Subscription_RootTag_TypesArgs = {
-  distinct_on?: InputMaybe<Array<Tag_Types_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tag_Types_Order_By>>;
-  where?: InputMaybe<Tag_Types_Bool_Exp>;
-};
-
-
-export type Subscription_RootTag_Types_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Tag_Types_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tag_Types_Order_By>>;
-  where?: InputMaybe<Tag_Types_Bool_Exp>;
-};
-
-
-export type Subscription_RootTag_Types_By_PkArgs = {
-  value: Scalars['String'];
-};
-
-
-export type Subscription_RootTag_Types_StreamArgs = {
-  batch_size: Scalars['Int'];
-  cursor: Array<InputMaybe<Tag_Types_Stream_Cursor_Input>>;
-  where?: InputMaybe<Tag_Types_Bool_Exp>;
-};
-
-
 export type Subscription_RootTagsArgs = {
-  distinct_on?: InputMaybe<Array<Tags_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Tags_Order_By>>;
-  where?: InputMaybe<Tags_Bool_Exp>;
-};
-
-
-export type Subscription_RootTags_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Tags_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -16777,24 +5199,6 @@ export type Subscription_RootTerms_Of_Service_StreamArgs = {
 };
 
 
-export type Subscription_RootTokenArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootTokensArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Token_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Token_Filter>;
-};
-
-
 export type Subscription_RootTokens_MetadataArgs = {
   distinct_on?: InputMaybe<Array<Tokens_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -16822,24 +5226,6 @@ export type Subscription_RootTokens_Metadata_StreamArgs = {
   batch_size: Scalars['Int'];
   cursor: Array<InputMaybe<Tokens_Metadata_Stream_Cursor_Input>>;
   where?: InputMaybe<Tokens_Metadata_Bool_Exp>;
-};
-
-
-export type Subscription_RootTransferArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootTransfersArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Transfer_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Transfer_Filter>;
 };
 
 
@@ -16912,15 +5298,6 @@ export type Subscription_RootVerticalsArgs = {
 };
 
 
-export type Subscription_RootVerticals_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Verticals_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Verticals_Order_By>>;
-  where?: InputMaybe<Verticals_Bool_Exp>;
-};
-
-
 export type Subscription_RootVerticals_By_PkArgs = {
   name: Scalars['String'];
 };
@@ -16934,15 +5311,6 @@ export type Subscription_RootVerticals_StreamArgs = {
 
 
 export type Subscription_RootWebflow_Artist_InfoArgs = {
-  distinct_on?: InputMaybe<Array<Webflow_Artist_Info_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Webflow_Artist_Info_Order_By>>;
-  where?: InputMaybe<Webflow_Artist_Info_Bool_Exp>;
-};
-
-
-export type Subscription_RootWebflow_Artist_Info_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Webflow_Artist_Info_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -16972,15 +5340,6 @@ export type Subscription_RootWebflow_Spectrum_ArticlesArgs = {
 };
 
 
-export type Subscription_RootWebflow_Spectrum_Articles_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Webflow_Spectrum_Articles_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Webflow_Spectrum_Articles_Order_By>>;
-  where?: InputMaybe<Webflow_Spectrum_Articles_Bool_Exp>;
-};
-
-
 export type Subscription_RootWebflow_Spectrum_Articles_By_PkArgs = {
   webflow_item_id: Scalars['String'];
 };
@@ -16991,257 +5350,6 @@ export type Subscription_RootWebflow_Spectrum_Articles_StreamArgs = {
   cursor: Array<InputMaybe<Webflow_Spectrum_Articles_Stream_Cursor_Input>>;
   where?: InputMaybe<Webflow_Spectrum_Articles_Bool_Exp>;
 };
-
-
-export type Subscription_RootWhitelistingArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type Subscription_RootWhitelistingsArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<Whitelisting_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<Whitelisting_Filter>;
-};
-
-/** columns and relationships of "sync_status" */
-export type Sync_Status = {
-  __typename?: 'sync_status';
-  id: Scalars['Boolean'];
-  last_contract_updated_at: Scalars['timestamptz'];
-  last_minter_filter_updated_at: Scalars['timestamptz'];
-  last_minter_updated_at: Scalars['timestamptz'];
-  last_project_updated_at: Scalars['timestamptz'];
-  last_secondary_updated_at: Scalars['timestamptz'];
-  last_token_updated_at: Scalars['timestamptz'];
-};
-
-/** aggregated selection of "sync_status" */
-export type Sync_Status_Aggregate = {
-  __typename?: 'sync_status_aggregate';
-  aggregate?: Maybe<Sync_Status_Aggregate_Fields>;
-  nodes: Array<Sync_Status>;
-};
-
-/** aggregate fields of "sync_status" */
-export type Sync_Status_Aggregate_Fields = {
-  __typename?: 'sync_status_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Sync_Status_Max_Fields>;
-  min?: Maybe<Sync_Status_Min_Fields>;
-};
-
-
-/** aggregate fields of "sync_status" */
-export type Sync_Status_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Sync_Status_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** Boolean expression to filter rows from the table "sync_status". All fields are combined with a logical 'AND'. */
-export type Sync_Status_Bool_Exp = {
-  _and?: InputMaybe<Array<Sync_Status_Bool_Exp>>;
-  _not?: InputMaybe<Sync_Status_Bool_Exp>;
-  _or?: InputMaybe<Array<Sync_Status_Bool_Exp>>;
-  id?: InputMaybe<Boolean_Comparison_Exp>;
-  last_contract_updated_at?: InputMaybe<Timestamptz_Comparison_Exp>;
-  last_minter_filter_updated_at?: InputMaybe<Timestamptz_Comparison_Exp>;
-  last_minter_updated_at?: InputMaybe<Timestamptz_Comparison_Exp>;
-  last_project_updated_at?: InputMaybe<Timestamptz_Comparison_Exp>;
-  last_secondary_updated_at?: InputMaybe<Timestamptz_Comparison_Exp>;
-  last_token_updated_at?: InputMaybe<Timestamptz_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "sync_status" */
-export enum Sync_Status_Constraint {
-  /** unique or primary key constraint on columns "id" */
-  SyncStatusPkey = 'sync_status_pkey'
-}
-
-/** input type for inserting data into table "sync_status" */
-export type Sync_Status_Insert_Input = {
-  id?: InputMaybe<Scalars['Boolean']>;
-  last_contract_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_minter_filter_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_minter_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_project_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_secondary_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_token_updated_at?: InputMaybe<Scalars['timestamptz']>;
-};
-
-/** aggregate max on columns */
-export type Sync_Status_Max_Fields = {
-  __typename?: 'sync_status_max_fields';
-  last_contract_updated_at?: Maybe<Scalars['timestamptz']>;
-  last_minter_filter_updated_at?: Maybe<Scalars['timestamptz']>;
-  last_minter_updated_at?: Maybe<Scalars['timestamptz']>;
-  last_project_updated_at?: Maybe<Scalars['timestamptz']>;
-  last_secondary_updated_at?: Maybe<Scalars['timestamptz']>;
-  last_token_updated_at?: Maybe<Scalars['timestamptz']>;
-};
-
-/** aggregate min on columns */
-export type Sync_Status_Min_Fields = {
-  __typename?: 'sync_status_min_fields';
-  last_contract_updated_at?: Maybe<Scalars['timestamptz']>;
-  last_minter_filter_updated_at?: Maybe<Scalars['timestamptz']>;
-  last_minter_updated_at?: Maybe<Scalars['timestamptz']>;
-  last_project_updated_at?: Maybe<Scalars['timestamptz']>;
-  last_secondary_updated_at?: Maybe<Scalars['timestamptz']>;
-  last_token_updated_at?: Maybe<Scalars['timestamptz']>;
-};
-
-/** response of any mutation on the table "sync_status" */
-export type Sync_Status_Mutation_Response = {
-  __typename?: 'sync_status_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Sync_Status>;
-};
-
-/** on_conflict condition type for table "sync_status" */
-export type Sync_Status_On_Conflict = {
-  constraint: Sync_Status_Constraint;
-  update_columns?: Array<Sync_Status_Update_Column>;
-  where?: InputMaybe<Sync_Status_Bool_Exp>;
-};
-
-/** Ordering options when selecting data from "sync_status". */
-export type Sync_Status_Order_By = {
-  id?: InputMaybe<Order_By>;
-  last_contract_updated_at?: InputMaybe<Order_By>;
-  last_minter_filter_updated_at?: InputMaybe<Order_By>;
-  last_minter_updated_at?: InputMaybe<Order_By>;
-  last_project_updated_at?: InputMaybe<Order_By>;
-  last_secondary_updated_at?: InputMaybe<Order_By>;
-  last_token_updated_at?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: sync_status */
-export type Sync_Status_Pk_Columns_Input = {
-  id: Scalars['Boolean'];
-};
-
-/** select columns of table "sync_status" */
-export enum Sync_Status_Select_Column {
-  /** column name */
-  Id = 'id',
-  /** column name */
-  LastContractUpdatedAt = 'last_contract_updated_at',
-  /** column name */
-  LastMinterFilterUpdatedAt = 'last_minter_filter_updated_at',
-  /** column name */
-  LastMinterUpdatedAt = 'last_minter_updated_at',
-  /** column name */
-  LastProjectUpdatedAt = 'last_project_updated_at',
-  /** column name */
-  LastSecondaryUpdatedAt = 'last_secondary_updated_at',
-  /** column name */
-  LastTokenUpdatedAt = 'last_token_updated_at'
-}
-
-/** input type for updating data in table "sync_status" */
-export type Sync_Status_Set_Input = {
-  id?: InputMaybe<Scalars['Boolean']>;
-  last_contract_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_minter_filter_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_minter_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_project_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_secondary_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_token_updated_at?: InputMaybe<Scalars['timestamptz']>;
-};
-
-/** Streaming cursor of the table "sync_status" */
-export type Sync_Status_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Sync_Status_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Sync_Status_Stream_Cursor_Value_Input = {
-  id?: InputMaybe<Scalars['Boolean']>;
-  last_contract_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_minter_filter_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_minter_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_project_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_secondary_updated_at?: InputMaybe<Scalars['timestamptz']>;
-  last_token_updated_at?: InputMaybe<Scalars['timestamptz']>;
-};
-
-/** update columns of table "sync_status" */
-export enum Sync_Status_Update_Column {
-  /** column name */
-  Id = 'id',
-  /** column name */
-  LastContractUpdatedAt = 'last_contract_updated_at',
-  /** column name */
-  LastMinterFilterUpdatedAt = 'last_minter_filter_updated_at',
-  /** column name */
-  LastMinterUpdatedAt = 'last_minter_updated_at',
-  /** column name */
-  LastProjectUpdatedAt = 'last_project_updated_at',
-  /** column name */
-  LastSecondaryUpdatedAt = 'last_secondary_updated_at',
-  /** column name */
-  LastTokenUpdatedAt = 'last_token_updated_at'
-}
-
-export type Sync_Status_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Sync_Status_Set_Input>;
-  where: Sync_Status_Bool_Exp;
-};
-
-/** columns and relationships of "tag_groupings" */
-export type Tag_Groupings = {
-  __typename?: 'tag_groupings';
-  name: Scalars['String'];
-};
-
-/** aggregated selection of "tag_groupings" */
-export type Tag_Groupings_Aggregate = {
-  __typename?: 'tag_groupings_aggregate';
-  aggregate?: Maybe<Tag_Groupings_Aggregate_Fields>;
-  nodes: Array<Tag_Groupings>;
-};
-
-/** aggregate fields of "tag_groupings" */
-export type Tag_Groupings_Aggregate_Fields = {
-  __typename?: 'tag_groupings_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Tag_Groupings_Max_Fields>;
-  min?: Maybe<Tag_Groupings_Min_Fields>;
-};
-
-
-/** aggregate fields of "tag_groupings" */
-export type Tag_Groupings_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Tag_Groupings_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** Boolean expression to filter rows from the table "tag_groupings". All fields are combined with a logical 'AND'. */
-export type Tag_Groupings_Bool_Exp = {
-  _and?: InputMaybe<Array<Tag_Groupings_Bool_Exp>>;
-  _not?: InputMaybe<Tag_Groupings_Bool_Exp>;
-  _or?: InputMaybe<Array<Tag_Groupings_Bool_Exp>>;
-  name?: InputMaybe<String_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "tag_groupings" */
-export enum Tag_Groupings_Constraint {
-  /** unique or primary key constraint on columns "name" */
-  TagGroupingsPkey = 'tag_groupings_pkey'
-}
 
 export enum Tag_Groupings_Enum {
   Heritage = 'heritage',
@@ -17259,129 +5367,6 @@ export type Tag_Groupings_Enum_Comparison_Exp = {
   _nin?: InputMaybe<Array<Tag_Groupings_Enum>>;
 };
 
-/** input type for inserting data into table "tag_groupings" */
-export type Tag_Groupings_Insert_Input = {
-  name?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Tag_Groupings_Max_Fields = {
-  __typename?: 'tag_groupings_max_fields';
-  name?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Tag_Groupings_Min_Fields = {
-  __typename?: 'tag_groupings_min_fields';
-  name?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "tag_groupings" */
-export type Tag_Groupings_Mutation_Response = {
-  __typename?: 'tag_groupings_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Tag_Groupings>;
-};
-
-/** on_conflict condition type for table "tag_groupings" */
-export type Tag_Groupings_On_Conflict = {
-  constraint: Tag_Groupings_Constraint;
-  update_columns?: Array<Tag_Groupings_Update_Column>;
-  where?: InputMaybe<Tag_Groupings_Bool_Exp>;
-};
-
-/** Ordering options when selecting data from "tag_groupings". */
-export type Tag_Groupings_Order_By = {
-  name?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: tag_groupings */
-export type Tag_Groupings_Pk_Columns_Input = {
-  name: Scalars['String'];
-};
-
-/** select columns of table "tag_groupings" */
-export enum Tag_Groupings_Select_Column {
-  /** column name */
-  Name = 'name'
-}
-
-/** input type for updating data in table "tag_groupings" */
-export type Tag_Groupings_Set_Input = {
-  name?: InputMaybe<Scalars['String']>;
-};
-
-/** Streaming cursor of the table "tag_groupings" */
-export type Tag_Groupings_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Tag_Groupings_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Tag_Groupings_Stream_Cursor_Value_Input = {
-  name?: InputMaybe<Scalars['String']>;
-};
-
-/** update columns of table "tag_groupings" */
-export enum Tag_Groupings_Update_Column {
-  /** column name */
-  Name = 'name'
-}
-
-export type Tag_Groupings_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Tag_Groupings_Set_Input>;
-  where: Tag_Groupings_Bool_Exp;
-};
-
-/** columns and relationships of "tag_status" */
-export type Tag_Status = {
-  __typename?: 'tag_status';
-  description: Scalars['String'];
-  value: Scalars['String'];
-};
-
-/** aggregated selection of "tag_status" */
-export type Tag_Status_Aggregate = {
-  __typename?: 'tag_status_aggregate';
-  aggregate?: Maybe<Tag_Status_Aggregate_Fields>;
-  nodes: Array<Tag_Status>;
-};
-
-/** aggregate fields of "tag_status" */
-export type Tag_Status_Aggregate_Fields = {
-  __typename?: 'tag_status_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Tag_Status_Max_Fields>;
-  min?: Maybe<Tag_Status_Min_Fields>;
-};
-
-
-/** aggregate fields of "tag_status" */
-export type Tag_Status_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Tag_Status_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** Boolean expression to filter rows from the table "tag_status". All fields are combined with a logical 'AND'. */
-export type Tag_Status_Bool_Exp = {
-  _and?: InputMaybe<Array<Tag_Status_Bool_Exp>>;
-  _not?: InputMaybe<Tag_Status_Bool_Exp>;
-  _or?: InputMaybe<Array<Tag_Status_Bool_Exp>>;
-  description?: InputMaybe<String_Comparison_Exp>;
-  value?: InputMaybe<String_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "tag_status" */
-export enum Tag_Status_Constraint {
-  /** unique or primary key constraint on columns "value" */
-  TagStatusEnumPkey = 'tag_status_enum_pkey'
-}
-
 export enum Tag_Status_Enum {
   /** private status */
   Private = 'private',
@@ -17397,146 +5382,6 @@ export type Tag_Status_Enum_Comparison_Exp = {
   _neq?: InputMaybe<Tag_Status_Enum>;
   _nin?: InputMaybe<Array<Tag_Status_Enum>>;
 };
-
-/** input type for inserting data into table "tag_status" */
-export type Tag_Status_Insert_Input = {
-  description?: InputMaybe<Scalars['String']>;
-  value?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Tag_Status_Max_Fields = {
-  __typename?: 'tag_status_max_fields';
-  description?: Maybe<Scalars['String']>;
-  value?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Tag_Status_Min_Fields = {
-  __typename?: 'tag_status_min_fields';
-  description?: Maybe<Scalars['String']>;
-  value?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "tag_status" */
-export type Tag_Status_Mutation_Response = {
-  __typename?: 'tag_status_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Tag_Status>;
-};
-
-/** input type for inserting object relation for remote table "tag_status" */
-export type Tag_Status_Obj_Rel_Insert_Input = {
-  data: Tag_Status_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Tag_Status_On_Conflict>;
-};
-
-/** on_conflict condition type for table "tag_status" */
-export type Tag_Status_On_Conflict = {
-  constraint: Tag_Status_Constraint;
-  update_columns?: Array<Tag_Status_Update_Column>;
-  where?: InputMaybe<Tag_Status_Bool_Exp>;
-};
-
-/** Ordering options when selecting data from "tag_status". */
-export type Tag_Status_Order_By = {
-  description?: InputMaybe<Order_By>;
-  value?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: tag_status */
-export type Tag_Status_Pk_Columns_Input = {
-  value: Scalars['String'];
-};
-
-/** select columns of table "tag_status" */
-export enum Tag_Status_Select_Column {
-  /** column name */
-  Description = 'description',
-  /** column name */
-  Value = 'value'
-}
-
-/** input type for updating data in table "tag_status" */
-export type Tag_Status_Set_Input = {
-  description?: InputMaybe<Scalars['String']>;
-  value?: InputMaybe<Scalars['String']>;
-};
-
-/** Streaming cursor of the table "tag_status" */
-export type Tag_Status_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Tag_Status_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Tag_Status_Stream_Cursor_Value_Input = {
-  description?: InputMaybe<Scalars['String']>;
-  value?: InputMaybe<Scalars['String']>;
-};
-
-/** update columns of table "tag_status" */
-export enum Tag_Status_Update_Column {
-  /** column name */
-  Description = 'description',
-  /** column name */
-  Value = 'value'
-}
-
-export type Tag_Status_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Tag_Status_Set_Input>;
-  where: Tag_Status_Bool_Exp;
-};
-
-/** columns and relationships of "tag_types" */
-export type Tag_Types = {
-  __typename?: 'tag_types';
-  description: Scalars['String'];
-  value: Scalars['String'];
-};
-
-/** aggregated selection of "tag_types" */
-export type Tag_Types_Aggregate = {
-  __typename?: 'tag_types_aggregate';
-  aggregate?: Maybe<Tag_Types_Aggregate_Fields>;
-  nodes: Array<Tag_Types>;
-};
-
-/** aggregate fields of "tag_types" */
-export type Tag_Types_Aggregate_Fields = {
-  __typename?: 'tag_types_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Tag_Types_Max_Fields>;
-  min?: Maybe<Tag_Types_Min_Fields>;
-};
-
-
-/** aggregate fields of "tag_types" */
-export type Tag_Types_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Tag_Types_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** Boolean expression to filter rows from the table "tag_types". All fields are combined with a logical 'AND'. */
-export type Tag_Types_Bool_Exp = {
-  _and?: InputMaybe<Array<Tag_Types_Bool_Exp>>;
-  _not?: InputMaybe<Tag_Types_Bool_Exp>;
-  _or?: InputMaybe<Array<Tag_Types_Bool_Exp>>;
-  description?: InputMaybe<String_Comparison_Exp>;
-  value?: InputMaybe<String_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "tag_types" */
-export enum Tag_Types_Constraint {
-  /** unique or primary key constraint on columns "value" */
-  TagTypesEnumPkey = 'tag_types_enum_pkey'
-}
 
 export enum Tag_Types_Enum {
   /** tag type of project */
@@ -17554,102 +5399,6 @@ export type Tag_Types_Enum_Comparison_Exp = {
   _nin?: InputMaybe<Array<Tag_Types_Enum>>;
 };
 
-/** input type for inserting data into table "tag_types" */
-export type Tag_Types_Insert_Input = {
-  description?: InputMaybe<Scalars['String']>;
-  value?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Tag_Types_Max_Fields = {
-  __typename?: 'tag_types_max_fields';
-  description?: Maybe<Scalars['String']>;
-  value?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Tag_Types_Min_Fields = {
-  __typename?: 'tag_types_min_fields';
-  description?: Maybe<Scalars['String']>;
-  value?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "tag_types" */
-export type Tag_Types_Mutation_Response = {
-  __typename?: 'tag_types_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Tag_Types>;
-};
-
-/** input type for inserting object relation for remote table "tag_types" */
-export type Tag_Types_Obj_Rel_Insert_Input = {
-  data: Tag_Types_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Tag_Types_On_Conflict>;
-};
-
-/** on_conflict condition type for table "tag_types" */
-export type Tag_Types_On_Conflict = {
-  constraint: Tag_Types_Constraint;
-  update_columns?: Array<Tag_Types_Update_Column>;
-  where?: InputMaybe<Tag_Types_Bool_Exp>;
-};
-
-/** Ordering options when selecting data from "tag_types". */
-export type Tag_Types_Order_By = {
-  description?: InputMaybe<Order_By>;
-  value?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: tag_types */
-export type Tag_Types_Pk_Columns_Input = {
-  value: Scalars['String'];
-};
-
-/** select columns of table "tag_types" */
-export enum Tag_Types_Select_Column {
-  /** column name */
-  Description = 'description',
-  /** column name */
-  Value = 'value'
-}
-
-/** input type for updating data in table "tag_types" */
-export type Tag_Types_Set_Input = {
-  description?: InputMaybe<Scalars['String']>;
-  value?: InputMaybe<Scalars['String']>;
-};
-
-/** Streaming cursor of the table "tag_types" */
-export type Tag_Types_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Tag_Types_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Tag_Types_Stream_Cursor_Value_Input = {
-  description?: InputMaybe<Scalars['String']>;
-  value?: InputMaybe<Scalars['String']>;
-};
-
-/** update columns of table "tag_types" */
-export enum Tag_Types_Update_Column {
-  /** column name */
-  Description = 'description',
-  /** column name */
-  Value = 'value'
-}
-
-export type Tag_Types_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Tag_Types_Set_Input>;
-  where: Tag_Types_Bool_Exp;
-};
-
 /** columns and relationships of "tags" */
 export type Tags = {
   __typename?: 'tags';
@@ -17657,21 +5406,15 @@ export type Tags = {
   display_name: Scalars['String'];
   /** An array relationship */
   entity_tags: Array<Entity_Tags>;
-  /** An aggregate relationship */
-  entity_tags_aggregate: Entity_Tags_Aggregate;
   grouping_name: Tag_Groupings_Enum;
   /** An object relationship */
   image?: Maybe<Media>;
   media_id?: Maybe<Scalars['Int']>;
   name: Scalars['String'];
   status: Tag_Status_Enum;
-  /** An object relationship */
-  status_enum: Tag_Status;
   tagline?: Maybe<Scalars['String']>;
   tier: Scalars['Int'];
   type: Tag_Types_Enum;
-  /** An object relationship */
-  type_enum: Tag_Types;
 };
 
 
@@ -17682,52 +5425,6 @@ export type TagsEntity_TagsArgs = {
   offset?: InputMaybe<Scalars['Int']>;
   order_by?: InputMaybe<Array<Entity_Tags_Order_By>>;
   where?: InputMaybe<Entity_Tags_Bool_Exp>;
-};
-
-
-/** columns and relationships of "tags" */
-export type TagsEntity_Tags_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Entity_Tags_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Entity_Tags_Order_By>>;
-  where?: InputMaybe<Entity_Tags_Bool_Exp>;
-};
-
-export type Tags_Aggregate = {
-  __typename?: 'tags_aggregate';
-  aggregate?: Maybe<Tags_Aggregate_Fields>;
-  nodes: Array<Tags>;
-};
-
-/** aggregate fields of "tags" */
-export type Tags_Aggregate_Fields = {
-  __typename?: 'tags_aggregate_fields';
-  avg?: Maybe<Tags_Avg_Fields>;
-  count: Scalars['Int'];
-  max?: Maybe<Tags_Max_Fields>;
-  min?: Maybe<Tags_Min_Fields>;
-  stddev?: Maybe<Tags_Stddev_Fields>;
-  stddev_pop?: Maybe<Tags_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Tags_Stddev_Samp_Fields>;
-  sum?: Maybe<Tags_Sum_Fields>;
-  var_pop?: Maybe<Tags_Var_Pop_Fields>;
-  var_samp?: Maybe<Tags_Var_Samp_Fields>;
-  variance?: Maybe<Tags_Variance_Fields>;
-};
-
-
-/** aggregate fields of "tags" */
-export type Tags_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Tags_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** aggregate avg on columns */
-export type Tags_Avg_Fields = {
-  __typename?: 'tags_avg_fields';
-  media_id?: Maybe<Scalars['Float']>;
-  tier?: Maybe<Scalars['Float']>;
 };
 
 /** Boolean expression to filter rows from the table "tags". All fields are combined with a logical 'AND'. */
@@ -17743,87 +5440,9 @@ export type Tags_Bool_Exp = {
   media_id?: InputMaybe<Int_Comparison_Exp>;
   name?: InputMaybe<String_Comparison_Exp>;
   status?: InputMaybe<Tag_Status_Enum_Comparison_Exp>;
-  status_enum?: InputMaybe<Tag_Status_Bool_Exp>;
   tagline?: InputMaybe<String_Comparison_Exp>;
   tier?: InputMaybe<Int_Comparison_Exp>;
   type?: InputMaybe<Tag_Types_Enum_Comparison_Exp>;
-  type_enum?: InputMaybe<Tag_Types_Bool_Exp>;
-};
-
-/** unique or primary key constraints on table "tags" */
-export enum Tags_Constraint {
-  /** unique or primary key constraint on columns "media_id" */
-  TagsMediaIdKey = 'tags_media_id_key',
-  /** unique or primary key constraint on columns "name" */
-  TagsPkey = 'tags_pkey'
-}
-
-/** input type for incrementing numeric columns in table "tags" */
-export type Tags_Inc_Input = {
-  media_id?: InputMaybe<Scalars['Int']>;
-  tier?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "tags" */
-export type Tags_Insert_Input = {
-  description?: InputMaybe<Scalars['String']>;
-  display_name?: InputMaybe<Scalars['String']>;
-  entity_tags?: InputMaybe<Entity_Tags_Arr_Rel_Insert_Input>;
-  grouping_name?: InputMaybe<Tag_Groupings_Enum>;
-  image?: InputMaybe<Media_Obj_Rel_Insert_Input>;
-  media_id?: InputMaybe<Scalars['Int']>;
-  name?: InputMaybe<Scalars['String']>;
-  status?: InputMaybe<Tag_Status_Enum>;
-  status_enum?: InputMaybe<Tag_Status_Obj_Rel_Insert_Input>;
-  tagline?: InputMaybe<Scalars['String']>;
-  tier?: InputMaybe<Scalars['Int']>;
-  type?: InputMaybe<Tag_Types_Enum>;
-  type_enum?: InputMaybe<Tag_Types_Obj_Rel_Insert_Input>;
-};
-
-/** aggregate max on columns */
-export type Tags_Max_Fields = {
-  __typename?: 'tags_max_fields';
-  description?: Maybe<Scalars['String']>;
-  display_name?: Maybe<Scalars['String']>;
-  media_id?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
-  tagline?: Maybe<Scalars['String']>;
-  tier?: Maybe<Scalars['Int']>;
-};
-
-/** aggregate min on columns */
-export type Tags_Min_Fields = {
-  __typename?: 'tags_min_fields';
-  description?: Maybe<Scalars['String']>;
-  display_name?: Maybe<Scalars['String']>;
-  media_id?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
-  tagline?: Maybe<Scalars['String']>;
-  tier?: Maybe<Scalars['Int']>;
-};
-
-/** response of any mutation on the table "tags" */
-export type Tags_Mutation_Response = {
-  __typename?: 'tags_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Tags>;
-};
-
-/** input type for inserting object relation for remote table "tags" */
-export type Tags_Obj_Rel_Insert_Input = {
-  data: Tags_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Tags_On_Conflict>;
-};
-
-/** on_conflict condition type for table "tags" */
-export type Tags_On_Conflict = {
-  constraint: Tags_Constraint;
-  update_columns?: Array<Tags_Update_Column>;
-  where?: InputMaybe<Tags_Bool_Exp>;
 };
 
 /** Ordering options when selecting data from "tags". */
@@ -17836,16 +5455,9 @@ export type Tags_Order_By = {
   media_id?: InputMaybe<Order_By>;
   name?: InputMaybe<Order_By>;
   status?: InputMaybe<Order_By>;
-  status_enum?: InputMaybe<Tag_Status_Order_By>;
   tagline?: InputMaybe<Order_By>;
   tier?: InputMaybe<Order_By>;
   type?: InputMaybe<Order_By>;
-  type_enum?: InputMaybe<Tag_Types_Order_By>;
-};
-
-/** primary key columns input for table: tags */
-export type Tags_Pk_Columns_Input = {
-  name: Scalars['String'];
 };
 
 /** select columns of table "tags" */
@@ -17870,40 +5482,6 @@ export enum Tags_Select_Column {
   Type = 'type'
 }
 
-/** input type for updating data in table "tags" */
-export type Tags_Set_Input = {
-  description?: InputMaybe<Scalars['String']>;
-  display_name?: InputMaybe<Scalars['String']>;
-  grouping_name?: InputMaybe<Tag_Groupings_Enum>;
-  media_id?: InputMaybe<Scalars['Int']>;
-  name?: InputMaybe<Scalars['String']>;
-  status?: InputMaybe<Tag_Status_Enum>;
-  tagline?: InputMaybe<Scalars['String']>;
-  tier?: InputMaybe<Scalars['Int']>;
-  type?: InputMaybe<Tag_Types_Enum>;
-};
-
-/** aggregate stddev on columns */
-export type Tags_Stddev_Fields = {
-  __typename?: 'tags_stddev_fields';
-  media_id?: Maybe<Scalars['Float']>;
-  tier?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_pop on columns */
-export type Tags_Stddev_Pop_Fields = {
-  __typename?: 'tags_stddev_pop_fields';
-  media_id?: Maybe<Scalars['Float']>;
-  tier?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Tags_Stddev_Samp_Fields = {
-  __typename?: 'tags_stddev_samp_fields';
-  media_id?: Maybe<Scalars['Float']>;
-  tier?: Maybe<Scalars['Float']>;
-};
-
 /** Streaming cursor of the table "tags" */
 export type Tags_Stream_Cursor_Input = {
   /** Stream column input with initial value */
@@ -17923,64 +5501,6 @@ export type Tags_Stream_Cursor_Value_Input = {
   tagline?: InputMaybe<Scalars['String']>;
   tier?: InputMaybe<Scalars['Int']>;
   type?: InputMaybe<Tag_Types_Enum>;
-};
-
-/** aggregate sum on columns */
-export type Tags_Sum_Fields = {
-  __typename?: 'tags_sum_fields';
-  media_id?: Maybe<Scalars['Int']>;
-  tier?: Maybe<Scalars['Int']>;
-};
-
-/** update columns of table "tags" */
-export enum Tags_Update_Column {
-  /** column name */
-  Description = 'description',
-  /** column name */
-  DisplayName = 'display_name',
-  /** column name */
-  GroupingName = 'grouping_name',
-  /** column name */
-  MediaId = 'media_id',
-  /** column name */
-  Name = 'name',
-  /** column name */
-  Status = 'status',
-  /** column name */
-  Tagline = 'tagline',
-  /** column name */
-  Tier = 'tier',
-  /** column name */
-  Type = 'type'
-}
-
-export type Tags_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Tags_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Tags_Set_Input>;
-  where: Tags_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Tags_Var_Pop_Fields = {
-  __typename?: 'tags_var_pop_fields';
-  media_id?: Maybe<Scalars['Float']>;
-  tier?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate var_samp on columns */
-export type Tags_Var_Samp_Fields = {
-  __typename?: 'tags_var_samp_fields';
-  media_id?: Maybe<Scalars['Float']>;
-  tier?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate variance on columns */
-export type Tags_Variance_Fields = {
-  __typename?: 'tags_variance_fields';
-  media_id?: Maybe<Scalars['Float']>;
-  tier?: Maybe<Scalars['Float']>;
 };
 
 /** columns and relationships of "terms_of_service" */
@@ -18037,24 +5557,6 @@ export type Terms_Of_Service_Bool_Exp = {
   id?: InputMaybe<Int_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "terms_of_service" */
-export enum Terms_Of_Service_Constraint {
-  /** unique or primary key constraint on columns "id" */
-  TermsOfServicePkey = 'terms_of_service_pkey'
-}
-
-/** input type for incrementing numeric columns in table "terms_of_service" */
-export type Terms_Of_Service_Inc_Input = {
-  id?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "terms_of_service" */
-export type Terms_Of_Service_Insert_Input = {
-  content?: InputMaybe<Scalars['String']>;
-  created_at?: InputMaybe<Scalars['timestamptz']>;
-  id?: InputMaybe<Scalars['Int']>;
-};
-
 /** aggregate max on columns */
 export type Terms_Of_Service_Max_Fields = {
   __typename?: 'terms_of_service_max_fields';
@@ -18071,32 +5573,11 @@ export type Terms_Of_Service_Min_Fields = {
   id?: Maybe<Scalars['Int']>;
 };
 
-/** response of any mutation on the table "terms_of_service" */
-export type Terms_Of_Service_Mutation_Response = {
-  __typename?: 'terms_of_service_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Terms_Of_Service>;
-};
-
-/** on_conflict condition type for table "terms_of_service" */
-export type Terms_Of_Service_On_Conflict = {
-  constraint: Terms_Of_Service_Constraint;
-  update_columns?: Array<Terms_Of_Service_Update_Column>;
-  where?: InputMaybe<Terms_Of_Service_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "terms_of_service". */
 export type Terms_Of_Service_Order_By = {
   content?: InputMaybe<Order_By>;
   created_at?: InputMaybe<Order_By>;
   id?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: terms_of_service */
-export type Terms_Of_Service_Pk_Columns_Input = {
-  id: Scalars['Int'];
 };
 
 /** select columns of table "terms_of_service" */
@@ -18108,13 +5589,6 @@ export enum Terms_Of_Service_Select_Column {
   /** column name */
   Id = 'id'
 }
-
-/** input type for updating data in table "terms_of_service" */
-export type Terms_Of_Service_Set_Input = {
-  content?: InputMaybe<Scalars['String']>;
-  created_at?: InputMaybe<Scalars['timestamptz']>;
-  id?: InputMaybe<Scalars['Int']>;
-};
 
 /** aggregate stddev on columns */
 export type Terms_Of_Service_Stddev_Fields = {
@@ -18153,24 +5627,6 @@ export type Terms_Of_Service_Stream_Cursor_Value_Input = {
 export type Terms_Of_Service_Sum_Fields = {
   __typename?: 'terms_of_service_sum_fields';
   id?: Maybe<Scalars['Int']>;
-};
-
-/** update columns of table "terms_of_service" */
-export enum Terms_Of_Service_Update_Column {
-  /** column name */
-  Content = 'content',
-  /** column name */
-  CreatedAt = 'created_at',
-  /** column name */
-  Id = 'id'
-}
-
-export type Terms_Of_Service_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Terms_Of_Service_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Terms_Of_Service_Set_Input>;
-  where: Terms_Of_Service_Bool_Exp;
 };
 
 /** aggregate var_pop on columns */
@@ -18263,7 +5719,6 @@ export type Tokens_Metadata = {
   project: Projects_Metadata;
   project_id: Scalars['String'];
   project_name?: Maybe<Scalars['String']>;
-  token?: Maybe<Token>;
   token_id: Scalars['String'];
   updated_at?: Maybe<Scalars['timestamp']>;
 };
@@ -18294,18 +5749,96 @@ export type Tokens_MetadataFeaturesArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
 
-
-/** columns and relationships of "tokens_metadata" */
-export type Tokens_MetadataTokenArgs = {
-  block?: InputMaybe<Block_Height>;
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
 /** aggregated selection of "tokens_metadata" */
 export type Tokens_Metadata_Aggregate = {
   __typename?: 'tokens_metadata_aggregate';
   aggregate?: Maybe<Tokens_Metadata_Aggregate_Fields>;
   nodes: Array<Tokens_Metadata>;
+};
+
+export type Tokens_Metadata_Aggregate_Bool_Exp = {
+  avg?: InputMaybe<Tokens_Metadata_Aggregate_Bool_Exp_Avg>;
+  corr?: InputMaybe<Tokens_Metadata_Aggregate_Bool_Exp_Corr>;
+  count?: InputMaybe<Tokens_Metadata_Aggregate_Bool_Exp_Count>;
+  covar_samp?: InputMaybe<Tokens_Metadata_Aggregate_Bool_Exp_Covar_Samp>;
+  max?: InputMaybe<Tokens_Metadata_Aggregate_Bool_Exp_Max>;
+  min?: InputMaybe<Tokens_Metadata_Aggregate_Bool_Exp_Min>;
+  stddev_samp?: InputMaybe<Tokens_Metadata_Aggregate_Bool_Exp_Stddev_Samp>;
+  sum?: InputMaybe<Tokens_Metadata_Aggregate_Bool_Exp_Sum>;
+  var_samp?: InputMaybe<Tokens_Metadata_Aggregate_Bool_Exp_Var_Samp>;
+};
+
+export type Tokens_Metadata_Aggregate_Bool_Exp_Avg = {
+  arguments: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Avg_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Tokens_Metadata_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
+export type Tokens_Metadata_Aggregate_Bool_Exp_Corr = {
+  arguments: Tokens_Metadata_Aggregate_Bool_Exp_Corr_Arguments;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Tokens_Metadata_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
+export type Tokens_Metadata_Aggregate_Bool_Exp_Corr_Arguments = {
+  X: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Corr_Arguments_Columns;
+  Y: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Corr_Arguments_Columns;
+};
+
+export type Tokens_Metadata_Aggregate_Bool_Exp_Count = {
+  arguments?: InputMaybe<Array<Tokens_Metadata_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Tokens_Metadata_Bool_Exp>;
+  predicate: Int_Comparison_Exp;
+};
+
+export type Tokens_Metadata_Aggregate_Bool_Exp_Covar_Samp = {
+  arguments: Tokens_Metadata_Aggregate_Bool_Exp_Covar_Samp_Arguments;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Tokens_Metadata_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
+export type Tokens_Metadata_Aggregate_Bool_Exp_Covar_Samp_Arguments = {
+  X: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Covar_Samp_Arguments_Columns;
+  Y: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Covar_Samp_Arguments_Columns;
+};
+
+export type Tokens_Metadata_Aggregate_Bool_Exp_Max = {
+  arguments: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Max_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Tokens_Metadata_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
+export type Tokens_Metadata_Aggregate_Bool_Exp_Min = {
+  arguments: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Min_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Tokens_Metadata_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
+export type Tokens_Metadata_Aggregate_Bool_Exp_Stddev_Samp = {
+  arguments: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Stddev_Samp_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Tokens_Metadata_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
+export type Tokens_Metadata_Aggregate_Bool_Exp_Sum = {
+  arguments: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Sum_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Tokens_Metadata_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
+};
+
+export type Tokens_Metadata_Aggregate_Bool_Exp_Var_Samp = {
+  arguments: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Var_Samp_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Tokens_Metadata_Bool_Exp>;
+  predicate: Float8_Comparison_Exp;
 };
 
 /** aggregate fields of "tokens_metadata" */
@@ -18346,18 +5879,6 @@ export type Tokens_Metadata_Aggregate_Order_By = {
   variance?: InputMaybe<Tokens_Metadata_Variance_Order_By>;
 };
 
-/** append existing jsonb value of filtered columns with new jsonb value */
-export type Tokens_Metadata_Append_Input = {
-  features?: InputMaybe<Scalars['jsonb']>;
-};
-
-/** input type for inserting array relation for remote table "tokens_metadata" */
-export type Tokens_Metadata_Arr_Rel_Insert_Input = {
-  data: Array<Tokens_Metadata_Insert_Input>;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Tokens_Metadata_On_Conflict>;
-};
-
 /** aggregate avg on columns */
 export type Tokens_Metadata_Avg_Fields = {
   __typename?: 'tokens_metadata_avg_fields';
@@ -18388,6 +5909,7 @@ export type Tokens_Metadata_Bool_Exp = {
   contract_address?: InputMaybe<String_Comparison_Exp>;
   favorited_by_user?: InputMaybe<Boolean_Comparison_Exp>;
   favorites?: InputMaybe<Favorites_Bool_Exp>;
+  favorites_aggregate?: InputMaybe<Favorites_Aggregate_Bool_Exp>;
   features?: InputMaybe<Jsonb_Comparison_Exp>;
   hash?: InputMaybe<String_Comparison_Exp>;
   high_res_image?: InputMaybe<Media_Bool_Exp>;
@@ -18416,72 +5938,6 @@ export type Tokens_Metadata_Bool_Exp = {
   project_name?: InputMaybe<String_Comparison_Exp>;
   token_id?: InputMaybe<String_Comparison_Exp>;
   updated_at?: InputMaybe<Timestamp_Comparison_Exp>;
-};
-
-/** unique or primary key constraints on table "tokens_metadata" */
-export enum Tokens_Metadata_Constraint {
-  /** unique or primary key constraint on columns "id" */
-  TokensMetadataPkey = 'tokens_metadata_pkey',
-  /** unique or primary key constraint on columns "token_id", "contract_address" */
-  TokensMetadataTokenIdContractAddressKey = 'tokens_metadata_token_id_contract_address_key'
-}
-
-/** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-export type Tokens_Metadata_Delete_At_Path_Input = {
-  features?: InputMaybe<Array<Scalars['String']>>;
-};
-
-/** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-export type Tokens_Metadata_Delete_Elem_Input = {
-  features?: InputMaybe<Scalars['Int']>;
-};
-
-/** delete key/value pair or string element. key/value pairs are matched based on their key value */
-export type Tokens_Metadata_Delete_Key_Input = {
-  features?: InputMaybe<Scalars['String']>;
-};
-
-/** input type for incrementing numeric columns in table "tokens_metadata" */
-export type Tokens_Metadata_Inc_Input = {
-  high_res_image_id?: InputMaybe<Scalars['Int']>;
-  image_id?: InputMaybe<Scalars['Int']>;
-  invocation?: InputMaybe<Scalars['Int']>;
-  list_eth_price?: InputMaybe<Scalars['float8']>;
-  list_price?: InputMaybe<Scalars['float8']>;
-  low_res_image_id?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "tokens_metadata" */
-export type Tokens_Metadata_Insert_Input = {
-  contract?: InputMaybe<Contracts_Metadata_Obj_Rel_Insert_Input>;
-  contract_address?: InputMaybe<Scalars['String']>;
-  favorites?: InputMaybe<Favorites_Arr_Rel_Insert_Input>;
-  features?: InputMaybe<Scalars['jsonb']>;
-  hash?: InputMaybe<Scalars['String']>;
-  high_res_image?: InputMaybe<Media_Obj_Rel_Insert_Input>;
-  high_res_image_id?: InputMaybe<Scalars['Int']>;
-  id?: InputMaybe<Scalars['String']>;
-  image?: InputMaybe<Media_Obj_Rel_Insert_Input>;
-  image_id?: InputMaybe<Scalars['Int']>;
-  invocation?: InputMaybe<Scalars['Int']>;
-  list_currency_address?: InputMaybe<Scalars['String']>;
-  list_currency_symbol?: InputMaybe<Scalars['String']>;
-  list_eth_price?: InputMaybe<Scalars['float8']>;
-  list_expiration_date?: InputMaybe<Scalars['timestamptz']>;
-  list_platform?: InputMaybe<Scalars['String']>;
-  list_price?: InputMaybe<Scalars['float8']>;
-  list_url?: InputMaybe<Scalars['String']>;
-  low_res_image?: InputMaybe<Media_Obj_Rel_Insert_Input>;
-  low_res_image_id?: InputMaybe<Scalars['Int']>;
-  mint_transaction_hash?: InputMaybe<Scalars['String']>;
-  minted_at?: InputMaybe<Scalars['timestamptz']>;
-  owner?: InputMaybe<Users_Obj_Rel_Insert_Input>;
-  owner_address?: InputMaybe<Scalars['String']>;
-  project?: InputMaybe<Projects_Metadata_Obj_Rel_Insert_Input>;
-  project_id?: InputMaybe<Scalars['String']>;
-  project_name?: InputMaybe<Scalars['String']>;
-  token_id?: InputMaybe<Scalars['String']>;
-  updated_at?: InputMaybe<Scalars['timestamp']>;
 };
 
 /** aggregate max on columns */
@@ -18586,29 +6042,6 @@ export type Tokens_Metadata_Min_Order_By = {
   updated_at?: InputMaybe<Order_By>;
 };
 
-/** response of any mutation on the table "tokens_metadata" */
-export type Tokens_Metadata_Mutation_Response = {
-  __typename?: 'tokens_metadata_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Tokens_Metadata>;
-};
-
-/** input type for inserting object relation for remote table "tokens_metadata" */
-export type Tokens_Metadata_Obj_Rel_Insert_Input = {
-  data: Tokens_Metadata_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Tokens_Metadata_On_Conflict>;
-};
-
-/** on_conflict condition type for table "tokens_metadata" */
-export type Tokens_Metadata_On_Conflict = {
-  constraint: Tokens_Metadata_Constraint;
-  update_columns?: Array<Tokens_Metadata_Update_Column>;
-  where?: InputMaybe<Tokens_Metadata_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "tokens_metadata". */
 export type Tokens_Metadata_Order_By = {
   contract?: InputMaybe<Contracts_Metadata_Order_By>;
@@ -18643,16 +6076,6 @@ export type Tokens_Metadata_Order_By = {
   project_name?: InputMaybe<Order_By>;
   token_id?: InputMaybe<Order_By>;
   updated_at?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: tokens_metadata */
-export type Tokens_Metadata_Pk_Columns_Input = {
-  id: Scalars['String'];
-};
-
-/** prepend existing jsonb value of filtered columns with new jsonb value */
-export type Tokens_Metadata_Prepend_Input = {
-  features?: InputMaybe<Scalars['jsonb']>;
 };
 
 /** select columns of table "tokens_metadata" */
@@ -18703,31 +6126,69 @@ export enum Tokens_Metadata_Select_Column {
   UpdatedAt = 'updated_at'
 }
 
-/** input type for updating data in table "tokens_metadata" */
-export type Tokens_Metadata_Set_Input = {
-  contract_address?: InputMaybe<Scalars['String']>;
-  features?: InputMaybe<Scalars['jsonb']>;
-  hash?: InputMaybe<Scalars['String']>;
-  high_res_image_id?: InputMaybe<Scalars['Int']>;
-  id?: InputMaybe<Scalars['String']>;
-  image_id?: InputMaybe<Scalars['Int']>;
-  invocation?: InputMaybe<Scalars['Int']>;
-  list_currency_address?: InputMaybe<Scalars['String']>;
-  list_currency_symbol?: InputMaybe<Scalars['String']>;
-  list_eth_price?: InputMaybe<Scalars['float8']>;
-  list_expiration_date?: InputMaybe<Scalars['timestamptz']>;
-  list_platform?: InputMaybe<Scalars['String']>;
-  list_price?: InputMaybe<Scalars['float8']>;
-  list_url?: InputMaybe<Scalars['String']>;
-  low_res_image_id?: InputMaybe<Scalars['Int']>;
-  mint_transaction_hash?: InputMaybe<Scalars['String']>;
-  minted_at?: InputMaybe<Scalars['timestamptz']>;
-  owner_address?: InputMaybe<Scalars['String']>;
-  project_id?: InputMaybe<Scalars['String']>;
-  project_name?: InputMaybe<Scalars['String']>;
-  token_id?: InputMaybe<Scalars['String']>;
-  updated_at?: InputMaybe<Scalars['timestamp']>;
-};
+/** select "tokens_metadata_aggregate_bool_exp_avg_arguments_columns" columns of table "tokens_metadata" */
+export enum Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Avg_Arguments_Columns {
+  /** column name */
+  ListEthPrice = 'list_eth_price',
+  /** column name */
+  ListPrice = 'list_price'
+}
+
+/** select "tokens_metadata_aggregate_bool_exp_corr_arguments_columns" columns of table "tokens_metadata" */
+export enum Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Corr_Arguments_Columns {
+  /** column name */
+  ListEthPrice = 'list_eth_price',
+  /** column name */
+  ListPrice = 'list_price'
+}
+
+/** select "tokens_metadata_aggregate_bool_exp_covar_samp_arguments_columns" columns of table "tokens_metadata" */
+export enum Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Covar_Samp_Arguments_Columns {
+  /** column name */
+  ListEthPrice = 'list_eth_price',
+  /** column name */
+  ListPrice = 'list_price'
+}
+
+/** select "tokens_metadata_aggregate_bool_exp_max_arguments_columns" columns of table "tokens_metadata" */
+export enum Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Max_Arguments_Columns {
+  /** column name */
+  ListEthPrice = 'list_eth_price',
+  /** column name */
+  ListPrice = 'list_price'
+}
+
+/** select "tokens_metadata_aggregate_bool_exp_min_arguments_columns" columns of table "tokens_metadata" */
+export enum Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Min_Arguments_Columns {
+  /** column name */
+  ListEthPrice = 'list_eth_price',
+  /** column name */
+  ListPrice = 'list_price'
+}
+
+/** select "tokens_metadata_aggregate_bool_exp_stddev_samp_arguments_columns" columns of table "tokens_metadata" */
+export enum Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Stddev_Samp_Arguments_Columns {
+  /** column name */
+  ListEthPrice = 'list_eth_price',
+  /** column name */
+  ListPrice = 'list_price'
+}
+
+/** select "tokens_metadata_aggregate_bool_exp_sum_arguments_columns" columns of table "tokens_metadata" */
+export enum Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Sum_Arguments_Columns {
+  /** column name */
+  ListEthPrice = 'list_eth_price',
+  /** column name */
+  ListPrice = 'list_price'
+}
+
+/** select "tokens_metadata_aggregate_bool_exp_var_samp_arguments_columns" columns of table "tokens_metadata" */
+export enum Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Var_Samp_Arguments_Columns {
+  /** column name */
+  ListEthPrice = 'list_eth_price',
+  /** column name */
+  ListPrice = 'list_price'
+}
 
 /** aggregate stddev on columns */
 export type Tokens_Metadata_Stddev_Fields = {
@@ -18845,72 +6306,6 @@ export type Tokens_Metadata_Sum_Order_By = {
   list_eth_price?: InputMaybe<Order_By>;
   list_price?: InputMaybe<Order_By>;
   low_res_image_id?: InputMaybe<Order_By>;
-};
-
-/** update columns of table "tokens_metadata" */
-export enum Tokens_Metadata_Update_Column {
-  /** column name */
-  ContractAddress = 'contract_address',
-  /** column name */
-  Features = 'features',
-  /** column name */
-  Hash = 'hash',
-  /** column name */
-  HighResImageId = 'high_res_image_id',
-  /** column name */
-  Id = 'id',
-  /** column name */
-  ImageId = 'image_id',
-  /** column name */
-  Invocation = 'invocation',
-  /** column name */
-  ListCurrencyAddress = 'list_currency_address',
-  /** column name */
-  ListCurrencySymbol = 'list_currency_symbol',
-  /** column name */
-  ListEthPrice = 'list_eth_price',
-  /** column name */
-  ListExpirationDate = 'list_expiration_date',
-  /** column name */
-  ListPlatform = 'list_platform',
-  /** column name */
-  ListPrice = 'list_price',
-  /** column name */
-  ListUrl = 'list_url',
-  /** column name */
-  LowResImageId = 'low_res_image_id',
-  /** column name */
-  MintTransactionHash = 'mint_transaction_hash',
-  /** column name */
-  MintedAt = 'minted_at',
-  /** column name */
-  OwnerAddress = 'owner_address',
-  /** column name */
-  ProjectId = 'project_id',
-  /** column name */
-  ProjectName = 'project_name',
-  /** column name */
-  TokenId = 'token_id',
-  /** column name */
-  UpdatedAt = 'updated_at'
-}
-
-export type Tokens_Metadata_Updates = {
-  /** append existing jsonb value of filtered columns with new jsonb value */
-  _append?: InputMaybe<Tokens_Metadata_Append_Input>;
-  /** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-  _delete_at_path?: InputMaybe<Tokens_Metadata_Delete_At_Path_Input>;
-  /** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-  _delete_elem?: InputMaybe<Tokens_Metadata_Delete_Elem_Input>;
-  /** delete key/value pair or string element. key/value pairs are matched based on their key value */
-  _delete_key?: InputMaybe<Tokens_Metadata_Delete_Key_Input>;
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Tokens_Metadata_Inc_Input>;
-  /** prepend existing jsonb value of filtered columns with new jsonb value */
-  _prepend?: InputMaybe<Tokens_Metadata_Prepend_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Tokens_Metadata_Set_Input>;
-  where: Tokens_Metadata_Bool_Exp;
 };
 
 /** aggregate var_pop on columns */
@@ -19039,33 +6434,6 @@ export type User_Profiles_Bool_Exp = {
   username?: InputMaybe<String_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "user_profiles" */
-export enum User_Profiles_Constraint {
-  /** unique or primary key constraint on columns "id" */
-  UserProfilesPkey = 'user_profiles_pkey',
-  /** unique or primary key constraint on columns "user_address" */
-  UserProfilesUserAddressKey = 'user_profiles_user_address_key',
-  /** unique or primary key constraint on columns "username" */
-  UserProfilesUsernameKey = 'user_profiles_username_key'
-}
-
-/** input type for incrementing numeric columns in table "user_profiles" */
-export type User_Profiles_Inc_Input = {
-  id?: InputMaybe<Scalars['Int']>;
-  profile_picture_id?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "user_profiles" */
-export type User_Profiles_Insert_Input = {
-  bio?: InputMaybe<Scalars['String']>;
-  id?: InputMaybe<Scalars['Int']>;
-  name?: InputMaybe<Scalars['String']>;
-  profile_picture?: InputMaybe<Media_Obj_Rel_Insert_Input>;
-  profile_picture_id?: InputMaybe<Scalars['Int']>;
-  user_address?: InputMaybe<Scalars['String']>;
-  username?: InputMaybe<Scalars['String']>;
-};
-
 /** aggregate max on columns */
 export type User_Profiles_Max_Fields = {
   __typename?: 'user_profiles_max_fields';
@@ -19088,29 +6456,6 @@ export type User_Profiles_Min_Fields = {
   username?: Maybe<Scalars['String']>;
 };
 
-/** response of any mutation on the table "user_profiles" */
-export type User_Profiles_Mutation_Response = {
-  __typename?: 'user_profiles_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<User_Profiles>;
-};
-
-/** input type for inserting object relation for remote table "user_profiles" */
-export type User_Profiles_Obj_Rel_Insert_Input = {
-  data: User_Profiles_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<User_Profiles_On_Conflict>;
-};
-
-/** on_conflict condition type for table "user_profiles" */
-export type User_Profiles_On_Conflict = {
-  constraint: User_Profiles_Constraint;
-  update_columns?: Array<User_Profiles_Update_Column>;
-  where?: InputMaybe<User_Profiles_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "user_profiles". */
 export type User_Profiles_Order_By = {
   bio?: InputMaybe<Order_By>;
@@ -19120,11 +6465,6 @@ export type User_Profiles_Order_By = {
   profile_picture_id?: InputMaybe<Order_By>;
   user_address?: InputMaybe<Order_By>;
   username?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: user_profiles */
-export type User_Profiles_Pk_Columns_Input = {
-  id: Scalars['Int'];
 };
 
 /** select columns of table "user_profiles" */
@@ -19142,16 +6482,6 @@ export enum User_Profiles_Select_Column {
   /** column name */
   Username = 'username'
 }
-
-/** input type for updating data in table "user_profiles" */
-export type User_Profiles_Set_Input = {
-  bio?: InputMaybe<Scalars['String']>;
-  id?: InputMaybe<Scalars['Int']>;
-  name?: InputMaybe<Scalars['String']>;
-  profile_picture_id?: InputMaybe<Scalars['Int']>;
-  user_address?: InputMaybe<Scalars['String']>;
-  username?: InputMaybe<Scalars['String']>;
-};
 
 /** aggregate stddev on columns */
 export type User_Profiles_Stddev_Fields = {
@@ -19199,30 +6529,6 @@ export type User_Profiles_Sum_Fields = {
   profile_picture_id?: Maybe<Scalars['Int']>;
 };
 
-/** update columns of table "user_profiles" */
-export enum User_Profiles_Update_Column {
-  /** column name */
-  Bio = 'bio',
-  /** column name */
-  Id = 'id',
-  /** column name */
-  Name = 'name',
-  /** column name */
-  ProfilePictureId = 'profile_picture_id',
-  /** column name */
-  UserAddress = 'user_address',
-  /** column name */
-  Username = 'username'
-}
-
-export type User_Profiles_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<User_Profiles_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<User_Profiles_Set_Input>;
-  where: User_Profiles_Bool_Exp;
-};
-
 /** aggregate var_pop on columns */
 export type User_Profiles_Var_Pop_Fields = {
   __typename?: 'user_profiles_var_pop_fields';
@@ -19247,11 +6553,8 @@ export type User_Profiles_Variance_Fields = {
 /** columns and relationships of "users" */
 export type Users = {
   __typename?: 'users';
-  account?: Maybe<Account>;
   /** An array relationship */
   allowlisted_on: Array<Contract_Allowlistings>;
-  /** An aggregate relationship */
-  allowlisted_on_aggregate: Contract_Allowlistings_Aggregate;
   created_at: Scalars['timestamptz'];
   /** A computed field, executes function "user_display_name" */
   display_name?: Maybe<Scalars['String']>;
@@ -19268,11 +6571,6 @@ export type Users = {
   is_curator?: Maybe<Scalars['Boolean']>;
   /** A computed field, executes function "generate_nonce" */
   nonce?: Maybe<Scalars['String']>;
-  nonce_offset: Scalars['Int'];
-  /** An array relationship */
-  notifications: Array<Notifications>;
-  /** An aggregate relationship */
-  notifications_aggregate: Notifications_Aggregate;
   /** An object relationship */
   profile?: Maybe<User_Profiles>;
   /** An array relationship */
@@ -19282,8 +6580,6 @@ export type Users = {
   public_address: Scalars['String'];
   /** An array relationship */
   tags: Array<Entity_Tags>;
-  /** An aggregate relationship */
-  tags_aggregate: Entity_Tags_Aggregate;
   /** An array relationship */
   tokens: Array<Tokens_Metadata>;
   /** An aggregate relationship */
@@ -19296,24 +6592,7 @@ export type Users = {
 
 
 /** columns and relationships of "users" */
-export type UsersAccountArgs = {
-  block?: InputMaybe<Block_Height>;
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-/** columns and relationships of "users" */
 export type UsersAllowlisted_OnArgs = {
-  distinct_on?: InputMaybe<Array<Contract_Allowlistings_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Contract_Allowlistings_Order_By>>;
-  where?: InputMaybe<Contract_Allowlistings_Bool_Exp>;
-};
-
-
-/** columns and relationships of "users" */
-export type UsersAllowlisted_On_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Contract_Allowlistings_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -19349,26 +6628,6 @@ export type UsersFeature_FlagsArgs = {
 
 
 /** columns and relationships of "users" */
-export type UsersNotificationsArgs = {
-  distinct_on?: InputMaybe<Array<Notifications_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Notifications_Order_By>>;
-  where?: InputMaybe<Notifications_Bool_Exp>;
-};
-
-
-/** columns and relationships of "users" */
-export type UsersNotifications_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Notifications_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Notifications_Order_By>>;
-  where?: InputMaybe<Notifications_Bool_Exp>;
-};
-
-
-/** columns and relationships of "users" */
 export type UsersProjects_CreatedArgs = {
   distinct_on?: InputMaybe<Array<Projects_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -19390,16 +6649,6 @@ export type UsersProjects_Created_AggregateArgs = {
 
 /** columns and relationships of "users" */
 export type UsersTagsArgs = {
-  distinct_on?: InputMaybe<Array<Entity_Tags_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Entity_Tags_Order_By>>;
-  where?: InputMaybe<Entity_Tags_Bool_Exp>;
-};
-
-
-/** columns and relationships of "users" */
-export type UsersTags_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Entity_Tags_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -19437,17 +6686,9 @@ export type Users_Aggregate = {
 /** aggregate fields of "users" */
 export type Users_Aggregate_Fields = {
   __typename?: 'users_aggregate_fields';
-  avg?: Maybe<Users_Avg_Fields>;
   count: Scalars['Int'];
   max?: Maybe<Users_Max_Fields>;
   min?: Maybe<Users_Min_Fields>;
-  stddev?: Maybe<Users_Stddev_Fields>;
-  stddev_pop?: Maybe<Users_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Users_Stddev_Samp_Fields>;
-  sum?: Maybe<Users_Sum_Fields>;
-  var_pop?: Maybe<Users_Var_Pop_Fields>;
-  var_samp?: Maybe<Users_Var_Samp_Fields>;
-  variance?: Maybe<Users_Variance_Fields>;
 };
 
 
@@ -19455,12 +6696,6 @@ export type Users_Aggregate_Fields = {
 export type Users_Aggregate_FieldsCountArgs = {
   columns?: InputMaybe<Array<Users_Select_Column>>;
   distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** aggregate avg on columns */
-export type Users_Avg_Fields = {
-  __typename?: 'users_avg_fields';
-  nonce_offset?: Maybe<Scalars['Float']>;
 };
 
 /** Boolean expression to filter rows from the table "users". All fields are combined with a logical 'AND'. */
@@ -19473,60 +6708,28 @@ export type Users_Bool_Exp = {
   display_name?: InputMaybe<String_Comparison_Exp>;
   favorited_by_user?: InputMaybe<Boolean_Comparison_Exp>;
   favorites?: InputMaybe<Favorites_Bool_Exp>;
+  favorites_aggregate?: InputMaybe<Favorites_Aggregate_Bool_Exp>;
   feature_flags?: InputMaybe<Jsonb_Comparison_Exp>;
   is_ab_staff?: InputMaybe<Boolean_Comparison_Exp>;
   is_curated?: InputMaybe<Boolean_Comparison_Exp>;
   is_curator?: InputMaybe<Boolean_Comparison_Exp>;
   nonce?: InputMaybe<String_Comparison_Exp>;
-  nonce_offset?: InputMaybe<Int_Comparison_Exp>;
-  notifications?: InputMaybe<Notifications_Bool_Exp>;
   profile?: InputMaybe<User_Profiles_Bool_Exp>;
   projects_created?: InputMaybe<Projects_Metadata_Bool_Exp>;
+  projects_created_aggregate?: InputMaybe<Projects_Metadata_Aggregate_Bool_Exp>;
   public_address?: InputMaybe<String_Comparison_Exp>;
   tags?: InputMaybe<Entity_Tags_Bool_Exp>;
   tokens?: InputMaybe<Tokens_Metadata_Bool_Exp>;
+  tokens_aggregate?: InputMaybe<Tokens_Metadata_Aggregate_Bool_Exp>;
   tos_accepted_at?: InputMaybe<Timestamptz_Comparison_Exp>;
   viewed_warning_banner?: InputMaybe<Boolean_Comparison_Exp>;
   webflow_artist_info?: InputMaybe<Webflow_Artist_Info_Bool_Exp>;
-};
-
-/** unique or primary key constraints on table "users" */
-export enum Users_Constraint {
-  /** unique or primary key constraint on columns "public_address" */
-  UsersPkey = 'users_pkey',
-  /** unique or primary key constraint on columns "public_address" */
-  UsersPublicAddressKey = 'users_public_address_key'
-}
-
-/** input type for incrementing numeric columns in table "users" */
-export type Users_Inc_Input = {
-  nonce_offset?: InputMaybe<Scalars['Int']>;
-};
-
-/** input type for inserting data into table "users" */
-export type Users_Insert_Input = {
-  allowlisted_on?: InputMaybe<Contract_Allowlistings_Arr_Rel_Insert_Input>;
-  created_at?: InputMaybe<Scalars['timestamptz']>;
-  favorites?: InputMaybe<Favorites_Arr_Rel_Insert_Input>;
-  is_ab_staff?: InputMaybe<Scalars['Boolean']>;
-  is_curator?: InputMaybe<Scalars['Boolean']>;
-  nonce_offset?: InputMaybe<Scalars['Int']>;
-  notifications?: InputMaybe<Notifications_Arr_Rel_Insert_Input>;
-  profile?: InputMaybe<User_Profiles_Obj_Rel_Insert_Input>;
-  projects_created?: InputMaybe<Projects_Metadata_Arr_Rel_Insert_Input>;
-  public_address?: InputMaybe<Scalars['String']>;
-  tags?: InputMaybe<Entity_Tags_Arr_Rel_Insert_Input>;
-  tokens?: InputMaybe<Tokens_Metadata_Arr_Rel_Insert_Input>;
-  tos_accepted_at?: InputMaybe<Scalars['timestamptz']>;
-  viewed_warning_banner?: InputMaybe<Scalars['Boolean']>;
-  webflow_artist_info?: InputMaybe<Webflow_Artist_Info_Obj_Rel_Insert_Input>;
 };
 
 /** aggregate max on columns */
 export type Users_Max_Fields = {
   __typename?: 'users_max_fields';
   created_at?: Maybe<Scalars['timestamptz']>;
-  nonce_offset?: Maybe<Scalars['Int']>;
   public_address?: Maybe<Scalars['String']>;
   tos_accepted_at?: Maybe<Scalars['timestamptz']>;
 };
@@ -19535,32 +6738,8 @@ export type Users_Max_Fields = {
 export type Users_Min_Fields = {
   __typename?: 'users_min_fields';
   created_at?: Maybe<Scalars['timestamptz']>;
-  nonce_offset?: Maybe<Scalars['Int']>;
   public_address?: Maybe<Scalars['String']>;
   tos_accepted_at?: Maybe<Scalars['timestamptz']>;
-};
-
-/** response of any mutation on the table "users" */
-export type Users_Mutation_Response = {
-  __typename?: 'users_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Users>;
-};
-
-/** input type for inserting object relation for remote table "users" */
-export type Users_Obj_Rel_Insert_Input = {
-  data: Users_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Users_On_Conflict>;
-};
-
-/** on_conflict condition type for table "users" */
-export type Users_On_Conflict = {
-  constraint: Users_Constraint;
-  update_columns?: Array<Users_Update_Column>;
-  where?: InputMaybe<Users_Bool_Exp>;
 };
 
 /** Ordering options when selecting data from "users". */
@@ -19575,8 +6754,6 @@ export type Users_Order_By = {
   is_curated?: InputMaybe<Order_By>;
   is_curator?: InputMaybe<Order_By>;
   nonce?: InputMaybe<Order_By>;
-  nonce_offset?: InputMaybe<Order_By>;
-  notifications_aggregate?: InputMaybe<Notifications_Aggregate_Order_By>;
   profile?: InputMaybe<User_Profiles_Order_By>;
   projects_created_aggregate?: InputMaybe<Projects_Metadata_Aggregate_Order_By>;
   public_address?: InputMaybe<Order_By>;
@@ -19585,11 +6762,6 @@ export type Users_Order_By = {
   tos_accepted_at?: InputMaybe<Order_By>;
   viewed_warning_banner?: InputMaybe<Order_By>;
   webflow_artist_info?: InputMaybe<Webflow_Artist_Info_Order_By>;
-};
-
-/** primary key columns input for table: users */
-export type Users_Pk_Columns_Input = {
-  public_address: Scalars['String'];
 };
 
 /** select columns of table "users" */
@@ -19601,43 +6773,12 @@ export enum Users_Select_Column {
   /** column name */
   IsCurator = 'is_curator',
   /** column name */
-  NonceOffset = 'nonce_offset',
-  /** column name */
   PublicAddress = 'public_address',
   /** column name */
   TosAcceptedAt = 'tos_accepted_at',
   /** column name */
   ViewedWarningBanner = 'viewed_warning_banner'
 }
-
-/** input type for updating data in table "users" */
-export type Users_Set_Input = {
-  created_at?: InputMaybe<Scalars['timestamptz']>;
-  is_ab_staff?: InputMaybe<Scalars['Boolean']>;
-  is_curator?: InputMaybe<Scalars['Boolean']>;
-  nonce_offset?: InputMaybe<Scalars['Int']>;
-  public_address?: InputMaybe<Scalars['String']>;
-  tos_accepted_at?: InputMaybe<Scalars['timestamptz']>;
-  viewed_warning_banner?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** aggregate stddev on columns */
-export type Users_Stddev_Fields = {
-  __typename?: 'users_stddev_fields';
-  nonce_offset?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_pop on columns */
-export type Users_Stddev_Pop_Fields = {
-  __typename?: 'users_stddev_pop_fields';
-  nonce_offset?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Users_Stddev_Samp_Fields = {
-  __typename?: 'users_stddev_samp_fields';
-  nonce_offset?: Maybe<Scalars['Float']>;
-};
 
 /** Streaming cursor of the table "users" */
 export type Users_Stream_Cursor_Input = {
@@ -19652,60 +6793,9 @@ export type Users_Stream_Cursor_Value_Input = {
   created_at?: InputMaybe<Scalars['timestamptz']>;
   is_ab_staff?: InputMaybe<Scalars['Boolean']>;
   is_curator?: InputMaybe<Scalars['Boolean']>;
-  nonce_offset?: InputMaybe<Scalars['Int']>;
   public_address?: InputMaybe<Scalars['String']>;
   tos_accepted_at?: InputMaybe<Scalars['timestamptz']>;
   viewed_warning_banner?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** aggregate sum on columns */
-export type Users_Sum_Fields = {
-  __typename?: 'users_sum_fields';
-  nonce_offset?: Maybe<Scalars['Int']>;
-};
-
-/** update columns of table "users" */
-export enum Users_Update_Column {
-  /** column name */
-  CreatedAt = 'created_at',
-  /** column name */
-  IsAbStaff = 'is_ab_staff',
-  /** column name */
-  IsCurator = 'is_curator',
-  /** column name */
-  NonceOffset = 'nonce_offset',
-  /** column name */
-  PublicAddress = 'public_address',
-  /** column name */
-  TosAcceptedAt = 'tos_accepted_at',
-  /** column name */
-  ViewedWarningBanner = 'viewed_warning_banner'
-}
-
-export type Users_Updates = {
-  /** increments the numeric columns with given value of the filtered values */
-  _inc?: InputMaybe<Users_Inc_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Users_Set_Input>;
-  where: Users_Bool_Exp;
-};
-
-/** aggregate var_pop on columns */
-export type Users_Var_Pop_Fields = {
-  __typename?: 'users_var_pop_fields';
-  nonce_offset?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate var_samp on columns */
-export type Users_Var_Samp_Fields = {
-  __typename?: 'users_var_samp_fields';
-  nonce_offset?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate variance on columns */
-export type Users_Variance_Fields = {
-  __typename?: 'users_variance_fields';
-  nonce_offset?: Maybe<Scalars['Float']>;
 };
 
 /** vertical enums */
@@ -19716,28 +6806,6 @@ export type Verticals = {
   project_vertical?: Maybe<Project_Verticals>;
 };
 
-/** aggregated selection of "verticals" */
-export type Verticals_Aggregate = {
-  __typename?: 'verticals_aggregate';
-  aggregate?: Maybe<Verticals_Aggregate_Fields>;
-  nodes: Array<Verticals>;
-};
-
-/** aggregate fields of "verticals" */
-export type Verticals_Aggregate_Fields = {
-  __typename?: 'verticals_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Verticals_Max_Fields>;
-  min?: Maybe<Verticals_Min_Fields>;
-};
-
-
-/** aggregate fields of "verticals" */
-export type Verticals_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Verticals_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
 /** Boolean expression to filter rows from the table "verticals". All fields are combined with a logical 'AND'. */
 export type Verticals_Bool_Exp = {
   _and?: InputMaybe<Array<Verticals_Bool_Exp>>;
@@ -19746,12 +6814,6 @@ export type Verticals_Bool_Exp = {
   name?: InputMaybe<String_Comparison_Exp>;
   project_vertical?: InputMaybe<Project_Verticals_Bool_Exp>;
 };
-
-/** unique or primary key constraints on table "verticals" */
-export enum Verticals_Constraint {
-  /** unique or primary key constraint on columns "name" */
-  VerticalsPkey = 'verticals_pkey'
-}
 
 export enum Verticals_Enum {
   Artblocksxpace = 'artblocksxpace',
@@ -19774,56 +6836,10 @@ export type Verticals_Enum_Comparison_Exp = {
   _nin?: InputMaybe<Array<Verticals_Enum>>;
 };
 
-/** input type for inserting data into table "verticals" */
-export type Verticals_Insert_Input = {
-  name?: InputMaybe<Scalars['String']>;
-  project_vertical?: InputMaybe<Project_Verticals_Obj_Rel_Insert_Input>;
-};
-
-/** aggregate max on columns */
-export type Verticals_Max_Fields = {
-  __typename?: 'verticals_max_fields';
-  name?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Verticals_Min_Fields = {
-  __typename?: 'verticals_min_fields';
-  name?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "verticals" */
-export type Verticals_Mutation_Response = {
-  __typename?: 'verticals_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Verticals>;
-};
-
-/** input type for inserting object relation for remote table "verticals" */
-export type Verticals_Obj_Rel_Insert_Input = {
-  data: Verticals_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Verticals_On_Conflict>;
-};
-
-/** on_conflict condition type for table "verticals" */
-export type Verticals_On_Conflict = {
-  constraint: Verticals_Constraint;
-  update_columns?: Array<Verticals_Update_Column>;
-  where?: InputMaybe<Verticals_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "verticals". */
 export type Verticals_Order_By = {
   name?: InputMaybe<Order_By>;
   project_vertical?: InputMaybe<Project_Verticals_Order_By>;
-};
-
-/** primary key columns input for table: verticals */
-export type Verticals_Pk_Columns_Input = {
-  name: Scalars['String'];
 };
 
 /** select columns of table "verticals" */
@@ -19831,11 +6847,6 @@ export enum Verticals_Select_Column {
   /** column name */
   Name = 'name'
 }
-
-/** input type for updating data in table "verticals" */
-export type Verticals_Set_Input = {
-  name?: InputMaybe<Scalars['String']>;
-};
 
 /** Streaming cursor of the table "verticals" */
 export type Verticals_Stream_Cursor_Input = {
@@ -19848,18 +6859,6 @@ export type Verticals_Stream_Cursor_Input = {
 /** Initial value of the column from where the streaming should start */
 export type Verticals_Stream_Cursor_Value_Input = {
   name?: InputMaybe<Scalars['String']>;
-};
-
-/** update columns of table "verticals" */
-export enum Verticals_Update_Column {
-  /** column name */
-  Name = 'name'
-}
-
-export type Verticals_Updates = {
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Verticals_Set_Input>;
-  where: Verticals_Bool_Exp;
 };
 
 /** columns and relationships of "webflow_artist_info" */
@@ -19881,33 +6880,6 @@ export type Webflow_Artist_InfoRaw_DataArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
 
-/** aggregated selection of "webflow_artist_info" */
-export type Webflow_Artist_Info_Aggregate = {
-  __typename?: 'webflow_artist_info_aggregate';
-  aggregate?: Maybe<Webflow_Artist_Info_Aggregate_Fields>;
-  nodes: Array<Webflow_Artist_Info>;
-};
-
-/** aggregate fields of "webflow_artist_info" */
-export type Webflow_Artist_Info_Aggregate_Fields = {
-  __typename?: 'webflow_artist_info_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Webflow_Artist_Info_Max_Fields>;
-  min?: Maybe<Webflow_Artist_Info_Min_Fields>;
-};
-
-
-/** aggregate fields of "webflow_artist_info" */
-export type Webflow_Artist_Info_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Webflow_Artist_Info_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** append existing jsonb value of filtered columns with new jsonb value */
-export type Webflow_Artist_Info_Append_Input = {
-  raw_data?: InputMaybe<Scalars['jsonb']>;
-};
-
 /** Boolean expression to filter rows from the table "webflow_artist_info". All fields are combined with a logical 'AND'. */
 export type Webflow_Artist_Info_Bool_Exp = {
   _and?: InputMaybe<Array<Webflow_Artist_Info_Bool_Exp>>;
@@ -19922,81 +6894,6 @@ export type Webflow_Artist_Info_Bool_Exp = {
   webflow_item_id?: InputMaybe<String_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "webflow_artist_info" */
-export enum Webflow_Artist_Info_Constraint {
-  /** unique or primary key constraint on columns "webflow_item_id" */
-  WebflowArtistInfoPkey = 'webflow_artist_info_pkey',
-  /** unique or primary key constraint on columns "user_public_address" */
-  WebflowArtistInfoUserPublicAddressKey = 'webflow_artist_info_user_public_address_key'
-}
-
-/** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-export type Webflow_Artist_Info_Delete_At_Path_Input = {
-  raw_data?: InputMaybe<Array<Scalars['String']>>;
-};
-
-/** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-export type Webflow_Artist_Info_Delete_Elem_Input = {
-  raw_data?: InputMaybe<Scalars['Int']>;
-};
-
-/** delete key/value pair or string element. key/value pairs are matched based on their key value */
-export type Webflow_Artist_Info_Delete_Key_Input = {
-  raw_data?: InputMaybe<Scalars['String']>;
-};
-
-/** input type for inserting data into table "webflow_artist_info" */
-export type Webflow_Artist_Info_Insert_Input = {
-  published?: InputMaybe<Scalars['Boolean']>;
-  raw_data?: InputMaybe<Scalars['jsonb']>;
-  slug?: InputMaybe<Scalars['String']>;
-  user?: InputMaybe<Users_Obj_Rel_Insert_Input>;
-  user_public_address?: InputMaybe<Scalars['String']>;
-  webflow_collection_id?: InputMaybe<Scalars['String']>;
-  webflow_item_id?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Webflow_Artist_Info_Max_Fields = {
-  __typename?: 'webflow_artist_info_max_fields';
-  slug?: Maybe<Scalars['String']>;
-  user_public_address?: Maybe<Scalars['String']>;
-  webflow_collection_id?: Maybe<Scalars['String']>;
-  webflow_item_id?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Webflow_Artist_Info_Min_Fields = {
-  __typename?: 'webflow_artist_info_min_fields';
-  slug?: Maybe<Scalars['String']>;
-  user_public_address?: Maybe<Scalars['String']>;
-  webflow_collection_id?: Maybe<Scalars['String']>;
-  webflow_item_id?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "webflow_artist_info" */
-export type Webflow_Artist_Info_Mutation_Response = {
-  __typename?: 'webflow_artist_info_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Webflow_Artist_Info>;
-};
-
-/** input type for inserting object relation for remote table "webflow_artist_info" */
-export type Webflow_Artist_Info_Obj_Rel_Insert_Input = {
-  data: Webflow_Artist_Info_Insert_Input;
-  /** upsert condition */
-  on_conflict?: InputMaybe<Webflow_Artist_Info_On_Conflict>;
-};
-
-/** on_conflict condition type for table "webflow_artist_info" */
-export type Webflow_Artist_Info_On_Conflict = {
-  constraint: Webflow_Artist_Info_Constraint;
-  update_columns?: Array<Webflow_Artist_Info_Update_Column>;
-  where?: InputMaybe<Webflow_Artist_Info_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "webflow_artist_info". */
 export type Webflow_Artist_Info_Order_By = {
   published?: InputMaybe<Order_By>;
@@ -20006,16 +6903,6 @@ export type Webflow_Artist_Info_Order_By = {
   user_public_address?: InputMaybe<Order_By>;
   webflow_collection_id?: InputMaybe<Order_By>;
   webflow_item_id?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: webflow_artist_info */
-export type Webflow_Artist_Info_Pk_Columns_Input = {
-  webflow_item_id: Scalars['String'];
-};
-
-/** prepend existing jsonb value of filtered columns with new jsonb value */
-export type Webflow_Artist_Info_Prepend_Input = {
-  raw_data?: InputMaybe<Scalars['jsonb']>;
 };
 
 /** select columns of table "webflow_artist_info" */
@@ -20034,16 +6921,6 @@ export enum Webflow_Artist_Info_Select_Column {
   WebflowItemId = 'webflow_item_id'
 }
 
-/** input type for updating data in table "webflow_artist_info" */
-export type Webflow_Artist_Info_Set_Input = {
-  published?: InputMaybe<Scalars['Boolean']>;
-  raw_data?: InputMaybe<Scalars['jsonb']>;
-  slug?: InputMaybe<Scalars['String']>;
-  user_public_address?: InputMaybe<Scalars['String']>;
-  webflow_collection_id?: InputMaybe<Scalars['String']>;
-  webflow_item_id?: InputMaybe<Scalars['String']>;
-};
-
 /** Streaming cursor of the table "webflow_artist_info" */
 export type Webflow_Artist_Info_Stream_Cursor_Input = {
   /** Stream column input with initial value */
@@ -20060,38 +6937,6 @@ export type Webflow_Artist_Info_Stream_Cursor_Value_Input = {
   user_public_address?: InputMaybe<Scalars['String']>;
   webflow_collection_id?: InputMaybe<Scalars['String']>;
   webflow_item_id?: InputMaybe<Scalars['String']>;
-};
-
-/** update columns of table "webflow_artist_info" */
-export enum Webflow_Artist_Info_Update_Column {
-  /** column name */
-  Published = 'published',
-  /** column name */
-  RawData = 'raw_data',
-  /** column name */
-  Slug = 'slug',
-  /** column name */
-  UserPublicAddress = 'user_public_address',
-  /** column name */
-  WebflowCollectionId = 'webflow_collection_id',
-  /** column name */
-  WebflowItemId = 'webflow_item_id'
-}
-
-export type Webflow_Artist_Info_Updates = {
-  /** append existing jsonb value of filtered columns with new jsonb value */
-  _append?: InputMaybe<Webflow_Artist_Info_Append_Input>;
-  /** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-  _delete_at_path?: InputMaybe<Webflow_Artist_Info_Delete_At_Path_Input>;
-  /** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-  _delete_elem?: InputMaybe<Webflow_Artist_Info_Delete_Elem_Input>;
-  /** delete key/value pair or string element. key/value pairs are matched based on their key value */
-  _delete_key?: InputMaybe<Webflow_Artist_Info_Delete_Key_Input>;
-  /** prepend existing jsonb value of filtered columns with new jsonb value */
-  _prepend?: InputMaybe<Webflow_Artist_Info_Prepend_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Webflow_Artist_Info_Set_Input>;
-  where: Webflow_Artist_Info_Bool_Exp;
 };
 
 /** columns and relationships of "webflow_spectrum_articles" */
@@ -20116,33 +6961,6 @@ export type Webflow_Spectrum_ArticlesRaw_DataArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
 
-/** aggregated selection of "webflow_spectrum_articles" */
-export type Webflow_Spectrum_Articles_Aggregate = {
-  __typename?: 'webflow_spectrum_articles_aggregate';
-  aggregate?: Maybe<Webflow_Spectrum_Articles_Aggregate_Fields>;
-  nodes: Array<Webflow_Spectrum_Articles>;
-};
-
-/** aggregate fields of "webflow_spectrum_articles" */
-export type Webflow_Spectrum_Articles_Aggregate_Fields = {
-  __typename?: 'webflow_spectrum_articles_aggregate_fields';
-  count: Scalars['Int'];
-  max?: Maybe<Webflow_Spectrum_Articles_Max_Fields>;
-  min?: Maybe<Webflow_Spectrum_Articles_Min_Fields>;
-};
-
-
-/** aggregate fields of "webflow_spectrum_articles" */
-export type Webflow_Spectrum_Articles_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Webflow_Spectrum_Articles_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** append existing jsonb value of filtered columns with new jsonb value */
-export type Webflow_Spectrum_Articles_Append_Input = {
-  raw_data?: InputMaybe<Scalars['jsonb']>;
-};
-
 /** Boolean expression to filter rows from the table "webflow_spectrum_articles". All fields are combined with a logical 'AND'. */
 export type Webflow_Spectrum_Articles_Bool_Exp = {
   _and?: InputMaybe<Array<Webflow_Spectrum_Articles_Bool_Exp>>;
@@ -20161,88 +6979,6 @@ export type Webflow_Spectrum_Articles_Bool_Exp = {
   webflow_item_id?: InputMaybe<String_Comparison_Exp>;
 };
 
-/** unique or primary key constraints on table "webflow_spectrum_articles" */
-export enum Webflow_Spectrum_Articles_Constraint {
-  /** unique or primary key constraint on columns "webflow_item_id" */
-  WebflowSpectrumArticlesPkey = 'webflow_spectrum_articles_pkey'
-}
-
-/** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-export type Webflow_Spectrum_Articles_Delete_At_Path_Input = {
-  raw_data?: InputMaybe<Array<Scalars['String']>>;
-};
-
-/** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-export type Webflow_Spectrum_Articles_Delete_Elem_Input = {
-  raw_data?: InputMaybe<Scalars['Int']>;
-};
-
-/** delete key/value pair or string element. key/value pairs are matched based on their key value */
-export type Webflow_Spectrum_Articles_Delete_Key_Input = {
-  raw_data?: InputMaybe<Scalars['String']>;
-};
-
-/** input type for inserting data into table "webflow_spectrum_articles" */
-export type Webflow_Spectrum_Articles_Insert_Input = {
-  category?: InputMaybe<Scalars['String']>;
-  description?: InputMaybe<Scalars['String']>;
-  extra_info?: InputMaybe<Scalars['String']>;
-  image?: InputMaybe<Scalars['String']>;
-  published_at?: InputMaybe<Scalars['timestamptz']>;
-  raw_data?: InputMaybe<Scalars['jsonb']>;
-  section?: InputMaybe<Scalars['String']>;
-  slug?: InputMaybe<Scalars['String']>;
-  title?: InputMaybe<Scalars['String']>;
-  webflow_collection_id?: InputMaybe<Scalars['String']>;
-  webflow_item_id?: InputMaybe<Scalars['String']>;
-};
-
-/** aggregate max on columns */
-export type Webflow_Spectrum_Articles_Max_Fields = {
-  __typename?: 'webflow_spectrum_articles_max_fields';
-  category?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  extra_info?: Maybe<Scalars['String']>;
-  image?: Maybe<Scalars['String']>;
-  published_at?: Maybe<Scalars['timestamptz']>;
-  section?: Maybe<Scalars['String']>;
-  slug?: Maybe<Scalars['String']>;
-  title?: Maybe<Scalars['String']>;
-  webflow_collection_id?: Maybe<Scalars['String']>;
-  webflow_item_id?: Maybe<Scalars['String']>;
-};
-
-/** aggregate min on columns */
-export type Webflow_Spectrum_Articles_Min_Fields = {
-  __typename?: 'webflow_spectrum_articles_min_fields';
-  category?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  extra_info?: Maybe<Scalars['String']>;
-  image?: Maybe<Scalars['String']>;
-  published_at?: Maybe<Scalars['timestamptz']>;
-  section?: Maybe<Scalars['String']>;
-  slug?: Maybe<Scalars['String']>;
-  title?: Maybe<Scalars['String']>;
-  webflow_collection_id?: Maybe<Scalars['String']>;
-  webflow_item_id?: Maybe<Scalars['String']>;
-};
-
-/** response of any mutation on the table "webflow_spectrum_articles" */
-export type Webflow_Spectrum_Articles_Mutation_Response = {
-  __typename?: 'webflow_spectrum_articles_mutation_response';
-  /** number of rows affected by the mutation */
-  affected_rows: Scalars['Int'];
-  /** data from the rows affected by the mutation */
-  returning: Array<Webflow_Spectrum_Articles>;
-};
-
-/** on_conflict condition type for table "webflow_spectrum_articles" */
-export type Webflow_Spectrum_Articles_On_Conflict = {
-  constraint: Webflow_Spectrum_Articles_Constraint;
-  update_columns?: Array<Webflow_Spectrum_Articles_Update_Column>;
-  where?: InputMaybe<Webflow_Spectrum_Articles_Bool_Exp>;
-};
-
 /** Ordering options when selecting data from "webflow_spectrum_articles". */
 export type Webflow_Spectrum_Articles_Order_By = {
   category?: InputMaybe<Order_By>;
@@ -20256,16 +6992,6 @@ export type Webflow_Spectrum_Articles_Order_By = {
   title?: InputMaybe<Order_By>;
   webflow_collection_id?: InputMaybe<Order_By>;
   webflow_item_id?: InputMaybe<Order_By>;
-};
-
-/** primary key columns input for table: webflow_spectrum_articles */
-export type Webflow_Spectrum_Articles_Pk_Columns_Input = {
-  webflow_item_id: Scalars['String'];
-};
-
-/** prepend existing jsonb value of filtered columns with new jsonb value */
-export type Webflow_Spectrum_Articles_Prepend_Input = {
-  raw_data?: InputMaybe<Scalars['jsonb']>;
 };
 
 /** select columns of table "webflow_spectrum_articles" */
@@ -20294,21 +7020,6 @@ export enum Webflow_Spectrum_Articles_Select_Column {
   WebflowItemId = 'webflow_item_id'
 }
 
-/** input type for updating data in table "webflow_spectrum_articles" */
-export type Webflow_Spectrum_Articles_Set_Input = {
-  category?: InputMaybe<Scalars['String']>;
-  description?: InputMaybe<Scalars['String']>;
-  extra_info?: InputMaybe<Scalars['String']>;
-  image?: InputMaybe<Scalars['String']>;
-  published_at?: InputMaybe<Scalars['timestamptz']>;
-  raw_data?: InputMaybe<Scalars['jsonb']>;
-  section?: InputMaybe<Scalars['String']>;
-  slug?: InputMaybe<Scalars['String']>;
-  title?: InputMaybe<Scalars['String']>;
-  webflow_collection_id?: InputMaybe<Scalars['String']>;
-  webflow_item_id?: InputMaybe<Scalars['String']>;
-};
-
 /** Streaming cursor of the table "webflow_spectrum_articles" */
 export type Webflow_Spectrum_Articles_Stream_Cursor_Input = {
   /** Stream column input with initial value */
@@ -20332,85 +7043,2503 @@ export type Webflow_Spectrum_Articles_Stream_Cursor_Value_Input = {
   webflow_item_id?: InputMaybe<Scalars['String']>;
 };
 
-/** update columns of table "webflow_spectrum_articles" */
-export enum Webflow_Spectrum_Articles_Update_Column {
-  /** column name */
-  Category = 'category',
-  /** column name */
-  Description = 'description',
-  /** column name */
-  ExtraInfo = 'extra_info',
-  /** column name */
-  Image = 'image',
-  /** column name */
-  PublishedAt = 'published_at',
-  /** column name */
-  RawData = 'raw_data',
-  /** column name */
-  Section = 'section',
-  /** column name */
-  Slug = 'slug',
-  /** column name */
-  Title = 'title',
-  /** column name */
-  WebflowCollectionId = 'webflow_collection_id',
-  /** column name */
-  WebflowItemId = 'webflow_item_id'
+export type ProjectsMetadataDetailsFragment = { __typename?: 'projects_metadata', id: string, start_datetime?: any | null, vertical_name: string, heritage_curation_status?: string | null, vertical: { __typename?: 'project_verticals', category_name: string } };
+
+export type GetAllProjectsHasuraDetailsQueryVariables = Exact<{
+  first: Scalars['Int'];
+  skip: Scalars['Int'];
+}>;
+
+
+export type GetAllProjectsHasuraDetailsQuery = { __typename?: 'query_root', projects_metadata: Array<{ __typename?: 'projects_metadata', id: string, start_datetime?: any | null, vertical_name: string, heritage_curation_status?: string | null, vertical: { __typename?: 'project_verticals', category_name: string } }> };
+
+
+
+export type ResolverTypeWrapper<T> = Promise<T> | T;
+
+
+export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
+  resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
+};
+export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> = ResolverFn<TResult, TParent, TContext, TArgs> | ResolverWithResolve<TResult, TParent, TContext, TArgs>;
+
+export type ResolverFn<TResult, TParent, TContext, TArgs> = (
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => Promise<TResult> | TResult;
+
+export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => AsyncIterable<TResult> | Promise<AsyncIterable<TResult>>;
+
+export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => TResult | Promise<TResult>;
+
+export interface SubscriptionSubscriberObject<TResult, TKey extends string, TParent, TContext, TArgs> {
+  subscribe: SubscriptionSubscribeFn<{ [key in TKey]: TResult }, TParent, TContext, TArgs>;
+  resolve?: SubscriptionResolveFn<TResult, { [key in TKey]: TResult }, TContext, TArgs>;
 }
 
-export type Webflow_Spectrum_Articles_Updates = {
-  /** append existing jsonb value of filtered columns with new jsonb value */
-  _append?: InputMaybe<Webflow_Spectrum_Articles_Append_Input>;
-  /** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
-  _delete_at_path?: InputMaybe<Webflow_Spectrum_Articles_Delete_At_Path_Input>;
-  /** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
-  _delete_elem?: InputMaybe<Webflow_Spectrum_Articles_Delete_Elem_Input>;
-  /** delete key/value pair or string element. key/value pairs are matched based on their key value */
-  _delete_key?: InputMaybe<Webflow_Spectrum_Articles_Delete_Key_Input>;
-  /** prepend existing jsonb value of filtered columns with new jsonb value */
-  _prepend?: InputMaybe<Webflow_Spectrum_Articles_Prepend_Input>;
-  /** sets the columns of the filtered rows to the given values */
-  _set?: InputMaybe<Webflow_Spectrum_Articles_Set_Input>;
-  where: Webflow_Spectrum_Articles_Bool_Exp;
+export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
+  subscribe: SubscriptionSubscribeFn<any, TParent, TContext, TArgs>;
+  resolve: SubscriptionResolveFn<TResult, any, TContext, TArgs>;
+}
+
+export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, TArgs> =
+  | SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
+  | SubscriptionResolverObject<TResult, TParent, TContext, TArgs>;
+
+export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TContext = {}, TArgs = {}> =
+  | ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
+  | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>;
+
+export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
+  parent: TParent,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
+
+export type IsTypeOfResolverFn<T = {}, TContext = {}> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
+
+export type NextResolverFn<T> = () => Promise<T>;
+
+export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs = {}> = (
+  next: NextResolverFn<TResult>,
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => TResult | Promise<TResult>;
+
+/** Mapping between all available schema types and the resolvers types */
+export type ResolversTypes = {
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  Boolean_comparison_exp: Boolean_Comparison_Exp;
+  Float: ResolverTypeWrapper<Scalars['Float']>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
+  Int_comparison_exp: Int_Comparison_Exp;
+  OpenseaCollectionData: ResolverTypeWrapper<OpenseaCollectionData>;
+  String: ResolverTypeWrapper<Scalars['String']>;
+  String_comparison_exp: String_Comparison_Exp;
+  bigint: ResolverTypeWrapper<Scalars['bigint']>;
+  bigint_comparison_exp: Bigint_Comparison_Exp;
+  categories: ResolverTypeWrapper<Categories>;
+  categories_bool_exp: Categories_Bool_Exp;
+  categories_enum: Categories_Enum;
+  categories_enum_comparison_exp: Categories_Enum_Comparison_Exp;
+  categories_order_by: Categories_Order_By;
+  categories_select_column: Categories_Select_Column;
+  categories_stream_cursor_input: Categories_Stream_Cursor_Input;
+  categories_stream_cursor_value_input: Categories_Stream_Cursor_Value_Input;
+  contract_allowlistings: ResolverTypeWrapper<Contract_Allowlistings>;
+  contract_allowlistings_aggregate_order_by: Contract_Allowlistings_Aggregate_Order_By;
+  contract_allowlistings_bool_exp: Contract_Allowlistings_Bool_Exp;
+  contract_allowlistings_max_order_by: Contract_Allowlistings_Max_Order_By;
+  contract_allowlistings_min_order_by: Contract_Allowlistings_Min_Order_By;
+  contract_allowlistings_order_by: Contract_Allowlistings_Order_By;
+  contract_allowlistings_select_column: Contract_Allowlistings_Select_Column;
+  contract_allowlistings_stream_cursor_input: Contract_Allowlistings_Stream_Cursor_Input;
+  contract_allowlistings_stream_cursor_value_input: Contract_Allowlistings_Stream_Cursor_Value_Input;
+  contract_type_names: ResolverTypeWrapper<Contract_Type_Names>;
+  contract_type_names_bool_exp: Contract_Type_Names_Bool_Exp;
+  contract_type_names_enum: Contract_Type_Names_Enum;
+  contract_type_names_enum_comparison_exp: Contract_Type_Names_Enum_Comparison_Exp;
+  contract_type_names_order_by: Contract_Type_Names_Order_By;
+  contract_type_names_select_column: Contract_Type_Names_Select_Column;
+  contract_type_names_stream_cursor_input: Contract_Type_Names_Stream_Cursor_Input;
+  contract_type_names_stream_cursor_value_input: Contract_Type_Names_Stream_Cursor_Value_Input;
+  contract_types: ResolverTypeWrapper<Contract_Types>;
+  contract_types_bool_exp: Contract_Types_Bool_Exp;
+  contract_types_order_by: Contract_Types_Order_By;
+  contract_types_select_column: Contract_Types_Select_Column;
+  contract_types_stream_cursor_input: Contract_Types_Stream_Cursor_Input;
+  contract_types_stream_cursor_value_input: Contract_Types_Stream_Cursor_Value_Input;
+  contracts_metadata: ResolverTypeWrapper<Contracts_Metadata>;
+  contracts_metadata_aggregate: ResolverTypeWrapper<Contracts_Metadata_Aggregate>;
+  contracts_metadata_aggregate_fields: ResolverTypeWrapper<Contracts_Metadata_Aggregate_Fields>;
+  contracts_metadata_avg_fields: ResolverTypeWrapper<Contracts_Metadata_Avg_Fields>;
+  contracts_metadata_bool_exp: Contracts_Metadata_Bool_Exp;
+  contracts_metadata_max_fields: ResolverTypeWrapper<Contracts_Metadata_Max_Fields>;
+  contracts_metadata_min_fields: ResolverTypeWrapper<Contracts_Metadata_Min_Fields>;
+  contracts_metadata_order_by: Contracts_Metadata_Order_By;
+  contracts_metadata_select_column: Contracts_Metadata_Select_Column;
+  contracts_metadata_stddev_fields: ResolverTypeWrapper<Contracts_Metadata_Stddev_Fields>;
+  contracts_metadata_stddev_pop_fields: ResolverTypeWrapper<Contracts_Metadata_Stddev_Pop_Fields>;
+  contracts_metadata_stddev_samp_fields: ResolverTypeWrapper<Contracts_Metadata_Stddev_Samp_Fields>;
+  contracts_metadata_stream_cursor_input: Contracts_Metadata_Stream_Cursor_Input;
+  contracts_metadata_stream_cursor_value_input: Contracts_Metadata_Stream_Cursor_Value_Input;
+  contracts_metadata_sum_fields: ResolverTypeWrapper<Contracts_Metadata_Sum_Fields>;
+  contracts_metadata_var_pop_fields: ResolverTypeWrapper<Contracts_Metadata_Var_Pop_Fields>;
+  contracts_metadata_var_samp_fields: ResolverTypeWrapper<Contracts_Metadata_Var_Samp_Fields>;
+  contracts_metadata_variance_fields: ResolverTypeWrapper<Contracts_Metadata_Variance_Fields>;
+  curation_statuses_enum: Curation_Statuses_Enum;
+  curation_statuses_enum_comparison_exp: Curation_Statuses_Enum_Comparison_Exp;
+  cursor_ordering: Cursor_Ordering;
+  entity_tags: ResolverTypeWrapper<Entity_Tags>;
+  entity_tags_aggregate_order_by: Entity_Tags_Aggregate_Order_By;
+  entity_tags_avg_order_by: Entity_Tags_Avg_Order_By;
+  entity_tags_bool_exp: Entity_Tags_Bool_Exp;
+  entity_tags_max_order_by: Entity_Tags_Max_Order_By;
+  entity_tags_min_order_by: Entity_Tags_Min_Order_By;
+  entity_tags_order_by: Entity_Tags_Order_By;
+  entity_tags_select_column: Entity_Tags_Select_Column;
+  entity_tags_stddev_order_by: Entity_Tags_Stddev_Order_By;
+  entity_tags_stddev_pop_order_by: Entity_Tags_Stddev_Pop_Order_By;
+  entity_tags_stddev_samp_order_by: Entity_Tags_Stddev_Samp_Order_By;
+  entity_tags_stream_cursor_input: Entity_Tags_Stream_Cursor_Input;
+  entity_tags_stream_cursor_value_input: Entity_Tags_Stream_Cursor_Value_Input;
+  entity_tags_sum_order_by: Entity_Tags_Sum_Order_By;
+  entity_tags_var_pop_order_by: Entity_Tags_Var_Pop_Order_By;
+  entity_tags_var_samp_order_by: Entity_Tags_Var_Samp_Order_By;
+  entity_tags_variance_order_by: Entity_Tags_Variance_Order_By;
+  favorites: ResolverTypeWrapper<Favorites>;
+  favorites_aggregate: ResolverTypeWrapper<Favorites_Aggregate>;
+  favorites_aggregate_bool_exp: Favorites_Aggregate_Bool_Exp;
+  favorites_aggregate_bool_exp_count: Favorites_Aggregate_Bool_Exp_Count;
+  favorites_aggregate_fields: ResolverTypeWrapper<Favorites_Aggregate_Fields>;
+  favorites_aggregate_order_by: Favorites_Aggregate_Order_By;
+  favorites_avg_fields: ResolverTypeWrapper<Favorites_Avg_Fields>;
+  favorites_avg_order_by: Favorites_Avg_Order_By;
+  favorites_bool_exp: Favorites_Bool_Exp;
+  favorites_max_fields: ResolverTypeWrapper<Favorites_Max_Fields>;
+  favorites_max_order_by: Favorites_Max_Order_By;
+  favorites_min_fields: ResolverTypeWrapper<Favorites_Min_Fields>;
+  favorites_min_order_by: Favorites_Min_Order_By;
+  favorites_order_by: Favorites_Order_By;
+  favorites_select_column: Favorites_Select_Column;
+  favorites_stddev_fields: ResolverTypeWrapper<Favorites_Stddev_Fields>;
+  favorites_stddev_order_by: Favorites_Stddev_Order_By;
+  favorites_stddev_pop_fields: ResolverTypeWrapper<Favorites_Stddev_Pop_Fields>;
+  favorites_stddev_pop_order_by: Favorites_Stddev_Pop_Order_By;
+  favorites_stddev_samp_fields: ResolverTypeWrapper<Favorites_Stddev_Samp_Fields>;
+  favorites_stddev_samp_order_by: Favorites_Stddev_Samp_Order_By;
+  favorites_stream_cursor_input: Favorites_Stream_Cursor_Input;
+  favorites_stream_cursor_value_input: Favorites_Stream_Cursor_Value_Input;
+  favorites_sum_fields: ResolverTypeWrapper<Favorites_Sum_Fields>;
+  favorites_sum_order_by: Favorites_Sum_Order_By;
+  favorites_var_pop_fields: ResolverTypeWrapper<Favorites_Var_Pop_Fields>;
+  favorites_var_pop_order_by: Favorites_Var_Pop_Order_By;
+  favorites_var_samp_fields: ResolverTypeWrapper<Favorites_Var_Samp_Fields>;
+  favorites_var_samp_order_by: Favorites_Var_Samp_Order_By;
+  favorites_variance_fields: ResolverTypeWrapper<Favorites_Variance_Fields>;
+  favorites_variance_order_by: Favorites_Variance_Order_By;
+  feature_flags: ResolverTypeWrapper<Feature_Flags>;
+  feature_flags_bool_exp: Feature_Flags_Bool_Exp;
+  feature_flags_order_by: Feature_Flags_Order_By;
+  feature_flags_select_column: Feature_Flags_Select_Column;
+  feature_flags_stream_cursor_input: Feature_Flags_Stream_Cursor_Input;
+  feature_flags_stream_cursor_value_input: Feature_Flags_Stream_Cursor_Value_Input;
+  featured_token_projects_metadata_args: Featured_Token_Projects_Metadata_Args;
+  filter_tokens_metadata_by_features_args: Filter_Tokens_Metadata_By_Features_Args;
+  float8: ResolverTypeWrapper<Scalars['float8']>;
+  float8_comparison_exp: Float8_Comparison_Exp;
+  jsonb: ResolverTypeWrapper<Scalars['jsonb']>;
+  jsonb_cast_exp: Jsonb_Cast_Exp;
+  jsonb_comparison_exp: Jsonb_Comparison_Exp;
+  jsonpath: ResolverTypeWrapper<Scalars['jsonpath']>;
+  list_projects_metadata_random_args: List_Projects_Metadata_Random_Args;
+  media: ResolverTypeWrapper<Media>;
+  media_bool_exp: Media_Bool_Exp;
+  media_order_by: Media_Order_By;
+  media_select_column: Media_Select_Column;
+  media_stream_cursor_input: Media_Stream_Cursor_Input;
+  media_stream_cursor_value_input: Media_Stream_Cursor_Value_Input;
+  minter_filters_metadata: ResolverTypeWrapper<Minter_Filters_Metadata>;
+  minter_filters_metadata_bool_exp: Minter_Filters_Metadata_Bool_Exp;
+  minter_filters_metadata_order_by: Minter_Filters_Metadata_Order_By;
+  minter_filters_metadata_select_column: Minter_Filters_Metadata_Select_Column;
+  minter_filters_metadata_stream_cursor_input: Minter_Filters_Metadata_Stream_Cursor_Input;
+  minter_filters_metadata_stream_cursor_value_input: Minter_Filters_Metadata_Stream_Cursor_Value_Input;
+  minter_type_names_enum: Minter_Type_Names_Enum;
+  minter_type_names_enum_comparison_exp: Minter_Type_Names_Enum_Comparison_Exp;
+  minter_types: ResolverTypeWrapper<Minter_Types>;
+  minter_types_bool_exp: Minter_Types_Bool_Exp;
+  minter_types_order_by: Minter_Types_Order_By;
+  minter_types_select_column: Minter_Types_Select_Column;
+  minter_types_stream_cursor_input: Minter_Types_Stream_Cursor_Input;
+  minter_types_stream_cursor_value_input: Minter_Types_Stream_Cursor_Value_Input;
+  minters_metadata: ResolverTypeWrapper<Minters_Metadata>;
+  minters_metadata_aggregate_order_by: Minters_Metadata_Aggregate_Order_By;
+  minters_metadata_avg_order_by: Minters_Metadata_Avg_Order_By;
+  minters_metadata_bool_exp: Minters_Metadata_Bool_Exp;
+  minters_metadata_max_order_by: Minters_Metadata_Max_Order_By;
+  minters_metadata_min_order_by: Minters_Metadata_Min_Order_By;
+  minters_metadata_order_by: Minters_Metadata_Order_By;
+  minters_metadata_select_column: Minters_Metadata_Select_Column;
+  minters_metadata_stddev_order_by: Minters_Metadata_Stddev_Order_By;
+  minters_metadata_stddev_pop_order_by: Minters_Metadata_Stddev_Pop_Order_By;
+  minters_metadata_stddev_samp_order_by: Minters_Metadata_Stddev_Samp_Order_By;
+  minters_metadata_stream_cursor_input: Minters_Metadata_Stream_Cursor_Input;
+  minters_metadata_stream_cursor_value_input: Minters_Metadata_Stream_Cursor_Value_Input;
+  minters_metadata_sum_order_by: Minters_Metadata_Sum_Order_By;
+  minters_metadata_var_pop_order_by: Minters_Metadata_Var_Pop_Order_By;
+  minters_metadata_var_samp_order_by: Minters_Metadata_Var_Samp_Order_By;
+  minters_metadata_variance_order_by: Minters_Metadata_Variance_Order_By;
+  numeric: ResolverTypeWrapper<Scalars['numeric']>;
+  numeric_comparison_exp: Numeric_Comparison_Exp;
+  order_by: Order_By;
+  project_external_asset_dependencies: ResolverTypeWrapper<Project_External_Asset_Dependencies>;
+  project_external_asset_dependencies_aggregate_order_by: Project_External_Asset_Dependencies_Aggregate_Order_By;
+  project_external_asset_dependencies_avg_order_by: Project_External_Asset_Dependencies_Avg_Order_By;
+  project_external_asset_dependencies_bool_exp: Project_External_Asset_Dependencies_Bool_Exp;
+  project_external_asset_dependencies_max_order_by: Project_External_Asset_Dependencies_Max_Order_By;
+  project_external_asset_dependencies_min_order_by: Project_External_Asset_Dependencies_Min_Order_By;
+  project_external_asset_dependencies_order_by: Project_External_Asset_Dependencies_Order_By;
+  project_external_asset_dependencies_select_column: Project_External_Asset_Dependencies_Select_Column;
+  project_external_asset_dependencies_stddev_order_by: Project_External_Asset_Dependencies_Stddev_Order_By;
+  project_external_asset_dependencies_stddev_pop_order_by: Project_External_Asset_Dependencies_Stddev_Pop_Order_By;
+  project_external_asset_dependencies_stddev_samp_order_by: Project_External_Asset_Dependencies_Stddev_Samp_Order_By;
+  project_external_asset_dependencies_stream_cursor_input: Project_External_Asset_Dependencies_Stream_Cursor_Input;
+  project_external_asset_dependencies_stream_cursor_value_input: Project_External_Asset_Dependencies_Stream_Cursor_Value_Input;
+  project_external_asset_dependencies_sum_order_by: Project_External_Asset_Dependencies_Sum_Order_By;
+  project_external_asset_dependencies_var_pop_order_by: Project_External_Asset_Dependencies_Var_Pop_Order_By;
+  project_external_asset_dependencies_var_samp_order_by: Project_External_Asset_Dependencies_Var_Samp_Order_By;
+  project_external_asset_dependencies_variance_order_by: Project_External_Asset_Dependencies_Variance_Order_By;
+  project_external_asset_dependency_types_enum: Project_External_Asset_Dependency_Types_Enum;
+  project_external_asset_dependency_types_enum_comparison_exp: Project_External_Asset_Dependency_Types_Enum_Comparison_Exp;
+  project_minter_configurations: ResolverTypeWrapper<Project_Minter_Configurations>;
+  project_minter_configurations_bool_exp: Project_Minter_Configurations_Bool_Exp;
+  project_minter_configurations_order_by: Project_Minter_Configurations_Order_By;
+  project_minter_configurations_select_column: Project_Minter_Configurations_Select_Column;
+  project_minter_configurations_stream_cursor_input: Project_Minter_Configurations_Stream_Cursor_Input;
+  project_minter_configurations_stream_cursor_value_input: Project_Minter_Configurations_Stream_Cursor_Value_Input;
+  project_scripts: ResolverTypeWrapper<Project_Scripts>;
+  project_scripts_aggregate_order_by: Project_Scripts_Aggregate_Order_By;
+  project_scripts_avg_order_by: Project_Scripts_Avg_Order_By;
+  project_scripts_bool_exp: Project_Scripts_Bool_Exp;
+  project_scripts_max_order_by: Project_Scripts_Max_Order_By;
+  project_scripts_min_order_by: Project_Scripts_Min_Order_By;
+  project_scripts_order_by: Project_Scripts_Order_By;
+  project_scripts_select_column: Project_Scripts_Select_Column;
+  project_scripts_stddev_order_by: Project_Scripts_Stddev_Order_By;
+  project_scripts_stddev_pop_order_by: Project_Scripts_Stddev_Pop_Order_By;
+  project_scripts_stddev_samp_order_by: Project_Scripts_Stddev_Samp_Order_By;
+  project_scripts_stream_cursor_input: Project_Scripts_Stream_Cursor_Input;
+  project_scripts_stream_cursor_value_input: Project_Scripts_Stream_Cursor_Value_Input;
+  project_scripts_sum_order_by: Project_Scripts_Sum_Order_By;
+  project_scripts_var_pop_order_by: Project_Scripts_Var_Pop_Order_By;
+  project_scripts_var_samp_order_by: Project_Scripts_Var_Samp_Order_By;
+  project_scripts_variance_order_by: Project_Scripts_Variance_Order_By;
+  project_series: ResolverTypeWrapper<Project_Series>;
+  project_series_aggregate: ResolverTypeWrapper<Project_Series_Aggregate>;
+  project_series_aggregate_fields: ResolverTypeWrapper<Project_Series_Aggregate_Fields>;
+  project_series_avg_fields: ResolverTypeWrapper<Project_Series_Avg_Fields>;
+  project_series_bool_exp: Project_Series_Bool_Exp;
+  project_series_max_fields: ResolverTypeWrapper<Project_Series_Max_Fields>;
+  project_series_min_fields: ResolverTypeWrapper<Project_Series_Min_Fields>;
+  project_series_order_by: Project_Series_Order_By;
+  project_series_select_column: Project_Series_Select_Column;
+  project_series_stddev_fields: ResolverTypeWrapper<Project_Series_Stddev_Fields>;
+  project_series_stddev_pop_fields: ResolverTypeWrapper<Project_Series_Stddev_Pop_Fields>;
+  project_series_stddev_samp_fields: ResolverTypeWrapper<Project_Series_Stddev_Samp_Fields>;
+  project_series_stream_cursor_input: Project_Series_Stream_Cursor_Input;
+  project_series_stream_cursor_value_input: Project_Series_Stream_Cursor_Value_Input;
+  project_series_sum_fields: ResolverTypeWrapper<Project_Series_Sum_Fields>;
+  project_series_var_pop_fields: ResolverTypeWrapper<Project_Series_Var_Pop_Fields>;
+  project_series_var_samp_fields: ResolverTypeWrapper<Project_Series_Var_Samp_Fields>;
+  project_series_variance_fields: ResolverTypeWrapper<Project_Series_Variance_Fields>;
+  project_vertical_categories: ResolverTypeWrapper<Project_Vertical_Categories>;
+  project_vertical_categories_bool_exp: Project_Vertical_Categories_Bool_Exp;
+  project_vertical_categories_order_by: Project_Vertical_Categories_Order_By;
+  project_vertical_categories_select_column: Project_Vertical_Categories_Select_Column;
+  project_vertical_categories_stream_cursor_input: Project_Vertical_Categories_Stream_Cursor_Input;
+  project_vertical_categories_stream_cursor_value_input: Project_Vertical_Categories_Stream_Cursor_Value_Input;
+  project_verticals: ResolverTypeWrapper<Project_Verticals>;
+  project_verticals_aggregate_order_by: Project_Verticals_Aggregate_Order_By;
+  project_verticals_bool_exp: Project_Verticals_Bool_Exp;
+  project_verticals_max_order_by: Project_Verticals_Max_Order_By;
+  project_verticals_min_order_by: Project_Verticals_Min_Order_By;
+  project_verticals_order_by: Project_Verticals_Order_By;
+  project_verticals_select_column: Project_Verticals_Select_Column;
+  project_verticals_stream_cursor_input: Project_Verticals_Stream_Cursor_Input;
+  project_verticals_stream_cursor_value_input: Project_Verticals_Stream_Cursor_Value_Input;
+  projects_features: ResolverTypeWrapper<Projects_Features>;
+  projects_features_bool_exp: Projects_Features_Bool_Exp;
+  projects_features_order_by: Projects_Features_Order_By;
+  projects_features_select_column: Projects_Features_Select_Column;
+  projects_features_stream_cursor_input: Projects_Features_Stream_Cursor_Input;
+  projects_features_stream_cursor_value_input: Projects_Features_Stream_Cursor_Value_Input;
+  projects_metadata: ResolverTypeWrapper<Projects_Metadata>;
+  projects_metadata_aggregate: ResolverTypeWrapper<Projects_Metadata_Aggregate>;
+  projects_metadata_aggregate_bool_exp: Projects_Metadata_Aggregate_Bool_Exp;
+  projects_metadata_aggregate_bool_exp_bool_and: Projects_Metadata_Aggregate_Bool_Exp_Bool_And;
+  projects_metadata_aggregate_bool_exp_bool_or: Projects_Metadata_Aggregate_Bool_Exp_Bool_Or;
+  projects_metadata_aggregate_bool_exp_count: Projects_Metadata_Aggregate_Bool_Exp_Count;
+  projects_metadata_aggregate_fields: ResolverTypeWrapper<Projects_Metadata_Aggregate_Fields>;
+  projects_metadata_aggregate_order_by: Projects_Metadata_Aggregate_Order_By;
+  projects_metadata_avg_fields: ResolverTypeWrapper<Projects_Metadata_Avg_Fields>;
+  projects_metadata_avg_order_by: Projects_Metadata_Avg_Order_By;
+  projects_metadata_bool_exp: Projects_Metadata_Bool_Exp;
+  projects_metadata_max_fields: ResolverTypeWrapper<Projects_Metadata_Max_Fields>;
+  projects_metadata_max_order_by: Projects_Metadata_Max_Order_By;
+  projects_metadata_min_fields: ResolverTypeWrapper<Projects_Metadata_Min_Fields>;
+  projects_metadata_min_order_by: Projects_Metadata_Min_Order_By;
+  projects_metadata_order_by: Projects_Metadata_Order_By;
+  projects_metadata_select_column: Projects_Metadata_Select_Column;
+  projects_metadata_select_column_projects_metadata_aggregate_bool_exp_bool_and_arguments_columns: Projects_Metadata_Select_Column_Projects_Metadata_Aggregate_Bool_Exp_Bool_And_Arguments_Columns;
+  projects_metadata_select_column_projects_metadata_aggregate_bool_exp_bool_or_arguments_columns: Projects_Metadata_Select_Column_Projects_Metadata_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns;
+  projects_metadata_stddev_fields: ResolverTypeWrapper<Projects_Metadata_Stddev_Fields>;
+  projects_metadata_stddev_order_by: Projects_Metadata_Stddev_Order_By;
+  projects_metadata_stddev_pop_fields: ResolverTypeWrapper<Projects_Metadata_Stddev_Pop_Fields>;
+  projects_metadata_stddev_pop_order_by: Projects_Metadata_Stddev_Pop_Order_By;
+  projects_metadata_stddev_samp_fields: ResolverTypeWrapper<Projects_Metadata_Stddev_Samp_Fields>;
+  projects_metadata_stddev_samp_order_by: Projects_Metadata_Stddev_Samp_Order_By;
+  projects_metadata_stream_cursor_input: Projects_Metadata_Stream_Cursor_Input;
+  projects_metadata_stream_cursor_value_input: Projects_Metadata_Stream_Cursor_Value_Input;
+  projects_metadata_sum_fields: ResolverTypeWrapper<Projects_Metadata_Sum_Fields>;
+  projects_metadata_sum_order_by: Projects_Metadata_Sum_Order_By;
+  projects_metadata_var_pop_fields: ResolverTypeWrapper<Projects_Metadata_Var_Pop_Fields>;
+  projects_metadata_var_pop_order_by: Projects_Metadata_Var_Pop_Order_By;
+  projects_metadata_var_samp_fields: ResolverTypeWrapper<Projects_Metadata_Var_Samp_Fields>;
+  projects_metadata_var_samp_order_by: Projects_Metadata_Var_Samp_Order_By;
+  projects_metadata_variance_fields: ResolverTypeWrapper<Projects_Metadata_Variance_Fields>;
+  projects_metadata_variance_order_by: Projects_Metadata_Variance_Order_By;
+  proposed_artist_addresses_and_splits: ResolverTypeWrapper<Proposed_Artist_Addresses_And_Splits>;
+  proposed_artist_addresses_and_splits_bool_exp: Proposed_Artist_Addresses_And_Splits_Bool_Exp;
+  proposed_artist_addresses_and_splits_order_by: Proposed_Artist_Addresses_And_Splits_Order_By;
+  proposed_artist_addresses_and_splits_select_column: Proposed_Artist_Addresses_And_Splits_Select_Column;
+  proposed_artist_addresses_and_splits_stream_cursor_input: Proposed_Artist_Addresses_And_Splits_Stream_Cursor_Input;
+  proposed_artist_addresses_and_splits_stream_cursor_value_input: Proposed_Artist_Addresses_And_Splits_Stream_Cursor_Value_Input;
+  query_root: ResolverTypeWrapper<{}>;
+  search_projects_args: Search_Projects_Args;
+  search_tags_args: Search_Tags_Args;
+  search_tokens_args: Search_Tokens_Args;
+  search_users_args: Search_Users_Args;
+  seed_float: ResolverTypeWrapper<Scalars['seed_float']>;
+  subscription_root: ResolverTypeWrapper<{}>;
+  tag_groupings_enum: Tag_Groupings_Enum;
+  tag_groupings_enum_comparison_exp: Tag_Groupings_Enum_Comparison_Exp;
+  tag_status_enum: Tag_Status_Enum;
+  tag_status_enum_comparison_exp: Tag_Status_Enum_Comparison_Exp;
+  tag_types_enum: Tag_Types_Enum;
+  tag_types_enum_comparison_exp: Tag_Types_Enum_Comparison_Exp;
+  tags: ResolverTypeWrapper<Tags>;
+  tags_bool_exp: Tags_Bool_Exp;
+  tags_order_by: Tags_Order_By;
+  tags_select_column: Tags_Select_Column;
+  tags_stream_cursor_input: Tags_Stream_Cursor_Input;
+  tags_stream_cursor_value_input: Tags_Stream_Cursor_Value_Input;
+  terms_of_service: ResolverTypeWrapper<Terms_Of_Service>;
+  terms_of_service_aggregate: ResolverTypeWrapper<Terms_Of_Service_Aggregate>;
+  terms_of_service_aggregate_fields: ResolverTypeWrapper<Terms_Of_Service_Aggregate_Fields>;
+  terms_of_service_avg_fields: ResolverTypeWrapper<Terms_Of_Service_Avg_Fields>;
+  terms_of_service_bool_exp: Terms_Of_Service_Bool_Exp;
+  terms_of_service_max_fields: ResolverTypeWrapper<Terms_Of_Service_Max_Fields>;
+  terms_of_service_min_fields: ResolverTypeWrapper<Terms_Of_Service_Min_Fields>;
+  terms_of_service_order_by: Terms_Of_Service_Order_By;
+  terms_of_service_select_column: Terms_Of_Service_Select_Column;
+  terms_of_service_stddev_fields: ResolverTypeWrapper<Terms_Of_Service_Stddev_Fields>;
+  terms_of_service_stddev_pop_fields: ResolverTypeWrapper<Terms_Of_Service_Stddev_Pop_Fields>;
+  terms_of_service_stddev_samp_fields: ResolverTypeWrapper<Terms_Of_Service_Stddev_Samp_Fields>;
+  terms_of_service_stream_cursor_input: Terms_Of_Service_Stream_Cursor_Input;
+  terms_of_service_stream_cursor_value_input: Terms_Of_Service_Stream_Cursor_Value_Input;
+  terms_of_service_sum_fields: ResolverTypeWrapper<Terms_Of_Service_Sum_Fields>;
+  terms_of_service_var_pop_fields: ResolverTypeWrapper<Terms_Of_Service_Var_Pop_Fields>;
+  terms_of_service_var_samp_fields: ResolverTypeWrapper<Terms_Of_Service_Var_Samp_Fields>;
+  terms_of_service_variance_fields: ResolverTypeWrapper<Terms_Of_Service_Variance_Fields>;
+  timestamp: ResolverTypeWrapper<Scalars['timestamp']>;
+  timestamp_comparison_exp: Timestamp_Comparison_Exp;
+  timestamptz: ResolverTypeWrapper<Scalars['timestamptz']>;
+  timestamptz_comparison_exp: Timestamptz_Comparison_Exp;
+  tokens_metadata: ResolverTypeWrapper<Tokens_Metadata>;
+  tokens_metadata_aggregate: ResolverTypeWrapper<Tokens_Metadata_Aggregate>;
+  tokens_metadata_aggregate_bool_exp: Tokens_Metadata_Aggregate_Bool_Exp;
+  tokens_metadata_aggregate_bool_exp_avg: Tokens_Metadata_Aggregate_Bool_Exp_Avg;
+  tokens_metadata_aggregate_bool_exp_corr: Tokens_Metadata_Aggregate_Bool_Exp_Corr;
+  tokens_metadata_aggregate_bool_exp_corr_arguments: Tokens_Metadata_Aggregate_Bool_Exp_Corr_Arguments;
+  tokens_metadata_aggregate_bool_exp_count: Tokens_Metadata_Aggregate_Bool_Exp_Count;
+  tokens_metadata_aggregate_bool_exp_covar_samp: Tokens_Metadata_Aggregate_Bool_Exp_Covar_Samp;
+  tokens_metadata_aggregate_bool_exp_covar_samp_arguments: Tokens_Metadata_Aggregate_Bool_Exp_Covar_Samp_Arguments;
+  tokens_metadata_aggregate_bool_exp_max: Tokens_Metadata_Aggregate_Bool_Exp_Max;
+  tokens_metadata_aggregate_bool_exp_min: Tokens_Metadata_Aggregate_Bool_Exp_Min;
+  tokens_metadata_aggregate_bool_exp_stddev_samp: Tokens_Metadata_Aggregate_Bool_Exp_Stddev_Samp;
+  tokens_metadata_aggregate_bool_exp_sum: Tokens_Metadata_Aggregate_Bool_Exp_Sum;
+  tokens_metadata_aggregate_bool_exp_var_samp: Tokens_Metadata_Aggregate_Bool_Exp_Var_Samp;
+  tokens_metadata_aggregate_fields: ResolverTypeWrapper<Tokens_Metadata_Aggregate_Fields>;
+  tokens_metadata_aggregate_order_by: Tokens_Metadata_Aggregate_Order_By;
+  tokens_metadata_avg_fields: ResolverTypeWrapper<Tokens_Metadata_Avg_Fields>;
+  tokens_metadata_avg_order_by: Tokens_Metadata_Avg_Order_By;
+  tokens_metadata_bool_exp: Tokens_Metadata_Bool_Exp;
+  tokens_metadata_max_fields: ResolverTypeWrapper<Tokens_Metadata_Max_Fields>;
+  tokens_metadata_max_order_by: Tokens_Metadata_Max_Order_By;
+  tokens_metadata_min_fields: ResolverTypeWrapper<Tokens_Metadata_Min_Fields>;
+  tokens_metadata_min_order_by: Tokens_Metadata_Min_Order_By;
+  tokens_metadata_order_by: Tokens_Metadata_Order_By;
+  tokens_metadata_select_column: Tokens_Metadata_Select_Column;
+  tokens_metadata_select_column_tokens_metadata_aggregate_bool_exp_avg_arguments_columns: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Avg_Arguments_Columns;
+  tokens_metadata_select_column_tokens_metadata_aggregate_bool_exp_corr_arguments_columns: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Corr_Arguments_Columns;
+  tokens_metadata_select_column_tokens_metadata_aggregate_bool_exp_covar_samp_arguments_columns: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Covar_Samp_Arguments_Columns;
+  tokens_metadata_select_column_tokens_metadata_aggregate_bool_exp_max_arguments_columns: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Max_Arguments_Columns;
+  tokens_metadata_select_column_tokens_metadata_aggregate_bool_exp_min_arguments_columns: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Min_Arguments_Columns;
+  tokens_metadata_select_column_tokens_metadata_aggregate_bool_exp_stddev_samp_arguments_columns: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Stddev_Samp_Arguments_Columns;
+  tokens_metadata_select_column_tokens_metadata_aggregate_bool_exp_sum_arguments_columns: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Sum_Arguments_Columns;
+  tokens_metadata_select_column_tokens_metadata_aggregate_bool_exp_var_samp_arguments_columns: Tokens_Metadata_Select_Column_Tokens_Metadata_Aggregate_Bool_Exp_Var_Samp_Arguments_Columns;
+  tokens_metadata_stddev_fields: ResolverTypeWrapper<Tokens_Metadata_Stddev_Fields>;
+  tokens_metadata_stddev_order_by: Tokens_Metadata_Stddev_Order_By;
+  tokens_metadata_stddev_pop_fields: ResolverTypeWrapper<Tokens_Metadata_Stddev_Pop_Fields>;
+  tokens_metadata_stddev_pop_order_by: Tokens_Metadata_Stddev_Pop_Order_By;
+  tokens_metadata_stddev_samp_fields: ResolverTypeWrapper<Tokens_Metadata_Stddev_Samp_Fields>;
+  tokens_metadata_stddev_samp_order_by: Tokens_Metadata_Stddev_Samp_Order_By;
+  tokens_metadata_stream_cursor_input: Tokens_Metadata_Stream_Cursor_Input;
+  tokens_metadata_stream_cursor_value_input: Tokens_Metadata_Stream_Cursor_Value_Input;
+  tokens_metadata_sum_fields: ResolverTypeWrapper<Tokens_Metadata_Sum_Fields>;
+  tokens_metadata_sum_order_by: Tokens_Metadata_Sum_Order_By;
+  tokens_metadata_var_pop_fields: ResolverTypeWrapper<Tokens_Metadata_Var_Pop_Fields>;
+  tokens_metadata_var_pop_order_by: Tokens_Metadata_Var_Pop_Order_By;
+  tokens_metadata_var_samp_fields: ResolverTypeWrapper<Tokens_Metadata_Var_Samp_Fields>;
+  tokens_metadata_var_samp_order_by: Tokens_Metadata_Var_Samp_Order_By;
+  tokens_metadata_variance_fields: ResolverTypeWrapper<Tokens_Metadata_Variance_Fields>;
+  tokens_metadata_variance_order_by: Tokens_Metadata_Variance_Order_By;
+  user_profiles: ResolverTypeWrapper<User_Profiles>;
+  user_profiles_aggregate: ResolverTypeWrapper<User_Profiles_Aggregate>;
+  user_profiles_aggregate_fields: ResolverTypeWrapper<User_Profiles_Aggregate_Fields>;
+  user_profiles_avg_fields: ResolverTypeWrapper<User_Profiles_Avg_Fields>;
+  user_profiles_bool_exp: User_Profiles_Bool_Exp;
+  user_profiles_max_fields: ResolverTypeWrapper<User_Profiles_Max_Fields>;
+  user_profiles_min_fields: ResolverTypeWrapper<User_Profiles_Min_Fields>;
+  user_profiles_order_by: User_Profiles_Order_By;
+  user_profiles_select_column: User_Profiles_Select_Column;
+  user_profiles_stddev_fields: ResolverTypeWrapper<User_Profiles_Stddev_Fields>;
+  user_profiles_stddev_pop_fields: ResolverTypeWrapper<User_Profiles_Stddev_Pop_Fields>;
+  user_profiles_stddev_samp_fields: ResolverTypeWrapper<User_Profiles_Stddev_Samp_Fields>;
+  user_profiles_stream_cursor_input: User_Profiles_Stream_Cursor_Input;
+  user_profiles_stream_cursor_value_input: User_Profiles_Stream_Cursor_Value_Input;
+  user_profiles_sum_fields: ResolverTypeWrapper<User_Profiles_Sum_Fields>;
+  user_profiles_var_pop_fields: ResolverTypeWrapper<User_Profiles_Var_Pop_Fields>;
+  user_profiles_var_samp_fields: ResolverTypeWrapper<User_Profiles_Var_Samp_Fields>;
+  user_profiles_variance_fields: ResolverTypeWrapper<User_Profiles_Variance_Fields>;
+  users: ResolverTypeWrapper<Users>;
+  users_aggregate: ResolverTypeWrapper<Users_Aggregate>;
+  users_aggregate_fields: ResolverTypeWrapper<Users_Aggregate_Fields>;
+  users_bool_exp: Users_Bool_Exp;
+  users_max_fields: ResolverTypeWrapper<Users_Max_Fields>;
+  users_min_fields: ResolverTypeWrapper<Users_Min_Fields>;
+  users_order_by: Users_Order_By;
+  users_select_column: Users_Select_Column;
+  users_stream_cursor_input: Users_Stream_Cursor_Input;
+  users_stream_cursor_value_input: Users_Stream_Cursor_Value_Input;
+  verticals: ResolverTypeWrapper<Verticals>;
+  verticals_bool_exp: Verticals_Bool_Exp;
+  verticals_enum: Verticals_Enum;
+  verticals_enum_comparison_exp: Verticals_Enum_Comparison_Exp;
+  verticals_order_by: Verticals_Order_By;
+  verticals_select_column: Verticals_Select_Column;
+  verticals_stream_cursor_input: Verticals_Stream_Cursor_Input;
+  verticals_stream_cursor_value_input: Verticals_Stream_Cursor_Value_Input;
+  webflow_artist_info: ResolverTypeWrapper<Webflow_Artist_Info>;
+  webflow_artist_info_bool_exp: Webflow_Artist_Info_Bool_Exp;
+  webflow_artist_info_order_by: Webflow_Artist_Info_Order_By;
+  webflow_artist_info_select_column: Webflow_Artist_Info_Select_Column;
+  webflow_artist_info_stream_cursor_input: Webflow_Artist_Info_Stream_Cursor_Input;
+  webflow_artist_info_stream_cursor_value_input: Webflow_Artist_Info_Stream_Cursor_Value_Input;
+  webflow_spectrum_articles: ResolverTypeWrapper<Webflow_Spectrum_Articles>;
+  webflow_spectrum_articles_bool_exp: Webflow_Spectrum_Articles_Bool_Exp;
+  webflow_spectrum_articles_order_by: Webflow_Spectrum_Articles_Order_By;
+  webflow_spectrum_articles_select_column: Webflow_Spectrum_Articles_Select_Column;
+  webflow_spectrum_articles_stream_cursor_input: Webflow_Spectrum_Articles_Stream_Cursor_Input;
+  webflow_spectrum_articles_stream_cursor_value_input: Webflow_Spectrum_Articles_Stream_Cursor_Value_Input;
 };
 
-export type GetProjectStartTimesQueryVariables = Exact<{
-  first: Scalars['Int'];
-  skip?: InputMaybe<Scalars['Int']>;
-}>;
+/** Mapping between all available schema types and the resolvers parents */
+export type ResolversParentTypes = {
+  Boolean: Scalars['Boolean'];
+  Boolean_comparison_exp: Boolean_Comparison_Exp;
+  Float: Scalars['Float'];
+  Int: Scalars['Int'];
+  Int_comparison_exp: Int_Comparison_Exp;
+  OpenseaCollectionData: OpenseaCollectionData;
+  String: Scalars['String'];
+  String_comparison_exp: String_Comparison_Exp;
+  bigint: Scalars['bigint'];
+  bigint_comparison_exp: Bigint_Comparison_Exp;
+  categories: Categories;
+  categories_bool_exp: Categories_Bool_Exp;
+  categories_enum_comparison_exp: Categories_Enum_Comparison_Exp;
+  categories_order_by: Categories_Order_By;
+  categories_stream_cursor_input: Categories_Stream_Cursor_Input;
+  categories_stream_cursor_value_input: Categories_Stream_Cursor_Value_Input;
+  contract_allowlistings: Contract_Allowlistings;
+  contract_allowlistings_aggregate_order_by: Contract_Allowlistings_Aggregate_Order_By;
+  contract_allowlistings_bool_exp: Contract_Allowlistings_Bool_Exp;
+  contract_allowlistings_max_order_by: Contract_Allowlistings_Max_Order_By;
+  contract_allowlistings_min_order_by: Contract_Allowlistings_Min_Order_By;
+  contract_allowlistings_order_by: Contract_Allowlistings_Order_By;
+  contract_allowlistings_stream_cursor_input: Contract_Allowlistings_Stream_Cursor_Input;
+  contract_allowlistings_stream_cursor_value_input: Contract_Allowlistings_Stream_Cursor_Value_Input;
+  contract_type_names: Contract_Type_Names;
+  contract_type_names_bool_exp: Contract_Type_Names_Bool_Exp;
+  contract_type_names_enum_comparison_exp: Contract_Type_Names_Enum_Comparison_Exp;
+  contract_type_names_order_by: Contract_Type_Names_Order_By;
+  contract_type_names_stream_cursor_input: Contract_Type_Names_Stream_Cursor_Input;
+  contract_type_names_stream_cursor_value_input: Contract_Type_Names_Stream_Cursor_Value_Input;
+  contract_types: Contract_Types;
+  contract_types_bool_exp: Contract_Types_Bool_Exp;
+  contract_types_order_by: Contract_Types_Order_By;
+  contract_types_stream_cursor_input: Contract_Types_Stream_Cursor_Input;
+  contract_types_stream_cursor_value_input: Contract_Types_Stream_Cursor_Value_Input;
+  contracts_metadata: Contracts_Metadata;
+  contracts_metadata_aggregate: Contracts_Metadata_Aggregate;
+  contracts_metadata_aggregate_fields: Contracts_Metadata_Aggregate_Fields;
+  contracts_metadata_avg_fields: Contracts_Metadata_Avg_Fields;
+  contracts_metadata_bool_exp: Contracts_Metadata_Bool_Exp;
+  contracts_metadata_max_fields: Contracts_Metadata_Max_Fields;
+  contracts_metadata_min_fields: Contracts_Metadata_Min_Fields;
+  contracts_metadata_order_by: Contracts_Metadata_Order_By;
+  contracts_metadata_stddev_fields: Contracts_Metadata_Stddev_Fields;
+  contracts_metadata_stddev_pop_fields: Contracts_Metadata_Stddev_Pop_Fields;
+  contracts_metadata_stddev_samp_fields: Contracts_Metadata_Stddev_Samp_Fields;
+  contracts_metadata_stream_cursor_input: Contracts_Metadata_Stream_Cursor_Input;
+  contracts_metadata_stream_cursor_value_input: Contracts_Metadata_Stream_Cursor_Value_Input;
+  contracts_metadata_sum_fields: Contracts_Metadata_Sum_Fields;
+  contracts_metadata_var_pop_fields: Contracts_Metadata_Var_Pop_Fields;
+  contracts_metadata_var_samp_fields: Contracts_Metadata_Var_Samp_Fields;
+  contracts_metadata_variance_fields: Contracts_Metadata_Variance_Fields;
+  curation_statuses_enum_comparison_exp: Curation_Statuses_Enum_Comparison_Exp;
+  entity_tags: Entity_Tags;
+  entity_tags_aggregate_order_by: Entity_Tags_Aggregate_Order_By;
+  entity_tags_avg_order_by: Entity_Tags_Avg_Order_By;
+  entity_tags_bool_exp: Entity_Tags_Bool_Exp;
+  entity_tags_max_order_by: Entity_Tags_Max_Order_By;
+  entity_tags_min_order_by: Entity_Tags_Min_Order_By;
+  entity_tags_order_by: Entity_Tags_Order_By;
+  entity_tags_stddev_order_by: Entity_Tags_Stddev_Order_By;
+  entity_tags_stddev_pop_order_by: Entity_Tags_Stddev_Pop_Order_By;
+  entity_tags_stddev_samp_order_by: Entity_Tags_Stddev_Samp_Order_By;
+  entity_tags_stream_cursor_input: Entity_Tags_Stream_Cursor_Input;
+  entity_tags_stream_cursor_value_input: Entity_Tags_Stream_Cursor_Value_Input;
+  entity_tags_sum_order_by: Entity_Tags_Sum_Order_By;
+  entity_tags_var_pop_order_by: Entity_Tags_Var_Pop_Order_By;
+  entity_tags_var_samp_order_by: Entity_Tags_Var_Samp_Order_By;
+  entity_tags_variance_order_by: Entity_Tags_Variance_Order_By;
+  favorites: Favorites;
+  favorites_aggregate: Favorites_Aggregate;
+  favorites_aggregate_bool_exp: Favorites_Aggregate_Bool_Exp;
+  favorites_aggregate_bool_exp_count: Favorites_Aggregate_Bool_Exp_Count;
+  favorites_aggregate_fields: Favorites_Aggregate_Fields;
+  favorites_aggregate_order_by: Favorites_Aggregate_Order_By;
+  favorites_avg_fields: Favorites_Avg_Fields;
+  favorites_avg_order_by: Favorites_Avg_Order_By;
+  favorites_bool_exp: Favorites_Bool_Exp;
+  favorites_max_fields: Favorites_Max_Fields;
+  favorites_max_order_by: Favorites_Max_Order_By;
+  favorites_min_fields: Favorites_Min_Fields;
+  favorites_min_order_by: Favorites_Min_Order_By;
+  favorites_order_by: Favorites_Order_By;
+  favorites_stddev_fields: Favorites_Stddev_Fields;
+  favorites_stddev_order_by: Favorites_Stddev_Order_By;
+  favorites_stddev_pop_fields: Favorites_Stddev_Pop_Fields;
+  favorites_stddev_pop_order_by: Favorites_Stddev_Pop_Order_By;
+  favorites_stddev_samp_fields: Favorites_Stddev_Samp_Fields;
+  favorites_stddev_samp_order_by: Favorites_Stddev_Samp_Order_By;
+  favorites_stream_cursor_input: Favorites_Stream_Cursor_Input;
+  favorites_stream_cursor_value_input: Favorites_Stream_Cursor_Value_Input;
+  favorites_sum_fields: Favorites_Sum_Fields;
+  favorites_sum_order_by: Favorites_Sum_Order_By;
+  favorites_var_pop_fields: Favorites_Var_Pop_Fields;
+  favorites_var_pop_order_by: Favorites_Var_Pop_Order_By;
+  favorites_var_samp_fields: Favorites_Var_Samp_Fields;
+  favorites_var_samp_order_by: Favorites_Var_Samp_Order_By;
+  favorites_variance_fields: Favorites_Variance_Fields;
+  favorites_variance_order_by: Favorites_Variance_Order_By;
+  feature_flags: Feature_Flags;
+  feature_flags_bool_exp: Feature_Flags_Bool_Exp;
+  feature_flags_order_by: Feature_Flags_Order_By;
+  feature_flags_stream_cursor_input: Feature_Flags_Stream_Cursor_Input;
+  feature_flags_stream_cursor_value_input: Feature_Flags_Stream_Cursor_Value_Input;
+  featured_token_projects_metadata_args: Featured_Token_Projects_Metadata_Args;
+  filter_tokens_metadata_by_features_args: Filter_Tokens_Metadata_By_Features_Args;
+  float8: Scalars['float8'];
+  float8_comparison_exp: Float8_Comparison_Exp;
+  jsonb: Scalars['jsonb'];
+  jsonb_cast_exp: Jsonb_Cast_Exp;
+  jsonb_comparison_exp: Jsonb_Comparison_Exp;
+  jsonpath: Scalars['jsonpath'];
+  list_projects_metadata_random_args: List_Projects_Metadata_Random_Args;
+  media: Media;
+  media_bool_exp: Media_Bool_Exp;
+  media_order_by: Media_Order_By;
+  media_stream_cursor_input: Media_Stream_Cursor_Input;
+  media_stream_cursor_value_input: Media_Stream_Cursor_Value_Input;
+  minter_filters_metadata: Minter_Filters_Metadata;
+  minter_filters_metadata_bool_exp: Minter_Filters_Metadata_Bool_Exp;
+  minter_filters_metadata_order_by: Minter_Filters_Metadata_Order_By;
+  minter_filters_metadata_stream_cursor_input: Minter_Filters_Metadata_Stream_Cursor_Input;
+  minter_filters_metadata_stream_cursor_value_input: Minter_Filters_Metadata_Stream_Cursor_Value_Input;
+  minter_type_names_enum_comparison_exp: Minter_Type_Names_Enum_Comparison_Exp;
+  minter_types: Minter_Types;
+  minter_types_bool_exp: Minter_Types_Bool_Exp;
+  minter_types_order_by: Minter_Types_Order_By;
+  minter_types_stream_cursor_input: Minter_Types_Stream_Cursor_Input;
+  minter_types_stream_cursor_value_input: Minter_Types_Stream_Cursor_Value_Input;
+  minters_metadata: Minters_Metadata;
+  minters_metadata_aggregate_order_by: Minters_Metadata_Aggregate_Order_By;
+  minters_metadata_avg_order_by: Minters_Metadata_Avg_Order_By;
+  minters_metadata_bool_exp: Minters_Metadata_Bool_Exp;
+  minters_metadata_max_order_by: Minters_Metadata_Max_Order_By;
+  minters_metadata_min_order_by: Minters_Metadata_Min_Order_By;
+  minters_metadata_order_by: Minters_Metadata_Order_By;
+  minters_metadata_stddev_order_by: Minters_Metadata_Stddev_Order_By;
+  minters_metadata_stddev_pop_order_by: Minters_Metadata_Stddev_Pop_Order_By;
+  minters_metadata_stddev_samp_order_by: Minters_Metadata_Stddev_Samp_Order_By;
+  minters_metadata_stream_cursor_input: Minters_Metadata_Stream_Cursor_Input;
+  minters_metadata_stream_cursor_value_input: Minters_Metadata_Stream_Cursor_Value_Input;
+  minters_metadata_sum_order_by: Minters_Metadata_Sum_Order_By;
+  minters_metadata_var_pop_order_by: Minters_Metadata_Var_Pop_Order_By;
+  minters_metadata_var_samp_order_by: Minters_Metadata_Var_Samp_Order_By;
+  minters_metadata_variance_order_by: Minters_Metadata_Variance_Order_By;
+  numeric: Scalars['numeric'];
+  numeric_comparison_exp: Numeric_Comparison_Exp;
+  project_external_asset_dependencies: Project_External_Asset_Dependencies;
+  project_external_asset_dependencies_aggregate_order_by: Project_External_Asset_Dependencies_Aggregate_Order_By;
+  project_external_asset_dependencies_avg_order_by: Project_External_Asset_Dependencies_Avg_Order_By;
+  project_external_asset_dependencies_bool_exp: Project_External_Asset_Dependencies_Bool_Exp;
+  project_external_asset_dependencies_max_order_by: Project_External_Asset_Dependencies_Max_Order_By;
+  project_external_asset_dependencies_min_order_by: Project_External_Asset_Dependencies_Min_Order_By;
+  project_external_asset_dependencies_order_by: Project_External_Asset_Dependencies_Order_By;
+  project_external_asset_dependencies_stddev_order_by: Project_External_Asset_Dependencies_Stddev_Order_By;
+  project_external_asset_dependencies_stddev_pop_order_by: Project_External_Asset_Dependencies_Stddev_Pop_Order_By;
+  project_external_asset_dependencies_stddev_samp_order_by: Project_External_Asset_Dependencies_Stddev_Samp_Order_By;
+  project_external_asset_dependencies_stream_cursor_input: Project_External_Asset_Dependencies_Stream_Cursor_Input;
+  project_external_asset_dependencies_stream_cursor_value_input: Project_External_Asset_Dependencies_Stream_Cursor_Value_Input;
+  project_external_asset_dependencies_sum_order_by: Project_External_Asset_Dependencies_Sum_Order_By;
+  project_external_asset_dependencies_var_pop_order_by: Project_External_Asset_Dependencies_Var_Pop_Order_By;
+  project_external_asset_dependencies_var_samp_order_by: Project_External_Asset_Dependencies_Var_Samp_Order_By;
+  project_external_asset_dependencies_variance_order_by: Project_External_Asset_Dependencies_Variance_Order_By;
+  project_external_asset_dependency_types_enum_comparison_exp: Project_External_Asset_Dependency_Types_Enum_Comparison_Exp;
+  project_minter_configurations: Project_Minter_Configurations;
+  project_minter_configurations_bool_exp: Project_Minter_Configurations_Bool_Exp;
+  project_minter_configurations_order_by: Project_Minter_Configurations_Order_By;
+  project_minter_configurations_stream_cursor_input: Project_Minter_Configurations_Stream_Cursor_Input;
+  project_minter_configurations_stream_cursor_value_input: Project_Minter_Configurations_Stream_Cursor_Value_Input;
+  project_scripts: Project_Scripts;
+  project_scripts_aggregate_order_by: Project_Scripts_Aggregate_Order_By;
+  project_scripts_avg_order_by: Project_Scripts_Avg_Order_By;
+  project_scripts_bool_exp: Project_Scripts_Bool_Exp;
+  project_scripts_max_order_by: Project_Scripts_Max_Order_By;
+  project_scripts_min_order_by: Project_Scripts_Min_Order_By;
+  project_scripts_order_by: Project_Scripts_Order_By;
+  project_scripts_stddev_order_by: Project_Scripts_Stddev_Order_By;
+  project_scripts_stddev_pop_order_by: Project_Scripts_Stddev_Pop_Order_By;
+  project_scripts_stddev_samp_order_by: Project_Scripts_Stddev_Samp_Order_By;
+  project_scripts_stream_cursor_input: Project_Scripts_Stream_Cursor_Input;
+  project_scripts_stream_cursor_value_input: Project_Scripts_Stream_Cursor_Value_Input;
+  project_scripts_sum_order_by: Project_Scripts_Sum_Order_By;
+  project_scripts_var_pop_order_by: Project_Scripts_Var_Pop_Order_By;
+  project_scripts_var_samp_order_by: Project_Scripts_Var_Samp_Order_By;
+  project_scripts_variance_order_by: Project_Scripts_Variance_Order_By;
+  project_series: Project_Series;
+  project_series_aggregate: Project_Series_Aggregate;
+  project_series_aggregate_fields: Project_Series_Aggregate_Fields;
+  project_series_avg_fields: Project_Series_Avg_Fields;
+  project_series_bool_exp: Project_Series_Bool_Exp;
+  project_series_max_fields: Project_Series_Max_Fields;
+  project_series_min_fields: Project_Series_Min_Fields;
+  project_series_order_by: Project_Series_Order_By;
+  project_series_stddev_fields: Project_Series_Stddev_Fields;
+  project_series_stddev_pop_fields: Project_Series_Stddev_Pop_Fields;
+  project_series_stddev_samp_fields: Project_Series_Stddev_Samp_Fields;
+  project_series_stream_cursor_input: Project_Series_Stream_Cursor_Input;
+  project_series_stream_cursor_value_input: Project_Series_Stream_Cursor_Value_Input;
+  project_series_sum_fields: Project_Series_Sum_Fields;
+  project_series_var_pop_fields: Project_Series_Var_Pop_Fields;
+  project_series_var_samp_fields: Project_Series_Var_Samp_Fields;
+  project_series_variance_fields: Project_Series_Variance_Fields;
+  project_vertical_categories: Project_Vertical_Categories;
+  project_vertical_categories_bool_exp: Project_Vertical_Categories_Bool_Exp;
+  project_vertical_categories_order_by: Project_Vertical_Categories_Order_By;
+  project_vertical_categories_stream_cursor_input: Project_Vertical_Categories_Stream_Cursor_Input;
+  project_vertical_categories_stream_cursor_value_input: Project_Vertical_Categories_Stream_Cursor_Value_Input;
+  project_verticals: Project_Verticals;
+  project_verticals_aggregate_order_by: Project_Verticals_Aggregate_Order_By;
+  project_verticals_bool_exp: Project_Verticals_Bool_Exp;
+  project_verticals_max_order_by: Project_Verticals_Max_Order_By;
+  project_verticals_min_order_by: Project_Verticals_Min_Order_By;
+  project_verticals_order_by: Project_Verticals_Order_By;
+  project_verticals_stream_cursor_input: Project_Verticals_Stream_Cursor_Input;
+  project_verticals_stream_cursor_value_input: Project_Verticals_Stream_Cursor_Value_Input;
+  projects_features: Projects_Features;
+  projects_features_bool_exp: Projects_Features_Bool_Exp;
+  projects_features_order_by: Projects_Features_Order_By;
+  projects_features_stream_cursor_input: Projects_Features_Stream_Cursor_Input;
+  projects_features_stream_cursor_value_input: Projects_Features_Stream_Cursor_Value_Input;
+  projects_metadata: Projects_Metadata;
+  projects_metadata_aggregate: Projects_Metadata_Aggregate;
+  projects_metadata_aggregate_bool_exp: Projects_Metadata_Aggregate_Bool_Exp;
+  projects_metadata_aggregate_bool_exp_bool_and: Projects_Metadata_Aggregate_Bool_Exp_Bool_And;
+  projects_metadata_aggregate_bool_exp_bool_or: Projects_Metadata_Aggregate_Bool_Exp_Bool_Or;
+  projects_metadata_aggregate_bool_exp_count: Projects_Metadata_Aggregate_Bool_Exp_Count;
+  projects_metadata_aggregate_fields: Projects_Metadata_Aggregate_Fields;
+  projects_metadata_aggregate_order_by: Projects_Metadata_Aggregate_Order_By;
+  projects_metadata_avg_fields: Projects_Metadata_Avg_Fields;
+  projects_metadata_avg_order_by: Projects_Metadata_Avg_Order_By;
+  projects_metadata_bool_exp: Projects_Metadata_Bool_Exp;
+  projects_metadata_max_fields: Projects_Metadata_Max_Fields;
+  projects_metadata_max_order_by: Projects_Metadata_Max_Order_By;
+  projects_metadata_min_fields: Projects_Metadata_Min_Fields;
+  projects_metadata_min_order_by: Projects_Metadata_Min_Order_By;
+  projects_metadata_order_by: Projects_Metadata_Order_By;
+  projects_metadata_stddev_fields: Projects_Metadata_Stddev_Fields;
+  projects_metadata_stddev_order_by: Projects_Metadata_Stddev_Order_By;
+  projects_metadata_stddev_pop_fields: Projects_Metadata_Stddev_Pop_Fields;
+  projects_metadata_stddev_pop_order_by: Projects_Metadata_Stddev_Pop_Order_By;
+  projects_metadata_stddev_samp_fields: Projects_Metadata_Stddev_Samp_Fields;
+  projects_metadata_stddev_samp_order_by: Projects_Metadata_Stddev_Samp_Order_By;
+  projects_metadata_stream_cursor_input: Projects_Metadata_Stream_Cursor_Input;
+  projects_metadata_stream_cursor_value_input: Projects_Metadata_Stream_Cursor_Value_Input;
+  projects_metadata_sum_fields: Projects_Metadata_Sum_Fields;
+  projects_metadata_sum_order_by: Projects_Metadata_Sum_Order_By;
+  projects_metadata_var_pop_fields: Projects_Metadata_Var_Pop_Fields;
+  projects_metadata_var_pop_order_by: Projects_Metadata_Var_Pop_Order_By;
+  projects_metadata_var_samp_fields: Projects_Metadata_Var_Samp_Fields;
+  projects_metadata_var_samp_order_by: Projects_Metadata_Var_Samp_Order_By;
+  projects_metadata_variance_fields: Projects_Metadata_Variance_Fields;
+  projects_metadata_variance_order_by: Projects_Metadata_Variance_Order_By;
+  proposed_artist_addresses_and_splits: Proposed_Artist_Addresses_And_Splits;
+  proposed_artist_addresses_and_splits_bool_exp: Proposed_Artist_Addresses_And_Splits_Bool_Exp;
+  proposed_artist_addresses_and_splits_order_by: Proposed_Artist_Addresses_And_Splits_Order_By;
+  proposed_artist_addresses_and_splits_stream_cursor_input: Proposed_Artist_Addresses_And_Splits_Stream_Cursor_Input;
+  proposed_artist_addresses_and_splits_stream_cursor_value_input: Proposed_Artist_Addresses_And_Splits_Stream_Cursor_Value_Input;
+  query_root: {};
+  search_projects_args: Search_Projects_Args;
+  search_tags_args: Search_Tags_Args;
+  search_tokens_args: Search_Tokens_Args;
+  search_users_args: Search_Users_Args;
+  seed_float: Scalars['seed_float'];
+  subscription_root: {};
+  tag_groupings_enum_comparison_exp: Tag_Groupings_Enum_Comparison_Exp;
+  tag_status_enum_comparison_exp: Tag_Status_Enum_Comparison_Exp;
+  tag_types_enum_comparison_exp: Tag_Types_Enum_Comparison_Exp;
+  tags: Tags;
+  tags_bool_exp: Tags_Bool_Exp;
+  tags_order_by: Tags_Order_By;
+  tags_stream_cursor_input: Tags_Stream_Cursor_Input;
+  tags_stream_cursor_value_input: Tags_Stream_Cursor_Value_Input;
+  terms_of_service: Terms_Of_Service;
+  terms_of_service_aggregate: Terms_Of_Service_Aggregate;
+  terms_of_service_aggregate_fields: Terms_Of_Service_Aggregate_Fields;
+  terms_of_service_avg_fields: Terms_Of_Service_Avg_Fields;
+  terms_of_service_bool_exp: Terms_Of_Service_Bool_Exp;
+  terms_of_service_max_fields: Terms_Of_Service_Max_Fields;
+  terms_of_service_min_fields: Terms_Of_Service_Min_Fields;
+  terms_of_service_order_by: Terms_Of_Service_Order_By;
+  terms_of_service_stddev_fields: Terms_Of_Service_Stddev_Fields;
+  terms_of_service_stddev_pop_fields: Terms_Of_Service_Stddev_Pop_Fields;
+  terms_of_service_stddev_samp_fields: Terms_Of_Service_Stddev_Samp_Fields;
+  terms_of_service_stream_cursor_input: Terms_Of_Service_Stream_Cursor_Input;
+  terms_of_service_stream_cursor_value_input: Terms_Of_Service_Stream_Cursor_Value_Input;
+  terms_of_service_sum_fields: Terms_Of_Service_Sum_Fields;
+  terms_of_service_var_pop_fields: Terms_Of_Service_Var_Pop_Fields;
+  terms_of_service_var_samp_fields: Terms_Of_Service_Var_Samp_Fields;
+  terms_of_service_variance_fields: Terms_Of_Service_Variance_Fields;
+  timestamp: Scalars['timestamp'];
+  timestamp_comparison_exp: Timestamp_Comparison_Exp;
+  timestamptz: Scalars['timestamptz'];
+  timestamptz_comparison_exp: Timestamptz_Comparison_Exp;
+  tokens_metadata: Tokens_Metadata;
+  tokens_metadata_aggregate: Tokens_Metadata_Aggregate;
+  tokens_metadata_aggregate_bool_exp: Tokens_Metadata_Aggregate_Bool_Exp;
+  tokens_metadata_aggregate_bool_exp_avg: Tokens_Metadata_Aggregate_Bool_Exp_Avg;
+  tokens_metadata_aggregate_bool_exp_corr: Tokens_Metadata_Aggregate_Bool_Exp_Corr;
+  tokens_metadata_aggregate_bool_exp_corr_arguments: Tokens_Metadata_Aggregate_Bool_Exp_Corr_Arguments;
+  tokens_metadata_aggregate_bool_exp_count: Tokens_Metadata_Aggregate_Bool_Exp_Count;
+  tokens_metadata_aggregate_bool_exp_covar_samp: Tokens_Metadata_Aggregate_Bool_Exp_Covar_Samp;
+  tokens_metadata_aggregate_bool_exp_covar_samp_arguments: Tokens_Metadata_Aggregate_Bool_Exp_Covar_Samp_Arguments;
+  tokens_metadata_aggregate_bool_exp_max: Tokens_Metadata_Aggregate_Bool_Exp_Max;
+  tokens_metadata_aggregate_bool_exp_min: Tokens_Metadata_Aggregate_Bool_Exp_Min;
+  tokens_metadata_aggregate_bool_exp_stddev_samp: Tokens_Metadata_Aggregate_Bool_Exp_Stddev_Samp;
+  tokens_metadata_aggregate_bool_exp_sum: Tokens_Metadata_Aggregate_Bool_Exp_Sum;
+  tokens_metadata_aggregate_bool_exp_var_samp: Tokens_Metadata_Aggregate_Bool_Exp_Var_Samp;
+  tokens_metadata_aggregate_fields: Tokens_Metadata_Aggregate_Fields;
+  tokens_metadata_aggregate_order_by: Tokens_Metadata_Aggregate_Order_By;
+  tokens_metadata_avg_fields: Tokens_Metadata_Avg_Fields;
+  tokens_metadata_avg_order_by: Tokens_Metadata_Avg_Order_By;
+  tokens_metadata_bool_exp: Tokens_Metadata_Bool_Exp;
+  tokens_metadata_max_fields: Tokens_Metadata_Max_Fields;
+  tokens_metadata_max_order_by: Tokens_Metadata_Max_Order_By;
+  tokens_metadata_min_fields: Tokens_Metadata_Min_Fields;
+  tokens_metadata_min_order_by: Tokens_Metadata_Min_Order_By;
+  tokens_metadata_order_by: Tokens_Metadata_Order_By;
+  tokens_metadata_stddev_fields: Tokens_Metadata_Stddev_Fields;
+  tokens_metadata_stddev_order_by: Tokens_Metadata_Stddev_Order_By;
+  tokens_metadata_stddev_pop_fields: Tokens_Metadata_Stddev_Pop_Fields;
+  tokens_metadata_stddev_pop_order_by: Tokens_Metadata_Stddev_Pop_Order_By;
+  tokens_metadata_stddev_samp_fields: Tokens_Metadata_Stddev_Samp_Fields;
+  tokens_metadata_stddev_samp_order_by: Tokens_Metadata_Stddev_Samp_Order_By;
+  tokens_metadata_stream_cursor_input: Tokens_Metadata_Stream_Cursor_Input;
+  tokens_metadata_stream_cursor_value_input: Tokens_Metadata_Stream_Cursor_Value_Input;
+  tokens_metadata_sum_fields: Tokens_Metadata_Sum_Fields;
+  tokens_metadata_sum_order_by: Tokens_Metadata_Sum_Order_By;
+  tokens_metadata_var_pop_fields: Tokens_Metadata_Var_Pop_Fields;
+  tokens_metadata_var_pop_order_by: Tokens_Metadata_Var_Pop_Order_By;
+  tokens_metadata_var_samp_fields: Tokens_Metadata_Var_Samp_Fields;
+  tokens_metadata_var_samp_order_by: Tokens_Metadata_Var_Samp_Order_By;
+  tokens_metadata_variance_fields: Tokens_Metadata_Variance_Fields;
+  tokens_metadata_variance_order_by: Tokens_Metadata_Variance_Order_By;
+  user_profiles: User_Profiles;
+  user_profiles_aggregate: User_Profiles_Aggregate;
+  user_profiles_aggregate_fields: User_Profiles_Aggregate_Fields;
+  user_profiles_avg_fields: User_Profiles_Avg_Fields;
+  user_profiles_bool_exp: User_Profiles_Bool_Exp;
+  user_profiles_max_fields: User_Profiles_Max_Fields;
+  user_profiles_min_fields: User_Profiles_Min_Fields;
+  user_profiles_order_by: User_Profiles_Order_By;
+  user_profiles_stddev_fields: User_Profiles_Stddev_Fields;
+  user_profiles_stddev_pop_fields: User_Profiles_Stddev_Pop_Fields;
+  user_profiles_stddev_samp_fields: User_Profiles_Stddev_Samp_Fields;
+  user_profiles_stream_cursor_input: User_Profiles_Stream_Cursor_Input;
+  user_profiles_stream_cursor_value_input: User_Profiles_Stream_Cursor_Value_Input;
+  user_profiles_sum_fields: User_Profiles_Sum_Fields;
+  user_profiles_var_pop_fields: User_Profiles_Var_Pop_Fields;
+  user_profiles_var_samp_fields: User_Profiles_Var_Samp_Fields;
+  user_profiles_variance_fields: User_Profiles_Variance_Fields;
+  users: Users;
+  users_aggregate: Users_Aggregate;
+  users_aggregate_fields: Users_Aggregate_Fields;
+  users_bool_exp: Users_Bool_Exp;
+  users_max_fields: Users_Max_Fields;
+  users_min_fields: Users_Min_Fields;
+  users_order_by: Users_Order_By;
+  users_stream_cursor_input: Users_Stream_Cursor_Input;
+  users_stream_cursor_value_input: Users_Stream_Cursor_Value_Input;
+  verticals: Verticals;
+  verticals_bool_exp: Verticals_Bool_Exp;
+  verticals_enum_comparison_exp: Verticals_Enum_Comparison_Exp;
+  verticals_order_by: Verticals_Order_By;
+  verticals_stream_cursor_input: Verticals_Stream_Cursor_Input;
+  verticals_stream_cursor_value_input: Verticals_Stream_Cursor_Value_Input;
+  webflow_artist_info: Webflow_Artist_Info;
+  webflow_artist_info_bool_exp: Webflow_Artist_Info_Bool_Exp;
+  webflow_artist_info_order_by: Webflow_Artist_Info_Order_By;
+  webflow_artist_info_stream_cursor_input: Webflow_Artist_Info_Stream_Cursor_Input;
+  webflow_artist_info_stream_cursor_value_input: Webflow_Artist_Info_Stream_Cursor_Value_Input;
+  webflow_spectrum_articles: Webflow_Spectrum_Articles;
+  webflow_spectrum_articles_bool_exp: Webflow_Spectrum_Articles_Bool_Exp;
+  webflow_spectrum_articles_order_by: Webflow_Spectrum_Articles_Order_By;
+  webflow_spectrum_articles_stream_cursor_input: Webflow_Spectrum_Articles_Stream_Cursor_Input;
+  webflow_spectrum_articles_stream_cursor_value_input: Webflow_Spectrum_Articles_Stream_Cursor_Value_Input;
+};
 
+export type CachedDirectiveArgs = {
+  refresh?: Scalars['Boolean'];
+  ttl?: Scalars['Int'];
+};
 
-export type GetProjectStartTimesQuery = { __typename?: 'query_root', projects_metadata: Array<{ __typename?: 'projects_metadata', id: string, start_datetime?: string | null | undefined }> };
+export type CachedDirectiveResolver<Result, Parent, ContextType = any, Args = CachedDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export type GetAllProjectsCurationStatusQueryVariables = Exact<{
-  first: Scalars['Int'];
-  skip?: InputMaybe<Scalars['Int']>;
-}>;
+export type OpenseaCollectionDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['OpenseaCollectionData'] = ResolversParentTypes['OpenseaCollectionData']> = {
+  projectId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
-
-export type GetAllProjectsCurationStatusQuery = { __typename?: 'query_root', projects_metadata: Array<{ __typename?: 'projects_metadata', id: string, vertical_name: string, heritage_curation_status?: string | null | undefined, vertical: { __typename?: 'project_verticals', category_name: string } }> };
-
-
-export const GetProjectStartTimesDocument = gql`
-    query getProjectStartTimes($first: Int!, $skip: Int) {
-  projects_metadata(limit: $first, offset: $skip) {
-    id
-    start_datetime
-  }
+export interface BigintScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['bigint'], any> {
+  name: 'bigint';
 }
-    `;
-export const GetAllProjectsCurationStatusDocument = gql`
-    query getAllProjectsCurationStatus($first: Int!, $skip: Int) {
-  projects_metadata(limit: $first, offset: $skip) {
-    id
-    vertical_name
-    heritage_curation_status
-    vertical {
-      category_name
-    }
-  }
-}
-    `;
 
-export const GetProjectStartTimesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getProjectStartTimes"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"start_datetime"}}]}}]}}]} as unknown as DocumentNode<GetProjectStartTimesQuery, GetProjectStartTimesQueryVariables>;
-export const GetAllProjectsCurationStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getAllProjectsCurationStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"vertical_name"}},{"kind":"Field","name":{"kind":"Name","value":"heritage_curation_status"}},{"kind":"Field","name":{"kind":"Name","value":"vertical"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"category_name"}}]}}]}}]}}]} as unknown as DocumentNode<GetAllProjectsCurationStatusQuery, GetAllProjectsCurationStatusQueryVariables>;
+export type CategoriesResolvers<ContextType = any, ParentType extends ResolversParentTypes['categories'] = ResolversParentTypes['categories']> = {
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  project_vertical_category?: Resolver<Maybe<ResolversTypes['project_vertical_categories']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contract_AllowlistingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['contract_allowlistings'] = ResolversParentTypes['contract_allowlistings']> = {
+  contract?: Resolver<Maybe<ResolversTypes['contracts_metadata']>, ParentType, ContextType>;
+  contract_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  user?: Resolver<Maybe<ResolversTypes['users']>, ParentType, ContextType>;
+  user_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contract_Type_NamesResolvers<ContextType = any, ParentType extends ResolversParentTypes['contract_type_names'] = ResolversParentTypes['contract_type_names']> = {
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contract_TypesResolvers<ContextType = any, ParentType extends ResolversParentTypes['contract_types'] = ResolversParentTypes['contract_types']> = {
+  abi?: Resolver<Maybe<ResolversTypes['jsonb']>, ParentType, ContextType, Partial<Contract_TypesAbiArgs>>;
+  type?: Resolver<ResolversTypes['contract_type_names_enum'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contracts_MetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['contracts_metadata'] = ResolversParentTypes['contracts_metadata']> = {
+  address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  admin?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  allowlisted_users?: Resolver<Array<ResolversTypes['contract_allowlistings']>, ParentType, ContextType, Partial<Contracts_MetadataAllowlisted_UsersArgs>>;
+  bucket_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  contract_type?: Resolver<ResolversTypes['contract_type_names_enum'], ParentType, ContextType>;
+  curation_registry_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  default_vertical?: Resolver<Maybe<ResolversTypes['project_verticals']>, ParentType, ContextType>;
+  dependency_registry_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  generator_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  minter_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  minter_filter?: Resolver<Maybe<ResolversTypes['minter_filters_metadata']>, ParentType, ContextType>;
+  minter_filter_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  new_projects_forbidden?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  new_projects_forbidden_offchain?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  new_projects_forbidden_onchain?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  preferred_arweave_gateway?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  preferred_ipfs_gateway?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  projects?: Resolver<Array<ResolversTypes['projects_metadata']>, ParentType, ContextType, Partial<Contracts_MetadataProjectsArgs>>;
+  projects_aggregate?: Resolver<ResolversTypes['projects_metadata_aggregate'], ParentType, ContextType, Partial<Contracts_MetadataProjects_AggregateArgs>>;
+  render_provider_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  render_provider_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  render_provider_secondary_sales_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  render_provider_secondary_sales_bps?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  token_base_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  type?: Resolver<Maybe<ResolversTypes['contract_types']>, ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['timestamp']>, ParentType, ContextType>;
+  user_is_allowlisted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contracts_Metadata_AggregateResolvers<ContextType = any, ParentType extends ResolversParentTypes['contracts_metadata_aggregate'] = ResolversParentTypes['contracts_metadata_aggregate']> = {
+  aggregate?: Resolver<Maybe<ResolversTypes['contracts_metadata_aggregate_fields']>, ParentType, ContextType>;
+  nodes?: Resolver<Array<ResolversTypes['contracts_metadata']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contracts_Metadata_Aggregate_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['contracts_metadata_aggregate_fields'] = ResolversParentTypes['contracts_metadata_aggregate_fields']> = {
+  avg?: Resolver<Maybe<ResolversTypes['contracts_metadata_avg_fields']>, ParentType, ContextType>;
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType, Partial<Contracts_Metadata_Aggregate_FieldsCountArgs>>;
+  max?: Resolver<Maybe<ResolversTypes['contracts_metadata_max_fields']>, ParentType, ContextType>;
+  min?: Resolver<Maybe<ResolversTypes['contracts_metadata_min_fields']>, ParentType, ContextType>;
+  stddev?: Resolver<Maybe<ResolversTypes['contracts_metadata_stddev_fields']>, ParentType, ContextType>;
+  stddev_pop?: Resolver<Maybe<ResolversTypes['contracts_metadata_stddev_pop_fields']>, ParentType, ContextType>;
+  stddev_samp?: Resolver<Maybe<ResolversTypes['contracts_metadata_stddev_samp_fields']>, ParentType, ContextType>;
+  sum?: Resolver<Maybe<ResolversTypes['contracts_metadata_sum_fields']>, ParentType, ContextType>;
+  var_pop?: Resolver<Maybe<ResolversTypes['contracts_metadata_var_pop_fields']>, ParentType, ContextType>;
+  var_samp?: Resolver<Maybe<ResolversTypes['contracts_metadata_var_samp_fields']>, ParentType, ContextType>;
+  variance?: Resolver<Maybe<ResolversTypes['contracts_metadata_variance_fields']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contracts_Metadata_Avg_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['contracts_metadata_avg_fields'] = ResolversParentTypes['contracts_metadata_avg_fields']> = {
+  render_provider_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  render_provider_secondary_sales_bps?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contracts_Metadata_Max_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['contracts_metadata_max_fields'] = ResolversParentTypes['contracts_metadata_max_fields']> = {
+  address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  admin?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  bucket_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  curation_registry_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  dependency_registry_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  generator_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  minter_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  minter_filter_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  preferred_arweave_gateway?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  preferred_ipfs_gateway?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  render_provider_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  render_provider_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  render_provider_secondary_sales_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  render_provider_secondary_sales_bps?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  token_base_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['timestamp']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contracts_Metadata_Min_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['contracts_metadata_min_fields'] = ResolversParentTypes['contracts_metadata_min_fields']> = {
+  address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  admin?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  bucket_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  curation_registry_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  dependency_registry_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  generator_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  minter_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  minter_filter_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  preferred_arweave_gateway?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  preferred_ipfs_gateway?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  render_provider_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  render_provider_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  render_provider_secondary_sales_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  render_provider_secondary_sales_bps?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  token_base_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['timestamp']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contracts_Metadata_Stddev_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['contracts_metadata_stddev_fields'] = ResolversParentTypes['contracts_metadata_stddev_fields']> = {
+  render_provider_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  render_provider_secondary_sales_bps?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contracts_Metadata_Stddev_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['contracts_metadata_stddev_pop_fields'] = ResolversParentTypes['contracts_metadata_stddev_pop_fields']> = {
+  render_provider_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  render_provider_secondary_sales_bps?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contracts_Metadata_Stddev_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['contracts_metadata_stddev_samp_fields'] = ResolversParentTypes['contracts_metadata_stddev_samp_fields']> = {
+  render_provider_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  render_provider_secondary_sales_bps?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contracts_Metadata_Sum_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['contracts_metadata_sum_fields'] = ResolversParentTypes['contracts_metadata_sum_fields']> = {
+  render_provider_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  render_provider_secondary_sales_bps?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contracts_Metadata_Var_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['contracts_metadata_var_pop_fields'] = ResolversParentTypes['contracts_metadata_var_pop_fields']> = {
+  render_provider_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  render_provider_secondary_sales_bps?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contracts_Metadata_Var_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['contracts_metadata_var_samp_fields'] = ResolversParentTypes['contracts_metadata_var_samp_fields']> = {
+  render_provider_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  render_provider_secondary_sales_bps?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Contracts_Metadata_Variance_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['contracts_metadata_variance_fields'] = ResolversParentTypes['contracts_metadata_variance_fields']> = {
+  render_provider_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  render_provider_secondary_sales_bps?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Entity_TagsResolvers<ContextType = any, ParentType extends ResolversParentTypes['entity_tags'] = ResolversParentTypes['entity_tags']> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  project?: Resolver<Maybe<ResolversTypes['projects_metadata']>, ParentType, ContextType>;
+  project_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  tag?: Resolver<Maybe<ResolversTypes['tags']>, ParentType, ContextType>;
+  tag_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  user?: Resolver<Maybe<ResolversTypes['users']>, ParentType, ContextType>;
+  user_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type FavoritesResolvers<ContextType = any, ParentType extends ResolversParentTypes['favorites'] = ResolversParentTypes['favorites']> = {
+  favorited_project_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  favorited_token_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  favorited_user?: Resolver<Maybe<ResolversTypes['users']>, ParentType, ContextType>;
+  favorited_user_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  project_metadata?: Resolver<Maybe<ResolversTypes['projects_metadata']>, ParentType, ContextType>;
+  token_metadata?: Resolver<Maybe<ResolversTypes['tokens_metadata']>, ParentType, ContextType>;
+  user?: Resolver<ResolversTypes['users'], ParentType, ContextType>;
+  user_public_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Favorites_AggregateResolvers<ContextType = any, ParentType extends ResolversParentTypes['favorites_aggregate'] = ResolversParentTypes['favorites_aggregate']> = {
+  aggregate?: Resolver<Maybe<ResolversTypes['favorites_aggregate_fields']>, ParentType, ContextType>;
+  nodes?: Resolver<Array<ResolversTypes['favorites']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Favorites_Aggregate_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['favorites_aggregate_fields'] = ResolversParentTypes['favorites_aggregate_fields']> = {
+  avg?: Resolver<Maybe<ResolversTypes['favorites_avg_fields']>, ParentType, ContextType>;
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType, Partial<Favorites_Aggregate_FieldsCountArgs>>;
+  max?: Resolver<Maybe<ResolversTypes['favorites_max_fields']>, ParentType, ContextType>;
+  min?: Resolver<Maybe<ResolversTypes['favorites_min_fields']>, ParentType, ContextType>;
+  stddev?: Resolver<Maybe<ResolversTypes['favorites_stddev_fields']>, ParentType, ContextType>;
+  stddev_pop?: Resolver<Maybe<ResolversTypes['favorites_stddev_pop_fields']>, ParentType, ContextType>;
+  stddev_samp?: Resolver<Maybe<ResolversTypes['favorites_stddev_samp_fields']>, ParentType, ContextType>;
+  sum?: Resolver<Maybe<ResolversTypes['favorites_sum_fields']>, ParentType, ContextType>;
+  var_pop?: Resolver<Maybe<ResolversTypes['favorites_var_pop_fields']>, ParentType, ContextType>;
+  var_samp?: Resolver<Maybe<ResolversTypes['favorites_var_samp_fields']>, ParentType, ContextType>;
+  variance?: Resolver<Maybe<ResolversTypes['favorites_variance_fields']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Favorites_Avg_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['favorites_avg_fields'] = ResolversParentTypes['favorites_avg_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Favorites_Max_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['favorites_max_fields'] = ResolversParentTypes['favorites_max_fields']> = {
+  favorited_project_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  favorited_token_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  favorited_user_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  user_public_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Favorites_Min_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['favorites_min_fields'] = ResolversParentTypes['favorites_min_fields']> = {
+  favorited_project_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  favorited_token_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  favorited_user_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  user_public_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Favorites_Stddev_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['favorites_stddev_fields'] = ResolversParentTypes['favorites_stddev_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Favorites_Stddev_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['favorites_stddev_pop_fields'] = ResolversParentTypes['favorites_stddev_pop_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Favorites_Stddev_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['favorites_stddev_samp_fields'] = ResolversParentTypes['favorites_stddev_samp_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Favorites_Sum_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['favorites_sum_fields'] = ResolversParentTypes['favorites_sum_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Favorites_Var_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['favorites_var_pop_fields'] = ResolversParentTypes['favorites_var_pop_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Favorites_Var_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['favorites_var_samp_fields'] = ResolversParentTypes['favorites_var_samp_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Favorites_Variance_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['favorites_variance_fields'] = ResolversParentTypes['favorites_variance_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Feature_FlagsResolvers<ContextType = any, ParentType extends ResolversParentTypes['feature_flags'] = ResolversParentTypes['feature_flags']> = {
+  flag_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  globally_enabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export interface Float8ScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['float8'], any> {
+  name: 'float8';
+}
+
+export interface JsonbScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['jsonb'], any> {
+  name: 'jsonb';
+}
+
+export interface JsonpathScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['jsonpath'], any> {
+  name: 'jsonpath';
+}
+
+export type MediaResolvers<ContextType = any, ParentType extends ResolversParentTypes['media'] = ResolversParentTypes['media']> = {
+  bucket_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  file_path?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  metadata?: Resolver<Maybe<ResolversTypes['jsonb']>, ParentType, ContextType, Partial<MediaMetadataArgs>>;
+  owner_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Minter_Filters_MetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['minter_filters_metadata'] = ResolversParentTypes['minter_filters_metadata']> = {
+  address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  allowed_minters?: Resolver<Array<ResolversTypes['minters_metadata']>, ParentType, ContextType, Partial<Minter_Filters_MetadataAllowed_MintersArgs>>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Minter_TypesResolvers<ContextType = any, ParentType extends ResolversParentTypes['minter_types'] = ResolversParentTypes['minter_types']> = {
+  description_template?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  label?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['minter_type_names_enum'], ParentType, ContextType>;
+  unversioned_type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  version_number?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Minters_MetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['minters_metadata'] = ResolversParentTypes['minters_metadata']> = {
+  address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  core_contract?: Resolver<Maybe<ResolversTypes['contracts_metadata']>, ParentType, ContextType>;
+  core_contract_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  extra_minter_details?: Resolver<Maybe<ResolversTypes['jsonb']>, ParentType, ContextType, Partial<Minters_MetadataExtra_Minter_DetailsArgs>>;
+  maximum_price_decay_half_life_in_seconds?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  minimum_auction_length_in_seconds?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  minimum_price_decay_half_life_in_seconds?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  minter_filter?: Resolver<Maybe<ResolversTypes['minter_filters_metadata']>, ParentType, ContextType>;
+  minter_filter_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  minter_type?: Resolver<ResolversTypes['minter_type_names_enum'], ParentType, ContextType>;
+  type?: Resolver<Maybe<ResolversTypes['minter_types']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export interface NumericScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['numeric'], any> {
+  name: 'numeric';
+}
+
+export type Project_External_Asset_DependenciesResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_external_asset_dependencies'] = ResolversParentTypes['project_external_asset_dependencies']> = {
+  cid?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  dependency_type?: Resolver<ResolversTypes['project_external_asset_dependency_types_enum'], ParentType, ContextType>;
+  index?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  project?: Resolver<ResolversTypes['projects_metadata'], ParentType, ContextType>;
+  project_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_Minter_ConfigurationsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_minter_configurations'] = ResolversParentTypes['project_minter_configurations']> = {
+  approximate_exp_da_end_time?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  base_price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  currency_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  currency_symbol?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  end_time?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  extra_minter_details?: Resolver<Maybe<ResolversTypes['jsonb']>, ParentType, ContextType, Partial<Project_Minter_ConfigurationsExtra_Minter_DetailsArgs>>;
+  half_life_in_seconds?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  minter?: Resolver<Maybe<ResolversTypes['minters_metadata']>, ParentType, ContextType>;
+  minter_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  offchain_extra_minter_details?: Resolver<Maybe<ResolversTypes['jsonb']>, ParentType, ContextType, Partial<Project_Minter_ConfigurationsOffchain_Extra_Minter_DetailsArgs>>;
+  price_is_configured?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  project?: Resolver<Maybe<ResolversTypes['projects_metadata']>, ParentType, ContextType>;
+  project_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  purchase_to_disabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  start_price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  start_time?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_ScriptsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_scripts'] = ResolversParentTypes['project_scripts']> = {
+  index?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  project?: Resolver<Maybe<ResolversTypes['projects_metadata']>, ParentType, ContextType>;
+  project_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  script?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_SeriesResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_series'] = ResolversParentTypes['project_series']> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  projects?: Resolver<Array<ResolversTypes['projects_metadata']>, ParentType, ContextType, Partial<Project_SeriesProjectsArgs>>;
+  projects_aggregate?: Resolver<ResolversTypes['projects_metadata_aggregate'], ParentType, ContextType, Partial<Project_SeriesProjects_AggregateArgs>>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_Series_AggregateResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_series_aggregate'] = ResolversParentTypes['project_series_aggregate']> = {
+  aggregate?: Resolver<Maybe<ResolversTypes['project_series_aggregate_fields']>, ParentType, ContextType>;
+  nodes?: Resolver<Array<ResolversTypes['project_series']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_Series_Aggregate_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_series_aggregate_fields'] = ResolversParentTypes['project_series_aggregate_fields']> = {
+  avg?: Resolver<Maybe<ResolversTypes['project_series_avg_fields']>, ParentType, ContextType>;
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType, Partial<Project_Series_Aggregate_FieldsCountArgs>>;
+  max?: Resolver<Maybe<ResolversTypes['project_series_max_fields']>, ParentType, ContextType>;
+  min?: Resolver<Maybe<ResolversTypes['project_series_min_fields']>, ParentType, ContextType>;
+  stddev?: Resolver<Maybe<ResolversTypes['project_series_stddev_fields']>, ParentType, ContextType>;
+  stddev_pop?: Resolver<Maybe<ResolversTypes['project_series_stddev_pop_fields']>, ParentType, ContextType>;
+  stddev_samp?: Resolver<Maybe<ResolversTypes['project_series_stddev_samp_fields']>, ParentType, ContextType>;
+  sum?: Resolver<Maybe<ResolversTypes['project_series_sum_fields']>, ParentType, ContextType>;
+  var_pop?: Resolver<Maybe<ResolversTypes['project_series_var_pop_fields']>, ParentType, ContextType>;
+  var_samp?: Resolver<Maybe<ResolversTypes['project_series_var_samp_fields']>, ParentType, ContextType>;
+  variance?: Resolver<Maybe<ResolversTypes['project_series_variance_fields']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_Series_Avg_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_series_avg_fields'] = ResolversParentTypes['project_series_avg_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_Series_Max_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_series_max_fields'] = ResolversParentTypes['project_series_max_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_Series_Min_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_series_min_fields'] = ResolversParentTypes['project_series_min_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_Series_Stddev_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_series_stddev_fields'] = ResolversParentTypes['project_series_stddev_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_Series_Stddev_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_series_stddev_pop_fields'] = ResolversParentTypes['project_series_stddev_pop_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_Series_Stddev_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_series_stddev_samp_fields'] = ResolversParentTypes['project_series_stddev_samp_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_Series_Sum_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_series_sum_fields'] = ResolversParentTypes['project_series_sum_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_Series_Var_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_series_var_pop_fields'] = ResolversParentTypes['project_series_var_pop_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_Series_Var_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_series_var_samp_fields'] = ResolversParentTypes['project_series_var_samp_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_Series_Variance_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_series_variance_fields'] = ResolversParentTypes['project_series_variance_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_Vertical_CategoriesResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_vertical_categories'] = ResolversParentTypes['project_vertical_categories']> = {
+  category?: Resolver<ResolversTypes['categories'], ParentType, ContextType>;
+  hosted?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['categories_enum'], ParentType, ContextType>;
+  verticals?: Resolver<Array<ResolversTypes['project_verticals']>, ParentType, ContextType, Partial<Project_Vertical_CategoriesVerticalsArgs>>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Project_VerticalsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_verticals'] = ResolversParentTypes['project_verticals']> = {
+  active?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  category?: Resolver<ResolversTypes['project_vertical_categories'], ParentType, ContextType>;
+  category_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  display_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['verticals_enum'], ParentType, ContextType>;
+  projects?: Resolver<Array<ResolversTypes['projects_metadata']>, ParentType, ContextType, Partial<Project_VerticalsProjectsArgs>>;
+  projects_aggregate?: Resolver<ResolversTypes['projects_metadata_aggregate'], ParentType, ContextType, Partial<Project_VerticalsProjects_AggregateArgs>>;
+  vertical?: Resolver<ResolversTypes['verticals'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Projects_FeaturesResolvers<ContextType = any, ParentType extends ResolversParentTypes['projects_features'] = ResolversParentTypes['projects_features']> = {
+  enable_artist_update_after_completion?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  feature_fields?: Resolver<Maybe<ResolversTypes['jsonb']>, ParentType, ContextType, Partial<Projects_FeaturesFeature_FieldsArgs>>;
+  feature_fields_counts?: Resolver<Maybe<ResolversTypes['jsonb']>, ParentType, ContextType, Partial<Projects_FeaturesFeature_Fields_CountsArgs>>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  project?: Resolver<ResolversTypes['projects_metadata'], ParentType, ContextType>;
+  project_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Projects_MetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['projects_metadata'] = ResolversParentTypes['projects_metadata']> = {
+  activated_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  active?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  additional_payee?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  additional_payee_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  additional_payee_secondary_sales_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  artist?: Resolver<ResolversTypes['users'], ParentType, ContextType>;
+  artist_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  artist_display_notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  artist_featured_token_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  artist_interview?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  artist_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  aspect_ratio?: Resolver<ResolversTypes['numeric'], ParentType, ContextType>;
+  base_uri?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  charitable_giving_details?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  complete?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  completed_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  contract?: Resolver<ResolversTypes['contracts_metadata'], ParentType, ContextType>;
+  contract_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  creative_credit?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  curation_status?: Resolver<ResolversTypes['curation_statuses_enum'], ParentType, ContextType>;
+  curation_status_display?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  curation_status_override?: Resolver<Maybe<ResolversTypes['curation_statuses_enum']>, ParentType, ContextType>;
+  currency_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  currency_decimals?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  currency_symbol?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  disable_auto_image_format?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  disable_sample_generator?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  display_static?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  external_asset_dependencies?: Resolver<Array<ResolversTypes['project_external_asset_dependencies']>, ParentType, ContextType, Partial<Projects_MetadataExternal_Asset_DependenciesArgs>>;
+  external_asset_dependencies_locked?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  external_asset_dependency_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
+  favorited_by_user?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  favorites?: Resolver<Array<ResolversTypes['favorites']>, ParentType, ContextType, Partial<Projects_MetadataFavoritesArgs>>;
+  favorites_aggregate?: Resolver<ResolversTypes['favorites_aggregate'], ParentType, ContextType, Partial<Projects_MetadataFavorites_AggregateArgs>>;
+  featured_token?: Resolver<Maybe<Array<ResolversTypes['tokens_metadata']>>, ParentType, ContextType, RequireFields<Projects_MetadataFeatured_TokenArgs, 'args'>>;
+  features?: Resolver<Maybe<ResolversTypes['projects_features']>, ParentType, ContextType>;
+  first_token_minted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  heritage_curation_status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  index?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  invocations?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
+  ipfs_hash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  is_artblocks?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  license?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  link_to_license?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  locked?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  lowest_listing?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
+  max_invocations?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  minter_configuration?: Resolver<Maybe<ResolversTypes['project_minter_configurations']>, ParentType, ContextType>;
+  minter_configuration_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  paused?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  price_per_token_in_wei?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  project_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  proposed_artist_addresses_and_split?: Resolver<Maybe<ResolversTypes['proposed_artist_addresses_and_splits']>, ParentType, ContextType>;
+  proposed_artists_and_splits_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  render_complete?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  render_delay?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  render_with_gpu?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  royalty_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  sales_notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  script?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  script_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
+  script_json?: Resolver<Maybe<ResolversTypes['jsonb']>, ParentType, ContextType, Partial<Projects_MetadataScript_JsonArgs>>;
+  script_type_and_version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  scripts?: Resolver<Array<ResolversTypes['project_scripts']>, ParentType, ContextType, Partial<Projects_MetadataScriptsArgs>>;
+  second_token_minted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  series?: Resolver<Maybe<ResolversTypes['project_series']>, ParentType, ContextType>;
+  series_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  start_datetime?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  tags?: Resolver<Array<ResolversTypes['entity_tags']>, ParentType, ContextType, Partial<Projects_MetadataTagsArgs>>;
+  tokens?: Resolver<Array<ResolversTypes['tokens_metadata']>, ParentType, ContextType, Partial<Projects_MetadataTokensArgs>>;
+  tokens_aggregate?: Resolver<ResolversTypes['tokens_metadata_aggregate'], ParentType, ContextType, Partial<Projects_MetadataTokens_AggregateArgs>>;
+  updated_at?: Resolver<Maybe<ResolversTypes['timestamp']>, ParentType, ContextType>;
+  user_is_artist?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  vertical?: Resolver<ResolversTypes['project_verticals'], ParentType, ContextType>;
+  vertical_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  website?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Projects_Metadata_AggregateResolvers<ContextType = any, ParentType extends ResolversParentTypes['projects_metadata_aggregate'] = ResolversParentTypes['projects_metadata_aggregate']> = {
+  aggregate?: Resolver<Maybe<ResolversTypes['projects_metadata_aggregate_fields']>, ParentType, ContextType>;
+  nodes?: Resolver<Array<ResolversTypes['projects_metadata']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Projects_Metadata_Aggregate_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['projects_metadata_aggregate_fields'] = ResolversParentTypes['projects_metadata_aggregate_fields']> = {
+  avg?: Resolver<Maybe<ResolversTypes['projects_metadata_avg_fields']>, ParentType, ContextType>;
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType, Partial<Projects_Metadata_Aggregate_FieldsCountArgs>>;
+  max?: Resolver<Maybe<ResolversTypes['projects_metadata_max_fields']>, ParentType, ContextType>;
+  min?: Resolver<Maybe<ResolversTypes['projects_metadata_min_fields']>, ParentType, ContextType>;
+  stddev?: Resolver<Maybe<ResolversTypes['projects_metadata_stddev_fields']>, ParentType, ContextType>;
+  stddev_pop?: Resolver<Maybe<ResolversTypes['projects_metadata_stddev_pop_fields']>, ParentType, ContextType>;
+  stddev_samp?: Resolver<Maybe<ResolversTypes['projects_metadata_stddev_samp_fields']>, ParentType, ContextType>;
+  sum?: Resolver<Maybe<ResolversTypes['projects_metadata_sum_fields']>, ParentType, ContextType>;
+  var_pop?: Resolver<Maybe<ResolversTypes['projects_metadata_var_pop_fields']>, ParentType, ContextType>;
+  var_samp?: Resolver<Maybe<ResolversTypes['projects_metadata_var_samp_fields']>, ParentType, ContextType>;
+  variance?: Resolver<Maybe<ResolversTypes['projects_metadata_variance_fields']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Projects_Metadata_Avg_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['projects_metadata_avg_fields'] = ResolversParentTypes['projects_metadata_avg_fields']> = {
+  additional_payee_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  currency_decimals?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  index?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  max_invocations?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  render_delay?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  royalty_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  series_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Projects_Metadata_Max_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['projects_metadata_max_fields'] = ResolversParentTypes['projects_metadata_max_fields']> = {
+  activated_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  additional_payee?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  additional_payee_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  additional_payee_secondary_sales_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  artist_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  artist_display_notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  artist_featured_token_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  artist_interview?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  artist_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  aspect_ratio?: Resolver<Maybe<ResolversTypes['numeric']>, ParentType, ContextType>;
+  base_uri?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  charitable_giving_details?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  contract_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  creative_credit?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  currency_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  currency_decimals?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  currency_symbol?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  index?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  ipfs_hash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  license?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  link_to_license?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  max_invocations?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  minter_configuration_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  price_per_token_in_wei?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  project_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  proposed_artists_and_splits_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  render_delay?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  royalty_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  sales_notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  script?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  script_type_and_version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  series_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  start_datetime?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['timestamp']>, ParentType, ContextType>;
+  vertical_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  website?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Projects_Metadata_Min_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['projects_metadata_min_fields'] = ResolversParentTypes['projects_metadata_min_fields']> = {
+  activated_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  additional_payee?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  additional_payee_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  additional_payee_secondary_sales_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  artist_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  artist_display_notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  artist_featured_token_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  artist_interview?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  artist_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  aspect_ratio?: Resolver<Maybe<ResolversTypes['numeric']>, ParentType, ContextType>;
+  base_uri?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  charitable_giving_details?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  contract_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  creative_credit?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  currency_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  currency_decimals?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  currency_symbol?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  index?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  ipfs_hash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  license?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  link_to_license?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  max_invocations?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  minter_configuration_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  price_per_token_in_wei?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  project_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  proposed_artists_and_splits_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  render_delay?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  royalty_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  sales_notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  script?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  script_type_and_version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  series_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  start_datetime?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['timestamp']>, ParentType, ContextType>;
+  vertical_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  website?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Projects_Metadata_Stddev_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['projects_metadata_stddev_fields'] = ResolversParentTypes['projects_metadata_stddev_fields']> = {
+  additional_payee_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  currency_decimals?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  index?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  max_invocations?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  render_delay?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  royalty_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  series_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Projects_Metadata_Stddev_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['projects_metadata_stddev_pop_fields'] = ResolversParentTypes['projects_metadata_stddev_pop_fields']> = {
+  additional_payee_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  currency_decimals?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  index?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  max_invocations?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  render_delay?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  royalty_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  series_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Projects_Metadata_Stddev_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['projects_metadata_stddev_samp_fields'] = ResolversParentTypes['projects_metadata_stddev_samp_fields']> = {
+  additional_payee_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  currency_decimals?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  index?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  max_invocations?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  render_delay?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  royalty_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  series_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Projects_Metadata_Sum_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['projects_metadata_sum_fields'] = ResolversParentTypes['projects_metadata_sum_fields']> = {
+  additional_payee_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  aspect_ratio?: Resolver<Maybe<ResolversTypes['numeric']>, ParentType, ContextType>;
+  currency_decimals?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  index?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  max_invocations?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  render_delay?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  royalty_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  series_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Projects_Metadata_Var_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['projects_metadata_var_pop_fields'] = ResolversParentTypes['projects_metadata_var_pop_fields']> = {
+  additional_payee_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  currency_decimals?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  index?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  max_invocations?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  render_delay?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  royalty_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  series_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Projects_Metadata_Var_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['projects_metadata_var_samp_fields'] = ResolversParentTypes['projects_metadata_var_samp_fields']> = {
+  additional_payee_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  currency_decimals?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  index?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  max_invocations?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  render_delay?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  royalty_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  series_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Projects_Metadata_Variance_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['projects_metadata_variance_fields'] = ResolversParentTypes['projects_metadata_variance_fields']> = {
+  additional_payee_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  currency_decimals?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  index?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  max_invocations?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  render_delay?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  royalty_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  series_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Proposed_Artist_Addresses_And_SplitsResolvers<ContextType = any, ParentType extends ResolversParentTypes['proposed_artist_addresses_and_splits'] = ResolversParentTypes['proposed_artist_addresses_and_splits']> = {
+  additional_payee_primary_sales?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  additional_payee_primary_sales_percentage?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  additional_payee_secondary_sales?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  additional_payee_secondary_sales_percentage?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  artist_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  project?: Resolver<ResolversTypes['projects_metadata'], ParentType, ContextType>;
+  project_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Query_RootResolvers<ContextType = any, ParentType extends ResolversParentTypes['query_root'] = ResolversParentTypes['query_root']> = {
+  categories?: Resolver<Array<ResolversTypes['categories']>, ParentType, ContextType, Partial<Query_RootCategoriesArgs>>;
+  categories_by_pk?: Resolver<Maybe<ResolversTypes['categories']>, ParentType, ContextType, RequireFields<Query_RootCategories_By_PkArgs, 'name'>>;
+  contract_allowlistings?: Resolver<Array<ResolversTypes['contract_allowlistings']>, ParentType, ContextType, Partial<Query_RootContract_AllowlistingsArgs>>;
+  contract_allowlistings_by_pk?: Resolver<Maybe<ResolversTypes['contract_allowlistings']>, ParentType, ContextType, RequireFields<Query_RootContract_Allowlistings_By_PkArgs, 'contract_address' | 'user_address'>>;
+  contract_type_names?: Resolver<Array<ResolversTypes['contract_type_names']>, ParentType, ContextType, Partial<Query_RootContract_Type_NamesArgs>>;
+  contract_type_names_by_pk?: Resolver<Maybe<ResolversTypes['contract_type_names']>, ParentType, ContextType, RequireFields<Query_RootContract_Type_Names_By_PkArgs, 'name'>>;
+  contract_types?: Resolver<Array<ResolversTypes['contract_types']>, ParentType, ContextType, Partial<Query_RootContract_TypesArgs>>;
+  contract_types_by_pk?: Resolver<Maybe<ResolversTypes['contract_types']>, ParentType, ContextType, RequireFields<Query_RootContract_Types_By_PkArgs, 'type'>>;
+  contracts_metadata?: Resolver<Array<ResolversTypes['contracts_metadata']>, ParentType, ContextType, Partial<Query_RootContracts_MetadataArgs>>;
+  contracts_metadata_aggregate?: Resolver<ResolversTypes['contracts_metadata_aggregate'], ParentType, ContextType, Partial<Query_RootContracts_Metadata_AggregateArgs>>;
+  contracts_metadata_by_pk?: Resolver<Maybe<ResolversTypes['contracts_metadata']>, ParentType, ContextType, RequireFields<Query_RootContracts_Metadata_By_PkArgs, 'address'>>;
+  entity_tags?: Resolver<Array<ResolversTypes['entity_tags']>, ParentType, ContextType, Partial<Query_RootEntity_TagsArgs>>;
+  entity_tags_by_pk?: Resolver<Maybe<ResolversTypes['entity_tags']>, ParentType, ContextType, RequireFields<Query_RootEntity_Tags_By_PkArgs, 'id'>>;
+  favorites?: Resolver<Array<ResolversTypes['favorites']>, ParentType, ContextType, Partial<Query_RootFavoritesArgs>>;
+  favorites_aggregate?: Resolver<ResolversTypes['favorites_aggregate'], ParentType, ContextType, Partial<Query_RootFavorites_AggregateArgs>>;
+  favorites_by_pk?: Resolver<Maybe<ResolversTypes['favorites']>, ParentType, ContextType, RequireFields<Query_RootFavorites_By_PkArgs, 'id'>>;
+  feature_flags?: Resolver<Array<ResolversTypes['feature_flags']>, ParentType, ContextType, Partial<Query_RootFeature_FlagsArgs>>;
+  feature_flags_by_pk?: Resolver<Maybe<ResolversTypes['feature_flags']>, ParentType, ContextType, RequireFields<Query_RootFeature_Flags_By_PkArgs, 'flag_name'>>;
+  filter_tokens_metadata_by_features?: Resolver<Array<ResolversTypes['tokens_metadata']>, ParentType, ContextType, RequireFields<Query_RootFilter_Tokens_Metadata_By_FeaturesArgs, 'args'>>;
+  filter_tokens_metadata_by_features_aggregate?: Resolver<ResolversTypes['tokens_metadata_aggregate'], ParentType, ContextType, RequireFields<Query_RootFilter_Tokens_Metadata_By_Features_AggregateArgs, 'args'>>;
+  getOpenseaCollectionURL?: Resolver<Maybe<ResolversTypes['OpenseaCollectionData']>, ParentType, ContextType, RequireFields<Query_RootGetOpenseaCollectionUrlArgs, 'contractAddress' | 'projectId'>>;
+  isTokenFlagged?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<Query_RootIsTokenFlaggedArgs, 'contractAddress' | 'tokenId'>>;
+  list_projects_metadata_random?: Resolver<Array<ResolversTypes['projects_metadata']>, ParentType, ContextType, RequireFields<Query_RootList_Projects_Metadata_RandomArgs, 'args'>>;
+  list_projects_metadata_random_aggregate?: Resolver<ResolversTypes['projects_metadata_aggregate'], ParentType, ContextType, RequireFields<Query_RootList_Projects_Metadata_Random_AggregateArgs, 'args'>>;
+  media?: Resolver<Array<ResolversTypes['media']>, ParentType, ContextType, Partial<Query_RootMediaArgs>>;
+  media_by_pk?: Resolver<Maybe<ResolversTypes['media']>, ParentType, ContextType, RequireFields<Query_RootMedia_By_PkArgs, 'id'>>;
+  minter_filters_metadata?: Resolver<Array<ResolversTypes['minter_filters_metadata']>, ParentType, ContextType, Partial<Query_RootMinter_Filters_MetadataArgs>>;
+  minter_filters_metadata_by_pk?: Resolver<Maybe<ResolversTypes['minter_filters_metadata']>, ParentType, ContextType, RequireFields<Query_RootMinter_Filters_Metadata_By_PkArgs, 'address'>>;
+  minter_types?: Resolver<Array<ResolversTypes['minter_types']>, ParentType, ContextType, Partial<Query_RootMinter_TypesArgs>>;
+  minter_types_by_pk?: Resolver<Maybe<ResolversTypes['minter_types']>, ParentType, ContextType, RequireFields<Query_RootMinter_Types_By_PkArgs, 'type'>>;
+  minters_metadata?: Resolver<Array<ResolversTypes['minters_metadata']>, ParentType, ContextType, Partial<Query_RootMinters_MetadataArgs>>;
+  minters_metadata_by_pk?: Resolver<Maybe<ResolversTypes['minters_metadata']>, ParentType, ContextType, RequireFields<Query_RootMinters_Metadata_By_PkArgs, 'address'>>;
+  project_external_asset_dependencies?: Resolver<Array<ResolversTypes['project_external_asset_dependencies']>, ParentType, ContextType, Partial<Query_RootProject_External_Asset_DependenciesArgs>>;
+  project_external_asset_dependencies_by_pk?: Resolver<Maybe<ResolversTypes['project_external_asset_dependencies']>, ParentType, ContextType, RequireFields<Query_RootProject_External_Asset_Dependencies_By_PkArgs, 'index' | 'project_id'>>;
+  project_minter_configurations?: Resolver<Array<ResolversTypes['project_minter_configurations']>, ParentType, ContextType, Partial<Query_RootProject_Minter_ConfigurationsArgs>>;
+  project_minter_configurations_by_pk?: Resolver<Maybe<ResolversTypes['project_minter_configurations']>, ParentType, ContextType, RequireFields<Query_RootProject_Minter_Configurations_By_PkArgs, 'id'>>;
+  project_scripts?: Resolver<Array<ResolversTypes['project_scripts']>, ParentType, ContextType, Partial<Query_RootProject_ScriptsArgs>>;
+  project_scripts_by_pk?: Resolver<Maybe<ResolversTypes['project_scripts']>, ParentType, ContextType, RequireFields<Query_RootProject_Scripts_By_PkArgs, 'index' | 'project_id'>>;
+  project_series?: Resolver<Array<ResolversTypes['project_series']>, ParentType, ContextType, Partial<Query_RootProject_SeriesArgs>>;
+  project_series_aggregate?: Resolver<ResolversTypes['project_series_aggregate'], ParentType, ContextType, Partial<Query_RootProject_Series_AggregateArgs>>;
+  project_series_by_pk?: Resolver<Maybe<ResolversTypes['project_series']>, ParentType, ContextType, RequireFields<Query_RootProject_Series_By_PkArgs, 'id'>>;
+  project_vertical_categories?: Resolver<Array<ResolversTypes['project_vertical_categories']>, ParentType, ContextType, Partial<Query_RootProject_Vertical_CategoriesArgs>>;
+  project_vertical_categories_by_pk?: Resolver<Maybe<ResolversTypes['project_vertical_categories']>, ParentType, ContextType, RequireFields<Query_RootProject_Vertical_Categories_By_PkArgs, 'name'>>;
+  project_verticals?: Resolver<Array<ResolversTypes['project_verticals']>, ParentType, ContextType, Partial<Query_RootProject_VerticalsArgs>>;
+  project_verticals_by_pk?: Resolver<Maybe<ResolversTypes['project_verticals']>, ParentType, ContextType, RequireFields<Query_RootProject_Verticals_By_PkArgs, 'name'>>;
+  projects_features?: Resolver<Array<ResolversTypes['projects_features']>, ParentType, ContextType, Partial<Query_RootProjects_FeaturesArgs>>;
+  projects_features_by_pk?: Resolver<Maybe<ResolversTypes['projects_features']>, ParentType, ContextType, RequireFields<Query_RootProjects_Features_By_PkArgs, 'id'>>;
+  projects_metadata?: Resolver<Array<ResolversTypes['projects_metadata']>, ParentType, ContextType, Partial<Query_RootProjects_MetadataArgs>>;
+  projects_metadata_aggregate?: Resolver<ResolversTypes['projects_metadata_aggregate'], ParentType, ContextType, Partial<Query_RootProjects_Metadata_AggregateArgs>>;
+  projects_metadata_by_pk?: Resolver<Maybe<ResolversTypes['projects_metadata']>, ParentType, ContextType, RequireFields<Query_RootProjects_Metadata_By_PkArgs, 'id'>>;
+  proposed_artist_addresses_and_splits?: Resolver<Array<ResolversTypes['proposed_artist_addresses_and_splits']>, ParentType, ContextType, Partial<Query_RootProposed_Artist_Addresses_And_SplitsArgs>>;
+  proposed_artist_addresses_and_splits_by_pk?: Resolver<Maybe<ResolversTypes['proposed_artist_addresses_and_splits']>, ParentType, ContextType, RequireFields<Query_RootProposed_Artist_Addresses_And_Splits_By_PkArgs, 'project_id'>>;
+  search_projects?: Resolver<Array<ResolversTypes['projects_metadata']>, ParentType, ContextType, RequireFields<Query_RootSearch_ProjectsArgs, 'args'>>;
+  search_projects_aggregate?: Resolver<ResolversTypes['projects_metadata_aggregate'], ParentType, ContextType, RequireFields<Query_RootSearch_Projects_AggregateArgs, 'args'>>;
+  search_tags?: Resolver<Array<ResolversTypes['tags']>, ParentType, ContextType, RequireFields<Query_RootSearch_TagsArgs, 'args'>>;
+  search_tokens?: Resolver<Array<ResolversTypes['tokens_metadata']>, ParentType, ContextType, RequireFields<Query_RootSearch_TokensArgs, 'args'>>;
+  search_tokens_aggregate?: Resolver<ResolversTypes['tokens_metadata_aggregate'], ParentType, ContextType, RequireFields<Query_RootSearch_Tokens_AggregateArgs, 'args'>>;
+  search_users?: Resolver<Array<ResolversTypes['user_profiles']>, ParentType, ContextType, RequireFields<Query_RootSearch_UsersArgs, 'args'>>;
+  search_users_aggregate?: Resolver<ResolversTypes['user_profiles_aggregate'], ParentType, ContextType, RequireFields<Query_RootSearch_Users_AggregateArgs, 'args'>>;
+  tags?: Resolver<Array<ResolversTypes['tags']>, ParentType, ContextType, Partial<Query_RootTagsArgs>>;
+  tags_by_pk?: Resolver<Maybe<ResolversTypes['tags']>, ParentType, ContextType, RequireFields<Query_RootTags_By_PkArgs, 'name'>>;
+  terms_of_service?: Resolver<Array<ResolversTypes['terms_of_service']>, ParentType, ContextType, Partial<Query_RootTerms_Of_ServiceArgs>>;
+  terms_of_service_aggregate?: Resolver<ResolversTypes['terms_of_service_aggregate'], ParentType, ContextType, Partial<Query_RootTerms_Of_Service_AggregateArgs>>;
+  terms_of_service_by_pk?: Resolver<Maybe<ResolversTypes['terms_of_service']>, ParentType, ContextType, RequireFields<Query_RootTerms_Of_Service_By_PkArgs, 'id'>>;
+  tokens_metadata?: Resolver<Array<ResolversTypes['tokens_metadata']>, ParentType, ContextType, Partial<Query_RootTokens_MetadataArgs>>;
+  tokens_metadata_aggregate?: Resolver<ResolversTypes['tokens_metadata_aggregate'], ParentType, ContextType, Partial<Query_RootTokens_Metadata_AggregateArgs>>;
+  tokens_metadata_by_pk?: Resolver<Maybe<ResolversTypes['tokens_metadata']>, ParentType, ContextType, RequireFields<Query_RootTokens_Metadata_By_PkArgs, 'id'>>;
+  user_profiles?: Resolver<Array<ResolversTypes['user_profiles']>, ParentType, ContextType, Partial<Query_RootUser_ProfilesArgs>>;
+  user_profiles_aggregate?: Resolver<ResolversTypes['user_profiles_aggregate'], ParentType, ContextType, Partial<Query_RootUser_Profiles_AggregateArgs>>;
+  user_profiles_by_pk?: Resolver<Maybe<ResolversTypes['user_profiles']>, ParentType, ContextType, RequireFields<Query_RootUser_Profiles_By_PkArgs, 'id'>>;
+  users?: Resolver<Array<ResolversTypes['users']>, ParentType, ContextType, Partial<Query_RootUsersArgs>>;
+  users_aggregate?: Resolver<ResolversTypes['users_aggregate'], ParentType, ContextType, Partial<Query_RootUsers_AggregateArgs>>;
+  users_by_pk?: Resolver<Maybe<ResolversTypes['users']>, ParentType, ContextType, RequireFields<Query_RootUsers_By_PkArgs, 'public_address'>>;
+  verticals?: Resolver<Array<ResolversTypes['verticals']>, ParentType, ContextType, Partial<Query_RootVerticalsArgs>>;
+  verticals_by_pk?: Resolver<Maybe<ResolversTypes['verticals']>, ParentType, ContextType, RequireFields<Query_RootVerticals_By_PkArgs, 'name'>>;
+  webflow_artist_info?: Resolver<Array<ResolversTypes['webflow_artist_info']>, ParentType, ContextType, Partial<Query_RootWebflow_Artist_InfoArgs>>;
+  webflow_artist_info_by_pk?: Resolver<Maybe<ResolversTypes['webflow_artist_info']>, ParentType, ContextType, RequireFields<Query_RootWebflow_Artist_Info_By_PkArgs, 'webflow_item_id'>>;
+  webflow_spectrum_articles?: Resolver<Array<ResolversTypes['webflow_spectrum_articles']>, ParentType, ContextType, Partial<Query_RootWebflow_Spectrum_ArticlesArgs>>;
+  webflow_spectrum_articles_by_pk?: Resolver<Maybe<ResolversTypes['webflow_spectrum_articles']>, ParentType, ContextType, RequireFields<Query_RootWebflow_Spectrum_Articles_By_PkArgs, 'webflow_item_id'>>;
+};
+
+export interface Seed_FloatScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['seed_float'], any> {
+  name: 'seed_float';
+}
+
+export type Subscription_RootResolvers<ContextType = any, ParentType extends ResolversParentTypes['subscription_root'] = ResolversParentTypes['subscription_root']> = {
+  categories?: SubscriptionResolver<Array<ResolversTypes['categories']>, "categories", ParentType, ContextType, Partial<Subscription_RootCategoriesArgs>>;
+  categories_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['categories']>, "categories_by_pk", ParentType, ContextType, RequireFields<Subscription_RootCategories_By_PkArgs, 'name'>>;
+  categories_stream?: SubscriptionResolver<Array<ResolversTypes['categories']>, "categories_stream", ParentType, ContextType, RequireFields<Subscription_RootCategories_StreamArgs, 'batch_size' | 'cursor'>>;
+  contract_allowlistings?: SubscriptionResolver<Array<ResolversTypes['contract_allowlistings']>, "contract_allowlistings", ParentType, ContextType, Partial<Subscription_RootContract_AllowlistingsArgs>>;
+  contract_allowlistings_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['contract_allowlistings']>, "contract_allowlistings_by_pk", ParentType, ContextType, RequireFields<Subscription_RootContract_Allowlistings_By_PkArgs, 'contract_address' | 'user_address'>>;
+  contract_allowlistings_stream?: SubscriptionResolver<Array<ResolversTypes['contract_allowlistings']>, "contract_allowlistings_stream", ParentType, ContextType, RequireFields<Subscription_RootContract_Allowlistings_StreamArgs, 'batch_size' | 'cursor'>>;
+  contract_type_names?: SubscriptionResolver<Array<ResolversTypes['contract_type_names']>, "contract_type_names", ParentType, ContextType, Partial<Subscription_RootContract_Type_NamesArgs>>;
+  contract_type_names_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['contract_type_names']>, "contract_type_names_by_pk", ParentType, ContextType, RequireFields<Subscription_RootContract_Type_Names_By_PkArgs, 'name'>>;
+  contract_type_names_stream?: SubscriptionResolver<Array<ResolversTypes['contract_type_names']>, "contract_type_names_stream", ParentType, ContextType, RequireFields<Subscription_RootContract_Type_Names_StreamArgs, 'batch_size' | 'cursor'>>;
+  contract_types?: SubscriptionResolver<Array<ResolversTypes['contract_types']>, "contract_types", ParentType, ContextType, Partial<Subscription_RootContract_TypesArgs>>;
+  contract_types_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['contract_types']>, "contract_types_by_pk", ParentType, ContextType, RequireFields<Subscription_RootContract_Types_By_PkArgs, 'type'>>;
+  contract_types_stream?: SubscriptionResolver<Array<ResolversTypes['contract_types']>, "contract_types_stream", ParentType, ContextType, RequireFields<Subscription_RootContract_Types_StreamArgs, 'batch_size' | 'cursor'>>;
+  contracts_metadata?: SubscriptionResolver<Array<ResolversTypes['contracts_metadata']>, "contracts_metadata", ParentType, ContextType, Partial<Subscription_RootContracts_MetadataArgs>>;
+  contracts_metadata_aggregate?: SubscriptionResolver<ResolversTypes['contracts_metadata_aggregate'], "contracts_metadata_aggregate", ParentType, ContextType, Partial<Subscription_RootContracts_Metadata_AggregateArgs>>;
+  contracts_metadata_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['contracts_metadata']>, "contracts_metadata_by_pk", ParentType, ContextType, RequireFields<Subscription_RootContracts_Metadata_By_PkArgs, 'address'>>;
+  contracts_metadata_stream?: SubscriptionResolver<Array<ResolversTypes['contracts_metadata']>, "contracts_metadata_stream", ParentType, ContextType, RequireFields<Subscription_RootContracts_Metadata_StreamArgs, 'batch_size' | 'cursor'>>;
+  entity_tags?: SubscriptionResolver<Array<ResolversTypes['entity_tags']>, "entity_tags", ParentType, ContextType, Partial<Subscription_RootEntity_TagsArgs>>;
+  entity_tags_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['entity_tags']>, "entity_tags_by_pk", ParentType, ContextType, RequireFields<Subscription_RootEntity_Tags_By_PkArgs, 'id'>>;
+  entity_tags_stream?: SubscriptionResolver<Array<ResolversTypes['entity_tags']>, "entity_tags_stream", ParentType, ContextType, RequireFields<Subscription_RootEntity_Tags_StreamArgs, 'batch_size' | 'cursor'>>;
+  favorites?: SubscriptionResolver<Array<ResolversTypes['favorites']>, "favorites", ParentType, ContextType, Partial<Subscription_RootFavoritesArgs>>;
+  favorites_aggregate?: SubscriptionResolver<ResolversTypes['favorites_aggregate'], "favorites_aggregate", ParentType, ContextType, Partial<Subscription_RootFavorites_AggregateArgs>>;
+  favorites_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['favorites']>, "favorites_by_pk", ParentType, ContextType, RequireFields<Subscription_RootFavorites_By_PkArgs, 'id'>>;
+  favorites_stream?: SubscriptionResolver<Array<ResolversTypes['favorites']>, "favorites_stream", ParentType, ContextType, RequireFields<Subscription_RootFavorites_StreamArgs, 'batch_size' | 'cursor'>>;
+  feature_flags?: SubscriptionResolver<Array<ResolversTypes['feature_flags']>, "feature_flags", ParentType, ContextType, Partial<Subscription_RootFeature_FlagsArgs>>;
+  feature_flags_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['feature_flags']>, "feature_flags_by_pk", ParentType, ContextType, RequireFields<Subscription_RootFeature_Flags_By_PkArgs, 'flag_name'>>;
+  feature_flags_stream?: SubscriptionResolver<Array<ResolversTypes['feature_flags']>, "feature_flags_stream", ParentType, ContextType, RequireFields<Subscription_RootFeature_Flags_StreamArgs, 'batch_size' | 'cursor'>>;
+  filter_tokens_metadata_by_features?: SubscriptionResolver<Array<ResolversTypes['tokens_metadata']>, "filter_tokens_metadata_by_features", ParentType, ContextType, RequireFields<Subscription_RootFilter_Tokens_Metadata_By_FeaturesArgs, 'args'>>;
+  filter_tokens_metadata_by_features_aggregate?: SubscriptionResolver<ResolversTypes['tokens_metadata_aggregate'], "filter_tokens_metadata_by_features_aggregate", ParentType, ContextType, RequireFields<Subscription_RootFilter_Tokens_Metadata_By_Features_AggregateArgs, 'args'>>;
+  list_projects_metadata_random?: SubscriptionResolver<Array<ResolversTypes['projects_metadata']>, "list_projects_metadata_random", ParentType, ContextType, RequireFields<Subscription_RootList_Projects_Metadata_RandomArgs, 'args'>>;
+  list_projects_metadata_random_aggregate?: SubscriptionResolver<ResolversTypes['projects_metadata_aggregate'], "list_projects_metadata_random_aggregate", ParentType, ContextType, RequireFields<Subscription_RootList_Projects_Metadata_Random_AggregateArgs, 'args'>>;
+  media?: SubscriptionResolver<Array<ResolversTypes['media']>, "media", ParentType, ContextType, Partial<Subscription_RootMediaArgs>>;
+  media_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['media']>, "media_by_pk", ParentType, ContextType, RequireFields<Subscription_RootMedia_By_PkArgs, 'id'>>;
+  media_stream?: SubscriptionResolver<Array<ResolversTypes['media']>, "media_stream", ParentType, ContextType, RequireFields<Subscription_RootMedia_StreamArgs, 'batch_size' | 'cursor'>>;
+  minter_filters_metadata?: SubscriptionResolver<Array<ResolversTypes['minter_filters_metadata']>, "minter_filters_metadata", ParentType, ContextType, Partial<Subscription_RootMinter_Filters_MetadataArgs>>;
+  minter_filters_metadata_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['minter_filters_metadata']>, "minter_filters_metadata_by_pk", ParentType, ContextType, RequireFields<Subscription_RootMinter_Filters_Metadata_By_PkArgs, 'address'>>;
+  minter_filters_metadata_stream?: SubscriptionResolver<Array<ResolversTypes['minter_filters_metadata']>, "minter_filters_metadata_stream", ParentType, ContextType, RequireFields<Subscription_RootMinter_Filters_Metadata_StreamArgs, 'batch_size' | 'cursor'>>;
+  minter_types?: SubscriptionResolver<Array<ResolversTypes['minter_types']>, "minter_types", ParentType, ContextType, Partial<Subscription_RootMinter_TypesArgs>>;
+  minter_types_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['minter_types']>, "minter_types_by_pk", ParentType, ContextType, RequireFields<Subscription_RootMinter_Types_By_PkArgs, 'type'>>;
+  minter_types_stream?: SubscriptionResolver<Array<ResolversTypes['minter_types']>, "minter_types_stream", ParentType, ContextType, RequireFields<Subscription_RootMinter_Types_StreamArgs, 'batch_size' | 'cursor'>>;
+  minters_metadata?: SubscriptionResolver<Array<ResolversTypes['minters_metadata']>, "minters_metadata", ParentType, ContextType, Partial<Subscription_RootMinters_MetadataArgs>>;
+  minters_metadata_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['minters_metadata']>, "minters_metadata_by_pk", ParentType, ContextType, RequireFields<Subscription_RootMinters_Metadata_By_PkArgs, 'address'>>;
+  minters_metadata_stream?: SubscriptionResolver<Array<ResolversTypes['minters_metadata']>, "minters_metadata_stream", ParentType, ContextType, RequireFields<Subscription_RootMinters_Metadata_StreamArgs, 'batch_size' | 'cursor'>>;
+  project_external_asset_dependencies?: SubscriptionResolver<Array<ResolversTypes['project_external_asset_dependencies']>, "project_external_asset_dependencies", ParentType, ContextType, Partial<Subscription_RootProject_External_Asset_DependenciesArgs>>;
+  project_external_asset_dependencies_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['project_external_asset_dependencies']>, "project_external_asset_dependencies_by_pk", ParentType, ContextType, RequireFields<Subscription_RootProject_External_Asset_Dependencies_By_PkArgs, 'index' | 'project_id'>>;
+  project_external_asset_dependencies_stream?: SubscriptionResolver<Array<ResolversTypes['project_external_asset_dependencies']>, "project_external_asset_dependencies_stream", ParentType, ContextType, RequireFields<Subscription_RootProject_External_Asset_Dependencies_StreamArgs, 'batch_size' | 'cursor'>>;
+  project_minter_configurations?: SubscriptionResolver<Array<ResolversTypes['project_minter_configurations']>, "project_minter_configurations", ParentType, ContextType, Partial<Subscription_RootProject_Minter_ConfigurationsArgs>>;
+  project_minter_configurations_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['project_minter_configurations']>, "project_minter_configurations_by_pk", ParentType, ContextType, RequireFields<Subscription_RootProject_Minter_Configurations_By_PkArgs, 'id'>>;
+  project_minter_configurations_stream?: SubscriptionResolver<Array<ResolversTypes['project_minter_configurations']>, "project_minter_configurations_stream", ParentType, ContextType, RequireFields<Subscription_RootProject_Minter_Configurations_StreamArgs, 'batch_size' | 'cursor'>>;
+  project_scripts?: SubscriptionResolver<Array<ResolversTypes['project_scripts']>, "project_scripts", ParentType, ContextType, Partial<Subscription_RootProject_ScriptsArgs>>;
+  project_scripts_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['project_scripts']>, "project_scripts_by_pk", ParentType, ContextType, RequireFields<Subscription_RootProject_Scripts_By_PkArgs, 'index' | 'project_id'>>;
+  project_scripts_stream?: SubscriptionResolver<Array<ResolversTypes['project_scripts']>, "project_scripts_stream", ParentType, ContextType, RequireFields<Subscription_RootProject_Scripts_StreamArgs, 'batch_size' | 'cursor'>>;
+  project_series?: SubscriptionResolver<Array<ResolversTypes['project_series']>, "project_series", ParentType, ContextType, Partial<Subscription_RootProject_SeriesArgs>>;
+  project_series_aggregate?: SubscriptionResolver<ResolversTypes['project_series_aggregate'], "project_series_aggregate", ParentType, ContextType, Partial<Subscription_RootProject_Series_AggregateArgs>>;
+  project_series_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['project_series']>, "project_series_by_pk", ParentType, ContextType, RequireFields<Subscription_RootProject_Series_By_PkArgs, 'id'>>;
+  project_series_stream?: SubscriptionResolver<Array<ResolversTypes['project_series']>, "project_series_stream", ParentType, ContextType, RequireFields<Subscription_RootProject_Series_StreamArgs, 'batch_size' | 'cursor'>>;
+  project_vertical_categories?: SubscriptionResolver<Array<ResolversTypes['project_vertical_categories']>, "project_vertical_categories", ParentType, ContextType, Partial<Subscription_RootProject_Vertical_CategoriesArgs>>;
+  project_vertical_categories_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['project_vertical_categories']>, "project_vertical_categories_by_pk", ParentType, ContextType, RequireFields<Subscription_RootProject_Vertical_Categories_By_PkArgs, 'name'>>;
+  project_vertical_categories_stream?: SubscriptionResolver<Array<ResolversTypes['project_vertical_categories']>, "project_vertical_categories_stream", ParentType, ContextType, RequireFields<Subscription_RootProject_Vertical_Categories_StreamArgs, 'batch_size' | 'cursor'>>;
+  project_verticals?: SubscriptionResolver<Array<ResolversTypes['project_verticals']>, "project_verticals", ParentType, ContextType, Partial<Subscription_RootProject_VerticalsArgs>>;
+  project_verticals_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['project_verticals']>, "project_verticals_by_pk", ParentType, ContextType, RequireFields<Subscription_RootProject_Verticals_By_PkArgs, 'name'>>;
+  project_verticals_stream?: SubscriptionResolver<Array<ResolversTypes['project_verticals']>, "project_verticals_stream", ParentType, ContextType, RequireFields<Subscription_RootProject_Verticals_StreamArgs, 'batch_size' | 'cursor'>>;
+  projects_features?: SubscriptionResolver<Array<ResolversTypes['projects_features']>, "projects_features", ParentType, ContextType, Partial<Subscription_RootProjects_FeaturesArgs>>;
+  projects_features_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['projects_features']>, "projects_features_by_pk", ParentType, ContextType, RequireFields<Subscription_RootProjects_Features_By_PkArgs, 'id'>>;
+  projects_features_stream?: SubscriptionResolver<Array<ResolversTypes['projects_features']>, "projects_features_stream", ParentType, ContextType, RequireFields<Subscription_RootProjects_Features_StreamArgs, 'batch_size' | 'cursor'>>;
+  projects_metadata?: SubscriptionResolver<Array<ResolversTypes['projects_metadata']>, "projects_metadata", ParentType, ContextType, Partial<Subscription_RootProjects_MetadataArgs>>;
+  projects_metadata_aggregate?: SubscriptionResolver<ResolversTypes['projects_metadata_aggregate'], "projects_metadata_aggregate", ParentType, ContextType, Partial<Subscription_RootProjects_Metadata_AggregateArgs>>;
+  projects_metadata_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['projects_metadata']>, "projects_metadata_by_pk", ParentType, ContextType, RequireFields<Subscription_RootProjects_Metadata_By_PkArgs, 'id'>>;
+  projects_metadata_stream?: SubscriptionResolver<Array<ResolversTypes['projects_metadata']>, "projects_metadata_stream", ParentType, ContextType, RequireFields<Subscription_RootProjects_Metadata_StreamArgs, 'batch_size' | 'cursor'>>;
+  proposed_artist_addresses_and_splits?: SubscriptionResolver<Array<ResolversTypes['proposed_artist_addresses_and_splits']>, "proposed_artist_addresses_and_splits", ParentType, ContextType, Partial<Subscription_RootProposed_Artist_Addresses_And_SplitsArgs>>;
+  proposed_artist_addresses_and_splits_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['proposed_artist_addresses_and_splits']>, "proposed_artist_addresses_and_splits_by_pk", ParentType, ContextType, RequireFields<Subscription_RootProposed_Artist_Addresses_And_Splits_By_PkArgs, 'project_id'>>;
+  proposed_artist_addresses_and_splits_stream?: SubscriptionResolver<Array<ResolversTypes['proposed_artist_addresses_and_splits']>, "proposed_artist_addresses_and_splits_stream", ParentType, ContextType, RequireFields<Subscription_RootProposed_Artist_Addresses_And_Splits_StreamArgs, 'batch_size' | 'cursor'>>;
+  search_projects?: SubscriptionResolver<Array<ResolversTypes['projects_metadata']>, "search_projects", ParentType, ContextType, RequireFields<Subscription_RootSearch_ProjectsArgs, 'args'>>;
+  search_projects_aggregate?: SubscriptionResolver<ResolversTypes['projects_metadata_aggregate'], "search_projects_aggregate", ParentType, ContextType, RequireFields<Subscription_RootSearch_Projects_AggregateArgs, 'args'>>;
+  search_tags?: SubscriptionResolver<Array<ResolversTypes['tags']>, "search_tags", ParentType, ContextType, RequireFields<Subscription_RootSearch_TagsArgs, 'args'>>;
+  search_tokens?: SubscriptionResolver<Array<ResolversTypes['tokens_metadata']>, "search_tokens", ParentType, ContextType, RequireFields<Subscription_RootSearch_TokensArgs, 'args'>>;
+  search_tokens_aggregate?: SubscriptionResolver<ResolversTypes['tokens_metadata_aggregate'], "search_tokens_aggregate", ParentType, ContextType, RequireFields<Subscription_RootSearch_Tokens_AggregateArgs, 'args'>>;
+  search_users?: SubscriptionResolver<Array<ResolversTypes['user_profiles']>, "search_users", ParentType, ContextType, RequireFields<Subscription_RootSearch_UsersArgs, 'args'>>;
+  search_users_aggregate?: SubscriptionResolver<ResolversTypes['user_profiles_aggregate'], "search_users_aggregate", ParentType, ContextType, RequireFields<Subscription_RootSearch_Users_AggregateArgs, 'args'>>;
+  tags?: SubscriptionResolver<Array<ResolversTypes['tags']>, "tags", ParentType, ContextType, Partial<Subscription_RootTagsArgs>>;
+  tags_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['tags']>, "tags_by_pk", ParentType, ContextType, RequireFields<Subscription_RootTags_By_PkArgs, 'name'>>;
+  tags_stream?: SubscriptionResolver<Array<ResolversTypes['tags']>, "tags_stream", ParentType, ContextType, RequireFields<Subscription_RootTags_StreamArgs, 'batch_size' | 'cursor'>>;
+  terms_of_service?: SubscriptionResolver<Array<ResolversTypes['terms_of_service']>, "terms_of_service", ParentType, ContextType, Partial<Subscription_RootTerms_Of_ServiceArgs>>;
+  terms_of_service_aggregate?: SubscriptionResolver<ResolversTypes['terms_of_service_aggregate'], "terms_of_service_aggregate", ParentType, ContextType, Partial<Subscription_RootTerms_Of_Service_AggregateArgs>>;
+  terms_of_service_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['terms_of_service']>, "terms_of_service_by_pk", ParentType, ContextType, RequireFields<Subscription_RootTerms_Of_Service_By_PkArgs, 'id'>>;
+  terms_of_service_stream?: SubscriptionResolver<Array<ResolversTypes['terms_of_service']>, "terms_of_service_stream", ParentType, ContextType, RequireFields<Subscription_RootTerms_Of_Service_StreamArgs, 'batch_size' | 'cursor'>>;
+  tokens_metadata?: SubscriptionResolver<Array<ResolversTypes['tokens_metadata']>, "tokens_metadata", ParentType, ContextType, Partial<Subscription_RootTokens_MetadataArgs>>;
+  tokens_metadata_aggregate?: SubscriptionResolver<ResolversTypes['tokens_metadata_aggregate'], "tokens_metadata_aggregate", ParentType, ContextType, Partial<Subscription_RootTokens_Metadata_AggregateArgs>>;
+  tokens_metadata_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['tokens_metadata']>, "tokens_metadata_by_pk", ParentType, ContextType, RequireFields<Subscription_RootTokens_Metadata_By_PkArgs, 'id'>>;
+  tokens_metadata_stream?: SubscriptionResolver<Array<ResolversTypes['tokens_metadata']>, "tokens_metadata_stream", ParentType, ContextType, RequireFields<Subscription_RootTokens_Metadata_StreamArgs, 'batch_size' | 'cursor'>>;
+  user_profiles?: SubscriptionResolver<Array<ResolversTypes['user_profiles']>, "user_profiles", ParentType, ContextType, Partial<Subscription_RootUser_ProfilesArgs>>;
+  user_profiles_aggregate?: SubscriptionResolver<ResolversTypes['user_profiles_aggregate'], "user_profiles_aggregate", ParentType, ContextType, Partial<Subscription_RootUser_Profiles_AggregateArgs>>;
+  user_profiles_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['user_profiles']>, "user_profiles_by_pk", ParentType, ContextType, RequireFields<Subscription_RootUser_Profiles_By_PkArgs, 'id'>>;
+  user_profiles_stream?: SubscriptionResolver<Array<ResolversTypes['user_profiles']>, "user_profiles_stream", ParentType, ContextType, RequireFields<Subscription_RootUser_Profiles_StreamArgs, 'batch_size' | 'cursor'>>;
+  users?: SubscriptionResolver<Array<ResolversTypes['users']>, "users", ParentType, ContextType, Partial<Subscription_RootUsersArgs>>;
+  users_aggregate?: SubscriptionResolver<ResolversTypes['users_aggregate'], "users_aggregate", ParentType, ContextType, Partial<Subscription_RootUsers_AggregateArgs>>;
+  users_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['users']>, "users_by_pk", ParentType, ContextType, RequireFields<Subscription_RootUsers_By_PkArgs, 'public_address'>>;
+  users_stream?: SubscriptionResolver<Array<ResolversTypes['users']>, "users_stream", ParentType, ContextType, RequireFields<Subscription_RootUsers_StreamArgs, 'batch_size' | 'cursor'>>;
+  verticals?: SubscriptionResolver<Array<ResolversTypes['verticals']>, "verticals", ParentType, ContextType, Partial<Subscription_RootVerticalsArgs>>;
+  verticals_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['verticals']>, "verticals_by_pk", ParentType, ContextType, RequireFields<Subscription_RootVerticals_By_PkArgs, 'name'>>;
+  verticals_stream?: SubscriptionResolver<Array<ResolversTypes['verticals']>, "verticals_stream", ParentType, ContextType, RequireFields<Subscription_RootVerticals_StreamArgs, 'batch_size' | 'cursor'>>;
+  webflow_artist_info?: SubscriptionResolver<Array<ResolversTypes['webflow_artist_info']>, "webflow_artist_info", ParentType, ContextType, Partial<Subscription_RootWebflow_Artist_InfoArgs>>;
+  webflow_artist_info_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['webflow_artist_info']>, "webflow_artist_info_by_pk", ParentType, ContextType, RequireFields<Subscription_RootWebflow_Artist_Info_By_PkArgs, 'webflow_item_id'>>;
+  webflow_artist_info_stream?: SubscriptionResolver<Array<ResolversTypes['webflow_artist_info']>, "webflow_artist_info_stream", ParentType, ContextType, RequireFields<Subscription_RootWebflow_Artist_Info_StreamArgs, 'batch_size' | 'cursor'>>;
+  webflow_spectrum_articles?: SubscriptionResolver<Array<ResolversTypes['webflow_spectrum_articles']>, "webflow_spectrum_articles", ParentType, ContextType, Partial<Subscription_RootWebflow_Spectrum_ArticlesArgs>>;
+  webflow_spectrum_articles_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['webflow_spectrum_articles']>, "webflow_spectrum_articles_by_pk", ParentType, ContextType, RequireFields<Subscription_RootWebflow_Spectrum_Articles_By_PkArgs, 'webflow_item_id'>>;
+  webflow_spectrum_articles_stream?: SubscriptionResolver<Array<ResolversTypes['webflow_spectrum_articles']>, "webflow_spectrum_articles_stream", ParentType, ContextType, RequireFields<Subscription_RootWebflow_Spectrum_Articles_StreamArgs, 'batch_size' | 'cursor'>>;
+};
+
+export type TagsResolvers<ContextType = any, ParentType extends ResolversParentTypes['tags'] = ResolversParentTypes['tags']> = {
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  display_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  entity_tags?: Resolver<Array<ResolversTypes['entity_tags']>, ParentType, ContextType, Partial<TagsEntity_TagsArgs>>;
+  grouping_name?: Resolver<ResolversTypes['tag_groupings_enum'], ParentType, ContextType>;
+  image?: Resolver<Maybe<ResolversTypes['media']>, ParentType, ContextType>;
+  media_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['tag_status_enum'], ParentType, ContextType>;
+  tagline?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  tier?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['tag_types_enum'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Terms_Of_ServiceResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service'] = ResolversParentTypes['terms_of_service']> = {
+  content?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['timestamptz'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Terms_Of_Service_AggregateResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_aggregate'] = ResolversParentTypes['terms_of_service_aggregate']> = {
+  aggregate?: Resolver<Maybe<ResolversTypes['terms_of_service_aggregate_fields']>, ParentType, ContextType>;
+  nodes?: Resolver<Array<ResolversTypes['terms_of_service']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Terms_Of_Service_Aggregate_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_aggregate_fields'] = ResolversParentTypes['terms_of_service_aggregate_fields']> = {
+  avg?: Resolver<Maybe<ResolversTypes['terms_of_service_avg_fields']>, ParentType, ContextType>;
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType, Partial<Terms_Of_Service_Aggregate_FieldsCountArgs>>;
+  max?: Resolver<Maybe<ResolversTypes['terms_of_service_max_fields']>, ParentType, ContextType>;
+  min?: Resolver<Maybe<ResolversTypes['terms_of_service_min_fields']>, ParentType, ContextType>;
+  stddev?: Resolver<Maybe<ResolversTypes['terms_of_service_stddev_fields']>, ParentType, ContextType>;
+  stddev_pop?: Resolver<Maybe<ResolversTypes['terms_of_service_stddev_pop_fields']>, ParentType, ContextType>;
+  stddev_samp?: Resolver<Maybe<ResolversTypes['terms_of_service_stddev_samp_fields']>, ParentType, ContextType>;
+  sum?: Resolver<Maybe<ResolversTypes['terms_of_service_sum_fields']>, ParentType, ContextType>;
+  var_pop?: Resolver<Maybe<ResolversTypes['terms_of_service_var_pop_fields']>, ParentType, ContextType>;
+  var_samp?: Resolver<Maybe<ResolversTypes['terms_of_service_var_samp_fields']>, ParentType, ContextType>;
+  variance?: Resolver<Maybe<ResolversTypes['terms_of_service_variance_fields']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Terms_Of_Service_Avg_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_avg_fields'] = ResolversParentTypes['terms_of_service_avg_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Terms_Of_Service_Max_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_max_fields'] = ResolversParentTypes['terms_of_service_max_fields']> = {
+  content?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  created_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Terms_Of_Service_Min_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_min_fields'] = ResolversParentTypes['terms_of_service_min_fields']> = {
+  content?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  created_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Terms_Of_Service_Stddev_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_stddev_fields'] = ResolversParentTypes['terms_of_service_stddev_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Terms_Of_Service_Stddev_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_stddev_pop_fields'] = ResolversParentTypes['terms_of_service_stddev_pop_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Terms_Of_Service_Stddev_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_stddev_samp_fields'] = ResolversParentTypes['terms_of_service_stddev_samp_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Terms_Of_Service_Sum_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_sum_fields'] = ResolversParentTypes['terms_of_service_sum_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Terms_Of_Service_Var_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_var_pop_fields'] = ResolversParentTypes['terms_of_service_var_pop_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Terms_Of_Service_Var_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_var_samp_fields'] = ResolversParentTypes['terms_of_service_var_samp_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Terms_Of_Service_Variance_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_variance_fields'] = ResolversParentTypes['terms_of_service_variance_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export interface TimestampScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['timestamp'], any> {
+  name: 'timestamp';
+}
+
+export interface TimestamptzScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['timestamptz'], any> {
+  name: 'timestamptz';
+}
+
+export type Tokens_MetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['tokens_metadata'] = ResolversParentTypes['tokens_metadata']> = {
+  contract?: Resolver<Maybe<ResolversTypes['contracts_metadata']>, ParentType, ContextType>;
+  contract_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  favorited_by_user?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  favorites?: Resolver<Array<ResolversTypes['favorites']>, ParentType, ContextType, Partial<Tokens_MetadataFavoritesArgs>>;
+  favorites_aggregate?: Resolver<ResolversTypes['favorites_aggregate'], ParentType, ContextType, Partial<Tokens_MetadataFavorites_AggregateArgs>>;
+  features?: Resolver<ResolversTypes['jsonb'], ParentType, ContextType, Partial<Tokens_MetadataFeaturesArgs>>;
+  hash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  high_res_image?: Resolver<Maybe<ResolversTypes['media']>, ParentType, ContextType>;
+  high_res_image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  image?: Resolver<Maybe<ResolversTypes['media']>, ParentType, ContextType>;
+  image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  invocation?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  isFlaggedAsSuspicious?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  list_currency_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  list_currency_symbol?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  list_eth_price?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
+  list_expiration_date?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  list_platform?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  list_price?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
+  list_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  live_view_path?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  live_view_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  low_res_image?: Resolver<Maybe<ResolversTypes['media']>, ParentType, ContextType>;
+  low_res_image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  mint_transaction_hash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  minted_at?: Resolver<ResolversTypes['timestamptz'], ParentType, ContextType>;
+  owner?: Resolver<Maybe<ResolversTypes['users']>, ParentType, ContextType>;
+  owner_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  project?: Resolver<ResolversTypes['projects_metadata'], ParentType, ContextType>;
+  project_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  project_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  token_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['timestamp']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Tokens_Metadata_AggregateResolvers<ContextType = any, ParentType extends ResolversParentTypes['tokens_metadata_aggregate'] = ResolversParentTypes['tokens_metadata_aggregate']> = {
+  aggregate?: Resolver<Maybe<ResolversTypes['tokens_metadata_aggregate_fields']>, ParentType, ContextType>;
+  nodes?: Resolver<Array<ResolversTypes['tokens_metadata']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Tokens_Metadata_Aggregate_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['tokens_metadata_aggregate_fields'] = ResolversParentTypes['tokens_metadata_aggregate_fields']> = {
+  avg?: Resolver<Maybe<ResolversTypes['tokens_metadata_avg_fields']>, ParentType, ContextType>;
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType, Partial<Tokens_Metadata_Aggregate_FieldsCountArgs>>;
+  max?: Resolver<Maybe<ResolversTypes['tokens_metadata_max_fields']>, ParentType, ContextType>;
+  min?: Resolver<Maybe<ResolversTypes['tokens_metadata_min_fields']>, ParentType, ContextType>;
+  stddev?: Resolver<Maybe<ResolversTypes['tokens_metadata_stddev_fields']>, ParentType, ContextType>;
+  stddev_pop?: Resolver<Maybe<ResolversTypes['tokens_metadata_stddev_pop_fields']>, ParentType, ContextType>;
+  stddev_samp?: Resolver<Maybe<ResolversTypes['tokens_metadata_stddev_samp_fields']>, ParentType, ContextType>;
+  sum?: Resolver<Maybe<ResolversTypes['tokens_metadata_sum_fields']>, ParentType, ContextType>;
+  var_pop?: Resolver<Maybe<ResolversTypes['tokens_metadata_var_pop_fields']>, ParentType, ContextType>;
+  var_samp?: Resolver<Maybe<ResolversTypes['tokens_metadata_var_samp_fields']>, ParentType, ContextType>;
+  variance?: Resolver<Maybe<ResolversTypes['tokens_metadata_variance_fields']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Tokens_Metadata_Avg_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['tokens_metadata_avg_fields'] = ResolversParentTypes['tokens_metadata_avg_fields']> = {
+  high_res_image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  invocation?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  list_eth_price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  list_price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  low_res_image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Tokens_Metadata_Max_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['tokens_metadata_max_fields'] = ResolversParentTypes['tokens_metadata_max_fields']> = {
+  contract_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  hash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  high_res_image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  invocation?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  list_currency_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  list_currency_symbol?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  list_eth_price?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
+  list_expiration_date?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  list_platform?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  list_price?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
+  list_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  low_res_image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  mint_transaction_hash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  minted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  owner_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  project_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  project_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  token_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['timestamp']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Tokens_Metadata_Min_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['tokens_metadata_min_fields'] = ResolversParentTypes['tokens_metadata_min_fields']> = {
+  contract_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  hash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  high_res_image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  invocation?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  list_currency_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  list_currency_symbol?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  list_eth_price?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
+  list_expiration_date?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  list_platform?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  list_price?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
+  list_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  low_res_image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  mint_transaction_hash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  minted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  owner_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  project_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  project_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  token_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['timestamp']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Tokens_Metadata_Stddev_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['tokens_metadata_stddev_fields'] = ResolversParentTypes['tokens_metadata_stddev_fields']> = {
+  high_res_image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  invocation?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  list_eth_price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  list_price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  low_res_image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Tokens_Metadata_Stddev_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['tokens_metadata_stddev_pop_fields'] = ResolversParentTypes['tokens_metadata_stddev_pop_fields']> = {
+  high_res_image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  invocation?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  list_eth_price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  list_price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  low_res_image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Tokens_Metadata_Stddev_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['tokens_metadata_stddev_samp_fields'] = ResolversParentTypes['tokens_metadata_stddev_samp_fields']> = {
+  high_res_image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  invocation?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  list_eth_price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  list_price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  low_res_image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Tokens_Metadata_Sum_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['tokens_metadata_sum_fields'] = ResolversParentTypes['tokens_metadata_sum_fields']> = {
+  high_res_image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  invocation?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  list_eth_price?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
+  list_price?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
+  low_res_image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Tokens_Metadata_Var_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['tokens_metadata_var_pop_fields'] = ResolversParentTypes['tokens_metadata_var_pop_fields']> = {
+  high_res_image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  invocation?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  list_eth_price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  list_price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  low_res_image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Tokens_Metadata_Var_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['tokens_metadata_var_samp_fields'] = ResolversParentTypes['tokens_metadata_var_samp_fields']> = {
+  high_res_image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  invocation?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  list_eth_price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  list_price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  low_res_image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Tokens_Metadata_Variance_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['tokens_metadata_variance_fields'] = ResolversParentTypes['tokens_metadata_variance_fields']> = {
+  high_res_image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  invocation?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  list_eth_price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  list_price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  low_res_image_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type User_ProfilesResolvers<ContextType = any, ParentType extends ResolversParentTypes['user_profiles'] = ResolversParentTypes['user_profiles']> = {
+  bio?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  profile_picture?: Resolver<Maybe<ResolversTypes['media']>, ParentType, ContextType>;
+  profile_picture_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  user_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  username?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type User_Profiles_AggregateResolvers<ContextType = any, ParentType extends ResolversParentTypes['user_profiles_aggregate'] = ResolversParentTypes['user_profiles_aggregate']> = {
+  aggregate?: Resolver<Maybe<ResolversTypes['user_profiles_aggregate_fields']>, ParentType, ContextType>;
+  nodes?: Resolver<Array<ResolversTypes['user_profiles']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type User_Profiles_Aggregate_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['user_profiles_aggregate_fields'] = ResolversParentTypes['user_profiles_aggregate_fields']> = {
+  avg?: Resolver<Maybe<ResolversTypes['user_profiles_avg_fields']>, ParentType, ContextType>;
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType, Partial<User_Profiles_Aggregate_FieldsCountArgs>>;
+  max?: Resolver<Maybe<ResolversTypes['user_profiles_max_fields']>, ParentType, ContextType>;
+  min?: Resolver<Maybe<ResolversTypes['user_profiles_min_fields']>, ParentType, ContextType>;
+  stddev?: Resolver<Maybe<ResolversTypes['user_profiles_stddev_fields']>, ParentType, ContextType>;
+  stddev_pop?: Resolver<Maybe<ResolversTypes['user_profiles_stddev_pop_fields']>, ParentType, ContextType>;
+  stddev_samp?: Resolver<Maybe<ResolversTypes['user_profiles_stddev_samp_fields']>, ParentType, ContextType>;
+  sum?: Resolver<Maybe<ResolversTypes['user_profiles_sum_fields']>, ParentType, ContextType>;
+  var_pop?: Resolver<Maybe<ResolversTypes['user_profiles_var_pop_fields']>, ParentType, ContextType>;
+  var_samp?: Resolver<Maybe<ResolversTypes['user_profiles_var_samp_fields']>, ParentType, ContextType>;
+  variance?: Resolver<Maybe<ResolversTypes['user_profiles_variance_fields']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type User_Profiles_Avg_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['user_profiles_avg_fields'] = ResolversParentTypes['user_profiles_avg_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  profile_picture_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type User_Profiles_Max_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['user_profiles_max_fields'] = ResolversParentTypes['user_profiles_max_fields']> = {
+  bio?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  profile_picture_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  user_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  username?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type User_Profiles_Min_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['user_profiles_min_fields'] = ResolversParentTypes['user_profiles_min_fields']> = {
+  bio?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  profile_picture_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  user_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  username?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type User_Profiles_Stddev_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['user_profiles_stddev_fields'] = ResolversParentTypes['user_profiles_stddev_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  profile_picture_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type User_Profiles_Stddev_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['user_profiles_stddev_pop_fields'] = ResolversParentTypes['user_profiles_stddev_pop_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  profile_picture_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type User_Profiles_Stddev_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['user_profiles_stddev_samp_fields'] = ResolversParentTypes['user_profiles_stddev_samp_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  profile_picture_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type User_Profiles_Sum_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['user_profiles_sum_fields'] = ResolversParentTypes['user_profiles_sum_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  profile_picture_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type User_Profiles_Var_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['user_profiles_var_pop_fields'] = ResolversParentTypes['user_profiles_var_pop_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  profile_picture_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type User_Profiles_Var_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['user_profiles_var_samp_fields'] = ResolversParentTypes['user_profiles_var_samp_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  profile_picture_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type User_Profiles_Variance_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['user_profiles_variance_fields'] = ResolversParentTypes['user_profiles_variance_fields']> = {
+  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  profile_picture_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type UsersResolvers<ContextType = any, ParentType extends ResolversParentTypes['users'] = ResolversParentTypes['users']> = {
+  allowlisted_on?: Resolver<Array<ResolversTypes['contract_allowlistings']>, ParentType, ContextType, Partial<UsersAllowlisted_OnArgs>>;
+  created_at?: Resolver<ResolversTypes['timestamptz'], ParentType, ContextType>;
+  display_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  favorited_by_user?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  favorites?: Resolver<Array<ResolversTypes['favorites']>, ParentType, ContextType, Partial<UsersFavoritesArgs>>;
+  favorites_aggregate?: Resolver<ResolversTypes['favorites_aggregate'], ParentType, ContextType, Partial<UsersFavorites_AggregateArgs>>;
+  feature_flags?: Resolver<Maybe<ResolversTypes['jsonb']>, ParentType, ContextType, Partial<UsersFeature_FlagsArgs>>;
+  is_ab_staff?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  is_curated?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  is_curator?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  nonce?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  profile?: Resolver<Maybe<ResolversTypes['user_profiles']>, ParentType, ContextType>;
+  projects_created?: Resolver<Array<ResolversTypes['projects_metadata']>, ParentType, ContextType, Partial<UsersProjects_CreatedArgs>>;
+  projects_created_aggregate?: Resolver<ResolversTypes['projects_metadata_aggregate'], ParentType, ContextType, Partial<UsersProjects_Created_AggregateArgs>>;
+  public_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tags?: Resolver<Array<ResolversTypes['entity_tags']>, ParentType, ContextType, Partial<UsersTagsArgs>>;
+  tokens?: Resolver<Array<ResolversTypes['tokens_metadata']>, ParentType, ContextType, Partial<UsersTokensArgs>>;
+  tokens_aggregate?: Resolver<ResolversTypes['tokens_metadata_aggregate'], ParentType, ContextType, Partial<UsersTokens_AggregateArgs>>;
+  tos_accepted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  viewed_warning_banner?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  webflow_artist_info?: Resolver<Maybe<ResolversTypes['webflow_artist_info']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Users_AggregateResolvers<ContextType = any, ParentType extends ResolversParentTypes['users_aggregate'] = ResolversParentTypes['users_aggregate']> = {
+  aggregate?: Resolver<Maybe<ResolversTypes['users_aggregate_fields']>, ParentType, ContextType>;
+  nodes?: Resolver<Array<ResolversTypes['users']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Users_Aggregate_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['users_aggregate_fields'] = ResolversParentTypes['users_aggregate_fields']> = {
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType, Partial<Users_Aggregate_FieldsCountArgs>>;
+  max?: Resolver<Maybe<ResolversTypes['users_max_fields']>, ParentType, ContextType>;
+  min?: Resolver<Maybe<ResolversTypes['users_min_fields']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Users_Max_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['users_max_fields'] = ResolversParentTypes['users_max_fields']> = {
+  created_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  public_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  tos_accepted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Users_Min_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['users_min_fields'] = ResolversParentTypes['users_min_fields']> = {
+  created_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  public_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  tos_accepted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type VerticalsResolvers<ContextType = any, ParentType extends ResolversParentTypes['verticals'] = ResolversParentTypes['verticals']> = {
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  project_vertical?: Resolver<Maybe<ResolversTypes['project_verticals']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Webflow_Artist_InfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['webflow_artist_info'] = ResolversParentTypes['webflow_artist_info']> = {
+  published?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  raw_data?: Resolver<ResolversTypes['jsonb'], ParentType, ContextType, Partial<Webflow_Artist_InfoRaw_DataArgs>>;
+  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  user?: Resolver<ResolversTypes['users'], ParentType, ContextType>;
+  user_public_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  webflow_collection_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  webflow_item_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Webflow_Spectrum_ArticlesResolvers<ContextType = any, ParentType extends ResolversParentTypes['webflow_spectrum_articles'] = ResolversParentTypes['webflow_spectrum_articles']> = {
+  category?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  extra_info?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  image?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  published_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  raw_data?: Resolver<ResolversTypes['jsonb'], ParentType, ContextType, Partial<Webflow_Spectrum_ArticlesRaw_DataArgs>>;
+  section?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  webflow_collection_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  webflow_item_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Resolvers<ContextType = any> = {
+  OpenseaCollectionData?: OpenseaCollectionDataResolvers<ContextType>;
+  bigint?: GraphQLScalarType;
+  categories?: CategoriesResolvers<ContextType>;
+  contract_allowlistings?: Contract_AllowlistingsResolvers<ContextType>;
+  contract_type_names?: Contract_Type_NamesResolvers<ContextType>;
+  contract_types?: Contract_TypesResolvers<ContextType>;
+  contracts_metadata?: Contracts_MetadataResolvers<ContextType>;
+  contracts_metadata_aggregate?: Contracts_Metadata_AggregateResolvers<ContextType>;
+  contracts_metadata_aggregate_fields?: Contracts_Metadata_Aggregate_FieldsResolvers<ContextType>;
+  contracts_metadata_avg_fields?: Contracts_Metadata_Avg_FieldsResolvers<ContextType>;
+  contracts_metadata_max_fields?: Contracts_Metadata_Max_FieldsResolvers<ContextType>;
+  contracts_metadata_min_fields?: Contracts_Metadata_Min_FieldsResolvers<ContextType>;
+  contracts_metadata_stddev_fields?: Contracts_Metadata_Stddev_FieldsResolvers<ContextType>;
+  contracts_metadata_stddev_pop_fields?: Contracts_Metadata_Stddev_Pop_FieldsResolvers<ContextType>;
+  contracts_metadata_stddev_samp_fields?: Contracts_Metadata_Stddev_Samp_FieldsResolvers<ContextType>;
+  contracts_metadata_sum_fields?: Contracts_Metadata_Sum_FieldsResolvers<ContextType>;
+  contracts_metadata_var_pop_fields?: Contracts_Metadata_Var_Pop_FieldsResolvers<ContextType>;
+  contracts_metadata_var_samp_fields?: Contracts_Metadata_Var_Samp_FieldsResolvers<ContextType>;
+  contracts_metadata_variance_fields?: Contracts_Metadata_Variance_FieldsResolvers<ContextType>;
+  entity_tags?: Entity_TagsResolvers<ContextType>;
+  favorites?: FavoritesResolvers<ContextType>;
+  favorites_aggregate?: Favorites_AggregateResolvers<ContextType>;
+  favorites_aggregate_fields?: Favorites_Aggregate_FieldsResolvers<ContextType>;
+  favorites_avg_fields?: Favorites_Avg_FieldsResolvers<ContextType>;
+  favorites_max_fields?: Favorites_Max_FieldsResolvers<ContextType>;
+  favorites_min_fields?: Favorites_Min_FieldsResolvers<ContextType>;
+  favorites_stddev_fields?: Favorites_Stddev_FieldsResolvers<ContextType>;
+  favorites_stddev_pop_fields?: Favorites_Stddev_Pop_FieldsResolvers<ContextType>;
+  favorites_stddev_samp_fields?: Favorites_Stddev_Samp_FieldsResolvers<ContextType>;
+  favorites_sum_fields?: Favorites_Sum_FieldsResolvers<ContextType>;
+  favorites_var_pop_fields?: Favorites_Var_Pop_FieldsResolvers<ContextType>;
+  favorites_var_samp_fields?: Favorites_Var_Samp_FieldsResolvers<ContextType>;
+  favorites_variance_fields?: Favorites_Variance_FieldsResolvers<ContextType>;
+  feature_flags?: Feature_FlagsResolvers<ContextType>;
+  float8?: GraphQLScalarType;
+  jsonb?: GraphQLScalarType;
+  jsonpath?: GraphQLScalarType;
+  media?: MediaResolvers<ContextType>;
+  minter_filters_metadata?: Minter_Filters_MetadataResolvers<ContextType>;
+  minter_types?: Minter_TypesResolvers<ContextType>;
+  minters_metadata?: Minters_MetadataResolvers<ContextType>;
+  numeric?: GraphQLScalarType;
+  project_external_asset_dependencies?: Project_External_Asset_DependenciesResolvers<ContextType>;
+  project_minter_configurations?: Project_Minter_ConfigurationsResolvers<ContextType>;
+  project_scripts?: Project_ScriptsResolvers<ContextType>;
+  project_series?: Project_SeriesResolvers<ContextType>;
+  project_series_aggregate?: Project_Series_AggregateResolvers<ContextType>;
+  project_series_aggregate_fields?: Project_Series_Aggregate_FieldsResolvers<ContextType>;
+  project_series_avg_fields?: Project_Series_Avg_FieldsResolvers<ContextType>;
+  project_series_max_fields?: Project_Series_Max_FieldsResolvers<ContextType>;
+  project_series_min_fields?: Project_Series_Min_FieldsResolvers<ContextType>;
+  project_series_stddev_fields?: Project_Series_Stddev_FieldsResolvers<ContextType>;
+  project_series_stddev_pop_fields?: Project_Series_Stddev_Pop_FieldsResolvers<ContextType>;
+  project_series_stddev_samp_fields?: Project_Series_Stddev_Samp_FieldsResolvers<ContextType>;
+  project_series_sum_fields?: Project_Series_Sum_FieldsResolvers<ContextType>;
+  project_series_var_pop_fields?: Project_Series_Var_Pop_FieldsResolvers<ContextType>;
+  project_series_var_samp_fields?: Project_Series_Var_Samp_FieldsResolvers<ContextType>;
+  project_series_variance_fields?: Project_Series_Variance_FieldsResolvers<ContextType>;
+  project_vertical_categories?: Project_Vertical_CategoriesResolvers<ContextType>;
+  project_verticals?: Project_VerticalsResolvers<ContextType>;
+  projects_features?: Projects_FeaturesResolvers<ContextType>;
+  projects_metadata?: Projects_MetadataResolvers<ContextType>;
+  projects_metadata_aggregate?: Projects_Metadata_AggregateResolvers<ContextType>;
+  projects_metadata_aggregate_fields?: Projects_Metadata_Aggregate_FieldsResolvers<ContextType>;
+  projects_metadata_avg_fields?: Projects_Metadata_Avg_FieldsResolvers<ContextType>;
+  projects_metadata_max_fields?: Projects_Metadata_Max_FieldsResolvers<ContextType>;
+  projects_metadata_min_fields?: Projects_Metadata_Min_FieldsResolvers<ContextType>;
+  projects_metadata_stddev_fields?: Projects_Metadata_Stddev_FieldsResolvers<ContextType>;
+  projects_metadata_stddev_pop_fields?: Projects_Metadata_Stddev_Pop_FieldsResolvers<ContextType>;
+  projects_metadata_stddev_samp_fields?: Projects_Metadata_Stddev_Samp_FieldsResolvers<ContextType>;
+  projects_metadata_sum_fields?: Projects_Metadata_Sum_FieldsResolvers<ContextType>;
+  projects_metadata_var_pop_fields?: Projects_Metadata_Var_Pop_FieldsResolvers<ContextType>;
+  projects_metadata_var_samp_fields?: Projects_Metadata_Var_Samp_FieldsResolvers<ContextType>;
+  projects_metadata_variance_fields?: Projects_Metadata_Variance_FieldsResolvers<ContextType>;
+  proposed_artist_addresses_and_splits?: Proposed_Artist_Addresses_And_SplitsResolvers<ContextType>;
+  query_root?: Query_RootResolvers<ContextType>;
+  seed_float?: GraphQLScalarType;
+  subscription_root?: Subscription_RootResolvers<ContextType>;
+  tags?: TagsResolvers<ContextType>;
+  terms_of_service?: Terms_Of_ServiceResolvers<ContextType>;
+  terms_of_service_aggregate?: Terms_Of_Service_AggregateResolvers<ContextType>;
+  terms_of_service_aggregate_fields?: Terms_Of_Service_Aggregate_FieldsResolvers<ContextType>;
+  terms_of_service_avg_fields?: Terms_Of_Service_Avg_FieldsResolvers<ContextType>;
+  terms_of_service_max_fields?: Terms_Of_Service_Max_FieldsResolvers<ContextType>;
+  terms_of_service_min_fields?: Terms_Of_Service_Min_FieldsResolvers<ContextType>;
+  terms_of_service_stddev_fields?: Terms_Of_Service_Stddev_FieldsResolvers<ContextType>;
+  terms_of_service_stddev_pop_fields?: Terms_Of_Service_Stddev_Pop_FieldsResolvers<ContextType>;
+  terms_of_service_stddev_samp_fields?: Terms_Of_Service_Stddev_Samp_FieldsResolvers<ContextType>;
+  terms_of_service_sum_fields?: Terms_Of_Service_Sum_FieldsResolvers<ContextType>;
+  terms_of_service_var_pop_fields?: Terms_Of_Service_Var_Pop_FieldsResolvers<ContextType>;
+  terms_of_service_var_samp_fields?: Terms_Of_Service_Var_Samp_FieldsResolvers<ContextType>;
+  terms_of_service_variance_fields?: Terms_Of_Service_Variance_FieldsResolvers<ContextType>;
+  timestamp?: GraphQLScalarType;
+  timestamptz?: GraphQLScalarType;
+  tokens_metadata?: Tokens_MetadataResolvers<ContextType>;
+  tokens_metadata_aggregate?: Tokens_Metadata_AggregateResolvers<ContextType>;
+  tokens_metadata_aggregate_fields?: Tokens_Metadata_Aggregate_FieldsResolvers<ContextType>;
+  tokens_metadata_avg_fields?: Tokens_Metadata_Avg_FieldsResolvers<ContextType>;
+  tokens_metadata_max_fields?: Tokens_Metadata_Max_FieldsResolvers<ContextType>;
+  tokens_metadata_min_fields?: Tokens_Metadata_Min_FieldsResolvers<ContextType>;
+  tokens_metadata_stddev_fields?: Tokens_Metadata_Stddev_FieldsResolvers<ContextType>;
+  tokens_metadata_stddev_pop_fields?: Tokens_Metadata_Stddev_Pop_FieldsResolvers<ContextType>;
+  tokens_metadata_stddev_samp_fields?: Tokens_Metadata_Stddev_Samp_FieldsResolvers<ContextType>;
+  tokens_metadata_sum_fields?: Tokens_Metadata_Sum_FieldsResolvers<ContextType>;
+  tokens_metadata_var_pop_fields?: Tokens_Metadata_Var_Pop_FieldsResolvers<ContextType>;
+  tokens_metadata_var_samp_fields?: Tokens_Metadata_Var_Samp_FieldsResolvers<ContextType>;
+  tokens_metadata_variance_fields?: Tokens_Metadata_Variance_FieldsResolvers<ContextType>;
+  user_profiles?: User_ProfilesResolvers<ContextType>;
+  user_profiles_aggregate?: User_Profiles_AggregateResolvers<ContextType>;
+  user_profiles_aggregate_fields?: User_Profiles_Aggregate_FieldsResolvers<ContextType>;
+  user_profiles_avg_fields?: User_Profiles_Avg_FieldsResolvers<ContextType>;
+  user_profiles_max_fields?: User_Profiles_Max_FieldsResolvers<ContextType>;
+  user_profiles_min_fields?: User_Profiles_Min_FieldsResolvers<ContextType>;
+  user_profiles_stddev_fields?: User_Profiles_Stddev_FieldsResolvers<ContextType>;
+  user_profiles_stddev_pop_fields?: User_Profiles_Stddev_Pop_FieldsResolvers<ContextType>;
+  user_profiles_stddev_samp_fields?: User_Profiles_Stddev_Samp_FieldsResolvers<ContextType>;
+  user_profiles_sum_fields?: User_Profiles_Sum_FieldsResolvers<ContextType>;
+  user_profiles_var_pop_fields?: User_Profiles_Var_Pop_FieldsResolvers<ContextType>;
+  user_profiles_var_samp_fields?: User_Profiles_Var_Samp_FieldsResolvers<ContextType>;
+  user_profiles_variance_fields?: User_Profiles_Variance_FieldsResolvers<ContextType>;
+  users?: UsersResolvers<ContextType>;
+  users_aggregate?: Users_AggregateResolvers<ContextType>;
+  users_aggregate_fields?: Users_Aggregate_FieldsResolvers<ContextType>;
+  users_max_fields?: Users_Max_FieldsResolvers<ContextType>;
+  users_min_fields?: Users_Min_FieldsResolvers<ContextType>;
+  verticals?: VerticalsResolvers<ContextType>;
+  webflow_artist_info?: Webflow_Artist_InfoResolvers<ContextType>;
+  webflow_spectrum_articles?: Webflow_Spectrum_ArticlesResolvers<ContextType>;
+};
+
+export type DirectiveResolvers<ContextType = any> = {
+  cached?: CachedDirectiveResolver<any, any, ContextType>;
+};
+
+export const ProjectsMetadataDetailsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProjectsMetadataDetails"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"projects_metadata"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"start_datetime"}},{"kind":"Field","name":{"kind":"Name","value":"vertical_name"}},{"kind":"Field","name":{"kind":"Name","value":"heritage_curation_status"}},{"kind":"Field","name":{"kind":"Name","value":"vertical"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"category_name"}}]}}]}}]} as unknown as DocumentNode<ProjectsMetadataDetailsFragment, unknown>;
+export const GetAllProjectsHasuraDetailsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getAllProjectsHasuraDetails"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectsMetadataDetails"}}]}}]}},...ProjectsMetadataDetailsFragmentDoc.definitions]} as unknown as DocumentNode<GetAllProjectsHasuraDetailsQuery, GetAllProjectsHasuraDetailsQueryVariables>;

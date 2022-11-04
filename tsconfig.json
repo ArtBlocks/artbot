@@ -18,5 +18,6 @@
     "useUnknownInCatchVariables": false,
     "outDir": "./build"
   },
-  "include": ["./**/*", "src/**/*.ts", "src/**/*.js"]
+  "include": ["./**/*", "src/**/*.ts", "src/**/*.js"],
+  "exclude": [ "./codegen.*"]
 }

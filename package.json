@@ -9,8 +9,9 @@
     "format": "prettier --write .",
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "codegen": "yarn codegen-hasura && yarn codegen-subgraph",
-    "codegen-hasura": "graphql-codegen --require dotenv/config --config ./graphql.hasura.config.js dotenv_config_path=./.env",
-    "codegen-subgraph": "graphql-codegen --require dotenv/config --config ./graphql.subgraph.config.js dotenv_config_path=./.env"
+    "codegen-hasura": "graphql-codegen --require dotenv/config --config ./codegen.hasura.ts dotenv_config_path=./.env",
+    "codegen-subgraph": "graphql-codegen --config ./codegen.subgraph.ts",
+    "dddddd": "graphql-codegen --config codegen.ts"
   },
   "keywords": [
     "artblocks",
@@ -52,13 +53,13 @@
   },
   "devDependencies": {
     "@ardatan/aggregate-error": "^0.0.6",
-    "@graphql-codegen/cli": "^2.13.8",
-    "@graphql-codegen/typed-document-node": "^2.3.5",
-    "@graphql-codegen/typescript": "^2.8.0",
-    "@graphql-codegen/typescript-document-nodes": "^2.3.5",
+    "@graphql-codegen/cli": "^2.13.11",
+    "@graphql-codegen/typed-document-node": "^2.3.6",
+    "@graphql-codegen/typescript": "^2.8.1",
     "@graphql-codegen/typescript-operations": "^2.5.5",
-    "@graphql-codegen/typescript-resolvers": "^2.2.0",
-    "@graphql-codegen/typescript-urql": "^3.7.2",
+    "@graphql-codegen/typescript-resolvers": "2.7.6",
+    "@graphql-codegen/typescript-urql": "^3.7.3",
+    "@graphql-codegen/urql-introspection": "^2.2.1",
     "@urql/exchange-retry": "^1.0.0",
     "graphql-tag": "^2.12.6"
   }

@@ -1,11 +1,11 @@
-import gql from 'graphql-tag';
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-export type Maybe<T> = T | null | undefined;
-export type InputMaybe<T> = T | null | undefined;
+export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -13,9 +13,9 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  BigDecimal: string;
-  BigInt: string;
-  Bytes: string;
+  BigDecimal: any;
+  BigInt: any;
+  Bytes: any;
 };
 
 export type Account = {
@@ -3341,40 +3341,41 @@ export enum _SubgraphErrorPolicy_ {
   Deny = 'deny'
 }
 
-export type GetContractProjectsMinimalQueryVariables = Exact<{
-  id: Scalars['ID'];
+export type ProjectDetailFragment = { __typename?: 'Project', projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, paused: boolean, complete: boolean, artistName?: string | null, contract: { __typename?: 'Contract', id: string } };
+
+export type GetAllProjectsQueryVariables = Exact<{
   first: Scalars['Int'];
   skip?: InputMaybe<Scalars['Int']>;
 }>;
 
 
-export type GetContractProjectsMinimalQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', projects?: Array<{ __typename?: 'Project', projectId: string }> | null | undefined } | null | undefined };
+export type GetAllProjectsQuery = { __typename?: 'Query', projects: Array<{ __typename?: 'Project', projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, paused: boolean, complete: boolean, artistName?: string | null, contract: { __typename?: 'Contract', id: string } }> };
 
-export type GetContractProjectsQueryVariables = Exact<{
-  id: Scalars['ID'];
+export type GetWalletTokensQueryVariables = Exact<{
+  wallet: Scalars['String'];
   first: Scalars['Int'];
   skip?: InputMaybe<Scalars['Int']>;
 }>;
 
 
-export type GetContractProjectsQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', projects?: Array<{ __typename?: 'Project', projectId: string, name?: string | null | undefined, invocations: string, maxInvocations: string, curationStatus?: string | null | undefined, active: boolean, artistName?: string | null | undefined, contract: { __typename?: 'Contract', id: string } }> | null | undefined } | null | undefined };
+export type GetWalletTokensQuery = { __typename?: 'Query', tokens: Array<{ __typename?: 'Token', invocation: any, project: { __typename?: 'Project', name?: string | null } }> };
 
 export type GetContractOpenProjectsQueryVariables = Exact<{
-  id: Scalars['ID'];
+  contract: Scalars['ID'];
   first: Scalars['Int'];
   skip?: InputMaybe<Scalars['Int']>;
 }>;
 
 
-export type GetContractOpenProjectsQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', projects?: Array<{ __typename?: 'Project', projectId: string, name?: string | null | undefined, invocations: string, maxInvocations: string, curationStatus?: string | null | undefined, active: boolean, contract: { __typename?: 'Contract', id: string } }> | null | undefined } | null | undefined };
+export type GetContractOpenProjectsQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', projects?: Array<{ __typename?: 'Project', projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, paused: boolean, complete: boolean, artistName?: string | null, contract: { __typename?: 'Contract', id: string } }> | null } | null };
 
 export type GetContractProjectQueryVariables = Exact<{
-  id: Scalars['ID'];
+  contract: Scalars['ID'];
   projectId: Scalars['BigInt'];
 }>;
 
 
-export type GetContractProjectQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', projects?: Array<{ __typename?: 'Project', name?: string | null | undefined, invocations: string, maxInvocations: string, active: boolean, curationStatus?: string | null | undefined, artistName?: string | null | undefined, contract: { __typename?: 'Contract', id: string } }> | null | undefined } | null | undefined };
+export type GetContractProjectQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', projects?: Array<{ __typename?: 'Project', projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, paused: boolean, complete: boolean, artistName?: string | null, contract: { __typename?: 'Contract', id: string } }> | null } | null };
 
 export type GetContractProjectsWithCurationStatusQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -3384,17 +3385,7 @@ export type GetContractProjectsWithCurationStatusQueryVariables = Exact<{
 }>;
 
 
-export type GetContractProjectsWithCurationStatusQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', projects?: Array<{ __typename?: 'Project', projectId: string, name?: string | null | undefined, invocations: string, maxInvocations: string, active: boolean, curationStatus?: string | null | undefined, contract: { __typename?: 'Contract', id: string } }> | null | undefined } | null | undefined };
-
-export type GetWalletTokensQueryVariables = Exact<{
-  wallet: Scalars['String'];
-  contracts: Array<Scalars['String']> | Scalars['String'];
-  first: Scalars['Int'];
-  skip?: InputMaybe<Scalars['Int']>;
-}>;
-
-
-export type GetWalletTokensQuery = { __typename?: 'Query', tokens: Array<{ __typename?: 'Token', invocation: string, project: { __typename?: 'Project', name?: string | null | undefined } }> };
+export type GetContractProjectsWithCurationStatusQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', projects?: Array<{ __typename?: 'Project', projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, curationStatus?: string | null, contract: { __typename?: 'Contract', id: string } }> | null } | null };
 
 export type GetEngineContractsQueryVariables = Exact<{
   ids?: InputMaybe<Array<Scalars['ID']> | Scalars['ID']>;
@@ -3404,120 +3395,581 @@ export type GetEngineContractsQueryVariables = Exact<{
 export type GetEngineContractsQuery = { __typename?: 'Query', contracts: Array<{ __typename?: 'Contract', id: string }> };
 
 
-export const GetContractProjectsMinimalDocument = gql`
-    query getContractProjectsMinimal($id: ID!, $first: Int!, $skip: Int) {
-  contract(id: $id) {
-    projects(first: $first, skip: $skip, orderBy: projectId) {
-      projectId
-    }
-  }
-}
-    `;
-export const GetContractProjectsDocument = gql`
-    query getContractProjects($id: ID!, $first: Int!, $skip: Int) {
-  contract(id: $id) {
-    projects(first: $first, skip: $skip, orderBy: projectId) {
-      projectId
-      name
-      invocations
-      maxInvocations
-      curationStatus
-      active
-      artistName
-      contract {
-        id
-      }
-    }
-  }
-}
-    `;
-export const GetContractOpenProjectsDocument = gql`
-    query getContractOpenProjects($id: ID!, $first: Int!, $skip: Int) {
-  contract(id: $id) {
-    projects(
-      first: $first
-      skip: $skip
-      orderBy: projectId
-      where: {paused: false, active: true, complete: false}
-    ) {
-      projectId
-      name
-      invocations
-      maxInvocations
-      curationStatus
-      active
-      contract {
-        id
-      }
-    }
-  }
-}
-    `;
-export const GetContractProjectDocument = gql`
-    query getContractProject($id: ID!, $projectId: BigInt!) {
-  contract(id: $id) {
-    projects(where: {projectId: $projectId}) {
-      name
-      invocations
-      maxInvocations
-      active
-      curationStatus
-      artistName
-      contract {
-        id
-      }
-    }
-  }
-}
-    `;
-export const GetContractProjectsWithCurationStatusDocument = gql`
-    query getContractProjectsWithCurationStatus($id: ID!, $first: Int!, $skip: Int, $curationStatus: String) {
-  contract(id: $id) {
-    projects(
-      where: {curationStatus: $curationStatus, active: true}
-      first: $first
-      skip: $skip
-      orderBy: projectId
-    ) {
-      projectId
-      name
-      invocations
-      maxInvocations
-      active
-      curationStatus
-      contract {
-        id
-      }
-    }
-  }
-}
-    `;
-export const GetWalletTokensDocument = gql`
-    query getWalletTokens($wallet: String!, $contracts: [String!]!, $first: Int!, $skip: Int) {
-  tokens(
-    first: $first
-    skip: $skip
-    where: {owner: $wallet, contract_in: $contracts}
-  ) {
-    invocation
-    project {
-      name
-    }
-  }
-}
-    `;
-export const GetEngineContractsDocument = gql`
-    query getEngineContracts($ids: [ID!]) {
-  contracts(where: {id_not_in: $ids}) {
-    id
-  }
-}
-    `;
 
-export const GetContractProjectsMinimalDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getContractProjectsMinimal"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contract"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"EnumValue","value":"projectId"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projectId"}}]}}]}}]}}]} as unknown as DocumentNode<GetContractProjectsMinimalQuery, GetContractProjectsMinimalQueryVariables>;
-export const GetContractProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getContractProjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contract"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"EnumValue","value":"projectId"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projectId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"invocations"}},{"kind":"Field","name":{"kind":"Name","value":"maxInvocations"}},{"kind":"Field","name":{"kind":"Name","value":"curationStatus"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"artistName"}},{"kind":"Field","name":{"kind":"Name","value":"contract"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetContractProjectsQuery, GetContractProjectsQueryVariables>;
-export const GetContractOpenProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getContractOpenProjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contract"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"EnumValue","value":"projectId"}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"paused"},"value":{"kind":"BooleanValue","value":false}},{"kind":"ObjectField","name":{"kind":"Name","value":"active"},"value":{"kind":"BooleanValue","value":true}},{"kind":"ObjectField","name":{"kind":"Name","value":"complete"},"value":{"kind":"BooleanValue","value":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projectId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"invocations"}},{"kind":"Field","name":{"kind":"Name","value":"maxInvocations"}},{"kind":"Field","name":{"kind":"Name","value":"curationStatus"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"contract"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetContractOpenProjectsQuery, GetContractOpenProjectsQueryVariables>;
-export const GetContractProjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getContractProject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"projectId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BigInt"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contract"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"projectId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"projectId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"invocations"}},{"kind":"Field","name":{"kind":"Name","value":"maxInvocations"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"curationStatus"}},{"kind":"Field","name":{"kind":"Name","value":"artistName"}},{"kind":"Field","name":{"kind":"Name","value":"contract"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetContractProjectQuery, GetContractProjectQueryVariables>;
+export type ResolverTypeWrapper<T> = Promise<T> | T;
+
+
+export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
+  resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
+};
+export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> = ResolverFn<TResult, TParent, TContext, TArgs> | ResolverWithResolve<TResult, TParent, TContext, TArgs>;
+
+export type ResolverFn<TResult, TParent, TContext, TArgs> = (
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => Promise<TResult> | TResult;
+
+export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => AsyncIterable<TResult> | Promise<AsyncIterable<TResult>>;
+
+export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => TResult | Promise<TResult>;
+
+export interface SubscriptionSubscriberObject<TResult, TKey extends string, TParent, TContext, TArgs> {
+  subscribe: SubscriptionSubscribeFn<{ [key in TKey]: TResult }, TParent, TContext, TArgs>;
+  resolve?: SubscriptionResolveFn<TResult, { [key in TKey]: TResult }, TContext, TArgs>;
+}
+
+export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
+  subscribe: SubscriptionSubscribeFn<any, TParent, TContext, TArgs>;
+  resolve: SubscriptionResolveFn<TResult, any, TContext, TArgs>;
+}
+
+export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, TArgs> =
+  | SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
+  | SubscriptionResolverObject<TResult, TParent, TContext, TArgs>;
+
+export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TContext = {}, TArgs = {}> =
+  | ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
+  | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>;
+
+export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
+  parent: TParent,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
+
+export type IsTypeOfResolverFn<T = {}, TContext = {}> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
+
+export type NextResolverFn<T> = () => Promise<T>;
+
+export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs = {}> = (
+  next: NextResolverFn<TResult>,
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => TResult | Promise<TResult>;
+
+/** Mapping between all available schema types and the resolvers types */
+export type ResolversTypes = {
+  Account: ResolverTypeWrapper<Account>;
+  AccountProject: ResolverTypeWrapper<AccountProject>;
+  AccountProject_filter: AccountProject_Filter;
+  AccountProject_orderBy: AccountProject_OrderBy;
+  Account_filter: Account_Filter;
+  Account_orderBy: Account_OrderBy;
+  BigDecimal: ResolverTypeWrapper<Scalars['BigDecimal']>;
+  BigInt: ResolverTypeWrapper<Scalars['BigInt']>;
+  BlockChangedFilter: BlockChangedFilter;
+  Block_height: Block_Height;
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  Bytes: ResolverTypeWrapper<Scalars['Bytes']>;
+  Contract: ResolverTypeWrapper<Contract>;
+  Contract_filter: Contract_Filter;
+  Contract_orderBy: Contract_OrderBy;
+  CoreType: CoreType;
+  Exchange: Exchange;
+  Float: ResolverTypeWrapper<Scalars['Float']>;
+  ID: ResolverTypeWrapper<Scalars['ID']>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
+  Minter: ResolverTypeWrapper<Minter>;
+  MinterFilter: ResolverTypeWrapper<MinterFilter>;
+  MinterFilter_filter: MinterFilter_Filter;
+  MinterFilter_orderBy: MinterFilter_OrderBy;
+  MinterType: MinterType;
+  Minter_filter: Minter_Filter;
+  Minter_orderBy: Minter_OrderBy;
+  OrderDirection: OrderDirection;
+  Payment: ResolverTypeWrapper<Payment>;
+  PaymentType: PaymentType;
+  Payment_filter: Payment_Filter;
+  Payment_orderBy: Payment_OrderBy;
+  Project: ResolverTypeWrapper<Project>;
+  ProjectExternalAssetDependency: ResolverTypeWrapper<ProjectExternalAssetDependency>;
+  ProjectExternalAssetDependencyType: ProjectExternalAssetDependencyType;
+  ProjectExternalAssetDependency_filter: ProjectExternalAssetDependency_Filter;
+  ProjectExternalAssetDependency_orderBy: ProjectExternalAssetDependency_OrderBy;
+  ProjectMinterConfiguration: ResolverTypeWrapper<ProjectMinterConfiguration>;
+  ProjectMinterConfiguration_filter: ProjectMinterConfiguration_Filter;
+  ProjectMinterConfiguration_orderBy: ProjectMinterConfiguration_OrderBy;
+  ProjectScript: ResolverTypeWrapper<ProjectScript>;
+  ProjectScript_filter: ProjectScript_Filter;
+  ProjectScript_orderBy: ProjectScript_OrderBy;
+  Project_filter: Project_Filter;
+  Project_orderBy: Project_OrderBy;
+  ProposedArtistAddressesAndSplit: ResolverTypeWrapper<ProposedArtistAddressesAndSplit>;
+  ProposedArtistAddressesAndSplit_filter: ProposedArtistAddressesAndSplit_Filter;
+  ProposedArtistAddressesAndSplit_orderBy: ProposedArtistAddressesAndSplit_OrderBy;
+  Query: ResolverTypeWrapper<{}>;
+  Sale: ResolverTypeWrapper<Sale>;
+  SaleLookupTable: ResolverTypeWrapper<SaleLookupTable>;
+  SaleLookupTable_filter: SaleLookupTable_Filter;
+  SaleLookupTable_orderBy: SaleLookupTable_OrderBy;
+  SaleType: SaleType;
+  Sale_filter: Sale_Filter;
+  Sale_orderBy: Sale_OrderBy;
+  String: ResolverTypeWrapper<Scalars['String']>;
+  Subscription: ResolverTypeWrapper<{}>;
+  Token: ResolverTypeWrapper<Token>;
+  Token_filter: Token_Filter;
+  Token_orderBy: Token_OrderBy;
+  Transfer: ResolverTypeWrapper<Transfer>;
+  Transfer_filter: Transfer_Filter;
+  Transfer_orderBy: Transfer_OrderBy;
+  Whitelisting: ResolverTypeWrapper<Whitelisting>;
+  Whitelisting_filter: Whitelisting_Filter;
+  Whitelisting_orderBy: Whitelisting_OrderBy;
+  _Block_: ResolverTypeWrapper<_Block_>;
+  _Meta_: ResolverTypeWrapper<_Meta_>;
+  _SubgraphErrorPolicy_: _SubgraphErrorPolicy_;
+};
+
+/** Mapping between all available schema types and the resolvers parents */
+export type ResolversParentTypes = {
+  Account: Account;
+  AccountProject: AccountProject;
+  AccountProject_filter: AccountProject_Filter;
+  Account_filter: Account_Filter;
+  BigDecimal: Scalars['BigDecimal'];
+  BigInt: Scalars['BigInt'];
+  BlockChangedFilter: BlockChangedFilter;
+  Block_height: Block_Height;
+  Boolean: Scalars['Boolean'];
+  Bytes: Scalars['Bytes'];
+  Contract: Contract;
+  Contract_filter: Contract_Filter;
+  Float: Scalars['Float'];
+  ID: Scalars['ID'];
+  Int: Scalars['Int'];
+  Minter: Minter;
+  MinterFilter: MinterFilter;
+  MinterFilter_filter: MinterFilter_Filter;
+  Minter_filter: Minter_Filter;
+  Payment: Payment;
+  Payment_filter: Payment_Filter;
+  Project: Project;
+  ProjectExternalAssetDependency: ProjectExternalAssetDependency;
+  ProjectExternalAssetDependency_filter: ProjectExternalAssetDependency_Filter;
+  ProjectMinterConfiguration: ProjectMinterConfiguration;
+  ProjectMinterConfiguration_filter: ProjectMinterConfiguration_Filter;
+  ProjectScript: ProjectScript;
+  ProjectScript_filter: ProjectScript_Filter;
+  Project_filter: Project_Filter;
+  ProposedArtistAddressesAndSplit: ProposedArtistAddressesAndSplit;
+  ProposedArtistAddressesAndSplit_filter: ProposedArtistAddressesAndSplit_Filter;
+  Query: {};
+  Sale: Sale;
+  SaleLookupTable: SaleLookupTable;
+  SaleLookupTable_filter: SaleLookupTable_Filter;
+  Sale_filter: Sale_Filter;
+  String: Scalars['String'];
+  Subscription: {};
+  Token: Token;
+  Token_filter: Token_Filter;
+  Transfer: Transfer;
+  Transfer_filter: Transfer_Filter;
+  Whitelisting: Whitelisting;
+  Whitelisting_filter: Whitelisting_Filter;
+  _Block_: _Block_;
+  _Meta_: _Meta_;
+};
+
+export type DerivedFromDirectiveArgs = {
+  field: Scalars['String'];
+};
+
+export type DerivedFromDirectiveResolver<Result, Parent, ContextType = any, Args = DerivedFromDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type EntityDirectiveArgs = { };
+
+export type EntityDirectiveResolver<Result, Parent, ContextType = any, Args = EntityDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type SubgraphIdDirectiveArgs = {
+  id: Scalars['String'];
+};
+
+export type SubgraphIdDirectiveResolver<Result, Parent, ContextType = any, Args = SubgraphIdDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type AccountResolvers<ContextType = any, ParentType extends ResolversParentTypes['Account'] = ResolversParentTypes['Account']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  projectsCreated?: Resolver<Maybe<Array<ResolversTypes['Project']>>, ParentType, ContextType, RequireFields<AccountProjectsCreatedArgs, 'first' | 'skip'>>;
+  projectsOwned?: Resolver<Maybe<Array<ResolversTypes['AccountProject']>>, ParentType, ContextType, RequireFields<AccountProjectsOwnedArgs, 'first' | 'skip'>>;
+  tokens?: Resolver<Maybe<Array<ResolversTypes['Token']>>, ParentType, ContextType, RequireFields<AccountTokensArgs, 'first' | 'skip'>>;
+  whitelistedOn?: Resolver<Maybe<Array<ResolversTypes['Whitelisting']>>, ParentType, ContextType, RequireFields<AccountWhitelistedOnArgs, 'first' | 'skip'>>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type AccountProjectResolvers<ContextType = any, ParentType extends ResolversParentTypes['AccountProject'] = ResolversParentTypes['AccountProject']> = {
+  account?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export interface BigDecimalScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['BigDecimal'], any> {
+  name: 'BigDecimal';
+}
+
+export interface BigIntScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['BigInt'], any> {
+  name: 'BigInt';
+}
+
+export interface BytesScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Bytes'], any> {
+  name: 'Bytes';
+}
+
+export type ContractResolvers<ContextType = any, ParentType extends ResolversParentTypes['Contract'] = ResolversParentTypes['Contract']> = {
+  admin?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  curationRegistry?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  dependencyRegistry?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  mintWhitelisted?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  minterFilter?: Resolver<Maybe<ResolversTypes['MinterFilter']>, ParentType, ContextType>;
+  newProjectsForbidden?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  nextProjectId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  preferredArweaveGateway?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  preferredIPFSGateway?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  projects?: Resolver<Maybe<Array<ResolversTypes['Project']>>, ParentType, ContextType, RequireFields<ContractProjectsArgs, 'first' | 'skip'>>;
+  randomizerContract?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  renderProviderAddress?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  renderProviderPercentage?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  renderProviderSecondarySalesAddress?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  renderProviderSecondarySalesBPS?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  tokens?: Resolver<Maybe<Array<ResolversTypes['Token']>>, ParentType, ContextType, RequireFields<ContractTokensArgs, 'first' | 'skip'>>;
+  type?: Resolver<ResolversTypes['CoreType'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  whitelisted?: Resolver<Maybe<Array<ResolversTypes['Whitelisting']>>, ParentType, ContextType, RequireFields<ContractWhitelistedArgs, 'first' | 'skip'>>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MinterResolvers<ContextType = any, ParentType extends ResolversParentTypes['Minter'] = ResolversParentTypes['Minter']> = {
+  coreContract?: Resolver<ResolversTypes['Contract'], ParentType, ContextType>;
+  extraMinterDetails?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  maximumHalfLifeInSeconds?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  minimumAuctionLengthInSeconds?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  minimumHalfLifeInSeconds?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  minterFilter?: Resolver<ResolversTypes['MinterFilter'], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['MinterType'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MinterFilterResolvers<ContextType = any, ParentType extends ResolversParentTypes['MinterFilter'] = ResolversParentTypes['MinterFilter']> = {
+  associatedMinters?: Resolver<Array<ResolversTypes['Minter']>, ParentType, ContextType, RequireFields<MinterFilterAssociatedMintersArgs, 'first' | 'skip'>>;
+  coreContract?: Resolver<ResolversTypes['Contract'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  minterAllowlist?: Resolver<Array<ResolversTypes['Minter']>, ParentType, ContextType, RequireFields<MinterFilterMinterAllowlistArgs, 'first' | 'skip'>>;
+  updatedAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PaymentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Payment'] = ResolversParentTypes['Payment']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  paymentToken?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  paymentType?: Resolver<ResolversTypes['PaymentType'], ParentType, ContextType>;
+  price?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  recipient?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  sale?: Resolver<ResolversTypes['Sale'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ProjectResolvers<ContextType = any, ParentType extends ResolversParentTypes['Project'] = ResolversParentTypes['Project']> = {
+  activatedAt?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  active?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  additionalPayee?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  additionalPayeePercentage?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  additionalPayeeSecondarySalesAddress?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  additionalPayeeSecondarySalesPercentage?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  artist?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
+  artistAddress?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  artistName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  aspectRatio?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  baseIpfsUri?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  baseUri?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  complete?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  completedAt?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  contract?: Resolver<ResolversTypes['Contract'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  curationStatus?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  currencyAddress?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  currencySymbol?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  dynamic?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  externalAssetDependencies?: Resolver<Array<ResolversTypes['ProjectExternalAssetDependency']>, ParentType, ContextType, RequireFields<ProjectExternalAssetDependenciesArgs, 'first' | 'skip'>>;
+  externalAssetDependenciesLocked?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  externalAssetDependencyCount?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  invocations?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  ipfsHash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  license?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  locked?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  maxInvocations?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  minterConfiguration?: Resolver<Maybe<ResolversTypes['ProjectMinterConfiguration']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  owners?: Resolver<Maybe<Array<ResolversTypes['AccountProject']>>, ParentType, ContextType, RequireFields<ProjectOwnersArgs, 'first' | 'skip'>>;
+  paused?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  pricePerTokenInWei?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  projectId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  proposedArtistAddressesAndSplits?: Resolver<Maybe<ResolversTypes['ProposedArtistAddressesAndSplit']>, ParentType, ContextType>;
+  royaltyPercentage?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  saleLookupTables?: Resolver<Array<ResolversTypes['SaleLookupTable']>, ParentType, ContextType, RequireFields<ProjectSaleLookupTablesArgs, 'first' | 'skip'>>;
+  script?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  scriptCount?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  scriptJSON?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  scriptTypeAndVersion?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  scriptUpdatedAt?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  scripts?: Resolver<Maybe<Array<ResolversTypes['ProjectScript']>>, ParentType, ContextType, RequireFields<ProjectScriptsArgs, 'first' | 'skip'>>;
+  tokens?: Resolver<Maybe<Array<ResolversTypes['Token']>>, ParentType, ContextType, RequireFields<ProjectTokensArgs, 'first' | 'skip'>>;
+  updatedAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  useHashString?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  useIpfs?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  website?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ProjectExternalAssetDependencyResolvers<ContextType = any, ParentType extends ResolversParentTypes['ProjectExternalAssetDependency'] = ResolversParentTypes['ProjectExternalAssetDependency']> = {
+  cid?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  dependencyType?: Resolver<ResolversTypes['ProjectExternalAssetDependencyType'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  index?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ProjectMinterConfigurationResolvers<ContextType = any, ParentType extends ResolversParentTypes['ProjectMinterConfiguration'] = ResolversParentTypes['ProjectMinterConfiguration']> = {
+  basePrice?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  currencyAddress?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  currencySymbol?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  endTime?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  extraMinterDetails?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  halfLifeSeconds?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  minter?: Resolver<ResolversTypes['Minter'], ParentType, ContextType>;
+  priceIsConfigured?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>;
+  purchaseToDisabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  startPrice?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  startTime?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ProjectScriptResolvers<ContextType = any, ParentType extends ResolversParentTypes['ProjectScript'] = ResolversParentTypes['ProjectScript']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  index?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>;
+  script?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ProposedArtistAddressesAndSplitResolvers<ContextType = any, ParentType extends ResolversParentTypes['ProposedArtistAddressesAndSplit'] = ResolversParentTypes['ProposedArtistAddressesAndSplit']> = {
+  additionalPayeePrimarySalesAddress?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  additionalPayeePrimarySalesPercentage?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  additionalPayeeSecondarySalesAddress?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  additionalPayeeSecondarySalesPercentage?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  artistAddress?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  _meta?: Resolver<Maybe<ResolversTypes['_Meta_']>, ParentType, ContextType, Partial<Query_MetaArgs>>;
+  account?: Resolver<Maybe<ResolversTypes['Account']>, ParentType, ContextType, RequireFields<QueryAccountArgs, 'id' | 'subgraphError'>>;
+  accountProject?: Resolver<Maybe<ResolversTypes['AccountProject']>, ParentType, ContextType, RequireFields<QueryAccountProjectArgs, 'id' | 'subgraphError'>>;
+  accountProjects?: Resolver<Array<ResolversTypes['AccountProject']>, ParentType, ContextType, RequireFields<QueryAccountProjectsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  accounts?: Resolver<Array<ResolversTypes['Account']>, ParentType, ContextType, RequireFields<QueryAccountsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  contract?: Resolver<Maybe<ResolversTypes['Contract']>, ParentType, ContextType, RequireFields<QueryContractArgs, 'id' | 'subgraphError'>>;
+  contracts?: Resolver<Array<ResolversTypes['Contract']>, ParentType, ContextType, RequireFields<QueryContractsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  minter?: Resolver<Maybe<ResolversTypes['Minter']>, ParentType, ContextType, RequireFields<QueryMinterArgs, 'id' | 'subgraphError'>>;
+  minterFilter?: Resolver<Maybe<ResolversTypes['MinterFilter']>, ParentType, ContextType, RequireFields<QueryMinterFilterArgs, 'id' | 'subgraphError'>>;
+  minterFilters?: Resolver<Array<ResolversTypes['MinterFilter']>, ParentType, ContextType, RequireFields<QueryMinterFiltersArgs, 'first' | 'skip' | 'subgraphError'>>;
+  minters?: Resolver<Array<ResolversTypes['Minter']>, ParentType, ContextType, RequireFields<QueryMintersArgs, 'first' | 'skip' | 'subgraphError'>>;
+  payment?: Resolver<Maybe<ResolversTypes['Payment']>, ParentType, ContextType, RequireFields<QueryPaymentArgs, 'id' | 'subgraphError'>>;
+  payments?: Resolver<Array<ResolversTypes['Payment']>, ParentType, ContextType, RequireFields<QueryPaymentsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  project?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectArgs, 'id' | 'subgraphError'>>;
+  projectExternalAssetDependencies?: Resolver<Array<ResolversTypes['ProjectExternalAssetDependency']>, ParentType, ContextType, RequireFields<QueryProjectExternalAssetDependenciesArgs, 'first' | 'skip' | 'subgraphError'>>;
+  projectExternalAssetDependency?: Resolver<Maybe<ResolversTypes['ProjectExternalAssetDependency']>, ParentType, ContextType, RequireFields<QueryProjectExternalAssetDependencyArgs, 'id' | 'subgraphError'>>;
+  projectMinterConfiguration?: Resolver<Maybe<ResolversTypes['ProjectMinterConfiguration']>, ParentType, ContextType, RequireFields<QueryProjectMinterConfigurationArgs, 'id' | 'subgraphError'>>;
+  projectMinterConfigurations?: Resolver<Array<ResolversTypes['ProjectMinterConfiguration']>, ParentType, ContextType, RequireFields<QueryProjectMinterConfigurationsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  projectScript?: Resolver<Maybe<ResolversTypes['ProjectScript']>, ParentType, ContextType, RequireFields<QueryProjectScriptArgs, 'id' | 'subgraphError'>>;
+  projectScripts?: Resolver<Array<ResolversTypes['ProjectScript']>, ParentType, ContextType, RequireFields<QueryProjectScriptsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  projects?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  proposedArtistAddressesAndSplit?: Resolver<Maybe<ResolversTypes['ProposedArtistAddressesAndSplit']>, ParentType, ContextType, RequireFields<QueryProposedArtistAddressesAndSplitArgs, 'id' | 'subgraphError'>>;
+  proposedArtistAddressesAndSplits?: Resolver<Array<ResolversTypes['ProposedArtistAddressesAndSplit']>, ParentType, ContextType, RequireFields<QueryProposedArtistAddressesAndSplitsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  sale?: Resolver<Maybe<ResolversTypes['Sale']>, ParentType, ContextType, RequireFields<QuerySaleArgs, 'id' | 'subgraphError'>>;
+  saleLookupTable?: Resolver<Maybe<ResolversTypes['SaleLookupTable']>, ParentType, ContextType, RequireFields<QuerySaleLookupTableArgs, 'id' | 'subgraphError'>>;
+  saleLookupTables?: Resolver<Array<ResolversTypes['SaleLookupTable']>, ParentType, ContextType, RequireFields<QuerySaleLookupTablesArgs, 'first' | 'skip' | 'subgraphError'>>;
+  sales?: Resolver<Array<ResolversTypes['Sale']>, ParentType, ContextType, RequireFields<QuerySalesArgs, 'first' | 'skip' | 'subgraphError'>>;
+  token?: Resolver<Maybe<ResolversTypes['Token']>, ParentType, ContextType, RequireFields<QueryTokenArgs, 'id' | 'subgraphError'>>;
+  tokens?: Resolver<Array<ResolversTypes['Token']>, ParentType, ContextType, RequireFields<QueryTokensArgs, 'first' | 'skip' | 'subgraphError'>>;
+  transfer?: Resolver<Maybe<ResolversTypes['Transfer']>, ParentType, ContextType, RequireFields<QueryTransferArgs, 'id' | 'subgraphError'>>;
+  transfers?: Resolver<Array<ResolversTypes['Transfer']>, ParentType, ContextType, RequireFields<QueryTransfersArgs, 'first' | 'skip' | 'subgraphError'>>;
+  whitelisting?: Resolver<Maybe<ResolversTypes['Whitelisting']>, ParentType, ContextType, RequireFields<QueryWhitelistingArgs, 'id' | 'subgraphError'>>;
+  whitelistings?: Resolver<Array<ResolversTypes['Whitelisting']>, ParentType, ContextType, RequireFields<QueryWhitelistingsArgs, 'first' | 'skip' | 'subgraphError'>>;
+};
+
+export type SaleResolvers<ContextType = any, ParentType extends ResolversParentTypes['Sale'] = ResolversParentTypes['Sale']> = {
+  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  buyer?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  exchange?: Resolver<ResolversTypes['Exchange'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  isPrivate?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  payments?: Resolver<Array<ResolversTypes['Payment']>, ParentType, ContextType, RequireFields<SalePaymentsArgs, 'first' | 'skip'>>;
+  saleLookupTables?: Resolver<Array<ResolversTypes['SaleLookupTable']>, ParentType, ContextType, RequireFields<SaleSaleLookupTablesArgs, 'first' | 'skip'>>;
+  saleType?: Resolver<ResolversTypes['SaleType'], ParentType, ContextType>;
+  seller?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  summaryTokensSold?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  txHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SaleLookupTableResolvers<ContextType = any, ParentType extends ResolversParentTypes['SaleLookupTable'] = ResolversParentTypes['SaleLookupTable']> = {
+  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>;
+  sale?: Resolver<ResolversTypes['Sale'], ParentType, ContextType>;
+  timestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  token?: Resolver<ResolversTypes['Token'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
+  _meta?: SubscriptionResolver<Maybe<ResolversTypes['_Meta_']>, "_meta", ParentType, ContextType, Partial<Subscription_MetaArgs>>;
+  account?: SubscriptionResolver<Maybe<ResolversTypes['Account']>, "account", ParentType, ContextType, RequireFields<SubscriptionAccountArgs, 'id' | 'subgraphError'>>;
+  accountProject?: SubscriptionResolver<Maybe<ResolversTypes['AccountProject']>, "accountProject", ParentType, ContextType, RequireFields<SubscriptionAccountProjectArgs, 'id' | 'subgraphError'>>;
+  accountProjects?: SubscriptionResolver<Array<ResolversTypes['AccountProject']>, "accountProjects", ParentType, ContextType, RequireFields<SubscriptionAccountProjectsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  accounts?: SubscriptionResolver<Array<ResolversTypes['Account']>, "accounts", ParentType, ContextType, RequireFields<SubscriptionAccountsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  contract?: SubscriptionResolver<Maybe<ResolversTypes['Contract']>, "contract", ParentType, ContextType, RequireFields<SubscriptionContractArgs, 'id' | 'subgraphError'>>;
+  contracts?: SubscriptionResolver<Array<ResolversTypes['Contract']>, "contracts", ParentType, ContextType, RequireFields<SubscriptionContractsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  minter?: SubscriptionResolver<Maybe<ResolversTypes['Minter']>, "minter", ParentType, ContextType, RequireFields<SubscriptionMinterArgs, 'id' | 'subgraphError'>>;
+  minterFilter?: SubscriptionResolver<Maybe<ResolversTypes['MinterFilter']>, "minterFilter", ParentType, ContextType, RequireFields<SubscriptionMinterFilterArgs, 'id' | 'subgraphError'>>;
+  minterFilters?: SubscriptionResolver<Array<ResolversTypes['MinterFilter']>, "minterFilters", ParentType, ContextType, RequireFields<SubscriptionMinterFiltersArgs, 'first' | 'skip' | 'subgraphError'>>;
+  minters?: SubscriptionResolver<Array<ResolversTypes['Minter']>, "minters", ParentType, ContextType, RequireFields<SubscriptionMintersArgs, 'first' | 'skip' | 'subgraphError'>>;
+  payment?: SubscriptionResolver<Maybe<ResolversTypes['Payment']>, "payment", ParentType, ContextType, RequireFields<SubscriptionPaymentArgs, 'id' | 'subgraphError'>>;
+  payments?: SubscriptionResolver<Array<ResolversTypes['Payment']>, "payments", ParentType, ContextType, RequireFields<SubscriptionPaymentsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  project?: SubscriptionResolver<Maybe<ResolversTypes['Project']>, "project", ParentType, ContextType, RequireFields<SubscriptionProjectArgs, 'id' | 'subgraphError'>>;
+  projectExternalAssetDependencies?: SubscriptionResolver<Array<ResolversTypes['ProjectExternalAssetDependency']>, "projectExternalAssetDependencies", ParentType, ContextType, RequireFields<SubscriptionProjectExternalAssetDependenciesArgs, 'first' | 'skip' | 'subgraphError'>>;
+  projectExternalAssetDependency?: SubscriptionResolver<Maybe<ResolversTypes['ProjectExternalAssetDependency']>, "projectExternalAssetDependency", ParentType, ContextType, RequireFields<SubscriptionProjectExternalAssetDependencyArgs, 'id' | 'subgraphError'>>;
+  projectMinterConfiguration?: SubscriptionResolver<Maybe<ResolversTypes['ProjectMinterConfiguration']>, "projectMinterConfiguration", ParentType, ContextType, RequireFields<SubscriptionProjectMinterConfigurationArgs, 'id' | 'subgraphError'>>;
+  projectMinterConfigurations?: SubscriptionResolver<Array<ResolversTypes['ProjectMinterConfiguration']>, "projectMinterConfigurations", ParentType, ContextType, RequireFields<SubscriptionProjectMinterConfigurationsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  projectScript?: SubscriptionResolver<Maybe<ResolversTypes['ProjectScript']>, "projectScript", ParentType, ContextType, RequireFields<SubscriptionProjectScriptArgs, 'id' | 'subgraphError'>>;
+  projectScripts?: SubscriptionResolver<Array<ResolversTypes['ProjectScript']>, "projectScripts", ParentType, ContextType, RequireFields<SubscriptionProjectScriptsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  projects?: SubscriptionResolver<Array<ResolversTypes['Project']>, "projects", ParentType, ContextType, RequireFields<SubscriptionProjectsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  proposedArtistAddressesAndSplit?: SubscriptionResolver<Maybe<ResolversTypes['ProposedArtistAddressesAndSplit']>, "proposedArtistAddressesAndSplit", ParentType, ContextType, RequireFields<SubscriptionProposedArtistAddressesAndSplitArgs, 'id' | 'subgraphError'>>;
+  proposedArtistAddressesAndSplits?: SubscriptionResolver<Array<ResolversTypes['ProposedArtistAddressesAndSplit']>, "proposedArtistAddressesAndSplits", ParentType, ContextType, RequireFields<SubscriptionProposedArtistAddressesAndSplitsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  sale?: SubscriptionResolver<Maybe<ResolversTypes['Sale']>, "sale", ParentType, ContextType, RequireFields<SubscriptionSaleArgs, 'id' | 'subgraphError'>>;
+  saleLookupTable?: SubscriptionResolver<Maybe<ResolversTypes['SaleLookupTable']>, "saleLookupTable", ParentType, ContextType, RequireFields<SubscriptionSaleLookupTableArgs, 'id' | 'subgraphError'>>;
+  saleLookupTables?: SubscriptionResolver<Array<ResolversTypes['SaleLookupTable']>, "saleLookupTables", ParentType, ContextType, RequireFields<SubscriptionSaleLookupTablesArgs, 'first' | 'skip' | 'subgraphError'>>;
+  sales?: SubscriptionResolver<Array<ResolversTypes['Sale']>, "sales", ParentType, ContextType, RequireFields<SubscriptionSalesArgs, 'first' | 'skip' | 'subgraphError'>>;
+  token?: SubscriptionResolver<Maybe<ResolversTypes['Token']>, "token", ParentType, ContextType, RequireFields<SubscriptionTokenArgs, 'id' | 'subgraphError'>>;
+  tokens?: SubscriptionResolver<Array<ResolversTypes['Token']>, "tokens", ParentType, ContextType, RequireFields<SubscriptionTokensArgs, 'first' | 'skip' | 'subgraphError'>>;
+  transfer?: SubscriptionResolver<Maybe<ResolversTypes['Transfer']>, "transfer", ParentType, ContextType, RequireFields<SubscriptionTransferArgs, 'id' | 'subgraphError'>>;
+  transfers?: SubscriptionResolver<Array<ResolversTypes['Transfer']>, "transfers", ParentType, ContextType, RequireFields<SubscriptionTransfersArgs, 'first' | 'skip' | 'subgraphError'>>;
+  whitelisting?: SubscriptionResolver<Maybe<ResolversTypes['Whitelisting']>, "whitelisting", ParentType, ContextType, RequireFields<SubscriptionWhitelistingArgs, 'id' | 'subgraphError'>>;
+  whitelistings?: SubscriptionResolver<Array<ResolversTypes['Whitelisting']>, "whitelistings", ParentType, ContextType, RequireFields<SubscriptionWhitelistingsArgs, 'first' | 'skip' | 'subgraphError'>>;
+};
+
+export type TokenResolvers<ContextType = any, ParentType extends ResolversParentTypes['Token'] = ResolversParentTypes['Token']> = {
+  contract?: Resolver<ResolversTypes['Contract'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  hash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  invocation?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  nextSaleId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  owner?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
+  project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>;
+  saleLookupTables?: Resolver<Array<ResolversTypes['SaleLookupTable']>, ParentType, ContextType, RequireFields<TokenSaleLookupTablesArgs, 'first' | 'skip'>>;
+  tokenId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  transfers?: Resolver<Maybe<Array<ResolversTypes['Transfer']>>, ParentType, ContextType, RequireFields<TokenTransfersArgs, 'first' | 'skip'>>;
+  updatedAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  uri?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type TransferResolvers<ContextType = any, ParentType extends ResolversParentTypes['Transfer'] = ResolversParentTypes['Transfer']> = {
+  createdAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  from?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  to?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  token?: Resolver<ResolversTypes['Token'], ParentType, ContextType>;
+  transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type WhitelistingResolvers<ContextType = any, ParentType extends ResolversParentTypes['Whitelisting'] = ResolversParentTypes['Whitelisting']> = {
+  account?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
+  contract?: Resolver<ResolversTypes['Contract'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type _Block_Resolvers<ContextType = any, ParentType extends ResolversParentTypes['_Block_'] = ResolversParentTypes['_Block_']> = {
+  hash?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  number?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  timestamp?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type _Meta_Resolvers<ContextType = any, ParentType extends ResolversParentTypes['_Meta_'] = ResolversParentTypes['_Meta_']> = {
+  block?: Resolver<ResolversTypes['_Block_'], ParentType, ContextType>;
+  deployment?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  hasIndexingErrors?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Resolvers<ContextType = any> = {
+  Account?: AccountResolvers<ContextType>;
+  AccountProject?: AccountProjectResolvers<ContextType>;
+  BigDecimal?: GraphQLScalarType;
+  BigInt?: GraphQLScalarType;
+  Bytes?: GraphQLScalarType;
+  Contract?: ContractResolvers<ContextType>;
+  Minter?: MinterResolvers<ContextType>;
+  MinterFilter?: MinterFilterResolvers<ContextType>;
+  Payment?: PaymentResolvers<ContextType>;
+  Project?: ProjectResolvers<ContextType>;
+  ProjectExternalAssetDependency?: ProjectExternalAssetDependencyResolvers<ContextType>;
+  ProjectMinterConfiguration?: ProjectMinterConfigurationResolvers<ContextType>;
+  ProjectScript?: ProjectScriptResolvers<ContextType>;
+  ProposedArtistAddressesAndSplit?: ProposedArtistAddressesAndSplitResolvers<ContextType>;
+  Query?: QueryResolvers<ContextType>;
+  Sale?: SaleResolvers<ContextType>;
+  SaleLookupTable?: SaleLookupTableResolvers<ContextType>;
+  Subscription?: SubscriptionResolvers<ContextType>;
+  Token?: TokenResolvers<ContextType>;
+  Transfer?: TransferResolvers<ContextType>;
+  Whitelisting?: WhitelistingResolvers<ContextType>;
+  _Block_?: _Block_Resolvers<ContextType>;
+  _Meta_?: _Meta_Resolvers<ContextType>;
+};
+
+export type DirectiveResolvers<ContextType = any> = {
+  derivedFrom?: DerivedFromDirectiveResolver<any, any, ContextType>;
+  entity?: EntityDirectiveResolver<any, any, ContextType>;
+  subgraphId?: SubgraphIdDirectiveResolver<any, any, ContextType>;
+};
+
+export const ProjectDetailFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProjectDetail"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Project"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projectId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"invocations"}},{"kind":"Field","name":{"kind":"Name","value":"maxInvocations"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"paused"}},{"kind":"Field","name":{"kind":"Name","value":"complete"}},{"kind":"Field","name":{"kind":"Name","value":"artistName"}},{"kind":"Field","name":{"kind":"Name","value":"contract"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ProjectDetailFragment, unknown>;
+export const GetAllProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getAllProjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"EnumValue","value":"projectId"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetAllProjectsQuery, GetAllProjectsQueryVariables>;
+export const GetWalletTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getWalletTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"wallet"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokens"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"wallet"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"invocation"}},{"kind":"Field","name":{"kind":"Name","value":"project"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetWalletTokensQuery, GetWalletTokensQueryVariables>;
+export const GetContractOpenProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getContractOpenProjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contract"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contract"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contract"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"EnumValue","value":"projectId"}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"paused"},"value":{"kind":"BooleanValue","value":false}},{"kind":"ObjectField","name":{"kind":"Name","value":"active"},"value":{"kind":"BooleanValue","value":true}},{"kind":"ObjectField","name":{"kind":"Name","value":"complete"},"value":{"kind":"BooleanValue","value":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetContractOpenProjectsQuery, GetContractOpenProjectsQueryVariables>;
+export const GetContractProjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getContractProject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contract"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"projectId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BigInt"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contract"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contract"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"projectId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"projectId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetContractProjectQuery, GetContractProjectQueryVariables>;
 export const GetContractProjectsWithCurationStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getContractProjectsWithCurationStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"curationStatus"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contract"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"curationStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"curationStatus"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"active"},"value":{"kind":"BooleanValue","value":true}}]}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"EnumValue","value":"projectId"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projectId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"invocations"}},{"kind":"Field","name":{"kind":"Name","value":"maxInvocations"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"curationStatus"}},{"kind":"Field","name":{"kind":"Name","value":"contract"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetContractProjectsWithCurationStatusQuery, GetContractProjectsWithCurationStatusQueryVariables>;
-export const GetWalletTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getWalletTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"wallet"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokens"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"wallet"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"contract_in"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"invocation"}},{"kind":"Field","name":{"kind":"Name","value":"project"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetWalletTokensQuery, GetWalletTokensQueryVariables>;
 export const GetEngineContractsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEngineContracts"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ids"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contracts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_not_in"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ids"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GetEngineContractsQuery, GetEngineContractsQueryVariables>;

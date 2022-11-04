@@ -3,10 +3,9 @@ dotenv.config()
 import { Client, Events, GatewayIntentBits } from 'discord.js'
 const express = require('express')
 const bodyParser = require('body-parser')
-const getArtBlocksFactoryProjects =
-  require('./Utils/parseArtBlocksAPI').getArtBlocksFactoryProjects
 
-const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot
+import { ArtIndexerBot } from './Classes/ArtIndexerBot'
+
 import { MintBot } from './Classes/MintBot'
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json')
@@ -15,10 +14,10 @@ import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
 const { ReservoirListBot } = require('./Classes/APIBots/ReservoirListBot')
 const { ArchipelagoBot } = require('./Classes/APIBots/ArchipelagoBot')
 // Special handlers.
-const {
-  getPBABProjects,
-  getArtBlocksXPaceProjects,
-} = require('./Utils/parseArtBlocksAPI')
+// const {
+//   getPBABProjects,
+//   getArtBlocksXPaceProjects,
+// } = require('./Utils/parseArtBlocksAPI')
 const COLLAB_CONTRACTS = require('./ProjectConfig/collaborationContracts.json')
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
@@ -32,11 +31,11 @@ const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects']
 // Block Talk
 const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 
-// PBAB Chat
-const CHANNEL_PBAB_CHAT = projectConfig.chIdByName['pbab-chat']
+// // PBAB Chat
+// const CHANNEL_PBAB_CHAT = projectConfig.chIdByName['pbab-chat']
 
-// AB x Pace
-const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
+// // AB x Pace
+// const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
 
 // AB Art Chat
 const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat']
@@ -129,10 +128,9 @@ bot.on('ready', () => {
   artIndexerBot.startBirthdayRoutine(bot.channels.cache, projectConfig)
 })
 
-const factoryParty = new ArtIndexerBot(getArtBlocksFactoryProjects)
 const artIndexerBot = new ArtIndexerBot()
-const pbabIndexerBot = new ArtIndexerBot(getPBABProjects)
-const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
+// const pbabIndexerBot = new ArtIndexerBot(getPBABProjects)
+// const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
 
 export const mintBot = new MintBot(bot)
 
@@ -153,17 +151,17 @@ bot.on(Events.MessageCreate, async (msg) => {
   if (msgContent.startsWith('#')) {
     switch (channelID) {
       case CHANNEL_FACTORY:
-        factoryParty.handleNumberMessage(msg)
+        artIndexerBot.handleNumberMessage(msg)
         break
       case CHANNEL_BLOCK_TALK:
         artIndexerBot.handleNumberMessage(msg)
         break
-      case CHANNEL_PBAB_CHAT:
-        pbabIndexerBot.handleNumberMessage(msg)
-        break
-      case CHANNEL_AB_X_PACE:
-        abXpaceIndexerBot.handleNumberMessage(msg)
-        break
+      // case CHANNEL_PBAB_CHAT:
+      //   pbabIndexerBot.handleNumberMessage(msg)
+      //   break
+      // case CHANNEL_AB_X_PACE:
+      //   abXpaceIndexerBot.handleNumberMessage(msg)
+      //   break
       case CHANNEL_ART_CHAT:
         artIndexerBot.handleNumberMessage(msg)
         break
