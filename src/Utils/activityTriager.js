@@ -195,9 +195,19 @@ async function triageActivityMessage(msg, bot) {
  * @param {*} embed
  * @param {*} artBlocksData
  */
-function sendEmbedToSaleChannels(bot, embed, artBlocksData) {
+function sendEmbedToSaleChannels(bot, embed, artBlocksData, saleAmt = null) {
   try {
     bot.channels.cache.get(CHANNEL_SALES).send({ embeds: [embed] })
+
+    // Don't send FB sales < 0.075 ETH to BT (temporarily)
+    if (
+      artBlocksData.collection_name.includes('Friendship Bracelets') &&
+      saleAmt &&
+      saleAmt < 0.075
+    ) {
+      return
+    }
+
     bot.channels.cache.get(CHANNEL_SALES_CHAT).send({ embeds: [embed] })
     // Forward all Chromie Squiggles sales on to the DAO.
     if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
