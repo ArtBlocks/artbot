@@ -203,7 +203,7 @@ function sendEmbedToSaleChannels(bot, embed, artBlocksData, saleAmt = null) {
     if (
       artBlocksData.collection_name.includes('Friendship Bracelets') &&
       saleAmt &&
-      saleAmt < 0.075
+      saleAmt < 0.1
     ) {
       return
     }
