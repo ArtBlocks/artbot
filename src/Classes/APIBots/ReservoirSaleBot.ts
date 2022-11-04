@@ -1,5 +1,5 @@
 import { Client } from 'discord.js'
-import { getTokenApiUrl } from './utils'
+import { getTokenApiUrl, isExplorationsContract } from './utils'
 
 const { APIPollBot } = require('./ApiPollBot')
 const { EmbedBuilder } = require('discord.js')
@@ -13,6 +13,7 @@ type ReservoirSale = {
   from: string
   to: string
   saleId: string
+  fillSource: string
   orderSource: string
   orderKind: string
   token: {
@@ -110,14 +111,14 @@ export class ReservoirSaleBot extends APIPollBot {
     const price = sale.price.amount.decimal
     const currency = sale.price.currency.symbol
     const owner = sale.from
-    const platform = sale.orderSource.toLowerCase()
+    const platform = sale.fillSource.toLowerCase()
     embed.setColor(this.saleColor)
 
     if (BAN_ADDRESSES.has(owner)) {
       console.log(`Skipping message propagation for ${owner}`)
       return
     }
-    if (sale.orderSource.toLowerCase().includes('looksrare')) {
+    if (platform.toLowerCase().includes('looksrare')) {
       console.log(`Skipping message propagation for LooksRare`)
       return
     }
@@ -179,6 +180,8 @@ export class ReservoirSaleBot extends APIPollBot {
 
     if (artBlocksData?.platform === 'Art Blocks x Pace') {
       curationStatus = 'AB x Pace'
+    } else if (isExplorationsContract(sale.token.contract)) {
+      curationStatus = 'Explorations'
     }
     // Update thumbnail image to use larger variant from Art Blocks API.
     if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
@@ -203,7 +206,7 @@ export class ReservoirSaleBot extends APIPollBot {
     embed.setURL(platformUrl)
     if (artBlocksData.collection_name) {
       console.log(artBlocksData.name + ' SALE')
-      sendEmbedToSaleChannels(this.bot, embed, artBlocksData)
+      sendEmbedToSaleChannels(this.bot, embed, artBlocksData, price)
     }
   }
 }

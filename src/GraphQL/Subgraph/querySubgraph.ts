@@ -5,6 +5,11 @@ const { createClient } = require('@urql/core')
 
 const API_URL = 'https://api.thegraph.com/subgraphs/name/artblocks/art-blocks'
 
+// core contract addresses to include during initilization
+const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
+const COLLAB_CONTRACTS = require('../ProjectConfig/collaborationContracts.json')
+const EXPLORATION_CONTRACTS = require('../ProjectConfig/explorationsContracts.json')
+
 const client = createClient({
   url: API_URL,
   fetch: fetch,
@@ -341,9 +346,14 @@ async function getArtBlocksProjects() {
 async function getArtBlocksOpenProjects() {
   return await getContractsOpenProjects(Object.values(CORE_CONTRACTS))
 }
-async function getArtBlocksAndCollabProjects() {
+
+async function getAllProjects() {
+  const engineContracts = await _getPBABContracts()
   return await getContractsProjects(
-    Object.values(CORE_CONTRACTS).concat(Object.values(COLLAB_CONTRACTS))
+    Object.values(CORE_CONTRACTS)
+      .concat(Object.values(COLLAB_CONTRACTS))
+      .concat(Object.values(EXPLORATION_CONTRACTS))
+      .concat(Object.values(engineContracts))
   )
 }
 
@@ -426,3 +436,19 @@ async function getAllWalletTokens(walletAddress) {
     return undefined
   }
 }
+<<<<<<< HEAD:src/GraphQL/Subgraph/querySubgraph.ts
+=======
+
+module.exports.getArtBlocksProject = getArtBlocksProject
+module.exports.getAllProjects = getAllProjects
+module.exports.getArtBlocksFactoryProjects = getArtBlocksFactoryProjects
+module.exports.getArtBlocksProjects = getArtBlocksProjects
+module.exports.getArtBlocksOpenProjects = getArtBlocksOpenProjects
+module.exports.getPBABProjects = getPBABProjects
+module.exports.getArtBlocksXPaceProjects = getArtBlocksXPaceProjects
+module.exports.getArtBlocksProjectCount = getArtBlocksProjectCount
+module.exports.getContractProject = getContractProject
+module.exports.getProjectsBirthdays = getProjectsBirthdays
+module.exports.getProjectsCurationStatus = getProjectsCurationStatus
+module.exports.getAllWalletTokens = getAllWalletTokens
+>>>>>>> ad3aad1cc32dbcf87d7cd36446c60c8f1cce7e67:src/Utils/parseArtBlocksAPI.js

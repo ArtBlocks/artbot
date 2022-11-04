@@ -654,6 +654,12 @@
   "1014641051140624445": {
     "name": "engine-mints"
   },
+  "935377049089097758": {
+    "name": "plottables-mints"
+  },
+  "937547685215473664": {
+    "name": "doodle-mints"
+  },
   "919937880288284722": {
     "name": "plottables-numbersinmotion",
     "projectBotHandlers": {
@@ -725,5 +731,11 @@
         "8-PLOTTABLES": ["spectral"]
       }
     }
+  },
+  "1037778085375905812": {
+    "name": "stevie-p-sales"
+  },
+  "1037834993004720158": {
+    "name": "stevie-p-listings"
   }
 }
