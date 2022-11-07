@@ -324,7 +324,7 @@ async function smartBotResponse(
       msgContentLowercase.includes('blagodaryu vas') || // russian
       msgContentLowercase.includes('danke')) && // german
     (msgContentLowercase.includes('grant') ||
-    msgContentLowercase.includes('grant-san'))
+      msgContentLowercase.includes('grant-san'))
   ) {
     grantThanks++
 

@@ -8,6 +8,10 @@ const provider = new ethers.providers.EtherscanProvider(
   'homestead',
   process.env.ETHERSCAN_API_KEY
 )
+
+const STAGING_CONTRACTS = require('../../ProjectConfig/stagingContracts.json')
+const EXPLORATIONS_CONTRACTS = require('../../ProjectConfig/explorationsContracts.json')
+
 const CORE_CONTRACTS = require('../../ProjectConfig/coreContracts.json')
 // Runtime ENS cache just to limit queries
 const ensAddressMap: { [id: string]: string } = {}
@@ -61,7 +65,7 @@ async function resolveEnsName(ensName: string): Promise<string> {
   return wallet
 }
 
-async function ensOrAddress(address: string): Promise<string> {
+export async function ensOrAddress(address: string): Promise<string> {
   const ens = await getENSName(address)
   return ens !== '' ? ens : address
 }
@@ -135,9 +139,17 @@ export function getTokenApiUrl(
     contractAddress === ''
   ) {
     return `https://token.artblocks.io/${tokenId}`
+  } else if (Object.values(STAGING_CONTRACTS).includes(contractAddress)) {
+    return `https://token.staging.artblocks.io/${contractAddress}/${tokenId}`
   } else {
     return `https://token.artblocks.io/${contractAddress}/${tokenId}`
   }
+}
+
+export function isExplorationsContract(contractAddress: string): boolean {
+  return Object.values(EXPLORATIONS_CONTRACTS).includes(
+    contractAddress.toLowerCase()
+  )
 }
 
 module.exports.ensOrAddress = ensOrAddress

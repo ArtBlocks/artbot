@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv'
+dotenv.config()
+
 const fetch = require('node-fetch')
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 
@@ -7,8 +10,10 @@ const CHANNEL_SALES = projectConfig.chIdByName['sales-feed']
 const CHANNEL_LISTINGS = projectConfig.chIdByName['listing-feed']
 const CHANNEL_SQUIGGLE_SALES = projectConfig.chIdByName['squiggle_square']
 const CHANNEL_SQUIGGLE_LISTINGS = projectConfig.chIdByName['squiggle-listings']
-const CHANNEL_FIDENZA_AND_IC_SALES =
-  projectConfig.chIdByName['fidenza-and-ic-sales']
+
+const STEVIE_P_SALES = projectConfig.chIdByName['stevie-p-sales']
+const STEVIE_P_LISTINGS = projectConfig.chIdByName['stevie-p-listings']
+
 // AB x Pace
 const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
 
@@ -193,27 +198,30 @@ async function triageActivityMessage(msg, bot) {
  * @param {*} embed
  * @param {*} artBlocksData
  */
-function sendEmbedToSaleChannels(bot, embed, artBlocksData) {
+function sendEmbedToSaleChannels(bot, embed, artBlocksData, saleAmt = null) {
   try {
     bot.channels.cache.get(CHANNEL_SALES).send({ embeds: [embed] })
+
+    // Don't send FB sales < 0.075 ETH to BT (temporarily)
+    if (
+      artBlocksData.collection_name.includes('Friendship Bracelets') &&
+      saleAmt &&
+      saleAmt < (parseFloat(process.env.FB_THRESHOLD) ?? 0.1)
+    ) {
+      return
+    }
+
     bot.channels.cache.get(CHANNEL_SALES_CHAT).send({ embeds: [embed] })
     // Forward all Chromie Squiggles sales on to the DAO.
     if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
       bot.channels.cache.get(CHANNEL_SQUIGGLE_SALES).send({ embeds: [embed] })
     }
-    if (artBlocksData.collection_name.includes('Fidenza')) {
-      bot.channels.cache
-        .get(CHANNEL_FIDENZA_AND_IC_SALES)
-        .send({ embeds: [embed] })
-    }
-    if (artBlocksData.collection_name.includes('Incomplete Control')) {
-      bot.channels.cache
-        .get(CHANNEL_FIDENZA_AND_IC_SALES)
-        .send({ embeds: [embed] })
-    }
     // Send Pace sales to AB x Pace channel
     if (artBlocksData.platform.includes('Art Blocks x Pace')) {
       bot.channels.cache.get(CHANNEL_AB_X_PACE).send({ embeds: [embed] })
+    }
+    if (artBlocksData.artist.includes('Steve Pikelny')) {
+      bot.channels.cache.get(STEVIE_P_SALES).send({ embeds: [embed] })
     }
   } catch (e) {
     console.warn(e)
@@ -235,15 +243,8 @@ function sendEmbedToListChannels(bot, embed, artBlocksData) {
         .get(CHANNEL_SQUIGGLE_LISTINGS)
         .send({ embeds: [embed] })
     }
-    if (artBlocksData.collection_name.includes('Fidenza')) {
-      bot.channels.cache
-        .get(CHANNEL_FIDENZA_AND_IC_SALES)
-        .send({ embeds: [embed] })
-    }
-    if (artBlocksData.collection_name.includes('Incomplete Control')) {
-      bot.channels.cache
-        .get(CHANNEL_FIDENZA_AND_IC_SALES)
-        .send({ embeds: [embed] })
+    if (artBlocksData.artist.includes('Steve Pikelny')) {
+      bot.channels.cache.get(STEVIE_P_LISTINGS).send({ embeds: [embed] })
     }
   } catch (e) {
     console.warn(e)
