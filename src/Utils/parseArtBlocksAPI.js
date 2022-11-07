@@ -504,6 +504,13 @@ async function getAllProjects() {
       .concat(Object.values(engineContracts))
   )
 }
+async function getArtBlocksAndCollabProjects() {
+  return await getContractsProjects(
+    Object.values(CORE_CONTRACTS)
+      .concat(Object.values(COLLAB_CONTRACTS))
+      .concat(Object.values(EXPLORATION_CONTRACTS))
+  )
+}
 
 /**
  * get data for all AB x Pace projects
@@ -674,6 +681,7 @@ async function getAllWalletTokens(walletAddress) {
 
 module.exports.getArtBlocksProject = getArtBlocksProject
 module.exports.getAllProjects = getAllProjects
+module.exports.getArtBlocksAndCollabProjects = getArtBlocksAndCollabProjects
 module.exports.getArtBlocksFactoryProjects = getArtBlocksFactoryProjects
 module.exports.getArtBlocksProjects = getArtBlocksProjects
 module.exports.getArtBlocksOpenProjects = getArtBlocksOpenProjects
