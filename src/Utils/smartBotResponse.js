@@ -309,10 +309,10 @@ async function smartBotResponse(
   if (
     channelID == CHANNEL_BLOCK_TALK &&
     (msgContentLowercase.includes('thanks') ||
-      msgContentLowercase.includes('thank you') || 
+      msgContentLowercase.includes('thank you') ||
       msgContentLowercase.includes('gracias') || // spanish
       msgContentLowercase.includes('domo arigato') || // japanese
-      msgContentLowercase.includes('arigato') || 
+      msgContentLowercase.includes('arigato') ||
       msgContentLowercase.includes('merci') || // french
       msgContentLowercase.includes('grazie') || // italian
       msgContentLowercase.includes('obrigada') || // portugese
