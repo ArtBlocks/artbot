@@ -133,7 +133,7 @@ export class ReservoirSaleBot extends APIPollBot {
 
     let sellerText = await this.ensOrAddress(sale.from)
     let buyerText = await this.ensOrAddress(sale.to)
-    let platformUrl = artBlocksData.external_url ?? 'https://www.artblocks.io'
+    let platformUrl: string = artBlocksData.external_url ?? ''
 
     if (platform.includes('opensea')) {
       if (!sellerText.includes('.eth')) {
@@ -214,7 +214,9 @@ export class ReservoirSaleBot extends APIPollBot {
     // rather than token number as the title and URL field..
     embed.author = null
     embed.setTitle(title)
-    embed.setURL(platformUrl)
+    if (platformUrl) {
+      embed.setURL(platformUrl)
+    }
     if (artBlocksData.collection_name) {
       console.log(artBlocksData.name + ' SALE')
       sendEmbedToSaleChannels(this.bot, embed, artBlocksData, price)
