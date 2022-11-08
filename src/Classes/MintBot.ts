@@ -1,5 +1,5 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js'
-import { mintBot } from '../index'
+import { ENGINE_CONTRACTS, mintBot } from '../index'
 import axios, { AxiosError } from 'axios'
 import { getTokenApiUrl } from './APIBots/utils'
 import { ensOrAddress } from './APIBots/utils'
@@ -29,16 +29,16 @@ export class MintBot {
   bot: Client
   newMints: { [id: string]: Mint } = {}
   mintsToPost: { [id: string]: Mint } = {}
-  contractToChannel: { [id: string]: string[] }
+  contractToChannel: { [id: string]: string[] } = {}
   constructor(bot: Client) {
     this.bot = bot
-    this.contractToChannel = this.buildContractToChannel()
-
+    this.buildContractToChannel()
     this.startRoutine()
   }
 
-  buildContractToChannel(): { [id: string]: string[] } {
+  async buildContractToChannel() {
     const contractToChannel: { [id: string]: string[] } = {}
+    const engineContracts = await ENGINE_CONTRACTS
     Object.entries(MINT_CONFIG).forEach(([mintType, channels]) => {
       let contracts: string[] = []
       switch (mintType) {
@@ -52,7 +52,7 @@ export class MintBot {
           contracts = Object.values(COLLAB_CONTRACTS)
           break
         case MintType.ENGINE:
-          // TODO: Add engine contracts
+          contracts = engineContracts
           break
         case MintType.STAGING:
           contracts = Object.values(STAGING_CONTRACTS)
@@ -75,7 +75,7 @@ export class MintBot {
       })
     })
 
-    return contractToChannel
+    this.contractToChannel = contractToChannel
   }
 
   // Go through all mints in the queue and make sure the image exists

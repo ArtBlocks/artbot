@@ -1,5 +1,9 @@
 import { Client } from 'discord.js'
-import { getTokenApiUrl, isExplorationsContract } from './utils'
+import {
+  getTokenApiUrl,
+  isExplorationsContract,
+  isEngineContract,
+} from './utils'
 
 const { APIPollBot } = require('./ApiPollBot')
 const { EmbedBuilder } = require('discord.js')
@@ -106,7 +110,6 @@ export class ReservoirSaleBot extends APIPollBot {
     if (sale.orderKind === 'mint') {
       return // Don't send mint events
     }
-
     const priceText = 'Sale Price'
     const price = sale.price.amount.decimal
     const currency = sale.price.currency.symbol
@@ -130,7 +133,7 @@ export class ReservoirSaleBot extends APIPollBot {
 
     let sellerText = await this.ensOrAddress(sale.from)
     let buyerText = await this.ensOrAddress(sale.to)
-    let platformUrl = artBlocksData.external_url
+    let platformUrl: string = artBlocksData.external_url ?? ''
 
     if (platform.includes('opensea')) {
       if (!sellerText.includes('.eth')) {
@@ -173,6 +176,9 @@ export class ReservoirSaleBot extends APIPollBot {
         inline: true,
       }
     )
+
+    let title = `${artBlocksData.name} - ${artBlocksData.artist}`
+
     let curationStatus = artBlocksData?.curation_status
       ? artBlocksData.curation_status[0].toUpperCase() +
         artBlocksData.curation_status.slice(1).toLowerCase()
@@ -182,6 +188,11 @@ export class ReservoirSaleBot extends APIPollBot {
       curationStatus = 'AB x Pace'
     } else if (isExplorationsContract(sale.token.contract)) {
       curationStatus = 'Explorations'
+    } else if (await isEngineContract(sale.token.contract)) {
+      curationStatus = 'Engine'
+      if (artBlocksData?.platform) {
+        title = `${artBlocksData.platform} - ${title}`
+      }
     }
     // Update thumbnail image to use larger variant from Art Blocks API.
     if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
@@ -202,8 +213,10 @@ export class ReservoirSaleBot extends APIPollBot {
     // Update to remove author name and to reflect this info in piece name
     // rather than token number as the title and URL field..
     embed.author = null
-    embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`)
-    embed.setURL(platformUrl)
+    embed.setTitle(title)
+    if (platformUrl) {
+      embed.setURL(platformUrl)
+    }
     if (artBlocksData.collection_name) {
       console.log(artBlocksData.name + ' SALE')
       sendEmbedToSaleChannels(this.bot, embed, artBlocksData, price)

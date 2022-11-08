@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv'
+import { ENGINE_CONTRACTS } from '../../index'
 dotenv.config()
 
 const axios = require('axios')
@@ -150,6 +151,12 @@ export function isExplorationsContract(contractAddress: string): boolean {
   return Object.values(EXPLORATIONS_CONTRACTS).includes(
     contractAddress.toLowerCase()
   )
+}
+
+export async function isEngineContract(
+  contractAddress: string
+): Promise<boolean> {
+  return (await ENGINE_CONTRACTS).includes(contractAddress.toLowerCase())
 }
 
 module.exports.ensOrAddress = ensOrAddress

@@ -9,9 +9,9 @@ const getArtBlocksFactoryProjects =
 const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot
 import { MintBot } from './Classes/MintBot'
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
-const CORE_CONTRACTS = require('./ProjectConfig/coreContracts.json')
-const EXPLORATIONS_CONTRACTS = require('./ProjectConfig/explorationsContracts.json')
+
 import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
+import { getEngineContracts } from './Utils/parseArtBlocksAPI'
 const { ReservoirListBot } = require('./Classes/APIBots/ReservoirListBot')
 const { ArchipelagoBot } = require('./Classes/APIBots/ArchipelagoBot')
 // Special handlers.
@@ -19,12 +19,23 @@ const {
   getPBABProjects,
   getArtBlocksXPaceProjects,
 } = require('./Utils/parseArtBlocksAPI')
-const COLLAB_CONTRACTS = require('./ProjectConfig/collaborationContracts.json')
+
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
 // Misc. server configuration info.
 const TOKEN = process.env.TOKEN
 const PORT = process.env.PORT || 3001
+
+export const CORE_CONTRACTS: {
+  [id: string]: string
+} = require('./ProjectConfig/coreContracts.json')
+export const EXPLORATIONS_CONTRACTS: {
+  [id: string]: string
+} = require('./ProjectConfig/explorationsContracts.json')
+export const COLLAB_CONTRACTS: {
+  [id: string]: string
+} = require('./ProjectConfig/collaborationContracts.json')
+export const ENGINE_CONTRACTS = getEngineContracts()
 
 // Factory Channel
 const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects']
@@ -33,7 +44,7 @@ const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects']
 const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 
 // PBAB Chat
-const CHANNEL_PBAB_CHAT = projectConfig.chIdByName['pbab-chat']
+const CHANNEL_PBAB_CHAT = projectConfig.chIdByName['engine-chat']
 
 // AB x Pace
 const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
@@ -190,10 +201,26 @@ bot.on(Events.MessageCreate, async (msg) => {
   )
 })
 
-// Instantiate API Pollers (if not in test mode)
-if (!TEST_MODE) {
+const initReservoirBots = async () => {
+  const buildContractsString = (contracts: string[]): string => {
+    const ans = 'contracts=' + contracts.join('&contracts=')
+    return ans
+  }
+
+  const mainListParams = buildContractsString(
+    Object.values(CORE_CONTRACTS)
+      .concat(Object.values(COLLAB_CONTRACTS))
+      .concat(Object.values(EXPLORATIONS_CONTRACTS))
+  )
+  const mainSaleParams = buildContractsString(
+    Object.values(CORE_CONTRACTS)
+      .concat(Object.values(COLLAB_CONTRACTS))
+      .concat(Object.values(EXPLORATIONS_CONTRACTS))
+      .concat(await ENGINE_CONTRACTS)
+  ).replaceAll('contracts', 'contract')
+
   new ReservoirListBot(
-    `https://api.reservoir.tools/orders/asks/v3?contracts=${CORE_CONTRACTS.OG}&contracts=${CORE_CONTRACTS.V2}&contracts=${CORE_CONTRACTS.V3}&contracts=${EXPLORATIONS_CONTRACTS.EXPLORATIONS}&contracts=${COLLAB_CONTRACTS.AB_X_PACE}&sortBy=createdAt&limit=${reservoirListLimit}`,
+    `https://api.reservoir.tools/orders/asks/v3?${mainListParams}&sortBy=createdAt&limit=${reservoirListLimit}`,
     API_POLL_TIME_MS,
     bot,
     {
@@ -203,7 +230,7 @@ if (!TEST_MODE) {
   )
 
   new ReservoirSaleBot(
-    `https://api.reservoir.tools/sales/v4?contract=${CORE_CONTRACTS.OG}&contract=${CORE_CONTRACTS.V2}&contract=${CORE_CONTRACTS.V3}&contract=${EXPLORATIONS_CONTRACTS.EXPLORATIONS}&contract=${COLLAB_CONTRACTS.AB_X_PACE}&limit=${reservoirSaleLimit}`,
+    `https://api.reservoir.tools/sales/v4?${mainSaleParams}&limit=${reservoirSaleLimit}`,
     API_POLL_TIME_MS,
     bot,
     {
@@ -211,7 +238,11 @@ if (!TEST_MODE) {
       'x-api-key': process.env.RESERVOIR_API_KEY,
     }
   )
+}
 
+// Instantiate API Pollers (if not in test mode)=
+if (!TEST_MODE) {
+  initReservoirBots()
   const archipelagoBot = new ArchipelagoBot(bot)
   archipelagoBot.activate()
 }
