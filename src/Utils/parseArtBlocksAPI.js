@@ -654,6 +654,7 @@ async function getPBABProjects() {
 }
 
 async function getAllWalletTokens(walletAddress) {
+  const engineContracts = await getEngineContracts()
   const maxTokensPerQuery = 1000
   try {
     const allTokens = []
@@ -661,7 +662,10 @@ async function getAllWalletTokens(walletAddress) {
       const result = await client
         .query(getWalletTokens, {
           wallet: walletAddress,
-          contracts: Object.values(CORE_CONTRACTS),
+          contracts: Object.values(CORE_CONTRACTS)
+            .concat(Object.values(COLLAB_CONTRACTS))
+            .concat(Object.values(EXPLORATION_CONTRACTS))
+            .concat(Object.values(engineContracts)),
           first: maxTokensPerQuery,
           skip: allTokens.length,
         })
