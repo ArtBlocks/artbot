@@ -44,7 +44,7 @@ const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects']
 const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 
 // PBAB Chat
-const CHANNEL_PBAB_CHAT = projectConfig.chIdByName['engine-mints']
+const CHANNEL_PBAB_CHAT = projectConfig.chIdByName['engine-chat']
 
 // AB x Pace
 const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
