@@ -1,5 +1,5 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js'
-import { mintBot } from '../index'
+import { ENGINE_CONTRACTS, mintBot } from '../index'
 import axios, { AxiosError } from 'axios'
 import { getTokenApiUrl } from './APIBots/utils'
 import { ensOrAddress } from './APIBots/utils'
@@ -39,7 +39,7 @@ export class MintBot {
 
   buildContractToChannel(): { [id: string]: string[] } {
     const contractToChannel: { [id: string]: string[] } = {}
-    Object.entries(MINT_CONFIG).forEach(([mintType, channels]) => {
+    Object.entries(MINT_CONFIG).forEach(async ([mintType, channels]) => {
       let contracts: string[] = []
       switch (mintType) {
         case MintType.CORE:
@@ -52,7 +52,7 @@ export class MintBot {
           contracts = Object.values(COLLAB_CONTRACTS)
           break
         case MintType.ENGINE:
-          // TODO: Add engine contracts
+          contracts = await ENGINE_CONTRACTS
           break
         case MintType.STAGING:
           contracts = Object.values(STAGING_CONTRACTS)

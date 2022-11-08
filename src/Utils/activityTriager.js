@@ -10,6 +10,7 @@ const CHANNEL_SALES = projectConfig.chIdByName['sales-feed']
 const CHANNEL_LISTINGS = projectConfig.chIdByName['listing-feed']
 const CHANNEL_SQUIGGLE_SALES = projectConfig.chIdByName['squiggle_square']
 const CHANNEL_SQUIGGLE_LISTINGS = projectConfig.chIdByName['squiggle-listings']
+const ENGINE_CHAT = projectConfig.chIdByName['engine-chat']
 
 const STEVIE_P_SALES = projectConfig.chIdByName['stevie-p-sales']
 const STEVIE_P_LISTINGS = projectConfig.chIdByName['stevie-p-listings']
@@ -200,6 +201,11 @@ async function triageActivityMessage(msg, bot) {
  */
 function sendEmbedToSaleChannels(bot, embed, artBlocksData, saleAmt = null) {
   try {
+    if (!artBlocksData.platform.includes('Art Blocks')) {
+      bot.channels.cache.get(ENGINE_CHAT).send({ embeds: [embed] })
+      return
+    }
+
     bot.channels.cache.get(CHANNEL_SALES).send({ embeds: [embed] })
 
     // Don't send FB sales < 0.075 ETH to BT (temporarily)

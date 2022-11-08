@@ -496,7 +496,7 @@ async function getArtBlocksOpenProjects() {
 }
 
 async function getAllProjects() {
-  const engineContracts = await _getPBABContracts()
+  const engineContracts = await getEngineContracts()
   return await getContractsProjects(
     Object.values(CORE_CONTRACTS)
       .concat(Object.values(COLLAB_CONTRACTS))
@@ -532,10 +532,10 @@ async function getArtBlocksXPaceProjects() {
  * gets all PBAB Contracts from Hasura
  *
  */
-async function _getPBABContracts() {
-  const nonPBABContracts = Object.values(CORE_CONTRACTS).concat(
-    Object.values(COLLAB_CONTRACTS)
-  )
+export async function getEngineContracts() {
+  const nonPBABContracts = Object.values(CORE_CONTRACTS)
+    .concat(Object.values(COLLAB_CONTRACTS))
+    .concat(Object.values(EXPLORATION_CONTRACTS))
   try {
     const result = await client
       .query(getPBABContracts, {
@@ -649,7 +649,7 @@ async function getProjectsCurationStatus() {
  *     - id: string Contract Address
  */
 async function getPBABProjects() {
-  const contractsToGet = await _getPBABContracts()
+  const contractsToGet = await getEngineContracts()
   return getContractsProjects(contractsToGet)
 }
 
