@@ -1,15 +1,15 @@
-import { Client, Message } from 'discord.js'
+import { Client, ColorResolvable } from 'discord.js'
 
 const { ensOrAddress, getOSName } = require('./utils')
 const axios = require('axios')
 /** Abstract parent class for all API Poll Bots */
-class APIPollBot {
+export class APIPollBot {
   apiEndpoint: string
   refreshRateMs: number
   bot: Client
   headers: any
-  listColor: string
-  saleColor: string
+  listColor: ColorResolvable
+  saleColor: ColorResolvable
   lastUpdatedTime: number
 
   /**
@@ -71,7 +71,7 @@ class APIPollBot {
    * Builds and sends any Discord messages
    * @param {*} msg - Event info dict
    */
-  async buildDiscordMessage(msg: Message) {
+  async buildDiscordMessage(msg: any) {
     console.warn('buildDiscordMessage function not implemented!', msg)
   }
 
@@ -93,5 +93,3 @@ class APIPollBot {
     return `https://x2y2.io/eth/${contractAddr}/${tokenId}`
   }
 }
-
-module.exports.APIPollBot = APIPollBot

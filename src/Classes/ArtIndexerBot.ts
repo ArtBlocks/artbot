@@ -4,8 +4,7 @@ import { ProjectBot } from './ProjectBot'
 dotenv.config()
 
 const deburr = require('lodash.deburr')
-const getArtBlocksAndCollabProjects =
-  require('../Utils/parseArtBlocksAPI').getArtBlocksAndCollabProjects
+const getAllProjects = require('../Utils/parseArtBlocksAPI').getAllProjects
 const getArtBlocksOpenProjects =
   require('../Utils/parseArtBlocksAPI').getArtBlocksOpenProjects
 const getProjectsBirthdays =
@@ -48,7 +47,7 @@ class ArtIndexerBot {
   sentBirthdays: { [id: string]: boolean }
   walletTokens: { [id: string]: string[] }
 
-  constructor(projectFetch = getArtBlocksAndCollabProjects) {
+  constructor(projectFetch = getAllProjects) {
     this.projectFetch = projectFetch
     this.projects = {}
     this.artists = {}
