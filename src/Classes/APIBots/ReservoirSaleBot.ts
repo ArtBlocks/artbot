@@ -1,17 +1,16 @@
-import { Client } from 'discord.js'
+import axios from 'axios'
+import { Client, EmbedBuilder } from 'discord.js'
+import {
+  BAN_ADDRESSES,
+  sendEmbedToSaleChannels,
+} from '../../Utils/activityTriager'
+import { APIPollBot } from './ApiPollBot'
 import {
   getTokenApiUrl,
   isExplorationsContract,
   isEngineContract,
+  getCollectionType,
 } from './utils'
-
-const { APIPollBot } = require('./ApiPollBot')
-const { EmbedBuilder } = require('discord.js')
-const axios = require('axios')
-const {
-  sendEmbedToSaleChannels,
-  BAN_ADDRESSES,
-} = require('../../Utils/activityTriager')
 
 type ReservoirSale = {
   from: string
@@ -42,6 +41,8 @@ type ReservoirSaleResponse = {
 
 /** API Poller for Reservoir Sale events */
 export class ReservoirSaleBot extends APIPollBot {
+  contract: string
+  saleIds: Set<string>
   /** Constructor just calls super
    * @param {string} apiEndpoint - Endpoint to be hitting
    * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
@@ -58,7 +59,7 @@ export class ReservoirSaleBot extends APIPollBot {
       apiEndpoint + '&startTimestamp=' + (Date.now() / 1000).toFixed()
     super(apiEndpoint, refreshRateMs, bot, headers)
     this.contract = contract
-    this.lastUpdatedTime = (this.lastUpdatedTime / 1000).toFixed()
+    this.lastUpdatedTime = Math.floor(this.lastUpdatedTime / 1000)
     this.saleIds = new Set()
   }
 
@@ -212,14 +213,18 @@ export class ReservoirSaleBot extends APIPollBot {
     )
     // Update to remove author name and to reflect this info in piece name
     // rather than token number as the title and URL field..
-    embed.author = null
     embed.setTitle(title)
     if (platformUrl) {
       embed.setURL(platformUrl)
     }
     if (artBlocksData.collection_name) {
       console.log(artBlocksData.name + ' SALE')
-      sendEmbedToSaleChannels(this.bot, embed, artBlocksData, price)
+      sendEmbedToSaleChannels(
+        this.bot,
+        embed,
+        artBlocksData,
+        await getCollectionType(sale.token.contract)
+      )
     }
   }
 }

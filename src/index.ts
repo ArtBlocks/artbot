@@ -10,9 +10,10 @@ const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot
 import { MintBot } from './Classes/MintBot'
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 
-import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
 import { getEngineContracts } from './Utils/parseArtBlocksAPI'
-const { ReservoirListBot } = require('./Classes/APIBots/ReservoirListBot')
+import { ReservoirListBot } from './Classes/APIBots/ReservoirListBot'
+import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
+
 const { ArchipelagoBot } = require('./Classes/APIBots/ArchipelagoBot')
 // Special handlers.
 const {

@@ -26,10 +26,6 @@
       "default": "59"
     }
   },
-  "825988122122649621": {
-    "name": "factory-projects",
-    "comment": "actual test server channel name is factory-activity"
-  },
   "785144843986665475": {
     "name": "general"
   },
@@ -59,5 +55,17 @@
   },
   "981922516215955476": {
     "name": "artblocks-mints"
+  },
+  "795703663955017782": {
+    "name": "explorations-sales"
+  },
+  "825988122122649621": {
+    "name": "explorations-listings"
+  },
+  "814275283951681558": {
+    "name": "engine-sales"
+  },
+  "1039671456080072736": {
+    "name": "engine-listings"
   }
 }

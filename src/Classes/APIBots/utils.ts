@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv'
-import { ENGINE_CONTRACTS } from '../../index'
+import { COLLAB_CONTRACTS, ENGINE_CONTRACTS } from '../../index'
+import { CollectionType } from '../MintBot'
 dotenv.config()
 
 const axios = require('axios')
@@ -157,6 +158,26 @@ export async function isEngineContract(
   contractAddress: string
 ): Promise<boolean> {
   return (await ENGINE_CONTRACTS).includes(contractAddress.toLowerCase())
+}
+
+export async function getCollectionType(
+  contractAddress: string
+): Promise<CollectionType> {
+  if (isExplorationsContract(contractAddress)) {
+    return CollectionType.EXPLORATIONS
+  } else if (
+    Object.values(CORE_CONTRACTS).includes(contractAddress.toLowerCase())
+  ) {
+    return CollectionType.CORE
+  } else if (
+    Object.values(COLLAB_CONTRACTS).includes(contractAddress.toLowerCase())
+  ) {
+    return CollectionType.CORE
+  } else if (await isEngineContract(contractAddress)) {
+    return CollectionType.ENGINE
+  }
+
+  throw new Error('Unknown collection type')
 }
 
 module.exports.ensOrAddress = ensOrAddress

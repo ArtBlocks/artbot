@@ -16,7 +16,7 @@ const PARTNER_CONTRACTS = require('../ProjectConfig/partnerContracts.json')
 
 const MINT_REFRESH_TIME_SECONDS = process.env.MINT_REFRESH_TIME_SECONDS ?? '60'
 
-enum MintType {
+export enum CollectionType {
   CORE = 'CORE',
   EXPLORATIONS = 'EXPLORATIONS',
   COLLAB = 'COLLAB',
@@ -42,19 +42,19 @@ export class MintBot {
     Object.entries(MINT_CONFIG).forEach(([mintType, channels]) => {
       let contracts: string[] = []
       switch (mintType) {
-        case MintType.CORE:
+        case CollectionType.CORE:
           contracts = Object.values(CORE_CONTRACTS)
           break
-        case MintType.EXPLORATIONS:
+        case CollectionType.EXPLORATIONS:
           contracts = Object.values(EXPLORATIONS_CONTRACTS)
           break
-        case MintType.COLLAB:
+        case CollectionType.COLLAB:
           contracts = Object.values(COLLAB_CONTRACTS)
           break
-        case MintType.ENGINE:
+        case CollectionType.ENGINE:
           contracts = engineContracts
           break
-        case MintType.STAGING:
+        case CollectionType.STAGING:
           contracts = Object.values(STAGING_CONTRACTS)
           break
         default:
