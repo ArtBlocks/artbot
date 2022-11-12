@@ -189,7 +189,9 @@ class Mint {
     const ownerProfile = baseABProfile + this.owner
 
     embed.setTitle(`Minted: ${this.tokenName} - ${this.artistName}`)
-    embed.setURL(this.artblocksUrl)
+    if (this.artblocksUrl) {
+      embed.setURL(this.artblocksUrl)
+    }
     embed.setImage(this.image)
     embed.setColor('#c9fdc9')
 
