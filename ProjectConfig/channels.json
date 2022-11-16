@@ -572,6 +572,12 @@
       }
     }
   },
+  "1039359385215963136": {
+    "name": "james-merrill",
+    "projectBotHandlers": {
+      "default": "379"
+    }
+  }, 
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
     "projectBotHandlers": {
