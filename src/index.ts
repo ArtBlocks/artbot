@@ -212,13 +212,9 @@ const initReservoirBots = async () => {
     Object.values(CORE_CONTRACTS)
       .concat(Object.values(COLLAB_CONTRACTS))
       .concat(Object.values(EXPLORATIONS_CONTRACTS))
-  )
-  const mainSaleParams = buildContractsString(
-    Object.values(CORE_CONTRACTS)
-      .concat(Object.values(COLLAB_CONTRACTS))
-      .concat(Object.values(EXPLORATIONS_CONTRACTS))
       .concat(await ENGINE_CONTRACTS)
-  ).replaceAll('contracts', 'contract')
+  )
+  const mainSaleParams = mainListParams.replaceAll('contracts', 'contract')
 
   new ReservoirListBot(
     `https://api.reservoir.tools/orders/asks/v3?${mainListParams}&sortBy=createdAt&limit=${reservoirListLimit}`,
