@@ -9,6 +9,7 @@ import { APIPollBot } from './ApiPollBot'
 import {
   getCollectionType,
   getTokenApiUrl,
+  isEngineContract,
   isExplorationsContract,
 } from './utils'
 
@@ -139,12 +140,18 @@ export class ReservoirListBot extends APIPollBot {
         artBlocksData.curation_status.slice(1).toLowerCase()
       : ''
 
+    let title = `${artBlocksData.name} - ${artBlocksData.artist}`
+
     if (artBlocksData?.platform === 'Art Blocks x Pace') {
       curationStatus = 'AB x Pace'
     } else if (isExplorationsContract(listing.contract)) {
       curationStatus = 'Explorations'
+    } else if (await isEngineContract(listing.contract)) {
+      curationStatus = 'Engine'
+      if (artBlocksData?.platform) {
+        title = `${artBlocksData.platform} - ${title}`
+      }
     }
-
     // Update thumbnail image to use larger variant from Art Blocks API.
     if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
       embed.setThumbnail(artBlocksData.image)
@@ -165,8 +172,10 @@ export class ReservoirListBot extends APIPollBot {
 
     const platformUrl = listing.source.url
 
-    embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`)
-    embed.setURL(platformUrl)
+    embed.setTitle(title)
+    if (platformUrl) {
+      embed.setURL(platformUrl)
+    }
     if (artBlocksData.collection_name) {
       console.log(artBlocksData.name + ' LIST')
       sendEmbedToListChannels(
