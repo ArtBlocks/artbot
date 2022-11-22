@@ -101,9 +101,16 @@ function sendEmbedToChannel(
   channelId: string
 ) {
   const channel = bot.channels?.cache?.get(channelId) as TextChannel
-  channel.send({
-    embeds: [embed],
-  })
+  channel
+    .send({
+      embeds: [embed],
+    })
+    .catch((err) => {
+      console.log(
+        `Error posting message in channel ${projectConfig.channels[channelId].name} (id: ${channelId})`,
+        err.message
+      )
+    })
 }
 
 /**
