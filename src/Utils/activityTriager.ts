@@ -129,7 +129,7 @@ export function sendEmbedToSaleChannels(
         break
       case CollectionType.EXPLORATIONS:
         sendEmbedToChannel(bot, embed, EXPLORATIONS_SALES)
-
+        sendEmbedToChannel(bot, embed, CHANNEL_SALES_CHAT)
         break
       case CollectionType.COLLAB:
         sendEmbedToChannel(bot, embed, CHANNEL_AB_X_PACE)
