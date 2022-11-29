@@ -4,6 +4,7 @@ import {
   BAN_ADDRESSES,
   sendEmbedToSaleChannels,
 } from '../../Utils/activityTriager'
+import { CollectionType } from '../MintBot'
 import { APIPollBot } from './ApiPollBot'
 import {
   getTokenApiUrl,
@@ -29,6 +30,7 @@ type ReservoirSale = {
     }
     amount: {
       decimal: number
+      native: number
     }
   }
   timestamp: number
@@ -71,14 +73,22 @@ export class ReservoirSaleBot extends APIPollBot {
    */
   async handleAPIResponse(responseData: ReservoirSaleResponse) {
     let maxTime = 0
+    const sales: { [id: string]: ReservoirSale[] } = {}
     for (const data of responseData.sales) {
       const eventTime = data.timestamp
       // Only deal with event if it is new and unique saleId
       if (this.lastUpdatedTime < eventTime && !this.saleIds.has(data.saleId)) {
-        this.buildDiscordMessage(data).catch((err) => {
-          console.log('Error sending sale message', err)
-        })
         this.saleIds.add(data.saleId)
+        if (!isExplorationsContract(data.token.contract)) {
+          this.buildDiscordMessage(data).catch((err) => {
+            console.log('Error sending sale message', err)
+          })
+        } else {
+          if (!sales[data.to]) {
+            sales[data.to] = []
+          }
+          sales[data.to].push(data)
+        }
       }
 
       // Save the time of the latest event from this batch
@@ -86,6 +96,18 @@ export class ReservoirSaleBot extends APIPollBot {
         maxTime = eventTime
       }
     }
+    // Handle Explorations sales (may need to batch big sweeps)
+    Object.keys(sales).forEach((user) => {
+      if (sales[user].length > 1) {
+        this.buildSweepDiscordMessage(sales[user]).catch((err) => {
+          console.log('Error sending batch sale message', err)
+        })
+      } else {
+        this.buildDiscordMessage(sales[user][0]).catch((err) => {
+          console.log('Error sending sale message', err)
+        })
+      }
+    })
 
     // Update latest time vars if batch has new latest time
     if (maxTime > this.lastUpdatedTime) {
@@ -226,5 +248,83 @@ export class ReservoirSaleBot extends APIPollBot {
         await getCollectionType(sale.token.contract)
       )
     }
+  }
+
+  async buildSweepDiscordMessage(sales: ReservoirSale[]) {
+    if (BAN_ADDRESSES.has(sales[0].to)) {
+      console.log(`Skipping message propagation for ${sales[0].to}`)
+      return
+    }
+    // Create embed we will be sending
+    const embed = new EmbedBuilder()
+
+    const buyerText = await this.ensOrAddress(sales[0].to)
+
+    // Get sale 0 token info for thumbnail, etc
+    const sale0 = sales[0]
+    const tokenUrl = getTokenApiUrl(sale0.token.contract, sale0.token.tokenId)
+    const artBlocksResponse = await axios.get(tokenUrl)
+    const artBlocksData = artBlocksResponse?.data
+    if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
+      embed.setThumbnail(artBlocksData.image)
+    }
+
+    let totalCost = 0
+
+    for (let i = 0; i < sales.length; i++) {
+      const sale = sales[i]
+      if (sale.orderKind === 'mint') {
+        return // Don't send mint events
+      }
+      const tokenName =
+        'Friendship Bracelets #' + (parseInt(sale.token.tokenId) % 1e6)
+      const price = sale.price.amount.decimal
+      const currency = sale.price.currency.symbol
+      totalCost += sale.price.amount.native
+      const ab_url = artBlocksData.external_url.replace(
+        sale0.token.tokenId,
+        sale.token.tokenId
+      )
+      const sellerText = await this.ensOrAddress(sale.from)
+
+      const platform = sale.fillSource.toLowerCase()
+      let platformUrl = ab_url
+      if (platform.includes('opensea')) {
+        platformUrl = this.buildOpenseaURL(
+          sale.token.contract,
+          sale.token.tokenId
+        )
+      } else if (platform.includes('looksrare')) {
+        platformUrl = this.buildLooksRareURL(
+          sale.token.contract,
+          sale.token.tokenId
+        )
+      } else if (platform.includes('x2y2')) {
+        platformUrl = this.buildX2Y2URL(sale.token.contract, sale.token.tokenId)
+      }
+      embed.addFields([
+        {
+          name: `${tokenName}`,
+          value: `Price: ${price}\t${currency}
+Seller: ${sellerText} ([${platform}](${platformUrl})) `,
+        },
+      ])
+    }
+
+    embed.setTitle(
+      `${buyerText} bought ${
+        sales.length
+      } Friendship Bracelets for ${totalCost.toFixed(3)} ETH`
+    )
+
+    embed.setColor(this.sweepColor)
+
+    console.log(buyerText + ' FB SWEEP')
+    sendEmbedToSaleChannels(
+      this.bot,
+      embed,
+      artBlocksData,
+      CollectionType.EXPLORATIONS
+    )
   }
 }

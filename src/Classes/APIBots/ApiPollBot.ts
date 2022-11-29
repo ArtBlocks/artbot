@@ -10,6 +10,7 @@ export class APIPollBot {
   headers: any
   listColor: ColorResolvable
   saleColor: ColorResolvable
+  sweepColor: ColorResolvable
   lastUpdatedTime: number
 
   /**
@@ -31,6 +32,7 @@ export class APIPollBot {
     this.headers = headers
     this.listColor = '#407FDB'
     this.saleColor = '#62DE7C'
+    this.sweepColor = '#A956FA'
 
     // Only send events that occur after this bot gets initialized
     this.lastUpdatedTime = Date.now()
