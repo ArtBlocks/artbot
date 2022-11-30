@@ -1,0 +1,18 @@
+name: 'Build Check'
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: yarn install --ignore-scripts
+      - name: Run program
+        run: export TEST_MODE=true && timeout 2m yarn start || ( [[ $? -eq 124 ]] && echo "WARNING Timeout reached, but that's OK" 
