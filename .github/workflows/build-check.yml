@@ -8,7 +8,7 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  build-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -21,4 +21,4 @@ jobs:
       - name: Install modules
         run: yarn install --ignore-scripts
       - name: Run program
-        run: timeout 2m yarn start || ( [[ $? -eq 124 ]] && echo "WARNING Timeout reached, but that's OK" )
+        run: timeout 1m yarn start || ( [[ $? -eq 124 ]] && echo "WARNING Timeout reached, but that's OK" )
