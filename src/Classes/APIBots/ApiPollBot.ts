@@ -1,4 +1,5 @@
 import { Client, ColorResolvable } from 'discord.js'
+import { buildOpenseaURL, buildLooksRareURL, buildX2Y2URL } from './utils'
 
 const { ensOrAddress, getOSName } = require('./utils')
 const axios = require('axios')
@@ -10,6 +11,7 @@ export class APIPollBot {
   headers: any
   listColor: ColorResolvable
   saleColor: ColorResolvable
+  sweepColor: ColorResolvable
   lastUpdatedTime: number
 
   /**
@@ -31,6 +33,7 @@ export class APIPollBot {
     this.headers = headers
     this.listColor = '#407FDB'
     this.saleColor = '#62DE7C'
+    this.sweepColor = '#A956FA'
 
     // Only send events that occur after this bot gets initialized
     this.lastUpdatedTime = Date.now()
@@ -82,14 +85,20 @@ export class APIPollBot {
   async osName(address: string): Promise<string> {
     return await getOSName(address)
   }
-
-  buildOpenseaURL(contractAddr: string, tokenId: string): string {
-    return `https://opensea.io/assets/ethereum/${contractAddr}/${tokenId}`
-  }
-  buildLooksRareURL(contractAddr: string, tokenId: string): string {
-    return `https://looksrare.org/collections/${contractAddr}/${tokenId}`
-  }
-  buildX2Y2URL(contractAddr: string, tokenId: string): string {
-    return `https://x2y2.io/eth/${contractAddr}/${tokenId}`
+  getPlatformUrl(
+    platform: string,
+    contractAddress: string,
+    tokenId: string,
+    externalUrl: string
+  ): string {
+    let platformUrl = externalUrl
+    if (platform.includes('opensea')) {
+      platformUrl = buildOpenseaURL(contractAddress, tokenId)
+    } else if (platform.includes('looksrare')) {
+      platformUrl = buildLooksRareURL(contractAddress, tokenId)
+    } else if (platform.includes('x2y2')) {
+      platformUrl = buildX2Y2URL(contractAddress, tokenId)
+    }
+    return platformUrl
   }
 }

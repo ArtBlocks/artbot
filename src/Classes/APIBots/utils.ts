@@ -180,6 +180,19 @@ export async function getCollectionType(
   throw new Error('Unknown collection type')
 }
 
+export function buildOpenseaURL(contractAddr: string, tokenId: string): string {
+  return `https://opensea.io/assets/ethereum/${contractAddr}/${tokenId}`
+}
+export function buildLooksRareURL(
+  contractAddr: string,
+  tokenId: string
+): string {
+  return `https://looksrare.org/collections/${contractAddr}/${tokenId}`
+}
+export function buildX2Y2URL(contractAddr: string, tokenId: string): string {
+  return `https://x2y2.io/eth/${contractAddr}/${tokenId}`
+}
+
 module.exports.ensOrAddress = ensOrAddress
 module.exports.getOSName = getOSName
 module.exports.resolveEnsName = resolveEnsName
