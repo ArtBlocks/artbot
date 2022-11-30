@@ -79,11 +79,16 @@ export class ReservoirSaleBot extends APIPollBot {
       // Only deal with event if it is new and unique saleId
       if (this.lastUpdatedTime < eventTime && !this.saleIds.has(data.saleId)) {
         this.saleIds.add(data.saleId)
-        if (!isExplorationsContract(data.token.contract)) {
+        // Only worrying about batch sales messages for Friendship Bracelets
+        if (
+          !isExplorationsContract(data.token.contract) ||
+          parseInt(data.token.tokenId) / 1e6 > 1 // To make sure non-FB explorations aren't batched
+        ) {
           this.buildDiscordMessage(data).catch((err) => {
             console.log('Error sending sale message', err)
           })
         } else {
+          // Instantiate array for address if it doesn't exist yet
           if (!sales[data.to]) {
             sales[data.to] = []
           }
@@ -156,7 +161,12 @@ export class ReservoirSaleBot extends APIPollBot {
 
     let sellerText = await this.ensOrAddress(sale.from)
     let buyerText = await this.ensOrAddress(sale.to)
-    let platformUrl: string = artBlocksData.external_url ?? ''
+    const platformUrl = this.getPlatformUrl(
+      platform,
+      sale.token.contract,
+      sale.token.tokenId,
+      artBlocksData.external_url
+    )
 
     if (platform.includes('opensea')) {
       if (!sellerText.includes('.eth')) {
@@ -168,18 +178,6 @@ export class ReservoirSaleBot extends APIPollBot {
         const buyerOS = await this.osName(sale.to)
         buyerText = buyerOS === '' ? buyerText : `${buyerText} (OS: ${buyerOS})`
       }
-
-      platformUrl = this.buildOpenseaURL(
-        sale.token.contract,
-        sale.token.tokenId
-      )
-    } else if (platform.includes('looksrare')) {
-      platformUrl = this.buildLooksRareURL(
-        sale.token.contract,
-        sale.token.tokenId
-      )
-    } else if (platform.includes('x2y2')) {
-      platformUrl = this.buildX2Y2URL(sale.token.contract, sale.token.tokenId)
     }
     const baseABProfile = 'https://www.artblocks.io/user/'
     const sellerProfile = baseABProfile + owner
@@ -251,17 +249,18 @@ export class ReservoirSaleBot extends APIPollBot {
   }
 
   async buildSweepDiscordMessage(sales: ReservoirSale[]) {
-    if (BAN_ADDRESSES.has(sales[0].to)) {
-      console.log(`Skipping message propagation for ${sales[0].to}`)
+    const sale0 = sales[0]
+
+    if (BAN_ADDRESSES.has(sale0.to)) {
+      console.log(`Skipping message propagation for ${sale0.to}`)
       return
     }
     // Create embed we will be sending
     const embed = new EmbedBuilder()
 
-    const buyerText = await this.ensOrAddress(sales[0].to)
+    const buyerText = await this.ensOrAddress(sale0.to)
 
     // Get sale 0 token info for thumbnail, etc
-    const sale0 = sales[0]
     const tokenUrl = getTokenApiUrl(sale0.token.contract, sale0.token.tokenId)
     const artBlocksResponse = await axios.get(tokenUrl)
     const artBlocksData = artBlocksResponse?.data
@@ -288,20 +287,12 @@ export class ReservoirSaleBot extends APIPollBot {
       const sellerText = await this.ensOrAddress(sale.from)
 
       const platform = sale.fillSource.toLowerCase()
-      let platformUrl = ab_url
-      if (platform.includes('opensea')) {
-        platformUrl = this.buildOpenseaURL(
-          sale.token.contract,
-          sale.token.tokenId
-        )
-      } else if (platform.includes('looksrare')) {
-        platformUrl = this.buildLooksRareURL(
-          sale.token.contract,
-          sale.token.tokenId
-        )
-      } else if (platform.includes('x2y2')) {
-        platformUrl = this.buildX2Y2URL(sale.token.contract, sale.token.tokenId)
-      }
+      const platformUrl = this.getPlatformUrl(
+        platform,
+        sale.token.contract,
+        sale.token.tokenId,
+        ab_url
+      )
       embed.addFields([
         {
           name: `${tokenName}`,
