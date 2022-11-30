@@ -24,7 +24,7 @@ const {
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
 // Misc. server configuration info.
-const TOKEN = process.env.TOKEN
+const DISCORD_TOKEN = process.env.DISCORD_TOKEN
 const PORT = process.env.PORT || 3001
 
 export const CORE_CONTRACTS: {
@@ -134,7 +134,7 @@ const bot = new Client({
     GatewayIntentBits.MessageContent,
   ],
 })
-bot.login(TOKEN)
+bot.login(DISCORD_TOKEN)
 
 bot.on('ready', () => {
   console.info(`Logged in as ${bot.user?.tag}!`)

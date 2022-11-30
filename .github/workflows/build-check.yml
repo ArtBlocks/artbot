@@ -12,7 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Set env vars
+        run: |
+          echo "TEST_MODE=true" >> $GITHUB_ENV
+          echo "HASURA_GRAPHQL_ENDPOINT=${{ secrets.HASURA_GRAPHQL_ENDPOINT }}" >> $GITHUB_ENV
+          echo "HASURA_GRAPHQL_ADMIN_SECRET=${{ secrets.HASURA_GRAPHQL_ADMIN_SECRET }}" >> $GITHUB_ENV
+          echo "DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}" >> $GITHUB_ENV
       - name: Install modules
         run: yarn install --ignore-scripts
       - name: Run program
-        run: export TEST_MODE=true && timeout 2m yarn start || ( [[ $? -eq 124 ]] && echo "WARNING Timeout reached, but that's OK" )
+        run: timeout 2m yarn start || ( [[ $? -eq 124 ]] && echo "WARNING Timeout reached, but that's OK" )
