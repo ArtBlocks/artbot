@@ -116,10 +116,9 @@ export class ProjectBot {
 
     this.sendMetaDataMessage(msg, tokenID.toString(), detailsRequested).catch(
       (err: Error | AxiosError) => {
-        console.log('Error sending metadata message', err)
+        console.error('Error sending metadata message', err)
         if (axios.isAxiosError(err)) {
           const axErr = err as AxiosError
-          // If Token API is being rate limited, send apology note
           if (axErr?.code === '429') {
             msg.channel.send(
               'Sorry! Our API is temporarily rate limited, please try again in a little bit'

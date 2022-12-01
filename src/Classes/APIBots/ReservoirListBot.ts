@@ -69,7 +69,7 @@ export class ReservoirListBot extends APIPollBot {
       // Only deal with event if it is new
       if (this.lastUpdatedTime < eventTime) {
         this.buildDiscordMessage(data).catch((err) => {
-          console.log('Error sending listing message', err)
+          console.error('Error sending listing message', err)
         })
       }
 
