@@ -85,7 +85,7 @@ export class ReservoirSaleBot extends APIPollBot {
           parseInt(data.token.tokenId) / 1e6 > 1 // To make sure non-FB explorations aren't batched
         ) {
           this.buildDiscordMessage(data).catch((err) => {
-            console.log('Error sending sale message', err)
+            console.error('Error sending sale message', err)
           })
         } else {
           // Instantiate array for address if it doesn't exist yet
@@ -105,11 +105,11 @@ export class ReservoirSaleBot extends APIPollBot {
     Object.keys(sales).forEach((user) => {
       if (sales[user].length > 1) {
         this.buildSweepDiscordMessage(sales[user]).catch((err) => {
-          console.log('Error sending batch sale message', err)
+          console.error('Error sending batch sale message', err)
         })
       } else {
         this.buildDiscordMessage(sales[user][0]).catch((err) => {
-          console.log('Error sending sale message', err)
+          console.error('Error sending sale message', err)
         })
       }
     })
