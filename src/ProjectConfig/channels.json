@@ -364,7 +364,9 @@
     "projectBotHandlers": {
       "default": "164",
       "stringTriggers": {
-        "100": ["century"]
+        "100": ["century"],
+        "369": ["century 2052"],
+        "383": ["preprocess", "pre-process"]
       }
     }
   },
