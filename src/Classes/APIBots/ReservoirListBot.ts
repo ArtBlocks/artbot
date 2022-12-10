@@ -158,7 +158,19 @@ class ReservoirListBot extends APIPollBot {
       }
     )
 
-    const platformUrl = listing.source.url
+    let platformUrl = listing.source.url
+
+    // Direct listing url to Sansa if part of core supported AB collections
+    if (
+      [
+        'Art Blocks x Pace',
+        'Art Blocks Curated',
+        'Art Blocks Presents',
+      ].includes(artBlocksData?.platform)
+    ) {
+      platformUrl =
+        'https://sansa.xyz/asset/' + listing.contract + '/' + tokenID
+    }
 
     embed.author = null
     embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`)
