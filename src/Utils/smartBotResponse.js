@@ -310,10 +310,19 @@ async function smartBotResponse(
     channelID == CHANNEL_BLOCK_TALK &&
     (msgContentLowercase.includes('thanks') ||
       msgContentLowercase.includes('thank you') ||
-      msgContentLowercase.includes('gracias') ||
-      msgContentLowercase.includes('domo arigato') ||
-      msgContentLowercase.includes('cheers') ||
-      msgContentLowercase.includes('danke')) &&
+      msgContentLowercase.includes('gracias') || // spanish
+      msgContentLowercase.includes('domo arigato') || // japanese
+      msgContentLowercase.includes('arigato') ||
+      msgContentLowercase.includes('merci') || // french
+      msgContentLowercase.includes('grazie') || // italian
+      msgContentLowercase.includes('obrigada') || // portugese
+      msgContentLowercase.includes('dziekuje') || // polish
+      msgContentLowercase.includes('tack') || // swedish
+      msgContentLowercase.includes('cheers') || // australian
+      msgContentLowercase.includes('efcharistó') || // greek
+      msgContentLowercase.includes('dyakuyu tobi') || // ukrainian
+      msgContentLowercase.includes('blagodaryu vas') || // russian
+      msgContentLowercase.includes('danke')) && // german
     (msgContentLowercase.includes('grant') ||
       msgContentLowercase.includes('grant-san'))
   ) {

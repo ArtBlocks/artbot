@@ -1,4 +1,6 @@
 import * as dotenv from 'dotenv'
+import { COLLAB_CONTRACTS, ENGINE_CONTRACTS } from '../../index'
+import { CollectionType } from '../MintBot'
 dotenv.config()
 
 const axios = require('axios')
@@ -10,6 +12,7 @@ const provider = new ethers.providers.EtherscanProvider(
 )
 
 const STAGING_CONTRACTS = require('../../ProjectConfig/stagingContracts.json')
+const EXPLORATIONS_CONTRACTS = require('../../ProjectConfig/explorationsContracts.json')
 
 const CORE_CONTRACTS = require('../../ProjectConfig/coreContracts.json')
 // Runtime ENS cache just to limit queries
@@ -143,6 +146,51 @@ export function getTokenApiUrl(
   } else {
     return `https://token.artblocks.io/${contractAddress}/${tokenId}`
   }
+}
+
+export function isExplorationsContract(contractAddress: string): boolean {
+  return Object.values(EXPLORATIONS_CONTRACTS).includes(
+    contractAddress.toLowerCase()
+  )
+}
+
+export async function isEngineContract(
+  contractAddress: string
+): Promise<boolean> {
+  return (await ENGINE_CONTRACTS).includes(contractAddress.toLowerCase())
+}
+
+export async function getCollectionType(
+  contractAddress: string
+): Promise<CollectionType> {
+  if (isExplorationsContract(contractAddress)) {
+    return CollectionType.EXPLORATIONS
+  } else if (
+    Object.values(CORE_CONTRACTS).includes(contractAddress.toLowerCase())
+  ) {
+    return CollectionType.CORE
+  } else if (
+    Object.values(COLLAB_CONTRACTS).includes(contractAddress.toLowerCase())
+  ) {
+    return CollectionType.CORE
+  } else if (await isEngineContract(contractAddress)) {
+    return CollectionType.ENGINE
+  }
+
+  throw new Error('Unknown collection type')
+}
+
+export function buildOpenseaURL(contractAddr: string, tokenId: string): string {
+  return `https://opensea.io/assets/ethereum/${contractAddr}/${tokenId}`
+}
+export function buildLooksRareURL(
+  contractAddr: string,
+  tokenId: string
+): string {
+  return `https://looksrare.org/collections/${contractAddr}/${tokenId}`
+}
+export function buildX2Y2URL(contractAddr: string, tokenId: string): string {
+  return `https://x2y2.io/eth/${contractAddr}/${tokenId}`
 }
 
 module.exports.ensOrAddress = ensOrAddress

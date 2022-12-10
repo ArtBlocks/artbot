@@ -364,7 +364,9 @@
     "projectBotHandlers": {
       "default": "164",
       "stringTriggers": {
-        "100": ["century"]
+        "100": ["century"],
+        "369": ["century 2052"],
+        "383": ["preprocess", "pre-process"]
       }
     }
   },
@@ -575,6 +577,12 @@
       }
     }
   },
+  "1039359385215963136": {
+    "name": "james-merrill",
+    "projectBotHandlers": {
+      "default": "379"
+    }
+  }, 
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
     "projectBotHandlers": {
@@ -631,7 +639,7 @@
     "name": "block-talk"
   },
   "976944919757348965": {
-    "name": "pbab-chat"
+    "name": "engine-chat"
   },
   "983836283954667530": {
     "name": "art-blocks-x-pace"
@@ -651,8 +659,29 @@
   "782311037172973618": {
     "name": "artblocks-mints"
   },
+  "1039653873066979410": {
+    "name": "explorations-mints"
+  },
+  "1039653771862610001": {
+    "name": "explorations-sales"
+  },
+  "1039653937810255872": {
+    "name": "explorations-listings"
+  },
   "1014641051140624445": {
     "name": "engine-mints"
+  },
+  "1039654066122399785": {
+    "name": "engine-sales"
+  },
+  "1039654132279156826": {
+    "name": "engine-listings"
+  },
+  "935377049089097758": {
+    "name": "plottables-mints"
+  },
+  "937547685215473664": {
+    "name": "doodle-mints"
   },
   "919937880288284722": {
     "name": "plottables-numbersinmotion",
@@ -725,5 +754,11 @@
         "8-PLOTTABLES": ["spectral"]
       }
     }
+  },
+  "1037778085375905812": {
+    "name": "stevie-p-sales"
+  },
+  "1037834993004720158": {
+    "name": "stevie-p-listings"
   }
 }

@@ -8,6 +8,7 @@ const API_URL = 'https://api.thegraph.com/subgraphs/name/artblocks/art-blocks'
 // core contract addresses to include during initilization
 const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
 const COLLAB_CONTRACTS = require('../ProjectConfig/collaborationContracts.json')
+const EXPLORATION_CONTRACTS = require('../ProjectConfig/explorationsContracts.json')
 
 const client = createClient({
   url: API_URL,
@@ -493,9 +494,21 @@ async function getArtBlocksProjects() {
 async function getArtBlocksOpenProjects() {
   return await getContractsOpenProjects(Object.values(CORE_CONTRACTS))
 }
+
+async function getAllProjects() {
+  const engineContracts = await getEngineContracts()
+  return await getContractsProjects(
+    Object.values(CORE_CONTRACTS)
+      .concat(Object.values(COLLAB_CONTRACTS))
+      .concat(Object.values(EXPLORATION_CONTRACTS))
+      .concat(Object.values(engineContracts))
+  )
+}
 async function getArtBlocksAndCollabProjects() {
   return await getContractsProjects(
-    Object.values(CORE_CONTRACTS).concat(Object.values(COLLAB_CONTRACTS))
+    Object.values(CORE_CONTRACTS)
+      .concat(Object.values(COLLAB_CONTRACTS))
+      .concat(Object.values(EXPLORATION_CONTRACTS))
   )
 }
 
@@ -519,10 +532,10 @@ async function getArtBlocksXPaceProjects() {
  * gets all PBAB Contracts from Hasura
  *
  */
-async function _getPBABContracts() {
-  const nonPBABContracts = Object.values(CORE_CONTRACTS).concat(
-    Object.values(COLLAB_CONTRACTS)
-  )
+export async function getEngineContracts() {
+  const nonPBABContracts = Object.values(CORE_CONTRACTS)
+    .concat(Object.values(COLLAB_CONTRACTS))
+    .concat(Object.values(EXPLORATION_CONTRACTS))
   try {
     const result = await client
       .query(getPBABContracts, {
@@ -636,11 +649,12 @@ async function getProjectsCurationStatus() {
  *     - id: string Contract Address
  */
 async function getPBABProjects() {
-  const contractsToGet = await _getPBABContracts()
+  const contractsToGet = await getEngineContracts()
   return getContractsProjects(contractsToGet)
 }
 
 async function getAllWalletTokens(walletAddress) {
+  const engineContracts = await getEngineContracts()
   const maxTokensPerQuery = 1000
   try {
     const allTokens = []
@@ -648,7 +662,10 @@ async function getAllWalletTokens(walletAddress) {
       const result = await client
         .query(getWalletTokens, {
           wallet: walletAddress,
-          contracts: Object.values(CORE_CONTRACTS),
+          contracts: Object.values(CORE_CONTRACTS)
+            .concat(Object.values(COLLAB_CONTRACTS))
+            .concat(Object.values(EXPLORATION_CONTRACTS))
+            .concat(Object.values(engineContracts)),
           first: maxTokensPerQuery,
           skip: allTokens.length,
         })
@@ -667,6 +684,7 @@ async function getAllWalletTokens(walletAddress) {
 }
 
 module.exports.getArtBlocksProject = getArtBlocksProject
+module.exports.getAllProjects = getAllProjects
 module.exports.getArtBlocksAndCollabProjects = getArtBlocksAndCollabProjects
 module.exports.getArtBlocksFactoryProjects = getArtBlocksFactoryProjects
 module.exports.getArtBlocksProjects = getArtBlocksProjects

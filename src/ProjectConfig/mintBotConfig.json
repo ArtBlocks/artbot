@@ -1,6 +1,9 @@
 {
   "CORE": ["artblocks-mints"],
+  "EXPLORATIONS": ["explorations-mints"],
   "STAGING": ["ab-art-chat"],
   "COLLAB": ["artblocks-mints", "ab-x-pace"],
-  "ENGINE": ["engine-mints"]
+  "ENGINE": ["engine-mints"],
+  "PLOTTABLES": ["plottables-mints"],
+  "DOODLE": ["doodle-mints"]
 }

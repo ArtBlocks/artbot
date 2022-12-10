@@ -1,5 +1,5 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js'
-import { mintBot } from '../index'
+import { ENGINE_CONTRACTS, mintBot } from '../index'
 import axios, { AxiosError } from 'axios'
 import { getTokenApiUrl } from './APIBots/utils'
 import { ensOrAddress } from './APIBots/utils'
@@ -11,11 +11,14 @@ const MINT_CONFIG: {
 const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
 const COLLAB_CONTRACTS = require('../ProjectConfig/collaborationContracts.json')
 const STAGING_CONTRACTS = require('../ProjectConfig/stagingContracts.json')
+const EXPLORATIONS_CONTRACTS = require('../ProjectConfig/explorationsContracts.json')
+const PARTNER_CONTRACTS = require('../ProjectConfig/partnerContracts.json')
 
 const MINT_REFRESH_TIME_SECONDS = process.env.MINT_REFRESH_TIME_SECONDS ?? '60'
 
-enum MintType {
+export enum CollectionType {
   CORE = 'CORE',
+  EXPLORATIONS = 'EXPLORATIONS',
   COLLAB = 'COLLAB',
   ENGINE = 'ENGINE',
   STAGING = 'STAGING',
@@ -26,32 +29,40 @@ export class MintBot {
   bot: Client
   newMints: { [id: string]: Mint } = {}
   mintsToPost: { [id: string]: Mint } = {}
-  contractToChannel: { [id: string]: string[] }
+  contractToChannel: { [id: string]: string[] } = {}
   constructor(bot: Client) {
     this.bot = bot
-    this.contractToChannel = this.buildContractToChannel()
-
+    this.buildContractToChannel()
     this.startRoutine()
   }
 
-  buildContractToChannel(): { [id: string]: string[] } {
+  async buildContractToChannel() {
     const contractToChannel: { [id: string]: string[] } = {}
+    const engineContracts = await ENGINE_CONTRACTS
     Object.entries(MINT_CONFIG).forEach(([mintType, channels]) => {
       let contracts: string[] = []
       switch (mintType) {
-        case MintType.CORE:
+        case CollectionType.CORE:
           contracts = Object.values(CORE_CONTRACTS)
           break
-        case MintType.COLLAB:
+        case CollectionType.EXPLORATIONS:
+          contracts = Object.values(EXPLORATIONS_CONTRACTS)
+          break
+        case CollectionType.COLLAB:
           contracts = Object.values(COLLAB_CONTRACTS)
           break
-        case MintType.ENGINE:
-          // TODO: Add engine contracts
+        case CollectionType.ENGINE:
+          contracts = engineContracts
           break
-        case MintType.STAGING:
+        case CollectionType.STAGING:
           contracts = Object.values(STAGING_CONTRACTS)
           break
         default:
+          // Non-MintTypes are partner contracts that forward to other discord servers/channels
+          contracts = PARTNER_CONTRACTS[mintType]
+          if (typeof contracts === 'string') {
+            contracts = [contracts]
+          }
           break
       }
       channels.forEach((channel) => {
@@ -64,7 +75,7 @@ export class MintBot {
       })
     })
 
-    return contractToChannel
+    this.contractToChannel = contractToChannel
   }
 
   // Go through all mints in the queue and make sure the image exists
@@ -178,7 +189,9 @@ class Mint {
     const ownerProfile = baseABProfile + this.owner
 
     embed.setTitle(`Minted: ${this.tokenName} - ${this.artistName}`)
-    embed.setURL(this.artblocksUrl)
+    if (this.artblocksUrl) {
+      embed.setURL(this.artblocksUrl)
+    }
     embed.setImage(this.image)
     embed.setColor('#c9fdc9')
 

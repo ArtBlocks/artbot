@@ -1,13 +1,17 @@
-import { Client } from 'discord.js'
-import { getTokenApiUrl } from './utils'
-
-const { APIPollBot } = require('./ApiPollBot')
-const { EmbedBuilder } = require('discord.js')
-const axios = require('axios')
-const {
-  sendEmbedToListChannels,
+import axios from 'axios'
+import { Client, EmbedBuilder } from 'discord.js'
+import {
   BAN_ADDRESSES,
-} = require('../../Utils/activityTriager')
+  sendEmbedToListChannels,
+} from '../../Utils/activityTriager'
+import { APIPollBot } from './ApiPollBot'
+
+import {
+  getCollectionType,
+  getTokenApiUrl,
+  isEngineContract,
+  isExplorationsContract,
+} from './utils'
 
 type ReservoirListing = {
   maker: string
@@ -34,7 +38,7 @@ type ReservoirListResponse = {
 }
 
 /** API Poller for Reservoir Sale events */
-class ReservoirListBot extends APIPollBot {
+export class ReservoirListBot extends APIPollBot {
   /** Constructor just calls super
    * @param {string} apiEndpoint - Endpoint to be hitting
    * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
@@ -49,7 +53,7 @@ class ReservoirListBot extends APIPollBot {
     super(apiEndpoint, refreshRateMs, bot, headers)
     this.listColor = '#407FDB'
     this.saleColor = '#62DE7C'
-    this.lastUpdatedTime = this.lastUpdatedTime.toFixed()
+    this.lastUpdatedTime = Math.floor(this.lastUpdatedTime)
   }
 
   /**
@@ -65,7 +69,7 @@ class ReservoirListBot extends APIPollBot {
       // Only deal with event if it is new
       if (this.lastUpdatedTime < eventTime) {
         this.buildDiscordMessage(data).catch((err) => {
-          console.log('Error sending listing message', err)
+          console.error('Error sending listing message', err)
         })
       }
 
@@ -136,10 +140,18 @@ class ReservoirListBot extends APIPollBot {
         artBlocksData.curation_status.slice(1).toLowerCase()
       : ''
 
+    let title = `${artBlocksData.name} - ${artBlocksData.artist}`
+
     if (artBlocksData?.platform === 'Art Blocks x Pace') {
       curationStatus = 'AB x Pace'
+    } else if (isExplorationsContract(listing.contract)) {
+      curationStatus = 'Explorations'
+    } else if (await isEngineContract(listing.contract)) {
+      curationStatus = 'Engine'
+      if (artBlocksData?.platform) {
+        title = `${artBlocksData.platform} - ${title}`
+      }
     }
-
     // Update thumbnail image to use larger variant from Art Blocks API.
     if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
       embed.setThumbnail(artBlocksData.image)
@@ -172,14 +184,18 @@ class ReservoirListBot extends APIPollBot {
         'https://sansa.xyz/asset/' + listing.contract + '/' + tokenID
     }
 
-    embed.author = null
-    embed.setTitle(`${artBlocksData.name} - ${artBlocksData.artist}`)
-    embed.setURL(platformUrl)
+    embed.setTitle(title)
+    if (platformUrl) {
+      embed.setURL(platformUrl)
+    }
     if (artBlocksData.collection_name) {
       console.log(artBlocksData.name + ' LIST')
-      sendEmbedToListChannels(this.bot, embed, artBlocksData)
+      sendEmbedToListChannels(
+        this.bot,
+        embed,
+        artBlocksData,
+        await getCollectionType(listing.contract)
+      )
     }
   }
 }
-
-module.exports.ReservoirListBot = ReservoirListBot
