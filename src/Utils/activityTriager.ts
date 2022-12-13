@@ -20,6 +20,9 @@ const CHANNEL_SQUIGGLE_LISTINGS = projectConfig.chIdByName['squiggle-listings']
 const STEVIE_P_SALES = projectConfig.chIdByName['stevie-p-sales']
 const STEVIE_P_LISTINGS = projectConfig.chIdByName['stevie-p-listings']
 
+const PLOTTABLES_SALES = projectConfig.chIdByName['plottables-sales']
+const PLOTTABLES_LISTINGS = projectConfig.chIdByName['plottables-listings']
+
 // AB x Pace
 const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
 
@@ -145,9 +148,13 @@ export function sendEmbedToSaleChannels(
     if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
       sendEmbedToChannel(bot, embed, CHANNEL_SQUIGGLE_SALES)
     }
+
     // Non-AB Discord servers
     if (artBlocksData.artist.includes('Steve Pikelny')) {
       sendEmbedToChannel(bot, embed, STEVIE_P_SALES)
+    }
+    if (artBlocksData.platform.includes('Plottables')) {
+      sendEmbedToChannel(bot, embed, PLOTTABLES_SALES)
     }
   } catch (e) {
     console.warn(e)
@@ -183,8 +190,12 @@ export function sendEmbedToListChannels(
       sendEmbedToChannel(bot, embed, CHANNEL_SQUIGGLE_LISTINGS)
     }
 
+    // Non-AB Discord servers
     if (artBlocksData.artist.includes('Steve Pikelny')) {
       sendEmbedToChannel(bot, embed, STEVIE_P_LISTINGS)
+    }
+    if (artBlocksData.platform.includes('Plottables')) {
+      sendEmbedToChannel(bot, embed, PLOTTABLES_LISTINGS)
     }
   } catch (e) {
     console.warn(e)
