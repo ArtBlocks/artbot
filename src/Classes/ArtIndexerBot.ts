@@ -78,6 +78,7 @@ class ArtIndexerBot {
       const heritageStatuses = collectionInfo[1]
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i]
+        if (project.invocations === '0') continue
         console.log(
           `Refreshing project cache for Project ${project.projectId} ${project.name}`
         )
