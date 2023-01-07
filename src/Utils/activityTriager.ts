@@ -20,6 +20,8 @@ const CHANNEL_SQUIGGLE_LISTINGS = projectConfig.chIdByName['squiggle-listings']
 const STEVIE_P_SALES = projectConfig.chIdByName['stevie-p-sales']
 const STEVIE_P_LISTINGS = projectConfig.chIdByName['stevie-p-listings']
 
+const IXNAYOKAY_SALES = projectConfig.chIdByName['ixnayokay-sales']
+
 const PLOTTABLES_SALES = projectConfig.chIdByName['plottables-sales']
 const PLOTTABLES_LISTINGS = projectConfig.chIdByName['plottables-listings']
 
@@ -152,6 +154,9 @@ export function sendEmbedToSaleChannels(
     // Non-AB Discord servers
     if (artBlocksData.artist.includes('Steve Pikelny')) {
       sendEmbedToChannel(bot, embed, STEVIE_P_SALES)
+    }
+    if (artBlocksData.artist.includes('ixnayokay')) {
+      sendEmbedToChannel(bot, embed, IXNAYOKAY_SALES)
     }
     if (artBlocksData.platform.includes('Plottables')) {
       sendEmbedToChannel(bot, embed, PLOTTABLES_SALES)
