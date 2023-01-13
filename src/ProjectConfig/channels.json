@@ -44,7 +44,8 @@
       "default": "1",
       "stringTriggers": {
         "18": ["gen2", "gen 2"],
-        "48": ["gen3", "gen 3"]
+        "48": ["gen3", "gen 3"],
+        "1-EXPLORATIONS": ["marfa yucca", "yucca"]
       }
     }
   },
@@ -105,7 +106,8 @@
       "default": "11",
       "stringTriggers": {
         "26": ["energy", "sculpture"],
-        "248": ["hashcrash"]
+        "248": ["hashcrash"],
+        "399": ["the field", "field"]
       }
     }
   },
@@ -583,6 +585,30 @@
       "default": "379"
     }
   },
+  "1035223653425610792": {
+    "name": "lovid",
+    "projectBotHandlers": {
+      "default": "376"
+    }
+  },
+  "1030149651283836968": {
+    "name": "aranda-lasch",
+    "projectBotHandlers": {
+      "default": "368"
+    }
+  },
+  "1050471214059106375": {
+    "name": "junia-farquhar",
+    "projectBotHandlers": {
+      "default": "385"
+    }
+  },
+  "1063143943363108905": {
+    "name": "perkwerk",
+    "projectBotHandlers": {
+      "default": "407"
+    }
+  },
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
     "projectBotHandlers": {
@@ -685,6 +711,9 @@
   },
   "907425686531227678": {
     "name": "plottables-listings"
+  },
+  "1062938848105078824": {
+    "name": "flutter-sales"
   },
   "937547685215473664": {
     "name": "doodle-mints"

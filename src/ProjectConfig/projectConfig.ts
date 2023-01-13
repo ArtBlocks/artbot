@@ -18,6 +18,7 @@ const PROJECT_BOTS = ARTBOT_IS_PROD
 import { ProjectBot } from '../Classes/ProjectBot'
 const { getContractProject } = require('../Utils/parseArtBlocksAPI')
 const PARTNER_CONTRACTS = require('../ProjectConfig/partnerContracts.json')
+const EXPLORATIONS_CONTRACTS = require('../ProjectConfig/explorationsContracts.json')
 
 type ProjectBotHandlers = {
   default: string
@@ -189,7 +190,9 @@ class ProjectConfig {
     const promises = Array.from(botsToInstatiate).map(async (botId: string) => {
       const [projectId, contractName] = botId.split('-')
       const namedMappings = projectBotsJson[botId]?.namedMappings
-      const configContract = PARTNER_CONTRACTS[contractName]
+      const configContract =
+        PARTNER_CONTRACTS[contractName] ?? EXPLORATIONS_CONTRACTS[contractName]
+
       if (contractName && !configContract) {
         console.warn(
           `Bot ${botId} had a contractName, but there was no matching contract in partnerContracts.json. Has it been defined?`

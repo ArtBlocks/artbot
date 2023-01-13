@@ -134,7 +134,9 @@ const bot = new Client({
     GatewayIntentBits.MessageContent,
   ],
 })
-bot.login(DISCORD_TOKEN)
+if (!TEST_MODE) {
+  bot.login(DISCORD_TOKEN)
+}
 
 bot.on('ready', () => {
   console.info(`Logged in as ${bot.user?.tag}!`)

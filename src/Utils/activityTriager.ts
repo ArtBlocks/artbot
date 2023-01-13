@@ -25,6 +25,8 @@ const IXNAYOKAY_SALES = projectConfig.chIdByName['ixnayokay-sales']
 const PLOTTABLES_SALES = projectConfig.chIdByName['plottables-sales']
 const PLOTTABLES_LISTINGS = projectConfig.chIdByName['plottables-listings']
 
+const FLUTTER_SALES = projectConfig.chIdByName['flutter-sales']
+
 // AB x Pace
 const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
 
@@ -160,6 +162,9 @@ export function sendEmbedToSaleChannels(
     }
     if (artBlocksData.platform.includes('Plottables')) {
       sendEmbedToChannel(bot, embed, PLOTTABLES_SALES)
+    }
+    if (artBlocksData.platform.includes('Flutter')) {
+      sendEmbedToChannel(bot, embed, FLUTTER_SALES)
     }
   } catch (e) {
     console.warn(e)

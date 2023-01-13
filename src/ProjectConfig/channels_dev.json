@@ -11,7 +11,8 @@
       "default": "13",
       "stringTriggers": {
         "22": ["eternal", "pump"],
-        "2-DOODLE": ["doodle"]
+        "2-DOODLE": ["doodle"],
+        "1-EXPLORATIONS": ["marfa yucca", "yucca"]
       },
       "tokenIdTriggers": [
         {
