@@ -1,6 +1,6 @@
 # ArtBot: The Art Blocks Discord Bot
 
-[![CircleCI](https://circleci.com/gh/ArtBlocks/artbot/tree/main.svg?style=svg)](https://circleci.com/gh/ArtBlocks/artbot/tree/main)
+[![GitPOAPs](https://public-api.gitpoap.io/v1/repo/ArtBlocks/artbot/badge)](https://www.gitpoap.io/gh/ArtBlocks/artbot)
 
 The Discord bot for [ArtBlocks](http://artblocks.io/).
 
@@ -39,17 +39,7 @@ Artbot is based on the [discord.js](https://discord.js.org/) package, and is exc
 yarn start
 ```
 
-- format your code!
-
-```bash
-yarn format
-```
-
-- Run unit tests
-
-```bash
-yarn test
-```
+- You should now be able to interact with your local Artbot instance in the a-t Discord server!
 
 ## Basic structure of artbot
 
@@ -59,32 +49,19 @@ The core engine of Artbot is built around the discord.js package. It serves seve
 
   One of the most widely used features is Artbot's ability to respond to a #[n] [project_name] query with a link to the appropriate token w/ embedded image. Currently this is implemented via the ProjectBot class.
 
-  - Curated/Playground projects:
-    - ProjectBot configurations are defined via json files in the `ProjectConfig/` directory.
-  - Factory projects:
-    - There is special handling for Art Blocks Factory projects in the FactoryBot class which queries the ArtBlocks hosted subgraph to cache any Factory Projects it can find, which is easier to maintain, but less flexible in the syntax we can respond to.
-  - Random:
-    - There's a special case in RandomBot which doesn't actually know about any of the projects, but simply responds to a `#?` query by looking for a random project number and mint number.
+  - All projects and their metadata are retrieved from the subgraph on startup in the `ArtIndexerBot.ts` class, which in turn creates a `ProjectBot` for every project. `#[n] [project_name]`, `#?`, etc queries are triaged by the `ArtIndexerBot` class, and the corresponding `ProjectBot` is triggered to respond.
+  - Curated artist channels are handled a bit differently. ProjectBots for the artist's projects are defined in `ProjectConfig/channels.json` and are triggered by the artist's name in the query. e.g. `#1 ringer` in `#dmitri-cherniak` will trigger the Ringer project bot.
+     - Additional configuration for these projects can be defined in `ProjectConfig/projectBots.json`. See [Adding query support for a project](#adding-query-support-for-a-project) for more details.
 
-- OpenSea Activity Feeds
+- Sales/Listing Feeds
 
-  Another well known feature of artbot is its ability to parse a feed of OpenSea activity data. There is a hidden channel in the ArtBlocks Discord that receives a raw feed of all Art Blocks OpenSea Activity data. Artbot then takes these messages and posts the appropriate events in the correct channel.  
-  This includes several channels on the AB Discord, as well as a few adjacent Discords, like SquiggleDAO. This logic lives in `Utils/activityTriager.js`
+  Artbot also provides a feeds for sales and listings of Art Blocks projects. It polls the (incredible) [Reservoir API](https://docs.reservoir.tools/reference/overview) to get the latest activity across all marketplaces (using the `ReservoirListBot.ts` and `ReservoirSaleBot.ts` classes, respectively), and then posts them to the appropriate Discord channels (`Utils/activityTriager.js`). 
 
 - SmartBot Responses
 
   Artbot has been taught to respond to some specific queries about gas price, curated/playground/factory, etc. when directly queried. This logic lives in `Utils/smartBotResponse.js`.
 
-- Giveaway queries
-
-  Artbot can also create giveaways through use of the discord-giveaways package. They currently require Mod privileges to initiate.
-
 ## Adding query support for a project
-
-**Curated & Playground Projects**
-
-Supported Curated and playground projects are defined via json files in the `ProjectConfig/` directory.
-
 ### Definitions
 
 #### Bot ID
@@ -141,11 +118,6 @@ Here are the currently valid contract names.
 - `NamedMappings/<projectName>Seets.json`
   - json file defining trigger names for single tokens. See `ringerSets.json` for example.
 
-**Factory Projects**
-
-Factory projects are automatically handled by artbot and may be queried from the Art Blocks Discord channel titled `factory-projects`.
-
-An example artbot query for a factory project is: `#146 Pieces of Me`
 
 ## PBAB instructions
 
@@ -193,6 +165,6 @@ These instructions explain how to configure Art Bot to serve project data in rel
 
 ## Contributing to artbot
 
-For now, Artbot development is coordinated informally over Discord. Please reach out to purplehat.eth#7327 or ryley-o.eth#5272 if you think you might be interested in helping out.
+For now, Artbot development is coordinated informally over Discord. Please reach out to grant#6616, purplehat.eth#7327, or ryley-o.eth#5272 if you think you might be interested in helping out.
 
-Please write tests for all new features!
+Anyone who contributes to Artbot will be eligible to claim a [GitPOAP](https://www.gitpoap.io/gh/ArtBlocks/artbot)
