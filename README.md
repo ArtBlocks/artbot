@@ -1,5 +1,5 @@
 # ArtBot: The Art Blocks Discord Bot
-
+![Build status](https://github.com/ArtBlocks/artbot/actions/workflows/build-check.yml/badge.svg)
 [![GitPOAPs](https://public-api.gitpoap.io/v1/repo/ArtBlocks/artbot/badge)](https://www.gitpoap.io/gh/ArtBlocks/artbot)
 
 The Discord bot for [ArtBlocks](http://artblocks.io/).
