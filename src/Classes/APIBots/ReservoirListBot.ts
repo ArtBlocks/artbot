@@ -51,8 +51,6 @@ export class ReservoirListBot extends APIPollBot {
     headers: any
   ) {
     super(apiEndpoint, refreshRateMs, bot, headers)
-    this.listColor = '#407FDB'
-    this.saleColor = '#62DE7C'
     this.lastUpdatedTime = Math.floor(this.lastUpdatedTime)
   }
 
@@ -100,9 +98,13 @@ export class ReservoirListBot extends APIPollBot {
     const price = listing.price.amount.decimal
     const currency = listing.price.currency.symbol
     const owner = listing.maker
-    const platform = listing.source.name
-
-    embed.setColor(this.listColor)
+    let platform = listing.source.name
+    if (platform.includes('artblocks')) {
+      embed.setColor(this.artblocksListColor)
+      platform += ' <:lilsquig:1028047420636020786>'
+    } else {
+      embed.setColor(this.listColor)
+    }
 
     if (BAN_ADDRESSES.has(owner)) {
       console.log(`Skipping message propagation for ${owner}`)

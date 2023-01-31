@@ -142,8 +142,14 @@ export class ReservoirSaleBot extends APIPollBot {
     const price = sale.price.amount.decimal
     const currency = sale.price.currency.symbol
     const owner = sale.from
-    const platform = sale.fillSource.toLowerCase()
-    embed.setColor(this.saleColor)
+    let platform = sale.fillSource.toLowerCase()
+
+    if (platform.includes('artblocks')) {
+      embed.setColor(this.artblocksSaleColor)
+      platform += ' <:lilsquig:1028047420636020786>'
+    } else {
+      embed.setColor(this.saleColor)
+    }
 
     if (BAN_ADDRESSES.has(owner)) {
       console.log(`Skipping message propagation for ${owner}`)
