@@ -214,7 +214,6 @@ const initReservoirBots = async () => {
     Object.values(CORE_CONTRACTS)
       .concat(Object.values(COLLAB_CONTRACTS))
       .concat(Object.values(EXPLORATIONS_CONTRACTS))
-      .concat(await ENGINE_CONTRACTS)
   )
   const mainSaleParams = mainListParams.replaceAll('contracts', 'contract')
 
