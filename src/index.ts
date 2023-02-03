@@ -236,32 +236,20 @@ const initReservoirBots = async () => {
     )
   }
 
-  const mainListParams = buildContractsString(
-    Object.values(CORE_CONTRACTS)
-      .concat(Object.values(COLLAB_CONTRACTS))
-      .concat(Object.values(EXPLORATIONS_CONTRACTS))
-  )
-  const mainSaleParams = mainListParams.replaceAll('contracts', 'contract')
-
-  createReservoirBots(mainListParams, mainSaleParams, API_POLL_TIME_MS)
-
-  // Handle Engine Contracts seperately and dynamically
-
-  const engineContracts = (await ENGINE_CONTRACTS).concat(
-    Object.values(CORE_CONTRACTS)
-      .concat(Object.values(COLLAB_CONTRACTS))
-      .concat(Object.values(EXPLORATIONS_CONTRACTS))
-  )
+  const allContracts = Object.values(CORE_CONTRACTS)
+    .concat(Object.values(COLLAB_CONTRACTS))
+    .concat(Object.values(EXPLORATIONS_CONTRACTS))
+    .concat(await ENGINE_CONTRACTS)
 
   const RESERVOIR_CONTRACT_LIMIT = 20
   const numBotInstances = Math.ceil(
-    engineContracts.length / RESERVOIR_CONTRACT_LIMIT
+    allContracts.length / RESERVOIR_CONTRACT_LIMIT
   )
   for (let i = 0; i < numBotInstances; i++) {
     const start = i * RESERVOIR_CONTRACT_LIMIT
     const end = start + RESERVOIR_CONTRACT_LIMIT
     const engineListParams = buildContractsString(
-      engineContracts.slice(start, end)
+      allContracts.slice(start, end)
     )
     const engineSaleParams = engineListParams.replaceAll(
       'contracts',
@@ -270,7 +258,7 @@ const initReservoirBots = async () => {
     createReservoirBots(
       engineListParams,
       engineSaleParams,
-      API_POLL_TIME_MS * (2.5 + i * 0.2)
+      API_POLL_TIME_MS + i * 3000
     )
   }
 }
