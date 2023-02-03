@@ -1,6 +1,6 @@
+import { EmbedBuilder, ColorResolvable } from 'discord.js'
 import * as dotenv from 'dotenv'
 dotenv.config()
-const { EmbedBuilder } = require('discord.js')
 const fetch = require('node-fetch')
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 
@@ -21,8 +21,8 @@ const ARTBOT_GREEN = 0x00ff00
 const ARTBOT_WARNING = 0xffff00
 
 // Returns a random color
-function randomColor(): string {
-  return Math.floor(Math.random() * 16777215).toString(16)
+function randomColor(): ColorResolvable {
+  return `#${Math.floor(Math.random() * 16777215).toString(16)}`
 }
 
 // Thank you message for people asking the artbot how it is.
@@ -266,7 +266,7 @@ export async function smartBotResponse(
   msgAuthor: string,
   artBotID: string,
   channelID: string
-) {
+): Promise<string | EmbedBuilder | null> {
   /*
    * NOTE: It is important to check if the message author is the ArtBot
    *       Itself to avoid a recursive infinite loop.

@@ -210,6 +210,32 @@ const initReservoirBots = async () => {
     return ans
   }
 
+  const createReservoirBots = (
+    listParams: string,
+    saleParams: string,
+    pollTimeMs: number
+  ) => {
+    new ReservoirListBot(
+      `https://api.reservoir.tools/orders/asks/v3?${listParams}&sortBy=createdAt&limit=${reservoirListLimit}`,
+      pollTimeMs,
+      bot,
+      {
+        Accept: 'application/json',
+        'x-api-key': process.env.RESERVOIR_API_KEY,
+      }
+    )
+
+    new ReservoirSaleBot(
+      `https://api.reservoir.tools/sales/v4?${saleParams}&limit=${reservoirSaleLimit}`,
+      pollTimeMs,
+      bot,
+      {
+        Accept: 'application/json',
+        'x-api-key': process.env.RESERVOIR_API_KEY,
+      }
+    )
+  }
+
   const mainListParams = buildContractsString(
     Object.values(CORE_CONTRACTS)
       .concat(Object.values(COLLAB_CONTRACTS))
@@ -217,28 +243,39 @@ const initReservoirBots = async () => {
   )
   const mainSaleParams = mainListParams.replaceAll('contracts', 'contract')
 
-  new ReservoirListBot(
-    `https://api.reservoir.tools/orders/asks/v3?${mainListParams}&sortBy=createdAt&limit=${reservoirListLimit}`,
-    API_POLL_TIME_MS,
-    bot,
-    {
-      Accept: 'application/json',
-      'x-api-key': process.env.RESERVOIR_API_KEY,
-    }
+  createReservoirBots(mainListParams, mainSaleParams, API_POLL_TIME_MS)
+
+  // Handle Engine Contracts seperately and dynamically
+
+  const engineContracts = (await ENGINE_CONTRACTS).concat(
+    Object.values(CORE_CONTRACTS)
+      .concat(Object.values(COLLAB_CONTRACTS))
+      .concat(Object.values(EXPLORATIONS_CONTRACTS))
   )
 
-  new ReservoirSaleBot(
-    `https://api.reservoir.tools/sales/v4?${mainSaleParams}&limit=${reservoirSaleLimit}`,
-    API_POLL_TIME_MS,
-    bot,
-    {
-      Accept: 'application/json',
-      'x-api-key': process.env.RESERVOIR_API_KEY,
-    }
+  const RESERVOIR_CONTRACT_LIMIT = 20
+  const numBotInstances = Math.ceil(
+    engineContracts.length / RESERVOIR_CONTRACT_LIMIT
   )
+  for (let i = 0; i < numBotInstances; i++) {
+    const start = i * RESERVOIR_CONTRACT_LIMIT
+    const end = start + RESERVOIR_CONTRACT_LIMIT
+    const engineListParams = buildContractsString(
+      engineContracts.slice(start, end)
+    )
+    const engineSaleParams = engineListParams.replaceAll(
+      'contracts',
+      'contract'
+    )
+    createReservoirBots(
+      engineListParams,
+      engineSaleParams,
+      API_POLL_TIME_MS * (2.5 + i * 0.2)
+    )
+  }
 }
 
-// Instantiate API Pollers (if not in test mode)=
+// Instantiate API Pollers (if not in test mode)
 if (!TEST_MODE) {
   initReservoirBots()
   const archipelagoBot = new ArchipelagoBot(bot)
