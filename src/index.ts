@@ -248,18 +248,10 @@ const initReservoirBots = async () => {
   for (let i = 0; i < numBotInstances; i++) {
     const start = i * RESERVOIR_CONTRACT_LIMIT
     const end = start + RESERVOIR_CONTRACT_LIMIT
-    const engineListParams = buildContractsString(
-      allContracts.slice(start, end)
-    )
-    const engineSaleParams = engineListParams.replaceAll(
-      'contracts',
-      'contract'
-    )
-    createReservoirBots(
-      engineListParams,
-      engineSaleParams,
-      API_POLL_TIME_MS + i * 3000
-    )
+    const listParams = buildContractsString(allContracts.slice(start, end))
+    const saleParams = listParams.replaceAll('contracts', 'contract')
+
+    createReservoirBots(listParams, saleParams, API_POLL_TIME_MS + i * 3000)
   }
 }
 
