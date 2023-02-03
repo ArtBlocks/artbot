@@ -1,16 +1,18 @@
-require('dotenv').config()
+import * as dotenv from 'dotenv'
+dotenv.config()
 const { EmbedBuilder } = require('discord.js')
 const fetch = require('node-fetch')
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 
 // Discord channel IDs.
-const CHANNEL_HELP = projectConfig.chIdByName['help']
-const CHANNEL_SNOWFRO = projectConfig.chIdByName['snowfro']
+const CHANNEL_HELP: string = projectConfig.chIdByName['help']
+const CHANNEL_SNOWFRO: string = projectConfig.chIdByName['snowfro']
 const GASSTATION_API_KEY = process.env.GASSTATION_API_KEY
 
-const CHANNEL_FOR_SALE_LISTINGS = projectConfig.chIdByName['for-sale-listings']
-const CHANNEL_TRADE_SWAPS = projectConfig.chIdByName['trade-swaps']
-const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
+const CHANNEL_FOR_SALE_LISTINGS: string =
+  projectConfig.chIdByName['for-sale-listings']
+const CHANNEL_TRADE_SWAPS: string = projectConfig.chIdByName['trade-swaps']
+const CHANNEL_BLOCK_TALK: string = projectConfig.chIdByName['block-talk']
 const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
 
 // ArtBot details..
@@ -19,7 +21,7 @@ const ARTBOT_GREEN = 0x00ff00
 const ARTBOT_WARNING = 0xffff00
 
 // Returns a random color
-function randomColor() {
+function randomColor(): string {
   return Math.floor(Math.random() * 16777215).toString(16)
 }
 
@@ -111,15 +113,15 @@ const VERTICALS_MESSAGE = new EmbedBuilder()
   // Set the main content of the embed
   .setDescription(
     `It looks like you're wondering about the different types of Art Blocks collections.
-    
+
     **Art Blocks Curated** includes projects selected by the [curation board](https://medium.com/the-link-art-blocks/meet-the-art-blocks-curation-board-696102e747e3) representing our vision of cutting-edge generative artwork. These highly innovative releases by artists reflect both astounding beauty and technical pioneering.
 
     **Art Blocks Explorations** encompasses our wild ideas and commissioned experiments. It is the place where we tinker, and these projects are connected not by theme or structure, but rather by their pursuit of delight.
-    
+
     **Art Blocks Presents** comprises of projects screened and selected by Art Blocks and embodies our standards for artistic creativity, conceptual rigor, and technical achievement.
-    
+
     **Art Blocks x Collaborations** are with select partners and organized into a new vertical of co-branded collections. Because partner projects live directly in the Art Blocks ecosystem, they will be subject to the same quality review and scheduling as any other Art Blocks project. These collections represent true collaborations between Art Blocks and our partners to shape the program of offerings.
-    
+
     **Art Blocks Heritage** is a designation to denote Art Blocks projects released as either Playground or Factory projects before 11/1/22.
   `
   )
@@ -201,7 +203,7 @@ const SAFETY_MESSAGE = new EmbedBuilder()
         **Avoid clicking links when possible.** Instead, use the official links provided by the platform’s verified Social accounts/Discord and navigate to the page/item you are trading.\n
         **Never** screen share with anyone even if they claim they’re from an official “support” team.\n
         **Never** share your seed phrase or private keys with **anyone.**\n
-        **If something seems too good to be true, it is!**\n 
+        **If something seems too good to be true, it is!**\n
         Stay up to date and report scams in <#1019738320303030345>\n
         **Official Art Blocks Links:**
         https://www.artblocks.io/
@@ -218,7 +220,7 @@ const OTC_MESSAGE = new EmbedBuilder()
   // Set the main content of the embed
   .setDescription(
     `If participating in an OTC trade, please take extra caution to ensure a safe transaction! We have a few trusted options pinned in the <#874066035618250752> channel.
-    
+
     For an OTC sale, we also encourage sending the Artist and Art Blocks royalties. More info can be found [on this post](https://discord.com/channels/411959613370400778/797930335874449408/1004904448583278712) in <#797930335874449408>`
   )
 
@@ -259,11 +261,11 @@ async function generateGasPriceMessage() {
  * @param {*} artBotID
  * @param {*} channelID
  */
-async function smartBotResponse(
-  msgContentLowercase,
-  msgAuthor,
-  artBotID,
-  channelID
+export async function smartBotResponse(
+  msgContentLowercase: string,
+  msgAuthor: string,
+  artBotID: string,
+  channelID: string
 ) {
   /*
    * NOTE: It is important to check if the message author is the ArtBot
@@ -273,17 +275,17 @@ async function smartBotResponse(
     return null
   }
   // Some shared helper variables.
-  const inHelpChannel = channelID == CHANNEL_HELP
-  const mentionedArtBot =
+  const inHelpChannel: boolean = channelID == CHANNEL_HELP
+  const mentionedArtBot: boolean =
     msgContentLowercase.includes(ARTBOT_USERNAME) ||
     msgContentLowercase.includes(artBotID)
-  const mentionedArtBotOrInOrHelp = mentionedArtBot || inHelpChannel
-  const containsQuestion = msgContentLowercase.includes('?')
+  const mentionedArtBotOrInOrHelp: boolean = mentionedArtBot || inHelpChannel
+  const containsQuestion: boolean = msgContentLowercase.includes('?')
 
   // Handle questions about the mint pausing for Chromie Squiggles.
-  const inSnowfroChannel = channelID == CHANNEL_SNOWFRO
+  const inSnowfroChannel: boolean = channelID == CHANNEL_SNOWFRO
   // Both "pause" and "stopped" are keywords.
-  const mentionsPause =
+  const mentionsPause: boolean =
     msgContentLowercase.includes('pause') ||
     msgContentLowercase.includes('stopped')
 
@@ -291,13 +293,14 @@ async function smartBotResponse(
    * Handle some common misspellings of "squiggle":
    * “squigle”, “squigglle”, “squiglle”
    */
-  const messageMentionsSquiggle =
+  const messageMentionsSquiggle: boolean =
     msgContentLowercase.includes('squiggle') ||
     msgContentLowercase.includes('squigle') ||
     msgContentLowercase.includes('squigglle') ||
     msgContentLowercase.includes('squiglle')
-  const squiggleChannelPauseMentioned = mentionsPause && inSnowfroChannel
-  const artbotOrHelpChannelSquigglePauseMentioned =
+  const squiggleChannelPauseMentioned: boolean =
+    mentionsPause && inSnowfroChannel
+  const artbotOrHelpChannelSquigglePauseMentioned: boolean =
     mentionsPause && messageMentionsSquiggle && mentionedArtBotOrInOrHelp
   if (
     squiggleChannelPauseMentioned ||
@@ -308,11 +311,11 @@ async function smartBotResponse(
 
   if (
     channelID == CHANNEL_BLOCK_TALK &&
-    (msgContentLowercase.includes('thanks') ||
-      msgContentLowercase.includes('thank you') ||
+    (msgContentLowercase.includes('thanks') || // english v1
+      msgContentLowercase.includes('thank you') || // english v2
       msgContentLowercase.includes('gracias') || // spanish
-      msgContentLowercase.includes('domo arigato') || // japanese
-      msgContentLowercase.includes('arigato') ||
+      msgContentLowercase.includes('domo arigato') || // japanese v1
+      msgContentLowercase.includes('arigato') || // japanese v2
       msgContentLowercase.includes('merci') || // french
       msgContentLowercase.includes('grazie') || // italian
       msgContentLowercase.includes('obrigada') || // portugese
@@ -378,13 +381,13 @@ async function smartBotResponse(
   }
 
   // Handle requests for help!
-  const mentionsHelp = msgContentLowercase.includes('help')
+  const mentionsHelp: boolean = msgContentLowercase.includes('help')
   if (containsQuestion && mentionsHelp) {
     return HELP_MESSAGE
   }
 
   // Handle requests for ArtBlocks info!
-  const mentionsArtBlocks =
+  const mentionsArtBlocks: boolean =
     msgContentLowercase.includes('artblocks') ||
     msgContentLowercase.includes('art blocks')
   if (containsQuestion && mentionsArtBlocks) {
@@ -392,7 +395,7 @@ async function smartBotResponse(
   }
 
   // Handle requests for GenArt info!
-  const mentionsGenArt =
+  const mentionsGenArt: boolean =
     msgContentLowercase.includes('genart') ||
     msgContentLowercase.includes('gen art')
   if (containsQuestion && mentionsGenArt) {
@@ -400,7 +403,7 @@ async function smartBotResponse(
   }
 
   // Handle requests for safety tips!
-  const mentionsSafety =
+  const mentionsSafety: boolean =
     msgContentLowercase.includes('staysafe') ||
     msgContentLowercase.includes('safety')
   if (containsQuestion && mentionsSafety) {
@@ -408,19 +411,19 @@ async function smartBotResponse(
   }
 
   // Handle drop questions.
-  const mentionsDrop = msgContentLowercase.includes('drop')
+  const mentionsDrop: boolean = msgContentLowercase.includes('drop')
   if (containsQuestion && mentionsDrop) {
     return NEXT_DROP_MESSAGE
   }
   // Handle when people are confused about OpenSea is saying a project is curated
-  const mentionedOpenSeaCurated =
+  const mentionedOpenSeaCurated: boolean =
     msgContentLowercase.includes('opensea') &&
     msgContentLowercase.includes('curated')
   if (mentionedArtBot && containsQuestion && mentionedOpenSeaCurated) {
     return OPENSEA_CURATED_MESSAGE
   }
   // Handle questions about Curated Projects vs. Artist Playground vs. Factory.
-  const mentionedVerticals =
+  const mentionedVerticals: boolean =
     msgContentLowercase.includes('curated') ||
     msgContentLowercase.includes('presents') ||
     msgContentLowercase.includes('heritage') ||
@@ -429,19 +432,20 @@ async function smartBotResponse(
   if (containsQuestion && mentionedVerticals) {
     return VERTICALS_MESSAGE
   }
-  const mentionedV2 = msgContentLowercase.includes('v2')
+  const mentionedV2: boolean = msgContentLowercase.includes('v2')
   if (containsQuestion && mentionedV2) {
     return V2_MESSAGE
   }
 
   // Handle OpenSea link requests.
-  const mentionedOpenSea = msgContentLowercase.includes('opensea')
+  const mentionedOpenSea: boolean = msgContentLowercase.includes('opensea')
   if (containsQuestion && mentionedOpenSea) {
     return OPENSEA_LINKS_MESSAGE
   }
 
   // Handle how are you messages.
-  const mentionedHowAreYou = msgContentLowercase.includes('how are you')
+  const mentionedHowAreYou: boolean =
+    msgContentLowercase.includes('how are you')
   if (mentionedArtBot && mentionedHowAreYou) {
     return (
       ARTBOT_HOW_ARE_YOU
@@ -453,20 +457,20 @@ async function smartBotResponse(
   }
 
   // Handle application questions.
-  const mentionedApplications =
+  const mentionedApplications: boolean =
     msgContentLowercase.includes('application') ||
     msgContentLowercase.includes('apply')
   if (containsQuestion && mentionedApplications) {
     return APPLICATIONS_OPEN_MESSAGE
   }
   // Handle metamask high gas questions.
-  const mentionedHighGas =
+  const mentionedHighGas: boolean =
     msgContentLowercase.includes('gas') && msgContentLowercase.includes('high')
   if (mentionedArtBot && containsQuestion && mentionedHighGas) {
     return MM_HIGH_GAS_MESSAGE
   }
   // Handle gas questions.
-  const mentionedGas = msgContentLowercase.includes('gas')
+  const mentionedGas: boolean = msgContentLowercase.includes('gas')
   if (containsQuestion && mentionedGas) {
     if (msgContentLowercase.includes('price')) {
       return generateGasPriceMessage()
@@ -476,5 +480,3 @@ async function smartBotResponse(
 
   return null
 }
-
-module.exports.smartBotResponse = smartBotResponse
