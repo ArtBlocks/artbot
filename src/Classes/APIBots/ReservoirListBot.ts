@@ -99,9 +99,9 @@ export class ReservoirListBot extends APIPollBot {
     const currency = listing.price.currency.symbol
     const owner = listing.maker
     let platform = listing.source.name
-    if (platform.includes('artblocks')) {
+    if (listing.source.domain.includes('artblocks')) {
       embed.setColor(this.artblocksListColor)
-      platform += ' <:lilsquig:1028047420636020786>'
+      platform = 'Art Blocks <:lilsquig:1028047420636020786>'
     } else {
       embed.setColor(this.listColor)
     }

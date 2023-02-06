@@ -146,7 +146,7 @@ export class ReservoirSaleBot extends APIPollBot {
 
     if (platform.includes('artblocks')) {
       embed.setColor(this.artblocksSaleColor)
-      platform += ' <:lilsquig:1028047420636020786>'
+      platform = 'Art Blocks <:lilsquig:1028047420636020786>'
     } else {
       embed.setColor(this.saleColor)
     }
