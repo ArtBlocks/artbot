@@ -210,35 +210,52 @@ const initReservoirBots = async () => {
     return ans
   }
 
-  const mainListParams = buildContractsString(
-    Object.values(CORE_CONTRACTS)
-      .concat(Object.values(COLLAB_CONTRACTS))
-      .concat(Object.values(EXPLORATIONS_CONTRACTS))
-  )
-  const mainSaleParams = mainListParams.replaceAll('contracts', 'contract')
+  const createReservoirBots = (
+    listParams: string,
+    saleParams: string,
+    pollTimeMs: number
+  ) => {
+    new ReservoirListBot(
+      `https://api.reservoir.tools/orders/asks/v3?${listParams}&sortBy=createdAt&limit=${reservoirListLimit}`,
+      pollTimeMs,
+      bot,
+      {
+        Accept: 'application/json',
+        'x-api-key': process.env.RESERVOIR_API_KEY,
+      }
+    )
 
-  new ReservoirListBot(
-    `https://api.reservoir.tools/orders/asks/v3?${mainListParams}&sortBy=createdAt&limit=${reservoirListLimit}`,
-    API_POLL_TIME_MS,
-    bot,
-    {
-      Accept: 'application/json',
-      'x-api-key': process.env.RESERVOIR_API_KEY,
-    }
-  )
+    new ReservoirSaleBot(
+      `https://api.reservoir.tools/sales/v4?${saleParams}&limit=${reservoirSaleLimit}`,
+      pollTimeMs,
+      bot,
+      {
+        Accept: 'application/json',
+        'x-api-key': process.env.RESERVOIR_API_KEY,
+      }
+    )
+  }
 
-  new ReservoirSaleBot(
-    `https://api.reservoir.tools/sales/v4?${mainSaleParams}&limit=${reservoirSaleLimit}`,
-    API_POLL_TIME_MS,
-    bot,
-    {
-      Accept: 'application/json',
-      'x-api-key': process.env.RESERVOIR_API_KEY,
-    }
+  const allContracts = Object.values(CORE_CONTRACTS)
+    .concat(Object.values(COLLAB_CONTRACTS))
+    .concat(Object.values(EXPLORATIONS_CONTRACTS))
+    .concat(await ENGINE_CONTRACTS)
+
+  const RESERVOIR_CONTRACT_LIMIT = 20
+  const numBotInstances = Math.ceil(
+    allContracts.length / RESERVOIR_CONTRACT_LIMIT
   )
+  for (let i = 0; i < numBotInstances; i++) {
+    const start = i * RESERVOIR_CONTRACT_LIMIT
+    const end = start + RESERVOIR_CONTRACT_LIMIT
+    const listParams = buildContractsString(allContracts.slice(start, end))
+    const saleParams = listParams.replaceAll('contracts', 'contract')
+
+    createReservoirBots(listParams, saleParams, API_POLL_TIME_MS + i * 3000)
+  }
 }
 
-// Instantiate API Pollers (if not in test mode)=
+// Instantiate API Pollers (if not in test mode)
 if (!TEST_MODE) {
   initReservoirBots()
   const archipelagoBot = new ArchipelagoBot(bot)
