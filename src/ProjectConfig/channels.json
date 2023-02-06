@@ -195,7 +195,8 @@
           "24 heures",
           "24 hours"
         ],
-        "350": ["departed"]
+        "350": ["departed"],
+        "0-EXPLORATIONS": ["friendship bracelets", "fb"]
       }
     }
   },
@@ -609,6 +610,13 @@
       "default": "407"
     }
   },
+  "1068213422606536795": {
+    "name": "holger-lippmann",
+    "projectBotHandlers": {
+      "default": "406"
+    }
+  },
+  
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
     "projectBotHandlers": {
