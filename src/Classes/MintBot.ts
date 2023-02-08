@@ -3,6 +3,7 @@ import { ENGINE_CONTRACTS, mintBot } from '../index'
 import axios, { AxiosError } from 'axios'
 import { getTokenApiUrl } from './APIBots/utils'
 import { ensOrAddress } from './APIBots/utils'
+import { TwitterBot } from './TwitterBot'
 
 const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 const MINT_CONFIG: {
@@ -27,11 +28,13 @@ export enum CollectionType {
 // Handles all logic and posting of new project mints!
 export class MintBot {
   bot: Client
+  twitterBot: TwitterBot
   newMints: { [id: string]: Mint } = {}
   mintsToPost: { [id: string]: Mint } = {}
   contractToChannel: { [id: string]: string[] } = {}
   constructor(bot: Client) {
     this.bot = bot
+    this.twitterBot = new TwitterBot()
     this.buildContractToChannel()
     this.startRoutine()
   }
@@ -113,6 +116,7 @@ export class MintBot {
               mint.artistName = artBlocksData.artist
               mint.artblocksUrl = artBlocksData.external_url
               mint.postToDiscord()
+              this.twitterBot.sendToTwitter(mint)
             }
           }
         } catch (e) {
@@ -153,7 +157,7 @@ export class MintBot {
   }
 }
 
-class Mint {
+export class Mint {
   bot: Client
   contractAddress: string
   tokenId: string

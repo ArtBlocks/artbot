@@ -172,7 +172,7 @@ export async function getCollectionType(
   } else if (
     Object.values(COLLAB_CONTRACTS).includes(contractAddress.toLowerCase())
   ) {
-    return CollectionType.CORE
+    return CollectionType.COLLAB
   } else if (await isEngineContract(contractAddress)) {
     return CollectionType.ENGINE
   }
