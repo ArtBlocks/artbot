@@ -28,15 +28,18 @@ export enum CollectionType {
 // Handles all logic and posting of new project mints!
 export class MintBot {
   bot: Client
-  twitterBot: TwitterBot
+  twitterBot?: TwitterBot
   newMints: { [id: string]: Mint } = {}
   mintsToPost: { [id: string]: Mint } = {}
   contractToChannel: { [id: string]: string[] } = {}
   constructor(bot: Client) {
     this.bot = bot
-    this.twitterBot = new TwitterBot()
     this.buildContractToChannel()
     this.startRoutine()
+
+    if (!process.env.TEST_MODE && process.env.AB_TWITTER_API_KEY) {
+      this.twitterBot = new TwitterBot()
+    }
   }
 
   async buildContractToChannel() {
@@ -116,7 +119,7 @@ export class MintBot {
               mint.artistName = artBlocksData.artist
               mint.artblocksUrl = artBlocksData.external_url
               mint.postToDiscord()
-              this.twitterBot.sendToTwitter(mint)
+              this.twitterBot?.sendToTwitter(mint)
             }
           }
         } catch (e) {
