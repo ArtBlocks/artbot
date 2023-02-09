@@ -37,7 +37,7 @@ export class MintBot {
     this.buildContractToChannel()
     this.startRoutine()
 
-    if (!process.env.TEST_MODE && process.env.AB_TWITTER_API_KEY) {
+    if (process.env.PRODUCTION_MODE && process.env.AB_TWITTER_API_KEY) {
       this.twitterBot = new TwitterBot()
     }
   }

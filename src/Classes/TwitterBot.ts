@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 import { TwitterApi } from 'twitter-api-v2'
 import { Mint, CollectionType } from './MintBot'
-import { ensOrAddress, getCollectionType } from './APIBots/utils'
+import { ensOrAddress, getCollectionType, timeout } from './APIBots/utils'
 import axios from 'axios'
 
 const TWITTER_TIMEOUT_MS = 14 * 1000
@@ -18,17 +18,11 @@ export class TwitterBot {
     })
   }
 
-  timeout(timeoutMs: number, failureMessage: string): Promise<never> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => reject(failureMessage), timeoutMs)
-    })
-  }
-
   async uploadTwitterImage(imgBinary: Buffer): Promise<string | undefined> {
     try {
       // use race function to timeout because twitter library doesn't timeout
       const uploadRes = await Promise.race([
-        this.timeout(TWITTER_TIMEOUT_MS, 'Twitter post timed out'),
+        timeout(TWITTER_TIMEOUT_MS, 'Twitter post timed out'),
         this.abTwitterClient.v1.uploadMedia(imgBinary, { mimeType: 'png' }),
       ])
       return uploadRes
