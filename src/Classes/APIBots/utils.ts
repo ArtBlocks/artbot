@@ -172,7 +172,7 @@ export async function getCollectionType(
   } else if (
     Object.values(COLLAB_CONTRACTS).includes(contractAddress.toLowerCase())
   ) {
-    return CollectionType.CORE
+    return CollectionType.COLLAB
   } else if (await isEngineContract(contractAddress)) {
     return CollectionType.ENGINE
   }
@@ -191,6 +191,15 @@ export function buildLooksRareURL(
 }
 export function buildX2Y2URL(contractAddr: string, tokenId: string): string {
   return `https://x2y2.io/eth/${contractAddr}/${tokenId}`
+}
+
+export function timeout(
+  timeoutMs: number,
+  failureMessage: string
+): Promise<never> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => reject(failureMessage), timeoutMs)
+  })
 }
 
 module.exports.ensOrAddress = ensOrAddress

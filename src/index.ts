@@ -58,7 +58,8 @@ const API_POLL_TIME_MS = 10000
 const reservoirListLimit = 50
 const reservoirSaleLimit = 100
 
-const TEST_MODE = process.env.TEST_MODE ?? false
+// Set PRODUCTION_MODE to true if testing locally
+const PRODUCTION_MODE = process.env.PRODUCTION_MODE ?? false
 
 // App setup.
 const app = express()
@@ -134,7 +135,7 @@ const bot = new Client({
     GatewayIntentBits.MessageContent,
   ],
 })
-if (!TEST_MODE) {
+if (PRODUCTION_MODE) {
   bot.login(DISCORD_TOKEN)
 }
 
@@ -256,7 +257,7 @@ const initReservoirBots = async () => {
 }
 
 // Instantiate API Pollers (if not in test mode)
-if (!TEST_MODE) {
+if (PRODUCTION_MODE) {
   initReservoirBots()
   const archipelagoBot = new ArchipelagoBot(bot)
   archipelagoBot.activate()
