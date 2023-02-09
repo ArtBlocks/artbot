@@ -44,7 +44,8 @@
       "default": "1",
       "stringTriggers": {
         "18": ["gen2", "gen 2"],
-        "48": ["gen3", "gen 3"]
+        "48": ["gen3", "gen 3"],
+        "1-EXPLORATIONS": ["marfa yucca", "yucca"]
       }
     }
   },
@@ -105,7 +106,8 @@
       "default": "11",
       "stringTriggers": {
         "26": ["energy", "sculpture"],
-        "248": ["hashcrash"]
+        "248": ["hashcrash"],
+        "399": ["the field", "field"]
       }
     }
   },
@@ -193,7 +195,8 @@
           "24 heures",
           "24 hours"
         ],
-        "350": ["departed"]
+        "350": ["departed"],
+        "0-EXPLORATIONS": ["friendship bracelets", "fb"]
       }
     }
   },
@@ -364,7 +367,9 @@
     "projectBotHandlers": {
       "default": "164",
       "stringTriggers": {
-        "100": ["century"]
+        "100": ["century"],
+        "369": ["century 2052"],
+        "383": ["preprocess", "pre-process"]
       }
     }
   },
@@ -575,6 +580,43 @@
       }
     }
   },
+  "1039359385215963136": {
+    "name": "james-merrill",
+    "projectBotHandlers": {
+      "default": "379"
+    }
+  },
+  "1035223653425610792": {
+    "name": "lovid",
+    "projectBotHandlers": {
+      "default": "376"
+    }
+  },
+  "1030149651283836968": {
+    "name": "aranda-lasch",
+    "projectBotHandlers": {
+      "default": "368"
+    }
+  },
+  "1050471214059106375": {
+    "name": "junia-farquhar",
+    "projectBotHandlers": {
+      "default": "385"
+    }
+  },
+  "1063143943363108905": {
+    "name": "perkwerk",
+    "projectBotHandlers": {
+      "default": "407"
+    }
+  },
+  "1068213422606536795": {
+    "name": "holger-lippmann",
+    "projectBotHandlers": {
+      "default": "406"
+    }
+  },
+  
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
     "projectBotHandlers": {
@@ -631,7 +673,7 @@
     "name": "block-talk"
   },
   "976944919757348965": {
-    "name": "pbab-chat"
+    "name": "engine-chat"
   },
   "983836283954667530": {
     "name": "art-blocks-x-pace"
@@ -651,11 +693,35 @@
   "782311037172973618": {
     "name": "artblocks-mints"
   },
+  "1039653873066979410": {
+    "name": "explorations-mints"
+  },
+  "1039653771862610001": {
+    "name": "explorations-sales"
+  },
+  "1039653937810255872": {
+    "name": "explorations-listings"
+  },
   "1014641051140624445": {
     "name": "engine-mints"
   },
+  "1039654066122399785": {
+    "name": "engine-sales"
+  },
+  "1039654132279156826": {
+    "name": "engine-listings"
+  },
   "935377049089097758": {
     "name": "plottables-mints"
+  },
+  "907425636455444520": {
+    "name": "plottables-sales"
+  },
+  "907425686531227678": {
+    "name": "plottables-listings"
+  },
+  "1062938848105078824": {
+    "name": "flutter-sales"
   },
   "937547685215473664": {
     "name": "doodle-mints"
@@ -737,5 +803,8 @@
   },
   "1037834993004720158": {
     "name": "stevie-p-listings"
+  },
+  "1061341199841099777": {
+    "name": "ixnayokay-sales"
   }
 }

@@ -1,5 +1,7 @@
 import * as dotenv from 'dotenv'
 import { ProjectsMetadataDetailsFragment } from '../../GraphQL/Hasura/generated/graphql'
+import { COLLAB_CONTRACTS, ENGINE_CONTRACTS } from '../../index'
+import { CollectionType } from '../MintBot'
 dotenv.config()
 
 const axios = require('axios')
@@ -181,6 +183,52 @@ export function buildCollectionMapping(
   })
 
   return [collectionMapping, heritageStatuses]
+export async function isEngineContract(
+  contractAddress: string
+): Promise<boolean> {
+  return (await ENGINE_CONTRACTS).includes(contractAddress.toLowerCase())
+}
+
+export async function getCollectionType(
+  contractAddress: string
+): Promise<CollectionType> {
+  if (isExplorationsContract(contractAddress)) {
+    return CollectionType.EXPLORATIONS
+  } else if (
+    Object.values(CORE_CONTRACTS).includes(contractAddress.toLowerCase())
+  ) {
+    return CollectionType.CORE
+  } else if (
+    Object.values(COLLAB_CONTRACTS).includes(contractAddress.toLowerCase())
+  ) {
+    return CollectionType.COLLAB
+  } else if (await isEngineContract(contractAddress)) {
+    return CollectionType.ENGINE
+  }
+
+  throw new Error('Unknown collection type')
+}
+
+export function buildOpenseaURL(contractAddr: string, tokenId: string): string {
+  return `https://opensea.io/assets/ethereum/${contractAddr}/${tokenId}`
+}
+export function buildLooksRareURL(
+  contractAddr: string,
+  tokenId: string
+): string {
+  return `https://looksrare.org/collections/${contractAddr}/${tokenId}`
+}
+export function buildX2Y2URL(contractAddr: string, tokenId: string): string {
+  return `https://x2y2.io/eth/${contractAddr}/${tokenId}`
+}
+
+export function timeout(
+  timeoutMs: number,
+  failureMessage: string
+): Promise<never> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => reject(failureMessage), timeoutMs)
+  })
 }
 
 module.exports.ensOrAddress = ensOrAddress

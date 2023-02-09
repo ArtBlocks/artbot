@@ -1,0 +1,24 @@
+name: 'Build Check'
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [main]
+
+jobs:
+  build-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set env vars
+        run: |
+          echo "PRODUCTION_MODE=false" >> $GITHUB_ENV
+          echo "HASURA_GRAPHQL_ENDPOINT=${{ secrets.HASURA_GRAPHQL_ENDPOINT }}" >> $GITHUB_ENV
+          echo "HASURA_GRAPHQL_ADMIN_SECRET=${{ secrets.HASURA_GRAPHQL_ADMIN_SECRET }}" >> $GITHUB_ENV
+          echo "DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}" >> $GITHUB_ENV
+      - name: Install modules
+        run: yarn install --ignore-scripts
+      - name: Run program
+        run: timeout 1m yarn start || ( [[ $? -eq 124 ]] && echo "WARNING Timeout reached, but that's OK" )
