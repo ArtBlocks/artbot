@@ -58,8 +58,12 @@ const API_POLL_TIME_MS = 10000
 const reservoirListLimit = 50
 const reservoirSaleLimit = 100
 
-// Set PRODUCTION_MODE to true if testing locally
-const PRODUCTION_MODE = process.env.PRODUCTION_MODE ?? false
+// Note: Please set PRODUCTION_MODE to true if testing locally
+const PRODUCTION_MODE =
+  process.env.PRODUCTION_MODE &&
+  process.env.PRODUCTION_MODE.toLowerCase() === 'true'
+
+console.log('PRODUCTION_MODE: ', PRODUCTION_MODE)
 
 // App setup.
 const app = express()
