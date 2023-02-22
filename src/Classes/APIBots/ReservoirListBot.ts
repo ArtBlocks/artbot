@@ -146,6 +146,8 @@ export class ReservoirListBot extends APIPollBot {
 
     if (artBlocksData?.platform === 'Art Blocks x Pace') {
       curationStatus = 'AB x Pace'
+    } else if (artBlocksData?.platform === 'Art Blocks × Bright Moments') {
+      curationStatus = 'AB x Bright Moments'
     } else if (isExplorationsContract(listing.contract)) {
       curationStatus = 'Explorations'
     } else if (await isEngineContract(listing.contract)) {

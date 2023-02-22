@@ -27,9 +27,6 @@ const PLOTTABLES_LISTINGS = projectConfig.chIdByName['plottables-listings']
 
 const FLUTTER_SALES = projectConfig.chIdByName['flutter-sales']
 
-// AB x Pace
-const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
-
 // Addresses which should be omitted entirely from event feeds.
 export const BAN_ADDRESSES = new Set([
   '0x8cf11506812f224af5c01c5f9dce5431ec3d60fd',
@@ -139,8 +136,6 @@ export function sendEmbedToSaleChannels(
         sendEmbedToChannel(bot, embed, CHANNEL_SALES_CHAT)
         break
       case CollectionType.COLLAB:
-        sendEmbedToChannel(bot, embed, CHANNEL_AB_X_PACE)
-      // eslint-disable-next-line no-fallthrough
       case CollectionType.CORE:
         sendEmbedToChannel(bot, embed, CHANNEL_SALES)
         sendEmbedToChannel(bot, embed, CHANNEL_SALES_CHAT)
