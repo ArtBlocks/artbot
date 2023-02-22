@@ -3,7 +3,15 @@ require('dotenv').config()
 const fetch = require('node-fetch')
 const { createClient, gql } = require('@urql/core')
 
-const API_URL = 'https://api.thegraph.com/subgraphs/name/artblocks/art-blocks'
+const HOSTED_API_URL =
+  'https://api.thegraph.com/subgraphs/name/artblocks/art-blocks'
+
+const DECENTRALIZED_API_URL = `https://gateway.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/5So3nipgHT3ks7pEPDQ6YgSFhfEmADrh481P9z1ZtcMA`
+
+let API_URL = HOSTED_API_URL
+if (process.env.GRAPH_API_KEY && process.env.USE_DECENTRALIZED_API === 'true') {
+  API_URL = DECENTRALIZED_API_URL
+}
 
 // core contract addresses to include during initilization
 const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
