@@ -452,7 +452,10 @@
   "923461105374855188": {
     "name": "mpkoz",
     "projectBotHandlers": {
-      "default": "233"
+      "default": "233",
+      "stringTriggers": {
+        "0-AB_X_BM": ["metropolis", "metro"]
+      }
     }
   },
   "933419567722664016": {
