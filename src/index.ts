@@ -19,6 +19,7 @@ const { ArchipelagoBot } = require('./Classes/APIBots/ArchipelagoBot')
 const {
   getPBABProjects,
   getArtBlocksXPaceProjects,
+  getArtBlocksXBMProjects,
 } = require('./Utils/parseArtBlocksAPI')
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
@@ -49,6 +50,7 @@ const CHANNEL_PBAB_CHAT = projectConfig.chIdByName['engine-chat']
 
 // AB x Pace
 const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
+const CHANNEL_AB_X_BM = projectConfig.chIdByName['art-blocks-x-bright-moments']
 
 // AB Art Chat
 const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat']
@@ -152,6 +154,7 @@ const factoryParty = new ArtIndexerBot(getArtBlocksFactoryProjects)
 const artIndexerBot = new ArtIndexerBot()
 const pbabIndexerBot = new ArtIndexerBot(getPBABProjects)
 const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
+const abXbmIndexerBot = new ArtIndexerBot(getArtBlocksXBMProjects)
 
 export const mintBot = new MintBot(bot)
 
@@ -182,6 +185,9 @@ bot.on(Events.MessageCreate, async (msg) => {
         break
       case CHANNEL_AB_X_PACE:
         abXpaceIndexerBot.handleNumberMessage(msg)
+        break
+      case CHANNEL_AB_X_BM:
+        abXbmIndexerBot.handleNumberMessage(msg)
         break
       case CHANNEL_ART_CHAT:
         artIndexerBot.handleNumberMessage(msg)
