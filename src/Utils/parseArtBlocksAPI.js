@@ -537,6 +537,22 @@ async function getArtBlocksXPaceProjects() {
 }
 
 /**
+ * get data for all AB x BM projects
+ * Returns undefined if errors encountered while fetching.
+ * If project found, returns array of project objects with:
+ *   - invocations
+ *   - maxInvocations
+ *   - active
+ *   - name
+ *   - projectId
+ *   - contract
+ *     - id: string Contract Address
+ */
+async function getArtBlocksXBMProjects() {
+  return await getContractsProjects([COLLAB_CONTRACTS.AB_X_BM])
+}
+
+/**
  * gets all PBAB Contracts from Hasura
  *
  */
@@ -699,6 +715,7 @@ module.exports.getArtBlocksProjects = getArtBlocksProjects
 module.exports.getArtBlocksOpenProjects = getArtBlocksOpenProjects
 module.exports.getPBABProjects = getPBABProjects
 module.exports.getArtBlocksXPaceProjects = getArtBlocksXPaceProjects
+module.exports.getArtBlocksXBMProjects = getArtBlocksXBMProjects
 module.exports.getArtBlocksProjectCount = getArtBlocksProjectCount
 module.exports.getContractProject = getContractProject
 module.exports.getProjectsBirthdays = getProjectsBirthdays

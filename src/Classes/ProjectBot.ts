@@ -159,6 +159,10 @@ export class ProjectBot {
       artBlocksData.platform !== '' &&
       !artBlocksData.platform.includes('Art Blocks')
     ) {
+      if (artBlocksData.platform === 'MOMENT') {
+        artBlocksData.platform = 'Bright Moments'
+      }
+
       title = artBlocksData.platform + ' - ' + title
     }
 
