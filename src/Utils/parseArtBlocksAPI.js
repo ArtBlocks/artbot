@@ -50,6 +50,14 @@ const getAllProjectsCurationStatus = gql`
   }
 `
 
+const projectInvocations = gql`
+  query getProjectInvocations($id: ID!) {
+    projects(where: { id: $id }) {
+      invocations
+    }
+  }
+`
+
 const contractProjectsMinimal = gql`
   query getContractProjectsMinimal($id: ID!, $first: Int!, $skip: Int) {
     contract(id: $id) {
@@ -64,6 +72,7 @@ const contractProjects = gql`
   query getContractProjects($id: ID!, $first: Int!, $skip: Int) {
     contract(id: $id) {
       projects(first: $first, skip: $skip, orderBy: projectId) {
+        id
         projectId
         name
         invocations
@@ -106,6 +115,7 @@ const contractProject = gql`
   query getContractProject($id: ID!, $projectId: Int!) {
     contract(id: $id) {
       projects(where: { projectId: $projectId }) {
+        id
         name
         invocations
         maxInvocations
@@ -237,6 +247,22 @@ async function _getContractProject(projectId, contractId) {
       .toPromise()
     return result.data.contract.projects.length > 0
       ? result.data.contract.projects[0]
+      : null
+  } catch (err) {
+    console.error(err)
+    return undefined
+  }
+}
+
+export async function projectRefreshInvocations(id) {
+  try {
+    const result = await client
+      .query(projectInvocations, {
+        id: id,
+      })
+      .toPromise()
+    return result.data.projects.length > 0
+      ? result.data.projects[0].invocations
       : null
   } catch (err) {
     console.error(err)

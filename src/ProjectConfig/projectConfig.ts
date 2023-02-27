@@ -202,17 +202,17 @@ class ProjectConfig {
         )
       }
       const projectNumber = parseInt(projectId)
-      const { invocations, name, active, contract } = await getContractProject(
-        projectNumber,
-        configContract
-      )
+      const { id, invocations, maxInvocations, name, active, contract } =
+        await getContractProject(projectNumber, configContract)
       console.log(
         `Refreshing project cache for Project ${projectNumber} ${name}`
       )
       projectBots[botId] = new ProjectBot(
+        id,
         projectNumber,
         contract.id,
         invocations,
+        maxInvocations,
         name,
         active,
         namedMappings
