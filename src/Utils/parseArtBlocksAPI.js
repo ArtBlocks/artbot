@@ -254,7 +254,7 @@ async function _getContractProject(projectId, contractId) {
   }
 }
 
-export async function projectRefreshInvocations(id) {
+export async function getProjectInvocations(id) {
   try {
     const result = await client
       .query(projectInvocations, {

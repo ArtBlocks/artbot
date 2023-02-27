@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 import { Message } from 'discord.js'
-import { projectRefreshInvocations } from '../Utils/parseArtBlocksAPI'
+import { getProjectInvocations } from '../Utils/parseArtBlocksAPI'
 
 const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
@@ -114,9 +114,7 @@ export class ProjectBot {
 
     // If project is still minting, refresh edition size to see if piece is in bounds
     if (pieceNumber >= this.editionSize && pieceNumber < this.maxEditionSize) {
-      const invocations: number | null = await projectRefreshInvocations(
-        this.id
-      )
+      const invocations: number | null = await getProjectInvocations(this.id)
 
       if (invocations) {
         this.editionSize = invocations
