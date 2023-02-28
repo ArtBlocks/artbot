@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios'
 import { Message } from 'discord.js'
+import { getProjectInvocations } from '../Utils/parseArtBlocksAPI'
 
 const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
@@ -18,9 +19,11 @@ const ONE_MILLION = 1e6
  * Bot for handling projects
  */
 export class ProjectBot {
+  id: string
   projectNumber: number
   coreContract: string
   editionSize: number
+  maxEditionSize: number
   projectName: string
   projectActive: boolean
   namedMappings: any
@@ -30,9 +33,11 @@ export class ProjectBot {
   startTime?: Date
 
   constructor(
+    id: string,
     projectNumber: number,
     coreContract: string,
     editionSize: number,
+    maxEditionSize: number,
     projectName: string,
     projectActive: boolean,
     namedMappings: any,
@@ -41,9 +46,11 @@ export class ProjectBot {
     heritageStatus?: string,
     startTime?: Date
   ) {
+    this.id = id
     this.projectNumber = projectNumber
     this.coreContract = coreContract
     this.editionSize = editionSize
+    this.maxEditionSize = maxEditionSize
     this.projectName = projectName
     this.projectActive = projectActive
     this.namedMappings = namedMappings
@@ -103,6 +110,15 @@ export class ProjectBot {
       pieceNumber = Math.floor(Math.random() * this.editionSize)
     } else {
       pieceNumber = parseInt(afterTheHash)
+    }
+
+    // If project is still minting, refresh edition size to see if piece is in bounds
+    if (pieceNumber >= this.editionSize && pieceNumber < this.maxEditionSize) {
+      const invocations: number | null = await getProjectInvocations(this.id)
+
+      if (invocations) {
+        this.editionSize = invocations
+      }
     }
 
     if (pieceNumber >= this.editionSize || pieceNumber < 0) {
