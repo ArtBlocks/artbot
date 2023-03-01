@@ -26,6 +26,7 @@ const client = createClient({
       'Content-Type': 'application/json',
     },
   }),
+  requestPolicy: 'network-only',
 })
 
 const projectsStartTimes = gql`
