@@ -619,6 +619,16 @@
       "default": "406"
     }
   },
+  "1078359185764389006": {
+    "name": "eric-de-giuli",
+    "projectBotHandlers": {
+      "default": "416",
+      "stringTriggers": {
+        "344": ["glass"],
+        "288": ["mazinaw"]
+      }
+    }
+  },
   
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
