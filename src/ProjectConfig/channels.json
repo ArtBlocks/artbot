@@ -269,7 +269,8 @@
       "stringTriggers": {
         "32": ["light", "beams"],
         "62": ["bubble", "blobby"],
-        "230": ["glow"]
+        "230": ["glow"],
+        "424": ["worlds", "within", "ww"]
       }
     }
   },
