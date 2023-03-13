@@ -630,6 +630,12 @@
       }
     }
   },
+  "1083444648502120448": {
+    "name": "charlotte-dann",
+    "projectBotHandlers": {
+      "default": "417"
+    }
+  },
   
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
