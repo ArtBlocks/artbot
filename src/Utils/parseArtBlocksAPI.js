@@ -17,7 +17,7 @@ if (process.env.GRAPH_API_KEY && process.env.USE_DECENTRALIZED_API === 'true') {
 const CORE_CONTRACTS = require('../ProjectConfig/coreContracts.json')
 const COLLAB_CONTRACTS = require('../ProjectConfig/collaborationContracts.json')
 const EXPLORATION_CONTRACTS = require('../ProjectConfig/explorationsContracts.json')
-
+const BLOCKED_ENGINE_CONTRACTS = require('../ProjectConfig/blockedEngineContracts.json')
 const client = createClient({
   url: API_URL,
   fetch: fetch,
@@ -587,6 +587,7 @@ export async function getEngineContracts() {
   const nonPBABContracts = Object.values(CORE_CONTRACTS)
     .concat(Object.values(COLLAB_CONTRACTS))
     .concat(Object.values(EXPLORATION_CONTRACTS))
+    .concat(Object.values(BLOCKED_ENGINE_CONTRACTS))
   try {
     const result = await client
       .query(getPBABContracts, {
