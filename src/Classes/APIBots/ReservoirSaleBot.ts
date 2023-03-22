@@ -11,6 +11,7 @@ import {
   isExplorationsContract,
   isEngineContract,
   getCollectionType,
+  SALE_UTM,
 } from './utils'
 
 type ReservoirSale = {
@@ -186,8 +187,8 @@ export class ReservoirSaleBot extends APIPollBot {
       }
     }
     const baseABProfile = 'https://www.artblocks.io/user/'
-    const sellerProfile = baseABProfile + owner
-    const buyerProfile = baseABProfile + sale.to
+    const sellerProfile = baseABProfile + owner + SALE_UTM
+    const buyerProfile = baseABProfile + sale.to + SALE_UTM
     embed.addFields(
       {
         name: `Seller (${platform})`,
@@ -235,7 +236,9 @@ export class ReservoirSaleBot extends APIPollBot {
       },
       {
         name: 'Live Script',
-        value: `[view on artblocks.io](${artBlocksData.external_url})`,
+        value: `[view on artblocks.io](${
+          artBlocksData.external_url + SALE_UTM
+        })`,
         inline: true,
       }
     )

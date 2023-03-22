@@ -1,6 +1,7 @@
 import { AxiosError } from 'axios'
 import { Message } from 'discord.js'
 import { getProjectInvocations } from '../Utils/parseArtBlocksAPI'
+import { PROJECTBOT_UTM } from './APIBots/utils'
 
 const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
@@ -165,7 +166,9 @@ export class ProjectBot {
     const osUrl = `https://api.opensea.io/api/v1/asset/${this.coreContract}/${tokenID}/`
 
     const titleLink =
-      artBlocksData.external_url !== '' ? artBlocksData.external_url : osUrl
+      artBlocksData.external_url !== ''
+        ? artBlocksData.external_url + PROJECTBOT_UTM
+        : osUrl
 
     let title = artBlocksData.name + ' - ' + artBlocksData.artist
 
@@ -195,7 +198,9 @@ export class ProjectBot {
         .addFields(
           {
             name: 'Live Script',
-            value: `[Generator](${artBlocksData.generator_url})`,
+            value: `[Generator](${
+              artBlocksData.generator_url + PROJECTBOT_UTM
+            })`,
             inline: true,
           },
           {
@@ -232,7 +237,7 @@ export class ProjectBot {
       .addFields(
         {
           name: 'Live Script',
-          value: `[Generator](${artBlocksData.generator_url})`,
+          value: `[Generator](${artBlocksData.generator_url + PROJECTBOT_UTM})`,
           inline: true,
         },
         {
@@ -336,7 +341,9 @@ export class ProjectBot {
         
         What are your favorite outputs from ${this.projectName}?
 
-        [Explore the full project here](${artBlocksData.external_url})
+        [Explore the full project here](${
+          artBlocksData.external_url + PROJECTBOT_UTM
+        })
         `
         )
         .setFooter(`${artBlocksData.name}`)

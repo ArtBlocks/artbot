@@ -7,6 +7,7 @@ import {
 import { APIPollBot } from './ApiPollBot'
 
 import {
+  LISTING_UTM,
   getCollectionType,
   getTokenApiUrl,
   isEngineContract,
@@ -118,7 +119,7 @@ export class ReservoirListBot extends APIPollBot {
 
     const sellerText = await this.ensOrAddress(listing.maker)
     const baseABProfile = 'https://www.artblocks.io/user/'
-    const sellerProfile = baseABProfile + owner
+    const sellerProfile = baseABProfile + owner + LISTING_UTM
 
     embed.addFields(
       {
@@ -169,7 +170,9 @@ export class ReservoirListBot extends APIPollBot {
       },
       {
         name: 'Live Script',
-        value: `[view on artblocks.io](${artBlocksData.external_url})`,
+        value: `[view on artblocks.io](${
+          artBlocksData.external_url + LISTING_UTM
+        })`,
         inline: true,
       }
     )
