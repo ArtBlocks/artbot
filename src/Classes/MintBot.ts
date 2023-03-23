@@ -1,7 +1,7 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js'
 import { ENGINE_CONTRACTS, mintBot } from '../index'
 import axios, { AxiosError } from 'axios'
-import { getTokenApiUrl } from './APIBots/utils'
+import { MINT_UTM, getTokenApiUrl } from './APIBots/utils'
 import { ensOrAddress } from './APIBots/utils'
 import { TwitterBot } from './TwitterBot'
 
@@ -193,11 +193,11 @@ export class Mint {
     const ownerText = await ensOrAddress(this.owner)
 
     const baseABProfile = 'https://www.artblocks.io/user/'
-    const ownerProfile = baseABProfile + this.owner
+    const ownerProfile = baseABProfile + this.owner + MINT_UTM
 
     embed.setTitle(`Minted: ${this.tokenName} - ${this.artistName}`)
     if (this.artblocksUrl) {
-      embed.setURL(this.artblocksUrl)
+      embed.setURL(this.artblocksUrl + MINT_UTM)
     }
     embed.setImage(this.image)
     embed.setColor('#c9fdc9')
@@ -210,7 +210,7 @@ export class Mint {
       },
       {
         name: 'Live Script',
-        value: `[Generator](${this.generatorLink})`,
+        value: `[Generator](${this.generatorLink + MINT_UTM})`,
         inline: true,
       }
     )

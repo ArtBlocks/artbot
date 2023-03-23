@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios'
 import { Message } from 'discord.js'
+import { PROJECTBOT_UTM } from './APIBots/utils'
 import {
   getProjectInvocations,
   getTokenOwnerAddress,
@@ -169,7 +170,9 @@ export class ProjectBot {
     const osUrl = `https://api.opensea.io/api/v1/asset/${this.coreContract}/${tokenID}/`
 
     const titleLink =
-      artBlocksData.external_url !== '' ? artBlocksData.external_url : osUrl
+      artBlocksData.external_url !== ''
+        ? artBlocksData.external_url + PROJECTBOT_UTM
+        : osUrl
 
     let title = artBlocksData.name + ' - ' + artBlocksData.artist
 
@@ -205,7 +208,6 @@ export class ProjectBot {
         .setTitle(title)
         // Add link to title.
         .setURL(titleLink)
-
         // Set the full image for embed.
         .setImage(artBlocksData.image)
 
@@ -242,7 +244,6 @@ export class ProjectBot {
       .setColor(EMBED_COLOR)
       // Set the main content of the embed
       .setThumbnail(artBlocksData.image)
-    // Add "Live Script" field.
 
     if (ownerText) {
       embedContent.addFields({
@@ -340,7 +341,9 @@ export class ProjectBot {
         
         What are your favorite outputs from ${this.projectName}?
 
-        [Explore the full project here](${artBlocksData.external_url})
+        [Explore the full project here](${
+          artBlocksData.external_url + PROJECTBOT_UTM
+        })
         `
         )
         .setFooter(`${artBlocksData.name}`)
