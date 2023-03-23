@@ -1,5 +1,11 @@
 import { AxiosError } from 'axios'
 import { Message } from 'discord.js'
+import { PROJECTBOT_UTM } from './APIBots/utils'
+import {
+  getProjectInvocations,
+  getTokenOwnerAddress,
+} from '../Utils/parseArtBlocksAPI'
+import { ensOrAddress } from './APIBots/utils'
 
 const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
@@ -18,9 +24,11 @@ const ONE_MILLION = 1e6
  * Bot for handling projects
  */
 export class ProjectBot {
+  id: string
   projectNumber: number
   coreContract: string
   editionSize: number
+  maxEditionSize: number
   projectName: string
   projectActive: boolean
   namedMappings: any
@@ -30,9 +38,11 @@ export class ProjectBot {
   startTime?: Date
 
   constructor(
+    id: string,
     projectNumber: number,
     coreContract: string,
     editionSize: number,
+    maxEditionSize: number,
     projectName: string,
     projectActive: boolean,
     namedMappings: any,
@@ -41,9 +51,11 @@ export class ProjectBot {
     heritageStatus?: string,
     startTime?: Date
   ) {
+    this.id = id
     this.projectNumber = projectNumber
     this.coreContract = coreContract
     this.editionSize = editionSize
+    this.maxEditionSize = maxEditionSize
     this.projectName = projectName
     this.projectActive = projectActive
     this.namedMappings = namedMappings
@@ -105,6 +117,15 @@ export class ProjectBot {
       pieceNumber = parseInt(afterTheHash)
     }
 
+    // If project is still minting, refresh edition size to see if piece is in bounds
+    if (pieceNumber >= this.editionSize && pieceNumber < this.maxEditionSize) {
+      const invocations: number | null = await getProjectInvocations(this.id)
+
+      if (invocations) {
+        this.editionSize = invocations
+      }
+    }
+
     if (pieceNumber >= this.editionSize || pieceNumber < 0) {
       msg.channel.send(
         `Invalid #, only ${this.editionSize} pieces minted for ${this.projectName}.`
@@ -149,7 +170,9 @@ export class ProjectBot {
     const osUrl = `https://api.opensea.io/api/v1/asset/${this.coreContract}/${tokenID}/`
 
     const titleLink =
-      artBlocksData.external_url !== '' ? artBlocksData.external_url : osUrl
+      artBlocksData.external_url !== ''
+        ? artBlocksData.external_url + PROJECTBOT_UTM
+        : osUrl
 
     let title = artBlocksData.name + ' - ' + artBlocksData.artist
 
@@ -159,35 +182,48 @@ export class ProjectBot {
       artBlocksData.platform !== '' &&
       !artBlocksData.platform.includes('Art Blocks')
     ) {
+      if (artBlocksData.platform === 'MOMENT') {
+        artBlocksData.platform = 'Bright Moments'
+      }
+
       title = artBlocksData.platform + ' - ' + title
     }
 
-    const moreDetailsText = `Add "?details" to your command!`
+    const ownerAddress = await getTokenOwnerAddress(
+      `${this.coreContract}-${tokenID}`
+    )
+    let ownerText = ownerAddress ? await ensOrAddress(ownerAddress) : ''
+    if (ownerText.startsWith('0x') && !ownerText.endsWith('.eth')) {
+      ownerText = ownerText.substring(0, 6) + '...' + ownerText.substring(38)
+    }
 
+    const ownerProfileLink = ownerAddress
+      ? 'https://www.artblocks.io/user/' + ownerAddress
+      : ''
     // If user did *not* request full details, return just a large image,
     // along with a link to the OpenSea page and ArtBlocks live script.
     if (!detailsRequested) {
-      const imageContent = new EmbedBuilder()
+      const embedContent = new EmbedBuilder()
         // Set the title of the field.
         .setTitle(title)
         // Add link to title.
         .setURL(titleLink)
-        .addFields(
-          {
-            name: 'Live Script',
-            value: `[Generator](${artBlocksData.generator_url})`,
-            inline: true,
-          },
-          {
-            name: 'Want More Info?',
-            value: moreDetailsText,
-            inline: true,
-          }
-        )
         // Set the full image for embed.
         .setImage(artBlocksData.image)
 
-      msg.channel.send({ embeds: [imageContent] })
+      if (ownerText) {
+        embedContent.addFields({
+          name: 'Owner',
+          value: `[${ownerText}](${ownerProfileLink})`,
+          inline: true,
+        })
+      }
+      embedContent.addFields({
+        name: 'Live Script',
+        value: `[Generator](${artBlocksData.generator_url})`,
+        inline: true,
+      })
+      msg.channel.send({ embeds: [embedContent] })
       return
     }
 
@@ -208,38 +244,27 @@ export class ProjectBot {
       .setColor(EMBED_COLOR)
       // Set the main content of the embed
       .setThumbnail(artBlocksData.image)
-      // Add "Live Script" field.
-      .addFields(
-        {
-          name: 'Live Script',
-          value: `[Generator](${artBlocksData.generator_url})`,
-          inline: true,
-        },
-        {
-          name: 'Features',
-          value: assetFeatures,
-        }
-      )
 
-    console.log(embedContent)
-  }
-
-  parseOwnerInfo(ownerAccount: any) {
-    const address = ownerAccount.address
-    const addressPreview =
-      address !== null ? address.slice(0, 8) : UNKNOWN_ADDRESS
-    const addressOpenSeaURL = `https://opensea.io/accounts/${address}`
-    let ownerUsername =
-      ownerAccount.user !== null ? ownerAccount.user.username : UNKNOWN_USERNAME
-    if (ownerUsername === null) {
-      ownerUsername = UNKNOWN_USERNAME
+    if (ownerText) {
+      embedContent.addFields({
+        name: 'Owner',
+        value: `[${ownerText}](${ownerProfileLink})`,
+        inline: true,
+      })
     }
+    embedContent.addFields(
+      {
+        name: 'Live Script',
+        value: `[Generator](${artBlocksData.generator_url})`,
+        inline: true,
+      },
+      {
+        name: 'Features',
+        value: assetFeatures,
+      }
+    )
 
-    return {
-      name: 'Owner',
-      value: `[${addressPreview}](${addressOpenSeaURL}) (${ownerUsername})`,
-      inline: true,
-    }
+    msg.channel.send({ embeds: [embedContent] })
   }
 
   parseSaleInfo(saleInfo: any) {
@@ -316,7 +341,9 @@ export class ProjectBot {
         
         What are your favorite outputs from ${this.projectName}?
 
-        [Explore the full project here](${artBlocksData.external_url})
+        [Explore the full project here](${
+          artBlocksData.external_url + PROJECTBOT_UTM
+        })
         `
         )
         .setFooter(`${artBlocksData.name}`)

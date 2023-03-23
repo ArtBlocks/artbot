@@ -1,7 +1,7 @@
 import { Client, ColorResolvable } from 'discord.js'
 import { buildOpenseaURL, buildLooksRareURL, buildX2Y2URL } from './utils'
 
-const { ensOrAddress, getOSName } = require('./utils')
+const { getOSName } = require('./utils')
 const axios = require('axios')
 /** Abstract parent class for all API Poll Bots */
 export class APIPollBot {
@@ -80,10 +80,6 @@ export class APIPollBot {
    */
   async buildDiscordMessage(msg: any) {
     console.warn('buildDiscordMessage function not implemented!', msg)
-  }
-
-  async ensOrAddress(address: string): Promise<string> {
-    return await ensOrAddress(address)
   }
 
   async osName(address: string): Promise<string> {

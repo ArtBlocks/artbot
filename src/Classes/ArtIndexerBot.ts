@@ -94,9 +94,11 @@ export class ArtIndexerBot {
           heritageStatuses[`${project.contract.id}-${project.projectId}`]
         )
         const newBot = new ProjectBot(
+          project.id,
           project.projectId,
           project.contract.id,
           project.invocations,
+          project.maxInvocations,
           project.name,
           project.active,
           undefined,

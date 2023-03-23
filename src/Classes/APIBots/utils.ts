@@ -22,6 +22,13 @@ const ensResolvedMap: { [id: string]: string } = {}
 const osAddressMap: { [id: string]: string } = {}
 const MAX_ENS_RETRIES = 3
 
+// UTM for links so we can track traffic that comes through Artbot
+const ARTBOT_UTM = '?utm_source=artbot&utm_medium=discord'
+export const LISTING_UTM = ARTBOT_UTM + '&utm_campaign=listing'
+export const SALE_UTM = ARTBOT_UTM + '&utm_campaign=sale'
+export const MINT_UTM = ARTBOT_UTM + '&utm_campaign=mint'
+export const PROJECTBOT_UTM = ARTBOT_UTM + '&utm_campaign=projectbot'
+
 async function getENSName(address: string): Promise<string> {
   let name = ''
   if (ensAddressMap[address]) {

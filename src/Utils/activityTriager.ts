@@ -22,13 +22,12 @@ const STEVIE_P_LISTINGS = projectConfig.chIdByName['stevie-p-listings']
 
 const IXNAYOKAY_SALES = projectConfig.chIdByName['ixnayokay-sales']
 
+const OWMO_SALES = projectConfig.chIdByName['owmo-sales']
+
 const PLOTTABLES_SALES = projectConfig.chIdByName['plottables-sales']
 const PLOTTABLES_LISTINGS = projectConfig.chIdByName['plottables-listings']
 
 const FLUTTER_SALES = projectConfig.chIdByName['flutter-sales']
-
-// AB x Pace
-const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
 
 // Addresses which should be omitted entirely from event feeds.
 export const BAN_ADDRESSES = new Set([
@@ -139,8 +138,6 @@ export function sendEmbedToSaleChannels(
         sendEmbedToChannel(bot, embed, CHANNEL_SALES_CHAT)
         break
       case CollectionType.COLLAB:
-        sendEmbedToChannel(bot, embed, CHANNEL_AB_X_PACE)
-      // eslint-disable-next-line no-fallthrough
       case CollectionType.CORE:
         sendEmbedToChannel(bot, embed, CHANNEL_SALES)
         sendEmbedToChannel(bot, embed, CHANNEL_SALES_CHAT)
@@ -159,6 +156,9 @@ export function sendEmbedToSaleChannels(
     }
     if (artBlocksData.artist.includes('ixnayokay')) {
       sendEmbedToChannel(bot, embed, IXNAYOKAY_SALES)
+    }
+    if (artBlocksData.artist.includes('Owen Moore')) {
+      sendEmbedToChannel(bot, embed, OWMO_SALES)
     }
     if (artBlocksData.platform.includes('Plottables')) {
       sendEmbedToChannel(bot, embed, PLOTTABLES_SALES)

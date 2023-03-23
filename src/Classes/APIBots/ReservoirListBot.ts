@@ -7,6 +7,8 @@ import {
 import { APIPollBot } from './ApiPollBot'
 
 import {
+  LISTING_UTM,
+  ensOrAddress,
   getCollectionType,
   getTokenApiUrl,
   isEngineContract,
@@ -116,9 +118,9 @@ export class ReservoirListBot extends APIPollBot {
       return
     }
 
-    const sellerText = await this.ensOrAddress(listing.maker)
+    const sellerText = await ensOrAddress(listing.maker)
     const baseABProfile = 'https://www.artblocks.io/user/'
-    const sellerProfile = baseABProfile + owner
+    const sellerProfile = baseABProfile + owner + LISTING_UTM
 
     embed.addFields(
       {
@@ -146,6 +148,8 @@ export class ReservoirListBot extends APIPollBot {
 
     if (artBlocksData?.platform === 'Art Blocks x Pace') {
       curationStatus = 'AB x Pace'
+    } else if (artBlocksData?.platform === 'Art Blocks × Bright Moments') {
+      curationStatus = 'AB x Bright Moments'
     } else if (isExplorationsContract(listing.contract)) {
       curationStatus = 'Explorations'
     } else if (await isEngineContract(listing.contract)) {
@@ -167,7 +171,9 @@ export class ReservoirListBot extends APIPollBot {
       },
       {
         name: 'Live Script',
-        value: `[view on artblocks.io](${artBlocksData.external_url})`,
+        value: `[view on artblocks.io](${
+          artBlocksData.external_url + LISTING_UTM
+        })`,
         inline: true,
       }
     )

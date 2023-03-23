@@ -19,6 +19,7 @@ import { ProjectBot } from '../Classes/ProjectBot'
 import { getContractProject } from '../GraphQL/Subgraph/querySubgraph'
 const PARTNER_CONTRACTS = require('../ProjectConfig/partnerContracts.json')
 const EXPLORATIONS_CONTRACTS = require('../ProjectConfig/explorationsContracts.json')
+const COLLAB_CONTRACTS = require('../ProjectConfig/collaborationContracts.json')
 
 type ProjectBotHandlers = {
   default: string
@@ -191,7 +192,9 @@ class ProjectConfig {
       const [projectId, contractName] = botId.split('-')
       const namedMappings = projectBotsJson[botId]?.namedMappings
       const configContract =
-        PARTNER_CONTRACTS[contractName] ?? EXPLORATIONS_CONTRACTS[contractName]
+        PARTNER_CONTRACTS[contractName] ??
+        EXPLORATIONS_CONTRACTS[contractName] ??
+        COLLAB_CONTRACTS[contractName]
 
       if (contractName && !configContract) {
         console.warn(
@@ -199,18 +202,18 @@ class ProjectConfig {
         )
       }
       const projectNumber = parseInt(projectId)
-      const { invocations, name, active, contract } = await getContractProject(
-        projectNumber,
-        configContract
-      )
+      const { id, invocations, maxInvocations, name, active, contract } =
+        await getContractProject(projectNumber, configContract)
       console.log(
         `Refreshing project cache for Project ${projectNumber} ${name}`
       )
       projectBots[botId] = new ProjectBot(
+        id,
         projectNumber,
         contract.id,
         invocations,
-        name ?? '',
+        maxInvocations,
+        name,
         active,
         namedMappings
       )

@@ -13,7 +13,6 @@ import { getEngineContracts } from './Utils/parseArtBlocksAPI'
 import { ReservoirListBot } from './Classes/APIBots/ReservoirListBot'
 import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
 
-const { ArchipelagoBot } = require('./Classes/APIBots/ArchipelagoBot')
 // Special handlers.
 // const {
 //   getPBABProjects,
@@ -46,8 +45,9 @@ const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 // PBAB Chat
 // const CHANNEL_PBAB_CHAT = projectConfig.chIdByName['engine-chat']
 
-// // AB x Pace
+// AB x Pace
 // const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
+// const CHANNEL_AB_X_BM = projectConfig.chIdByName['art-blocks-x-bright-moments']
 
 // AB Art Chat
 const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat']
@@ -57,8 +57,12 @@ const API_POLL_TIME_MS = 10000
 const reservoirListLimit = 50
 const reservoirSaleLimit = 100
 
-// Set PRODUCTION_MODE to true if testing locally
-const PRODUCTION_MODE = process.env.PRODUCTION_MODE ?? false
+// Note: Please set PRODUCTION_MODE to true if testing locally
+const PRODUCTION_MODE =
+  process.env.PRODUCTION_MODE &&
+  process.env.PRODUCTION_MODE.toLowerCase() === 'true'
+
+console.log('PRODUCTION_MODE: ', PRODUCTION_MODE)
 
 // App setup.
 const app = express()
@@ -146,6 +150,7 @@ bot.on('ready', () => {
 const artIndexerBot = new ArtIndexerBot()
 // const pbabIndexerBot = new ArtIndexerBot(getPBABProjects)
 // const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
+// const abXbmIndexerBot = new ArtIndexerBot(getArtBlocksXBMProjects)
 
 export const mintBot = new MintBot(bot)
 
@@ -176,6 +181,9 @@ bot.on(Events.MessageCreate, async (msg) => {
       //   break
       // case CHANNEL_AB_X_PACE:
       //   abXpaceIndexerBot.handleNumberMessage(msg)
+      //   break
+      // case CHANNEL_AB_X_BM:
+      //   abXbmIndexerBot.handleNumberMessage(msg)
       //   break
       case CHANNEL_ART_CHAT:
         artIndexerBot.handleNumberMessage(msg)
@@ -257,6 +265,4 @@ const initReservoirBots = async () => {
 // Instantiate API Pollers (if not in test mode)
 if (PRODUCTION_MODE) {
   initReservoirBots()
-  const archipelagoBot = new ArchipelagoBot(bot)
-  archipelagoBot.activate()
 }

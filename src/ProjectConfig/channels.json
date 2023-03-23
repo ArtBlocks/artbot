@@ -269,7 +269,8 @@
       "stringTriggers": {
         "32": ["light", "beams"],
         "62": ["bubble", "blobby"],
-        "230": ["glow"]
+        "230": ["glow"],
+        "424": ["worlds", "within", "ww"]
       }
     }
   },
@@ -452,7 +453,10 @@
   "923461105374855188": {
     "name": "mpkoz",
     "projectBotHandlers": {
-      "default": "233"
+      "default": "233",
+      "stringTriggers": {
+        "0-AB_X_BM": ["metropolis", "metro"]
+      }
     }
   },
   "933419567722664016": {
@@ -616,6 +620,22 @@
       "default": "406"
     }
   },
+  "1078359185764389006": {
+    "name": "eric-de-giuli",
+    "projectBotHandlers": {
+      "default": "416",
+      "stringTriggers": {
+        "344": ["glass"],
+        "288": ["mazinaw"]
+      }
+    }
+  },
+  "1083444648502120448": {
+    "name": "charlotte-dann",
+    "projectBotHandlers": {
+      "default": "417"
+    }
+  },
   
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
@@ -677,6 +697,9 @@
   },
   "983836283954667530": {
     "name": "art-blocks-x-pace"
+  },
+  "1067538362275201045": {
+    "name": "art-blocks-x-bright-moments"
   },
   "830940204441272369": {
     "name": "listing-feed"
@@ -806,5 +829,8 @@
   },
   "1061341199841099777": {
     "name": "ixnayokay-sales"
+  },
+  "1077311249701945504": {
+    "name": "owmo-sales"
   }
 }
