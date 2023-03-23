@@ -8,6 +8,7 @@ import { APIPollBot } from './ApiPollBot'
 
 import {
   LISTING_UTM,
+  ensOrAddress,
   getCollectionType,
   getTokenApiUrl,
   isEngineContract,
@@ -117,7 +118,7 @@ export class ReservoirListBot extends APIPollBot {
       return
     }
 
-    const sellerText = await this.ensOrAddress(listing.maker)
+    const sellerText = await ensOrAddress(listing.maker)
     const baseABProfile = 'https://www.artblocks.io/user/'
     const sellerProfile = baseABProfile + owner + LISTING_UTM
 

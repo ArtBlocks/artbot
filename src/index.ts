@@ -14,7 +14,6 @@ import { getEngineContracts } from './Utils/parseArtBlocksAPI'
 import { ReservoirListBot } from './Classes/APIBots/ReservoirListBot'
 import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
 
-const { ArchipelagoBot } = require('./Classes/APIBots/ArchipelagoBot')
 // Special handlers.
 const {
   getPBABProjects,
@@ -269,6 +268,4 @@ const initReservoirBots = async () => {
 // Instantiate API Pollers (if not in test mode)
 if (PRODUCTION_MODE) {
   initReservoirBots()
-  const archipelagoBot = new ArchipelagoBot(bot)
-  archipelagoBot.activate()
 }
