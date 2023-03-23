@@ -9,9 +9,9 @@ import { ArtIndexerBot } from './Classes/ArtIndexerBot'
 import { MintBot } from './Classes/MintBot'
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 
-import { getEngineContracts } from './Utils/parseArtBlocksAPI'
 import { ReservoirListBot } from './Classes/APIBots/ReservoirListBot'
 import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
+import { getEngineContracts } from './GraphQL/Subgraph/querySubgraph'
 
 // Special handlers.
 // const {
@@ -246,7 +246,7 @@ const initReservoirBots = async () => {
   const allContracts = Object.values(CORE_CONTRACTS)
     .concat(Object.values(COLLAB_CONTRACTS))
     .concat(Object.values(EXPLORATIONS_CONTRACTS))
-    .concat(await ENGINE_CONTRACTS)
+    .concat((await ENGINE_CONTRACTS) ?? [])
 
   const RESERVOIR_CONTRACT_LIMIT = 20
   const numBotInstances = Math.ceil(

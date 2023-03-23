@@ -213,7 +213,7 @@ class ProjectConfig {
         contract.id,
         invocations,
         maxInvocations,
-        name,
+        name ?? 'Unknown',
         active,
         namedMappings
       )

@@ -190,10 +190,14 @@ export function buildCollectionMapping(
   })
 
   return [collectionMapping, heritageStatuses]
+}
+
 export async function isEngineContract(
   contractAddress: string
 ): Promise<boolean> {
-  return (await ENGINE_CONTRACTS).includes(contractAddress.toLowerCase())
+  return ((await ENGINE_CONTRACTS) ?? []).includes(
+    contractAddress.toLowerCase()
+  )
 }
 
 export async function getCollectionType(

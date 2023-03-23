@@ -58,7 +58,7 @@ export class MintBot {
           contracts = Object.values(COLLAB_CONTRACTS)
           break
         case CollectionType.ENGINE:
-          contracts = engineContracts
+          contracts = engineContracts ?? []
           break
         case CollectionType.STAGING:
           contracts = Object.values(STAGING_CONTRACTS)

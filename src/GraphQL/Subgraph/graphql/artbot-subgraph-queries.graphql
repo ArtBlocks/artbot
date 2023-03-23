@@ -1,4 +1,5 @@
 fragment ProjectDetail on Project {
+  id
   projectId
   name
   invocations
@@ -18,8 +19,17 @@ query getAllProjects($first: Int!, $skip: Int) {
   }
 }
 
-query getWalletTokens($wallet: String!, $first: Int!, $skip: Int) {
-  tokens(first: $first, skip: $skip, where: { owner: $wallet }) {
+query getWalletTokens(
+  $wallet: String!
+  $contracts: [String!]!
+  $first: Int!
+  $skip: Int
+) {
+  tokens(
+    first: $first
+    skip: $skip
+    where: { owner: $wallet, contract_in: $contracts }
+  ) {
     invocation
     project {
       name
@@ -61,6 +71,7 @@ query getContractProjectsWithCurationStatus(
       skip: $skip
       orderBy: projectId
     ) {
+      id
       projectId
       name
       invocations
@@ -77,5 +88,19 @@ query getContractProjectsWithCurationStatus(
 query getEngineContracts($ids: [ID!]) {
   contracts(where: { id_not_in: $ids }) {
     id
+  }
+}
+
+query getProjectInvocations($id: ID!) {
+  projects(where: { id: $id }) {
+    invocations
+  }
+}
+
+query getTokenOwner($id: ID!) {
+  tokens(where: { id: $id }) {
+    owner {
+      id
+    }
   }
 }

@@ -1,11 +1,12 @@
 import { AxiosError } from 'axios'
 import { Message } from 'discord.js'
 import { PROJECTBOT_UTM } from './APIBots/utils'
+
+import { ensOrAddress } from './APIBots/utils'
 import {
   getProjectInvocations,
   getTokenOwnerAddress,
-} from '../Utils/parseArtBlocksAPI'
-import { ensOrAddress } from './APIBots/utils'
+} from '../GraphQL/Subgraph/querySubgraph'
 
 const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')

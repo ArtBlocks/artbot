@@ -25,6 +25,8 @@ export type Account = {
   projectsCreated?: Maybe<Array<Project>>;
   /** Projects the account owns tokens from */
   projectsOwned?: Maybe<Array<AccountProject>>;
+  /** Receipts for the account, on minters with settlement */
+  receipts?: Maybe<Array<Receipt>>;
   tokens?: Maybe<Array<Token>>;
   /** Contracts the account is whitelisted on */
   whitelistedOn?: Maybe<Array<Whitelisting>>;
@@ -46,6 +48,15 @@ export type AccountProjectsOwnedArgs = {
   orderDirection?: InputMaybe<OrderDirection>;
   skip?: InputMaybe<Scalars['Int']>;
   where?: InputMaybe<AccountProject_Filter>;
+};
+
+
+export type AccountReceiptsArgs = {
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<Receipt_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<Receipt_Filter>;
 };
 
 
@@ -98,6 +109,7 @@ export type AccountProject_Filter = {
   account_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
   account_starts_with?: InputMaybe<Scalars['String']>;
   account_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  and?: InputMaybe<Array<InputMaybe<AccountProject_Filter>>>;
   count?: InputMaybe<Scalars['Int']>;
   count_gt?: InputMaybe<Scalars['Int']>;
   count_gte?: InputMaybe<Scalars['Int']>;
@@ -114,6 +126,7 @@ export type AccountProject_Filter = {
   id_lte?: InputMaybe<Scalars['ID']>;
   id_not?: InputMaybe<Scalars['ID']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  or?: InputMaybe<Array<InputMaybe<AccountProject_Filter>>>;
   project?: InputMaybe<Scalars['String']>;
   project_?: InputMaybe<Project_Filter>;
   project_contains?: InputMaybe<Scalars['String']>;
@@ -139,14 +152,57 @@ export type AccountProject_Filter = {
 
 export enum AccountProject_OrderBy {
   Account = 'account',
+  AccountId = 'account__id',
   Count = 'count',
   Id = 'id',
-  Project = 'project'
+  Project = 'project',
+  ProjectActivatedAt = 'project__activatedAt',
+  ProjectActive = 'project__active',
+  ProjectAdditionalPayee = 'project__additionalPayee',
+  ProjectAdditionalPayeePercentage = 'project__additionalPayeePercentage',
+  ProjectAdditionalPayeeSecondarySalesAddress = 'project__additionalPayeeSecondarySalesAddress',
+  ProjectAdditionalPayeeSecondarySalesPercentage = 'project__additionalPayeeSecondarySalesPercentage',
+  ProjectArtistAddress = 'project__artistAddress',
+  ProjectArtistName = 'project__artistName',
+  ProjectAspectRatio = 'project__aspectRatio',
+  ProjectBaseIpfsUri = 'project__baseIpfsUri',
+  ProjectBaseUri = 'project__baseUri',
+  ProjectComplete = 'project__complete',
+  ProjectCompletedAt = 'project__completedAt',
+  ProjectCreatedAt = 'project__createdAt',
+  ProjectCurationStatus = 'project__curationStatus',
+  ProjectCurrencyAddress = 'project__currencyAddress',
+  ProjectCurrencySymbol = 'project__currencySymbol',
+  ProjectDescription = 'project__description',
+  ProjectDynamic = 'project__dynamic',
+  ProjectExternalAssetDependenciesLocked = 'project__externalAssetDependenciesLocked',
+  ProjectExternalAssetDependencyCount = 'project__externalAssetDependencyCount',
+  ProjectId = 'project__id',
+  ProjectInvocations = 'project__invocations',
+  ProjectIpfsHash = 'project__ipfsHash',
+  ProjectLicense = 'project__license',
+  ProjectLocked = 'project__locked',
+  ProjectMaxInvocations = 'project__maxInvocations',
+  ProjectName = 'project__name',
+  ProjectPaused = 'project__paused',
+  ProjectPricePerTokenInWei = 'project__pricePerTokenInWei',
+  ProjectProjectId = 'project__projectId',
+  ProjectRoyaltyPercentage = 'project__royaltyPercentage',
+  ProjectScript = 'project__script',
+  ProjectScriptCount = 'project__scriptCount',
+  ProjectScriptJson = 'project__scriptJSON',
+  ProjectScriptTypeAndVersion = 'project__scriptTypeAndVersion',
+  ProjectScriptUpdatedAt = 'project__scriptUpdatedAt',
+  ProjectUpdatedAt = 'project__updatedAt',
+  ProjectUseHashString = 'project__useHashString',
+  ProjectUseIpfs = 'project__useIpfs',
+  ProjectWebsite = 'project__website'
 }
 
 export type Account_Filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<Account_Filter>>>;
   id?: InputMaybe<Scalars['ID']>;
   id_gt?: InputMaybe<Scalars['ID']>;
   id_gte?: InputMaybe<Scalars['ID']>;
@@ -155,8 +211,10 @@ export type Account_Filter = {
   id_lte?: InputMaybe<Scalars['ID']>;
   id_not?: InputMaybe<Scalars['ID']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  or?: InputMaybe<Array<InputMaybe<Account_Filter>>>;
   projectsCreated_?: InputMaybe<Project_Filter>;
   projectsOwned_?: InputMaybe<AccountProject_Filter>;
+  receipts_?: InputMaybe<Receipt_Filter>;
   tokens_?: InputMaybe<Token_Filter>;
   whitelistedOn_?: InputMaybe<Whitelisting_Filter>;
 };
@@ -165,6 +223,7 @@ export enum Account_OrderBy {
   Id = 'id',
   ProjectsCreated = 'projectsCreated',
   ProjectsOwned = 'projectsOwned',
+  Receipts = 'receipts',
   Tokens = 'tokens',
   WhitelistedOn = 'whitelistedOn'
 }
@@ -182,15 +241,26 @@ export type Block_Height = {
 export type Contract = {
   __typename?: 'Contract';
   admin: Scalars['Bytes'];
+  /** Automatically approve all artist split proposals (used on V3 Engine contracts) */
+  autoApproveArtistSplitProposals?: Maybe<Scalars['Boolean']>;
   createdAt: Scalars['BigInt'];
   /** Curation registry contract address */
   curationRegistry?: Maybe<Scalars['Bytes']>;
   /** Dependency registry contract address */
-  dependencyRegistry?: Maybe<Scalars['Bytes']>;
+  dependencyRegistry?: Maybe<DependencyRegistry>;
+  /** Address that receives primary sales platform fees, only for V3_Engine contracts */
+  enginePlatformProviderAddress?: Maybe<Scalars['Bytes']>;
+  /** Percentage of primary sales allocated to the platform, only for V3_Engine contracts */
+  enginePlatformProviderPercentage?: Maybe<Scalars['BigInt']>;
+  /** Address that receives secondary sales platform royalties, only for V3_Engine contracts */
+  enginePlatformProviderSecondarySalesAddress?: Maybe<Scalars['Bytes']>;
+  /** Basis points of secondary sales allocated to the platform, only for V3_Engine contracts */
+  enginePlatformProviderSecondarySalesBPS?: Maybe<Scalars['BigInt']>;
+  /** Unique identifier made up of the contract address */
   id: Scalars['ID'];
   /** List of contracts that are allowed to mint */
   mintWhitelisted: Array<Scalars['Bytes']>;
-  /** Associated minter filter (if applicable) */
+  /** Associated minter filter (if being indexed) - not always indexed for Engine contracts */
   minterFilter?: Maybe<MinterFilter>;
   /** New projects forbidden (can only be true on V3+ contracts) */
   newProjectsForbidden: Scalars['Boolean'];
@@ -201,6 +271,8 @@ export type Contract = {
   projects?: Maybe<Array<Project>>;
   /** Randomizer contract used to generate token hashes */
   randomizerContract?: Maybe<Scalars['Bytes']>;
+  /** Latest engine registry that this contract is registered with, if any (used for indexing purposes) */
+  registeredOn?: Maybe<EngineRegistry>;
   /** Address that receives primary sales platform fees */
   renderProviderAddress: Scalars['Bytes'];
   /** Percentage of primary sales allocated to the platform */
@@ -250,10 +322,19 @@ export type Contract_Filter = {
   _change_block?: InputMaybe<BlockChangedFilter>;
   admin?: InputMaybe<Scalars['Bytes']>;
   admin_contains?: InputMaybe<Scalars['Bytes']>;
+  admin_gt?: InputMaybe<Scalars['Bytes']>;
+  admin_gte?: InputMaybe<Scalars['Bytes']>;
   admin_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  admin_lt?: InputMaybe<Scalars['Bytes']>;
+  admin_lte?: InputMaybe<Scalars['Bytes']>;
   admin_not?: InputMaybe<Scalars['Bytes']>;
   admin_not_contains?: InputMaybe<Scalars['Bytes']>;
   admin_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  and?: InputMaybe<Array<InputMaybe<Contract_Filter>>>;
+  autoApproveArtistSplitProposals?: InputMaybe<Scalars['Boolean']>;
+  autoApproveArtistSplitProposals_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  autoApproveArtistSplitProposals_not?: InputMaybe<Scalars['Boolean']>;
+  autoApproveArtistSplitProposals_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
   createdAt?: InputMaybe<Scalars['BigInt']>;
   createdAt_gt?: InputMaybe<Scalars['BigInt']>;
   createdAt_gte?: InputMaybe<Scalars['BigInt']>;
@@ -264,16 +345,71 @@ export type Contract_Filter = {
   createdAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   curationRegistry?: InputMaybe<Scalars['Bytes']>;
   curationRegistry_contains?: InputMaybe<Scalars['Bytes']>;
+  curationRegistry_gt?: InputMaybe<Scalars['Bytes']>;
+  curationRegistry_gte?: InputMaybe<Scalars['Bytes']>;
   curationRegistry_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  curationRegistry_lt?: InputMaybe<Scalars['Bytes']>;
+  curationRegistry_lte?: InputMaybe<Scalars['Bytes']>;
   curationRegistry_not?: InputMaybe<Scalars['Bytes']>;
   curationRegistry_not_contains?: InputMaybe<Scalars['Bytes']>;
   curationRegistry_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  dependencyRegistry?: InputMaybe<Scalars['Bytes']>;
-  dependencyRegistry_contains?: InputMaybe<Scalars['Bytes']>;
-  dependencyRegistry_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  dependencyRegistry_not?: InputMaybe<Scalars['Bytes']>;
-  dependencyRegistry_not_contains?: InputMaybe<Scalars['Bytes']>;
-  dependencyRegistry_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  dependencyRegistry?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_?: InputMaybe<DependencyRegistry_Filter>;
+  dependencyRegistry_contains?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_contains_nocase?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_ends_with?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_gt?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_gte?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_in?: InputMaybe<Array<Scalars['String']>>;
+  dependencyRegistry_lt?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_lte?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_not?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_not_contains?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_not_ends_with?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_not_in?: InputMaybe<Array<Scalars['String']>>;
+  dependencyRegistry_not_starts_with?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_starts_with?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  enginePlatformProviderAddress?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderAddress_gte?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  enginePlatformProviderAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderAddress_lte?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderAddress_not?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  enginePlatformProviderPercentage?: InputMaybe<Scalars['BigInt']>;
+  enginePlatformProviderPercentage_gt?: InputMaybe<Scalars['BigInt']>;
+  enginePlatformProviderPercentage_gte?: InputMaybe<Scalars['BigInt']>;
+  enginePlatformProviderPercentage_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  enginePlatformProviderPercentage_lt?: InputMaybe<Scalars['BigInt']>;
+  enginePlatformProviderPercentage_lte?: InputMaybe<Scalars['BigInt']>;
+  enginePlatformProviderPercentage_not?: InputMaybe<Scalars['BigInt']>;
+  enginePlatformProviderPercentage_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  enginePlatformProviderSecondarySalesAddress?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderSecondarySalesAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderSecondarySalesAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderSecondarySalesAddress_gte?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderSecondarySalesAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  enginePlatformProviderSecondarySalesAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderSecondarySalesAddress_lte?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderSecondarySalesAddress_not?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderSecondarySalesAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
+  enginePlatformProviderSecondarySalesAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  enginePlatformProviderSecondarySalesBPS?: InputMaybe<Scalars['BigInt']>;
+  enginePlatformProviderSecondarySalesBPS_gt?: InputMaybe<Scalars['BigInt']>;
+  enginePlatformProviderSecondarySalesBPS_gte?: InputMaybe<Scalars['BigInt']>;
+  enginePlatformProviderSecondarySalesBPS_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  enginePlatformProviderSecondarySalesBPS_lt?: InputMaybe<Scalars['BigInt']>;
+  enginePlatformProviderSecondarySalesBPS_lte?: InputMaybe<Scalars['BigInt']>;
+  enginePlatformProviderSecondarySalesBPS_not?: InputMaybe<Scalars['BigInt']>;
+  enginePlatformProviderSecondarySalesBPS_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   id?: InputMaybe<Scalars['ID']>;
   id_gt?: InputMaybe<Scalars['ID']>;
   id_gte?: InputMaybe<Scalars['ID']>;
@@ -321,6 +457,7 @@ export type Contract_Filter = {
   nextProjectId_lte?: InputMaybe<Scalars['BigInt']>;
   nextProjectId_not?: InputMaybe<Scalars['BigInt']>;
   nextProjectId_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  or?: InputMaybe<Array<InputMaybe<Contract_Filter>>>;
   preferredArweaveGateway?: InputMaybe<Scalars['String']>;
   preferredArweaveGateway_contains?: InputMaybe<Scalars['String']>;
   preferredArweaveGateway_contains_nocase?: InputMaybe<Scalars['String']>;
@@ -364,13 +501,42 @@ export type Contract_Filter = {
   projects_?: InputMaybe<Project_Filter>;
   randomizerContract?: InputMaybe<Scalars['Bytes']>;
   randomizerContract_contains?: InputMaybe<Scalars['Bytes']>;
+  randomizerContract_gt?: InputMaybe<Scalars['Bytes']>;
+  randomizerContract_gte?: InputMaybe<Scalars['Bytes']>;
   randomizerContract_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  randomizerContract_lt?: InputMaybe<Scalars['Bytes']>;
+  randomizerContract_lte?: InputMaybe<Scalars['Bytes']>;
   randomizerContract_not?: InputMaybe<Scalars['Bytes']>;
   randomizerContract_not_contains?: InputMaybe<Scalars['Bytes']>;
   randomizerContract_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  registeredOn?: InputMaybe<Scalars['String']>;
+  registeredOn_?: InputMaybe<EngineRegistry_Filter>;
+  registeredOn_contains?: InputMaybe<Scalars['String']>;
+  registeredOn_contains_nocase?: InputMaybe<Scalars['String']>;
+  registeredOn_ends_with?: InputMaybe<Scalars['String']>;
+  registeredOn_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  registeredOn_gt?: InputMaybe<Scalars['String']>;
+  registeredOn_gte?: InputMaybe<Scalars['String']>;
+  registeredOn_in?: InputMaybe<Array<Scalars['String']>>;
+  registeredOn_lt?: InputMaybe<Scalars['String']>;
+  registeredOn_lte?: InputMaybe<Scalars['String']>;
+  registeredOn_not?: InputMaybe<Scalars['String']>;
+  registeredOn_not_contains?: InputMaybe<Scalars['String']>;
+  registeredOn_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  registeredOn_not_ends_with?: InputMaybe<Scalars['String']>;
+  registeredOn_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  registeredOn_not_in?: InputMaybe<Array<Scalars['String']>>;
+  registeredOn_not_starts_with?: InputMaybe<Scalars['String']>;
+  registeredOn_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  registeredOn_starts_with?: InputMaybe<Scalars['String']>;
+  registeredOn_starts_with_nocase?: InputMaybe<Scalars['String']>;
   renderProviderAddress?: InputMaybe<Scalars['Bytes']>;
   renderProviderAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  renderProviderAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  renderProviderAddress_gte?: InputMaybe<Scalars['Bytes']>;
   renderProviderAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  renderProviderAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  renderProviderAddress_lte?: InputMaybe<Scalars['Bytes']>;
   renderProviderAddress_not?: InputMaybe<Scalars['Bytes']>;
   renderProviderAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
   renderProviderAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -384,7 +550,11 @@ export type Contract_Filter = {
   renderProviderPercentage_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   renderProviderSecondarySalesAddress?: InputMaybe<Scalars['Bytes']>;
   renderProviderSecondarySalesAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  renderProviderSecondarySalesAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  renderProviderSecondarySalesAddress_gte?: InputMaybe<Scalars['Bytes']>;
   renderProviderSecondarySalesAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  renderProviderSecondarySalesAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  renderProviderSecondarySalesAddress_lte?: InputMaybe<Scalars['Bytes']>;
   renderProviderSecondarySalesAddress_not?: InputMaybe<Scalars['Bytes']>;
   renderProviderSecondarySalesAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
   renderProviderSecondarySalesAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -414,18 +584,30 @@ export type Contract_Filter = {
 
 export enum Contract_OrderBy {
   Admin = 'admin',
+  AutoApproveArtistSplitProposals = 'autoApproveArtistSplitProposals',
   CreatedAt = 'createdAt',
   CurationRegistry = 'curationRegistry',
   DependencyRegistry = 'dependencyRegistry',
+  DependencyRegistryId = 'dependencyRegistry__id',
+  DependencyRegistryOwner = 'dependencyRegistry__owner',
+  DependencyRegistryUpdatedAt = 'dependencyRegistry__updatedAt',
+  EnginePlatformProviderAddress = 'enginePlatformProviderAddress',
+  EnginePlatformProviderPercentage = 'enginePlatformProviderPercentage',
+  EnginePlatformProviderSecondarySalesAddress = 'enginePlatformProviderSecondarySalesAddress',
+  EnginePlatformProviderSecondarySalesBps = 'enginePlatformProviderSecondarySalesBPS',
   Id = 'id',
   MintWhitelisted = 'mintWhitelisted',
   MinterFilter = 'minterFilter',
+  MinterFilterId = 'minterFilter__id',
+  MinterFilterUpdatedAt = 'minterFilter__updatedAt',
   NewProjectsForbidden = 'newProjectsForbidden',
   NextProjectId = 'nextProjectId',
   PreferredArweaveGateway = 'preferredArweaveGateway',
   PreferredIpfsGateway = 'preferredIPFSGateway',
   Projects = 'projects',
   RandomizerContract = 'randomizerContract',
+  RegisteredOn = 'registeredOn',
+  RegisteredOnId = 'registeredOn__id',
   RenderProviderAddress = 'renderProviderAddress',
   RenderProviderPercentage = 'renderProviderPercentage',
   RenderProviderSecondarySalesAddress = 'renderProviderSecondarySalesAddress',
@@ -444,7 +626,642 @@ export enum CoreType {
   /** Art Blocks Engine & Partner cores */
   GenArt721CoreV2 = 'GenArt721CoreV2',
   /** Third Art Blocks flagship core */
-  GenArt721CoreV3 = 'GenArt721CoreV3'
+  GenArt721CoreV3 = 'GenArt721CoreV3',
+  /** V3 Derivative - Art Blocks Engine core */
+  GenArt721CoreV3Engine = 'GenArt721CoreV3_Engine',
+  /** V3 Derivative - Art Blocks Engine Flex core */
+  GenArt721CoreV3EngineFlex = 'GenArt721CoreV3_Engine_Flex'
+}
+
+export type Dependency = {
+  __typename?: 'Dependency';
+  /** Number of additional CDNs for this dependency */
+  additionalCDNCount: Scalars['BigInt'];
+  /** Additional CDNs for this dependency */
+  additionalCDNs: Array<DependencyAdditionalCdn>;
+  /** Number of additional repositories for this dependency */
+  additionalRepositories: Array<DependencyAdditionalRepository>;
+  /** Additional repositories for this dependency */
+  additionalRepositoryCount: Scalars['BigInt'];
+  /** Depenency registry contract that this dependency is registered on */
+  dependencyRegistry: DependencyRegistry;
+  /** Unique identifier made up of dependency name and version separated by an @ symbol (e.g. p5js@1.0.0) */
+  id: Scalars['ID'];
+  /** Preffered CDN for this dependency */
+  preferredCDN: Scalars['String'];
+  /** Preffered repository for this dependency */
+  preferredRepository: Scalars['String'];
+  /** Reference website for this dependency (e.g. https://p5js.org) */
+  referenceWebsite: Scalars['String'];
+  /** Concatenated string of all scripts for this dependency */
+  script?: Maybe<Scalars['String']>;
+  /** Number of on-chain scripts for this dependency */
+  scriptCount: Scalars['BigInt'];
+  /** List of on-chain scripts that for this dependency */
+  scripts: Array<DependencyScript>;
+  /** Timestamp of last update */
+  updatedAt: Scalars['BigInt'];
+};
+
+
+export type DependencyAdditionalCdNsArgs = {
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<DependencyAdditionalCdn_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<DependencyAdditionalCdn_Filter>;
+};
+
+
+export type DependencyAdditionalRepositoriesArgs = {
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<DependencyAdditionalRepository_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<DependencyAdditionalRepository_Filter>;
+};
+
+
+export type DependencyScriptsArgs = {
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<DependencyScript_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<DependencyScript_Filter>;
+};
+
+export type DependencyAdditionalCdn = {
+  __typename?: 'DependencyAdditionalCDN';
+  /** URL of the CDN */
+  cdn: Scalars['String'];
+  /** Dependency this additional CDN belongs to */
+  dependency: Dependency;
+  /** Unique identifier made up of dependency id and index */
+  id: Scalars['ID'];
+  /** Index of this additional CDN */
+  index: Scalars['BigInt'];
+};
+
+export type DependencyAdditionalCdn_Filter = {
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<DependencyAdditionalCdn_Filter>>>;
+  cdn?: InputMaybe<Scalars['String']>;
+  cdn_contains?: InputMaybe<Scalars['String']>;
+  cdn_contains_nocase?: InputMaybe<Scalars['String']>;
+  cdn_ends_with?: InputMaybe<Scalars['String']>;
+  cdn_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  cdn_gt?: InputMaybe<Scalars['String']>;
+  cdn_gte?: InputMaybe<Scalars['String']>;
+  cdn_in?: InputMaybe<Array<Scalars['String']>>;
+  cdn_lt?: InputMaybe<Scalars['String']>;
+  cdn_lte?: InputMaybe<Scalars['String']>;
+  cdn_not?: InputMaybe<Scalars['String']>;
+  cdn_not_contains?: InputMaybe<Scalars['String']>;
+  cdn_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  cdn_not_ends_with?: InputMaybe<Scalars['String']>;
+  cdn_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  cdn_not_in?: InputMaybe<Array<Scalars['String']>>;
+  cdn_not_starts_with?: InputMaybe<Scalars['String']>;
+  cdn_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  cdn_starts_with?: InputMaybe<Scalars['String']>;
+  cdn_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  dependency?: InputMaybe<Scalars['String']>;
+  dependency_?: InputMaybe<Dependency_Filter>;
+  dependency_contains?: InputMaybe<Scalars['String']>;
+  dependency_contains_nocase?: InputMaybe<Scalars['String']>;
+  dependency_ends_with?: InputMaybe<Scalars['String']>;
+  dependency_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  dependency_gt?: InputMaybe<Scalars['String']>;
+  dependency_gte?: InputMaybe<Scalars['String']>;
+  dependency_in?: InputMaybe<Array<Scalars['String']>>;
+  dependency_lt?: InputMaybe<Scalars['String']>;
+  dependency_lte?: InputMaybe<Scalars['String']>;
+  dependency_not?: InputMaybe<Scalars['String']>;
+  dependency_not_contains?: InputMaybe<Scalars['String']>;
+  dependency_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  dependency_not_ends_with?: InputMaybe<Scalars['String']>;
+  dependency_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  dependency_not_in?: InputMaybe<Array<Scalars['String']>>;
+  dependency_not_starts_with?: InputMaybe<Scalars['String']>;
+  dependency_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  dependency_starts_with?: InputMaybe<Scalars['String']>;
+  dependency_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  id?: InputMaybe<Scalars['ID']>;
+  id_gt?: InputMaybe<Scalars['ID']>;
+  id_gte?: InputMaybe<Scalars['ID']>;
+  id_in?: InputMaybe<Array<Scalars['ID']>>;
+  id_lt?: InputMaybe<Scalars['ID']>;
+  id_lte?: InputMaybe<Scalars['ID']>;
+  id_not?: InputMaybe<Scalars['ID']>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  index?: InputMaybe<Scalars['BigInt']>;
+  index_gt?: InputMaybe<Scalars['BigInt']>;
+  index_gte?: InputMaybe<Scalars['BigInt']>;
+  index_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  index_lt?: InputMaybe<Scalars['BigInt']>;
+  index_lte?: InputMaybe<Scalars['BigInt']>;
+  index_not?: InputMaybe<Scalars['BigInt']>;
+  index_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  or?: InputMaybe<Array<InputMaybe<DependencyAdditionalCdn_Filter>>>;
+};
+
+export enum DependencyAdditionalCdn_OrderBy {
+  Cdn = 'cdn',
+  Dependency = 'dependency',
+  DependencyAdditionalCdnCount = 'dependency__additionalCDNCount',
+  DependencyAdditionalRepositoryCount = 'dependency__additionalRepositoryCount',
+  DependencyId = 'dependency__id',
+  DependencyPreferredCdn = 'dependency__preferredCDN',
+  DependencyPreferredRepository = 'dependency__preferredRepository',
+  DependencyReferenceWebsite = 'dependency__referenceWebsite',
+  DependencyScript = 'dependency__script',
+  DependencyScriptCount = 'dependency__scriptCount',
+  DependencyUpdatedAt = 'dependency__updatedAt',
+  Id = 'id',
+  Index = 'index'
+}
+
+export type DependencyAdditionalRepository = {
+  __typename?: 'DependencyAdditionalRepository';
+  /** Dependency this additional repository belongs to */
+  dependency: Dependency;
+  /** Unique identifier made up of dependency id and index */
+  id: Scalars['ID'];
+  /** Index of this additional repository */
+  index: Scalars['BigInt'];
+  /** URL of the repository */
+  repository: Scalars['String'];
+};
+
+export type DependencyAdditionalRepository_Filter = {
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<DependencyAdditionalRepository_Filter>>>;
+  dependency?: InputMaybe<Scalars['String']>;
+  dependency_?: InputMaybe<Dependency_Filter>;
+  dependency_contains?: InputMaybe<Scalars['String']>;
+  dependency_contains_nocase?: InputMaybe<Scalars['String']>;
+  dependency_ends_with?: InputMaybe<Scalars['String']>;
+  dependency_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  dependency_gt?: InputMaybe<Scalars['String']>;
+  dependency_gte?: InputMaybe<Scalars['String']>;
+  dependency_in?: InputMaybe<Array<Scalars['String']>>;
+  dependency_lt?: InputMaybe<Scalars['String']>;
+  dependency_lte?: InputMaybe<Scalars['String']>;
+  dependency_not?: InputMaybe<Scalars['String']>;
+  dependency_not_contains?: InputMaybe<Scalars['String']>;
+  dependency_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  dependency_not_ends_with?: InputMaybe<Scalars['String']>;
+  dependency_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  dependency_not_in?: InputMaybe<Array<Scalars['String']>>;
+  dependency_not_starts_with?: InputMaybe<Scalars['String']>;
+  dependency_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  dependency_starts_with?: InputMaybe<Scalars['String']>;
+  dependency_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  id?: InputMaybe<Scalars['ID']>;
+  id_gt?: InputMaybe<Scalars['ID']>;
+  id_gte?: InputMaybe<Scalars['ID']>;
+  id_in?: InputMaybe<Array<Scalars['ID']>>;
+  id_lt?: InputMaybe<Scalars['ID']>;
+  id_lte?: InputMaybe<Scalars['ID']>;
+  id_not?: InputMaybe<Scalars['ID']>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  index?: InputMaybe<Scalars['BigInt']>;
+  index_gt?: InputMaybe<Scalars['BigInt']>;
+  index_gte?: InputMaybe<Scalars['BigInt']>;
+  index_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  index_lt?: InputMaybe<Scalars['BigInt']>;
+  index_lte?: InputMaybe<Scalars['BigInt']>;
+  index_not?: InputMaybe<Scalars['BigInt']>;
+  index_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  or?: InputMaybe<Array<InputMaybe<DependencyAdditionalRepository_Filter>>>;
+  repository?: InputMaybe<Scalars['String']>;
+  repository_contains?: InputMaybe<Scalars['String']>;
+  repository_contains_nocase?: InputMaybe<Scalars['String']>;
+  repository_ends_with?: InputMaybe<Scalars['String']>;
+  repository_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  repository_gt?: InputMaybe<Scalars['String']>;
+  repository_gte?: InputMaybe<Scalars['String']>;
+  repository_in?: InputMaybe<Array<Scalars['String']>>;
+  repository_lt?: InputMaybe<Scalars['String']>;
+  repository_lte?: InputMaybe<Scalars['String']>;
+  repository_not?: InputMaybe<Scalars['String']>;
+  repository_not_contains?: InputMaybe<Scalars['String']>;
+  repository_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  repository_not_ends_with?: InputMaybe<Scalars['String']>;
+  repository_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  repository_not_in?: InputMaybe<Array<Scalars['String']>>;
+  repository_not_starts_with?: InputMaybe<Scalars['String']>;
+  repository_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  repository_starts_with?: InputMaybe<Scalars['String']>;
+  repository_starts_with_nocase?: InputMaybe<Scalars['String']>;
+};
+
+export enum DependencyAdditionalRepository_OrderBy {
+  Dependency = 'dependency',
+  DependencyAdditionalCdnCount = 'dependency__additionalCDNCount',
+  DependencyAdditionalRepositoryCount = 'dependency__additionalRepositoryCount',
+  DependencyId = 'dependency__id',
+  DependencyPreferredCdn = 'dependency__preferredCDN',
+  DependencyPreferredRepository = 'dependency__preferredRepository',
+  DependencyReferenceWebsite = 'dependency__referenceWebsite',
+  DependencyScript = 'dependency__script',
+  DependencyScriptCount = 'dependency__scriptCount',
+  DependencyUpdatedAt = 'dependency__updatedAt',
+  Id = 'id',
+  Index = 'index',
+  Repository = 'repository'
+}
+
+export type DependencyRegistry = {
+  __typename?: 'DependencyRegistry';
+  /** List of dependencies that are registered on this registry contract */
+  dependencies?: Maybe<Array<Dependency>>;
+  /** Unique identifier made up of dependency registry contract address */
+  id: Scalars['Bytes'];
+  /** Current owner of this contract */
+  owner: Scalars['Bytes'];
+  /** Core contracts that this registry can provide dependeny overrides for */
+  supportedCoreContracts: Array<Contract>;
+  /** Timestamp of last update */
+  updatedAt: Scalars['BigInt'];
+};
+
+
+export type DependencyRegistryDependenciesArgs = {
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<Dependency_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<Dependency_Filter>;
+};
+
+
+export type DependencyRegistrySupportedCoreContractsArgs = {
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<Contract_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<Contract_Filter>;
+};
+
+export type DependencyRegistry_Filter = {
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<DependencyRegistry_Filter>>>;
+  dependencies_?: InputMaybe<Dependency_Filter>;
+  id?: InputMaybe<Scalars['Bytes']>;
+  id_contains?: InputMaybe<Scalars['Bytes']>;
+  id_gt?: InputMaybe<Scalars['Bytes']>;
+  id_gte?: InputMaybe<Scalars['Bytes']>;
+  id_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_lt?: InputMaybe<Scalars['Bytes']>;
+  id_lte?: InputMaybe<Scalars['Bytes']>;
+  id_not?: InputMaybe<Scalars['Bytes']>;
+  id_not_contains?: InputMaybe<Scalars['Bytes']>;
+  id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  or?: InputMaybe<Array<InputMaybe<DependencyRegistry_Filter>>>;
+  owner?: InputMaybe<Scalars['Bytes']>;
+  owner_contains?: InputMaybe<Scalars['Bytes']>;
+  owner_gt?: InputMaybe<Scalars['Bytes']>;
+  owner_gte?: InputMaybe<Scalars['Bytes']>;
+  owner_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  owner_lt?: InputMaybe<Scalars['Bytes']>;
+  owner_lte?: InputMaybe<Scalars['Bytes']>;
+  owner_not?: InputMaybe<Scalars['Bytes']>;
+  owner_not_contains?: InputMaybe<Scalars['Bytes']>;
+  owner_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  supportedCoreContracts_?: InputMaybe<Contract_Filter>;
+  updatedAt?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_gt?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_gte?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  updatedAt_lt?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_lte?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_not?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+};
+
+export enum DependencyRegistry_OrderBy {
+  Dependencies = 'dependencies',
+  Id = 'id',
+  Owner = 'owner',
+  SupportedCoreContracts = 'supportedCoreContracts',
+  UpdatedAt = 'updatedAt'
+}
+
+export type DependencyScript = {
+  __typename?: 'DependencyScript';
+  /** Address of the bytecode storage contract for this script */
+  address: Scalars['Bytes'];
+  /** Dependency this script belongs to */
+  dependency: Dependency;
+  /** Unique identifier made up of dependency id and index */
+  id: Scalars['ID'];
+  /** Index of this script */
+  index: Scalars['BigInt'];
+  /** Contents of script */
+  script: Scalars['String'];
+};
+
+export type DependencyScript_Filter = {
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  address?: InputMaybe<Scalars['Bytes']>;
+  address_contains?: InputMaybe<Scalars['Bytes']>;
+  address_gt?: InputMaybe<Scalars['Bytes']>;
+  address_gte?: InputMaybe<Scalars['Bytes']>;
+  address_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  address_lt?: InputMaybe<Scalars['Bytes']>;
+  address_lte?: InputMaybe<Scalars['Bytes']>;
+  address_not?: InputMaybe<Scalars['Bytes']>;
+  address_not_contains?: InputMaybe<Scalars['Bytes']>;
+  address_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  and?: InputMaybe<Array<InputMaybe<DependencyScript_Filter>>>;
+  dependency?: InputMaybe<Scalars['String']>;
+  dependency_?: InputMaybe<Dependency_Filter>;
+  dependency_contains?: InputMaybe<Scalars['String']>;
+  dependency_contains_nocase?: InputMaybe<Scalars['String']>;
+  dependency_ends_with?: InputMaybe<Scalars['String']>;
+  dependency_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  dependency_gt?: InputMaybe<Scalars['String']>;
+  dependency_gte?: InputMaybe<Scalars['String']>;
+  dependency_in?: InputMaybe<Array<Scalars['String']>>;
+  dependency_lt?: InputMaybe<Scalars['String']>;
+  dependency_lte?: InputMaybe<Scalars['String']>;
+  dependency_not?: InputMaybe<Scalars['String']>;
+  dependency_not_contains?: InputMaybe<Scalars['String']>;
+  dependency_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  dependency_not_ends_with?: InputMaybe<Scalars['String']>;
+  dependency_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  dependency_not_in?: InputMaybe<Array<Scalars['String']>>;
+  dependency_not_starts_with?: InputMaybe<Scalars['String']>;
+  dependency_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  dependency_starts_with?: InputMaybe<Scalars['String']>;
+  dependency_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  id?: InputMaybe<Scalars['ID']>;
+  id_gt?: InputMaybe<Scalars['ID']>;
+  id_gte?: InputMaybe<Scalars['ID']>;
+  id_in?: InputMaybe<Array<Scalars['ID']>>;
+  id_lt?: InputMaybe<Scalars['ID']>;
+  id_lte?: InputMaybe<Scalars['ID']>;
+  id_not?: InputMaybe<Scalars['ID']>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  index?: InputMaybe<Scalars['BigInt']>;
+  index_gt?: InputMaybe<Scalars['BigInt']>;
+  index_gte?: InputMaybe<Scalars['BigInt']>;
+  index_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  index_lt?: InputMaybe<Scalars['BigInt']>;
+  index_lte?: InputMaybe<Scalars['BigInt']>;
+  index_not?: InputMaybe<Scalars['BigInt']>;
+  index_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  or?: InputMaybe<Array<InputMaybe<DependencyScript_Filter>>>;
+  script?: InputMaybe<Scalars['String']>;
+  script_contains?: InputMaybe<Scalars['String']>;
+  script_contains_nocase?: InputMaybe<Scalars['String']>;
+  script_ends_with?: InputMaybe<Scalars['String']>;
+  script_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  script_gt?: InputMaybe<Scalars['String']>;
+  script_gte?: InputMaybe<Scalars['String']>;
+  script_in?: InputMaybe<Array<Scalars['String']>>;
+  script_lt?: InputMaybe<Scalars['String']>;
+  script_lte?: InputMaybe<Scalars['String']>;
+  script_not?: InputMaybe<Scalars['String']>;
+  script_not_contains?: InputMaybe<Scalars['String']>;
+  script_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  script_not_ends_with?: InputMaybe<Scalars['String']>;
+  script_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  script_not_in?: InputMaybe<Array<Scalars['String']>>;
+  script_not_starts_with?: InputMaybe<Scalars['String']>;
+  script_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  script_starts_with?: InputMaybe<Scalars['String']>;
+  script_starts_with_nocase?: InputMaybe<Scalars['String']>;
+};
+
+export enum DependencyScript_OrderBy {
+  Address = 'address',
+  Dependency = 'dependency',
+  DependencyAdditionalCdnCount = 'dependency__additionalCDNCount',
+  DependencyAdditionalRepositoryCount = 'dependency__additionalRepositoryCount',
+  DependencyId = 'dependency__id',
+  DependencyPreferredCdn = 'dependency__preferredCDN',
+  DependencyPreferredRepository = 'dependency__preferredRepository',
+  DependencyReferenceWebsite = 'dependency__referenceWebsite',
+  DependencyScript = 'dependency__script',
+  DependencyScriptCount = 'dependency__scriptCount',
+  DependencyUpdatedAt = 'dependency__updatedAt',
+  Id = 'id',
+  Index = 'index',
+  Script = 'script'
+}
+
+export type Dependency_Filter = {
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  additionalCDNCount?: InputMaybe<Scalars['BigInt']>;
+  additionalCDNCount_gt?: InputMaybe<Scalars['BigInt']>;
+  additionalCDNCount_gte?: InputMaybe<Scalars['BigInt']>;
+  additionalCDNCount_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  additionalCDNCount_lt?: InputMaybe<Scalars['BigInt']>;
+  additionalCDNCount_lte?: InputMaybe<Scalars['BigInt']>;
+  additionalCDNCount_not?: InputMaybe<Scalars['BigInt']>;
+  additionalCDNCount_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  additionalCDNs_?: InputMaybe<DependencyAdditionalCdn_Filter>;
+  additionalRepositories_?: InputMaybe<DependencyAdditionalRepository_Filter>;
+  additionalRepositoryCount?: InputMaybe<Scalars['BigInt']>;
+  additionalRepositoryCount_gt?: InputMaybe<Scalars['BigInt']>;
+  additionalRepositoryCount_gte?: InputMaybe<Scalars['BigInt']>;
+  additionalRepositoryCount_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  additionalRepositoryCount_lt?: InputMaybe<Scalars['BigInt']>;
+  additionalRepositoryCount_lte?: InputMaybe<Scalars['BigInt']>;
+  additionalRepositoryCount_not?: InputMaybe<Scalars['BigInt']>;
+  additionalRepositoryCount_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  and?: InputMaybe<Array<InputMaybe<Dependency_Filter>>>;
+  dependencyRegistry?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_?: InputMaybe<DependencyRegistry_Filter>;
+  dependencyRegistry_contains?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_contains_nocase?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_ends_with?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_gt?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_gte?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_in?: InputMaybe<Array<Scalars['String']>>;
+  dependencyRegistry_lt?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_lte?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_not?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_not_contains?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_not_ends_with?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_not_in?: InputMaybe<Array<Scalars['String']>>;
+  dependencyRegistry_not_starts_with?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_starts_with?: InputMaybe<Scalars['String']>;
+  dependencyRegistry_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  id?: InputMaybe<Scalars['ID']>;
+  id_gt?: InputMaybe<Scalars['ID']>;
+  id_gte?: InputMaybe<Scalars['ID']>;
+  id_in?: InputMaybe<Array<Scalars['ID']>>;
+  id_lt?: InputMaybe<Scalars['ID']>;
+  id_lte?: InputMaybe<Scalars['ID']>;
+  id_not?: InputMaybe<Scalars['ID']>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  or?: InputMaybe<Array<InputMaybe<Dependency_Filter>>>;
+  preferredCDN?: InputMaybe<Scalars['String']>;
+  preferredCDN_contains?: InputMaybe<Scalars['String']>;
+  preferredCDN_contains_nocase?: InputMaybe<Scalars['String']>;
+  preferredCDN_ends_with?: InputMaybe<Scalars['String']>;
+  preferredCDN_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  preferredCDN_gt?: InputMaybe<Scalars['String']>;
+  preferredCDN_gte?: InputMaybe<Scalars['String']>;
+  preferredCDN_in?: InputMaybe<Array<Scalars['String']>>;
+  preferredCDN_lt?: InputMaybe<Scalars['String']>;
+  preferredCDN_lte?: InputMaybe<Scalars['String']>;
+  preferredCDN_not?: InputMaybe<Scalars['String']>;
+  preferredCDN_not_contains?: InputMaybe<Scalars['String']>;
+  preferredCDN_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  preferredCDN_not_ends_with?: InputMaybe<Scalars['String']>;
+  preferredCDN_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  preferredCDN_not_in?: InputMaybe<Array<Scalars['String']>>;
+  preferredCDN_not_starts_with?: InputMaybe<Scalars['String']>;
+  preferredCDN_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  preferredCDN_starts_with?: InputMaybe<Scalars['String']>;
+  preferredCDN_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  preferredRepository?: InputMaybe<Scalars['String']>;
+  preferredRepository_contains?: InputMaybe<Scalars['String']>;
+  preferredRepository_contains_nocase?: InputMaybe<Scalars['String']>;
+  preferredRepository_ends_with?: InputMaybe<Scalars['String']>;
+  preferredRepository_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  preferredRepository_gt?: InputMaybe<Scalars['String']>;
+  preferredRepository_gte?: InputMaybe<Scalars['String']>;
+  preferredRepository_in?: InputMaybe<Array<Scalars['String']>>;
+  preferredRepository_lt?: InputMaybe<Scalars['String']>;
+  preferredRepository_lte?: InputMaybe<Scalars['String']>;
+  preferredRepository_not?: InputMaybe<Scalars['String']>;
+  preferredRepository_not_contains?: InputMaybe<Scalars['String']>;
+  preferredRepository_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  preferredRepository_not_ends_with?: InputMaybe<Scalars['String']>;
+  preferredRepository_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  preferredRepository_not_in?: InputMaybe<Array<Scalars['String']>>;
+  preferredRepository_not_starts_with?: InputMaybe<Scalars['String']>;
+  preferredRepository_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  preferredRepository_starts_with?: InputMaybe<Scalars['String']>;
+  preferredRepository_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  referenceWebsite?: InputMaybe<Scalars['String']>;
+  referenceWebsite_contains?: InputMaybe<Scalars['String']>;
+  referenceWebsite_contains_nocase?: InputMaybe<Scalars['String']>;
+  referenceWebsite_ends_with?: InputMaybe<Scalars['String']>;
+  referenceWebsite_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  referenceWebsite_gt?: InputMaybe<Scalars['String']>;
+  referenceWebsite_gte?: InputMaybe<Scalars['String']>;
+  referenceWebsite_in?: InputMaybe<Array<Scalars['String']>>;
+  referenceWebsite_lt?: InputMaybe<Scalars['String']>;
+  referenceWebsite_lte?: InputMaybe<Scalars['String']>;
+  referenceWebsite_not?: InputMaybe<Scalars['String']>;
+  referenceWebsite_not_contains?: InputMaybe<Scalars['String']>;
+  referenceWebsite_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  referenceWebsite_not_ends_with?: InputMaybe<Scalars['String']>;
+  referenceWebsite_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  referenceWebsite_not_in?: InputMaybe<Array<Scalars['String']>>;
+  referenceWebsite_not_starts_with?: InputMaybe<Scalars['String']>;
+  referenceWebsite_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  referenceWebsite_starts_with?: InputMaybe<Scalars['String']>;
+  referenceWebsite_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  script?: InputMaybe<Scalars['String']>;
+  scriptCount?: InputMaybe<Scalars['BigInt']>;
+  scriptCount_gt?: InputMaybe<Scalars['BigInt']>;
+  scriptCount_gte?: InputMaybe<Scalars['BigInt']>;
+  scriptCount_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  scriptCount_lt?: InputMaybe<Scalars['BigInt']>;
+  scriptCount_lte?: InputMaybe<Scalars['BigInt']>;
+  scriptCount_not?: InputMaybe<Scalars['BigInt']>;
+  scriptCount_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  script_contains?: InputMaybe<Scalars['String']>;
+  script_contains_nocase?: InputMaybe<Scalars['String']>;
+  script_ends_with?: InputMaybe<Scalars['String']>;
+  script_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  script_gt?: InputMaybe<Scalars['String']>;
+  script_gte?: InputMaybe<Scalars['String']>;
+  script_in?: InputMaybe<Array<Scalars['String']>>;
+  script_lt?: InputMaybe<Scalars['String']>;
+  script_lte?: InputMaybe<Scalars['String']>;
+  script_not?: InputMaybe<Scalars['String']>;
+  script_not_contains?: InputMaybe<Scalars['String']>;
+  script_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  script_not_ends_with?: InputMaybe<Scalars['String']>;
+  script_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  script_not_in?: InputMaybe<Array<Scalars['String']>>;
+  script_not_starts_with?: InputMaybe<Scalars['String']>;
+  script_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  script_starts_with?: InputMaybe<Scalars['String']>;
+  script_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  scripts_?: InputMaybe<DependencyScript_Filter>;
+  updatedAt?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_gt?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_gte?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  updatedAt_lt?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_lte?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_not?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+};
+
+export enum Dependency_OrderBy {
+  AdditionalCdnCount = 'additionalCDNCount',
+  AdditionalCdNs = 'additionalCDNs',
+  AdditionalRepositories = 'additionalRepositories',
+  AdditionalRepositoryCount = 'additionalRepositoryCount',
+  DependencyRegistry = 'dependencyRegistry',
+  DependencyRegistryId = 'dependencyRegistry__id',
+  DependencyRegistryOwner = 'dependencyRegistry__owner',
+  DependencyRegistryUpdatedAt = 'dependencyRegistry__updatedAt',
+  Id = 'id',
+  PreferredCdn = 'preferredCDN',
+  PreferredRepository = 'preferredRepository',
+  ReferenceWebsite = 'referenceWebsite',
+  Script = 'script',
+  ScriptCount = 'scriptCount',
+  Scripts = 'scripts',
+  UpdatedAt = 'updatedAt'
+}
+
+export type EngineRegistry = {
+  __typename?: 'EngineRegistry';
+  /** Unique identifier made up of the Engine Registry's contract address */
+  id: Scalars['ID'];
+  /** Core contracts that are registered on this Engine Registry, when this is most recent Engine Registry to add the contract */
+  registeredContracts?: Maybe<Array<Contract>>;
+};
+
+
+export type EngineRegistryRegisteredContractsArgs = {
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<Contract_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<Contract_Filter>;
+};
+
+export type EngineRegistry_Filter = {
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<EngineRegistry_Filter>>>;
+  id?: InputMaybe<Scalars['ID']>;
+  id_gt?: InputMaybe<Scalars['ID']>;
+  id_gte?: InputMaybe<Scalars['ID']>;
+  id_in?: InputMaybe<Array<Scalars['ID']>>;
+  id_lt?: InputMaybe<Scalars['ID']>;
+  id_lte?: InputMaybe<Scalars['ID']>;
+  id_not?: InputMaybe<Scalars['ID']>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  or?: InputMaybe<Array<InputMaybe<EngineRegistry_Filter>>>;
+  registeredContracts_?: InputMaybe<Contract_Filter>;
+};
+
+export enum EngineRegistry_OrderBy {
+  Id = 'id',
+  RegisteredContracts = 'registeredContracts'
 }
 
 export enum Exchange {
@@ -473,9 +1290,20 @@ export type Minter = {
   minimumHalfLifeInSeconds?: Maybe<Scalars['BigInt']>;
   /** Associated Minter Filter */
   minterFilter: MinterFilter;
-  /** Minter type */
-  type: MinterType;
+  /** Receipts for this minter, only for minters with settlement */
+  receipts?: Maybe<Array<Receipt>>;
+  /** Minter type - String if minter returns it's type, empty string otherwise */
+  type: Scalars['String'];
   updatedAt: Scalars['BigInt'];
+};
+
+
+export type MinterReceiptsArgs = {
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<Receipt_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<Receipt_Filter>;
 };
 
 export type MinterFilter = {
@@ -512,6 +1340,7 @@ export type MinterFilterMinterAllowlistArgs = {
 export type MinterFilter_Filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<MinterFilter_Filter>>>;
   associatedMinters_?: InputMaybe<Minter_Filter>;
   coreContract?: InputMaybe<Scalars['String']>;
   coreContract_?: InputMaybe<Contract_Filter>;
@@ -549,6 +1378,7 @@ export type MinterFilter_Filter = {
   minterAllowlist_not?: InputMaybe<Array<Scalars['String']>>;
   minterAllowlist_not_contains?: InputMaybe<Array<Scalars['String']>>;
   minterAllowlist_not_contains_nocase?: InputMaybe<Array<Scalars['String']>>;
+  or?: InputMaybe<Array<InputMaybe<MinterFilter_Filter>>>;
   updatedAt?: InputMaybe<Scalars['BigInt']>;
   updatedAt_gt?: InputMaybe<Scalars['BigInt']>;
   updatedAt_gte?: InputMaybe<Scalars['BigInt']>;
@@ -562,34 +1392,35 @@ export type MinterFilter_Filter = {
 export enum MinterFilter_OrderBy {
   AssociatedMinters = 'associatedMinters',
   CoreContract = 'coreContract',
+  CoreContractAdmin = 'coreContract__admin',
+  CoreContractAutoApproveArtistSplitProposals = 'coreContract__autoApproveArtistSplitProposals',
+  CoreContractCreatedAt = 'coreContract__createdAt',
+  CoreContractCurationRegistry = 'coreContract__curationRegistry',
+  CoreContractEnginePlatformProviderAddress = 'coreContract__enginePlatformProviderAddress',
+  CoreContractEnginePlatformProviderPercentage = 'coreContract__enginePlatformProviderPercentage',
+  CoreContractEnginePlatformProviderSecondarySalesAddress = 'coreContract__enginePlatformProviderSecondarySalesAddress',
+  CoreContractEnginePlatformProviderSecondarySalesBps = 'coreContract__enginePlatformProviderSecondarySalesBPS',
+  CoreContractId = 'coreContract__id',
+  CoreContractNewProjectsForbidden = 'coreContract__newProjectsForbidden',
+  CoreContractNextProjectId = 'coreContract__nextProjectId',
+  CoreContractPreferredArweaveGateway = 'coreContract__preferredArweaveGateway',
+  CoreContractPreferredIpfsGateway = 'coreContract__preferredIPFSGateway',
+  CoreContractRandomizerContract = 'coreContract__randomizerContract',
+  CoreContractRenderProviderAddress = 'coreContract__renderProviderAddress',
+  CoreContractRenderProviderPercentage = 'coreContract__renderProviderPercentage',
+  CoreContractRenderProviderSecondarySalesAddress = 'coreContract__renderProviderSecondarySalesAddress',
+  CoreContractRenderProviderSecondarySalesBps = 'coreContract__renderProviderSecondarySalesBPS',
+  CoreContractType = 'coreContract__type',
+  CoreContractUpdatedAt = 'coreContract__updatedAt',
   Id = 'id',
   MinterAllowlist = 'minterAllowlist',
   UpdatedAt = 'updatedAt'
 }
 
-export enum MinterType {
-  MinterDaExpV0 = 'MinterDAExpV0',
-  MinterDaExpV1 = 'MinterDAExpV1',
-  MinterDaExpV2 = 'MinterDAExpV2',
-  MinterDaLinV0 = 'MinterDALinV0',
-  MinterDaLinV1 = 'MinterDALinV1',
-  MinterDaLinV2 = 'MinterDALinV2',
-  MinterHolderV0 = 'MinterHolderV0',
-  MinterHolderV1 = 'MinterHolderV1',
-  MinterMerkleV0 = 'MinterMerkleV0',
-  MinterMerkleV1 = 'MinterMerkleV1',
-  MinterMerkleV2 = 'MinterMerkleV2',
-  MinterSetPriceErc20V0 = 'MinterSetPriceERC20V0',
-  MinterSetPriceErc20V1 = 'MinterSetPriceERC20V1',
-  MinterSetPriceErc20V2 = 'MinterSetPriceERC20V2',
-  MinterSetPriceV0 = 'MinterSetPriceV0',
-  MinterSetPriceV1 = 'MinterSetPriceV1',
-  MinterSetPriceV2 = 'MinterSetPriceV2'
-}
-
 export type Minter_Filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<Minter_Filter>>>;
   coreContract?: InputMaybe<Scalars['String']>;
   coreContract_?: InputMaybe<Contract_Filter>;
   coreContract_contains?: InputMaybe<Scalars['String']>;
@@ -684,10 +1515,28 @@ export type Minter_Filter = {
   minterFilter_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
   minterFilter_starts_with?: InputMaybe<Scalars['String']>;
   minterFilter_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  type?: InputMaybe<MinterType>;
-  type_in?: InputMaybe<Array<MinterType>>;
-  type_not?: InputMaybe<MinterType>;
-  type_not_in?: InputMaybe<Array<MinterType>>;
+  or?: InputMaybe<Array<InputMaybe<Minter_Filter>>>;
+  receipts_?: InputMaybe<Receipt_Filter>;
+  type?: InputMaybe<Scalars['String']>;
+  type_contains?: InputMaybe<Scalars['String']>;
+  type_contains_nocase?: InputMaybe<Scalars['String']>;
+  type_ends_with?: InputMaybe<Scalars['String']>;
+  type_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  type_gt?: InputMaybe<Scalars['String']>;
+  type_gte?: InputMaybe<Scalars['String']>;
+  type_in?: InputMaybe<Array<Scalars['String']>>;
+  type_lt?: InputMaybe<Scalars['String']>;
+  type_lte?: InputMaybe<Scalars['String']>;
+  type_not?: InputMaybe<Scalars['String']>;
+  type_not_contains?: InputMaybe<Scalars['String']>;
+  type_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  type_not_ends_with?: InputMaybe<Scalars['String']>;
+  type_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  type_not_in?: InputMaybe<Array<Scalars['String']>>;
+  type_not_starts_with?: InputMaybe<Scalars['String']>;
+  type_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  type_starts_with?: InputMaybe<Scalars['String']>;
+  type_starts_with_nocase?: InputMaybe<Scalars['String']>;
   updatedAt?: InputMaybe<Scalars['BigInt']>;
   updatedAt_gt?: InputMaybe<Scalars['BigInt']>;
   updatedAt_gte?: InputMaybe<Scalars['BigInt']>;
@@ -700,12 +1549,35 @@ export type Minter_Filter = {
 
 export enum Minter_OrderBy {
   CoreContract = 'coreContract',
+  CoreContractAdmin = 'coreContract__admin',
+  CoreContractAutoApproveArtistSplitProposals = 'coreContract__autoApproveArtistSplitProposals',
+  CoreContractCreatedAt = 'coreContract__createdAt',
+  CoreContractCurationRegistry = 'coreContract__curationRegistry',
+  CoreContractEnginePlatformProviderAddress = 'coreContract__enginePlatformProviderAddress',
+  CoreContractEnginePlatformProviderPercentage = 'coreContract__enginePlatformProviderPercentage',
+  CoreContractEnginePlatformProviderSecondarySalesAddress = 'coreContract__enginePlatformProviderSecondarySalesAddress',
+  CoreContractEnginePlatformProviderSecondarySalesBps = 'coreContract__enginePlatformProviderSecondarySalesBPS',
+  CoreContractId = 'coreContract__id',
+  CoreContractNewProjectsForbidden = 'coreContract__newProjectsForbidden',
+  CoreContractNextProjectId = 'coreContract__nextProjectId',
+  CoreContractPreferredArweaveGateway = 'coreContract__preferredArweaveGateway',
+  CoreContractPreferredIpfsGateway = 'coreContract__preferredIPFSGateway',
+  CoreContractRandomizerContract = 'coreContract__randomizerContract',
+  CoreContractRenderProviderAddress = 'coreContract__renderProviderAddress',
+  CoreContractRenderProviderPercentage = 'coreContract__renderProviderPercentage',
+  CoreContractRenderProviderSecondarySalesAddress = 'coreContract__renderProviderSecondarySalesAddress',
+  CoreContractRenderProviderSecondarySalesBps = 'coreContract__renderProviderSecondarySalesBPS',
+  CoreContractType = 'coreContract__type',
+  CoreContractUpdatedAt = 'coreContract__updatedAt',
   ExtraMinterDetails = 'extraMinterDetails',
   Id = 'id',
   MaximumHalfLifeInSeconds = 'maximumHalfLifeInSeconds',
   MinimumAuctionLengthInSeconds = 'minimumAuctionLengthInSeconds',
   MinimumHalfLifeInSeconds = 'minimumHalfLifeInSeconds',
   MinterFilter = 'minterFilter',
+  MinterFilterId = 'minterFilter__id',
+  MinterFilterUpdatedAt = 'minterFilter__updatedAt',
+  Receipts = 'receipts',
   Type = 'type',
   UpdatedAt = 'updatedAt'
 }
@@ -742,6 +1614,7 @@ export enum PaymentType {
 export type Payment_Filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<Payment_Filter>>>;
   id?: InputMaybe<Scalars['ID']>;
   id_gt?: InputMaybe<Scalars['ID']>;
   id_gte?: InputMaybe<Scalars['ID']>;
@@ -750,9 +1623,14 @@ export type Payment_Filter = {
   id_lte?: InputMaybe<Scalars['ID']>;
   id_not?: InputMaybe<Scalars['ID']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  or?: InputMaybe<Array<InputMaybe<Payment_Filter>>>;
   paymentToken?: InputMaybe<Scalars['Bytes']>;
   paymentToken_contains?: InputMaybe<Scalars['Bytes']>;
+  paymentToken_gt?: InputMaybe<Scalars['Bytes']>;
+  paymentToken_gte?: InputMaybe<Scalars['Bytes']>;
   paymentToken_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  paymentToken_lt?: InputMaybe<Scalars['Bytes']>;
+  paymentToken_lte?: InputMaybe<Scalars['Bytes']>;
   paymentToken_not?: InputMaybe<Scalars['Bytes']>;
   paymentToken_not_contains?: InputMaybe<Scalars['Bytes']>;
   paymentToken_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -770,7 +1648,11 @@ export type Payment_Filter = {
   price_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   recipient?: InputMaybe<Scalars['Bytes']>;
   recipient_contains?: InputMaybe<Scalars['Bytes']>;
+  recipient_gt?: InputMaybe<Scalars['Bytes']>;
+  recipient_gte?: InputMaybe<Scalars['Bytes']>;
   recipient_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  recipient_lt?: InputMaybe<Scalars['Bytes']>;
+  recipient_lte?: InputMaybe<Scalars['Bytes']>;
   recipient_not?: InputMaybe<Scalars['Bytes']>;
   recipient_not_contains?: InputMaybe<Scalars['Bytes']>;
   recipient_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -803,7 +1685,17 @@ export enum Payment_OrderBy {
   PaymentType = 'paymentType',
   Price = 'price',
   Recipient = 'recipient',
-  Sale = 'sale'
+  Sale = 'sale',
+  SaleBlockNumber = 'sale__blockNumber',
+  SaleBlockTimestamp = 'sale__blockTimestamp',
+  SaleBuyer = 'sale__buyer',
+  SaleExchange = 'sale__exchange',
+  SaleId = 'sale__id',
+  SaleIsPrivate = 'sale__isPrivate',
+  SaleSaleType = 'sale__saleType',
+  SaleSeller = 'sale__seller',
+  SaleSummaryTokensSold = 'sale__summaryTokensSold',
+  SaleTxHash = 'sale__txHash'
 }
 
 export type Project = {
@@ -859,7 +1751,7 @@ export type Project = {
   license?: Maybe<Scalars['String']>;
   /** For V3 and-on, this field is null, and projects lock 4 weeks after `completedAt`. Once the project is locked its script may never be updated again. */
   locked?: Maybe<Scalars['Boolean']>;
-  /** Maximum number of invocations allowed for the project */
+  /** Maximum number of invocations allowed for the project. Note that minter contracts may additionally limit a project's maxInvocations on a specific minter. */
   maxInvocations: Scalars['BigInt'];
   /** Minter configuration for this project (not implemented prior to minter filters) */
   minterConfiguration?: Maybe<ProjectMinterConfiguration>;
@@ -874,6 +1766,8 @@ export type Project = {
   projectId: Scalars['BigInt'];
   /** Proposed Artist addresses and payment split percentages */
   proposedArtistAddressesAndSplits?: Maybe<ProposedArtistAddressesAndSplit>;
+  /** Receipts for this project, only on minters with settlement */
+  receipts?: Maybe<Array<Receipt>>;
   /** Artist/additional payee royalty percentage */
   royaltyPercentage?: Maybe<Scalars['BigInt']>;
   /** Lookup table to get the Sale history of the project */
@@ -919,6 +1813,15 @@ export type ProjectOwnersArgs = {
 };
 
 
+export type ProjectReceiptsArgs = {
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<Receipt_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<Receipt_Filter>;
+};
+
+
 export type ProjectSaleLookupTablesArgs = {
   first?: InputMaybe<Scalars['Int']>;
   orderBy?: InputMaybe<SaleLookupTable_OrderBy>;
@@ -947,8 +1850,12 @@ export type ProjectTokensArgs = {
 
 export type ProjectExternalAssetDependency = {
   __typename?: 'ProjectExternalAssetDependency';
-  /** The dependency cid */
+  /** Address of the bytecode storage contract for this asset if it is of type ONCHAIN */
+  bytecodeAddress?: Maybe<Scalars['Bytes']>;
+  /** The dependency cid. This will be an empty string assets of type ONCHAIN. */
   cid: Scalars['String'];
+  /** The asset data if it is onchain */
+  data?: Maybe<Scalars['String']>;
   /** The dependency type */
   dependencyType: ProjectExternalAssetDependencyType;
   /** Unique identifier made up of projectId-index */
@@ -963,12 +1870,25 @@ export enum ProjectExternalAssetDependencyType {
   /** Asset hosted on Arweave */
   Arweave = 'ARWEAVE',
   /** Asset hosted on IPFS */
-  Ipfs = 'IPFS'
+  Ipfs = 'IPFS',
+  /** Asset hosted on chain */
+  Onchain = 'ONCHAIN'
 }
 
 export type ProjectExternalAssetDependency_Filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<ProjectExternalAssetDependency_Filter>>>;
+  bytecodeAddress?: InputMaybe<Scalars['Bytes']>;
+  bytecodeAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  bytecodeAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  bytecodeAddress_gte?: InputMaybe<Scalars['Bytes']>;
+  bytecodeAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  bytecodeAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  bytecodeAddress_lte?: InputMaybe<Scalars['Bytes']>;
+  bytecodeAddress_not?: InputMaybe<Scalars['Bytes']>;
+  bytecodeAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
+  bytecodeAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
   cid?: InputMaybe<Scalars['String']>;
   cid_contains?: InputMaybe<Scalars['String']>;
   cid_contains_nocase?: InputMaybe<Scalars['String']>;
@@ -989,6 +1909,26 @@ export type ProjectExternalAssetDependency_Filter = {
   cid_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
   cid_starts_with?: InputMaybe<Scalars['String']>;
   cid_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  data?: InputMaybe<Scalars['String']>;
+  data_contains?: InputMaybe<Scalars['String']>;
+  data_contains_nocase?: InputMaybe<Scalars['String']>;
+  data_ends_with?: InputMaybe<Scalars['String']>;
+  data_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  data_gt?: InputMaybe<Scalars['String']>;
+  data_gte?: InputMaybe<Scalars['String']>;
+  data_in?: InputMaybe<Array<Scalars['String']>>;
+  data_lt?: InputMaybe<Scalars['String']>;
+  data_lte?: InputMaybe<Scalars['String']>;
+  data_not?: InputMaybe<Scalars['String']>;
+  data_not_contains?: InputMaybe<Scalars['String']>;
+  data_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  data_not_ends_with?: InputMaybe<Scalars['String']>;
+  data_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  data_not_in?: InputMaybe<Array<Scalars['String']>>;
+  data_not_starts_with?: InputMaybe<Scalars['String']>;
+  data_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  data_starts_with?: InputMaybe<Scalars['String']>;
+  data_starts_with_nocase?: InputMaybe<Scalars['String']>;
   dependencyType?: InputMaybe<ProjectExternalAssetDependencyType>;
   dependencyType_in?: InputMaybe<Array<ProjectExternalAssetDependencyType>>;
   dependencyType_not?: InputMaybe<ProjectExternalAssetDependencyType>;
@@ -1009,6 +1949,7 @@ export type ProjectExternalAssetDependency_Filter = {
   index_lte?: InputMaybe<Scalars['BigInt']>;
   index_not?: InputMaybe<Scalars['BigInt']>;
   index_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  or?: InputMaybe<Array<InputMaybe<ProjectExternalAssetDependency_Filter>>>;
   project?: InputMaybe<Scalars['String']>;
   project_?: InputMaybe<Project_Filter>;
   project_contains?: InputMaybe<Scalars['String']>;
@@ -1033,11 +1974,54 @@ export type ProjectExternalAssetDependency_Filter = {
 };
 
 export enum ProjectExternalAssetDependency_OrderBy {
+  BytecodeAddress = 'bytecodeAddress',
   Cid = 'cid',
+  Data = 'data',
   DependencyType = 'dependencyType',
   Id = 'id',
   Index = 'index',
-  Project = 'project'
+  Project = 'project',
+  ProjectActivatedAt = 'project__activatedAt',
+  ProjectActive = 'project__active',
+  ProjectAdditionalPayee = 'project__additionalPayee',
+  ProjectAdditionalPayeePercentage = 'project__additionalPayeePercentage',
+  ProjectAdditionalPayeeSecondarySalesAddress = 'project__additionalPayeeSecondarySalesAddress',
+  ProjectAdditionalPayeeSecondarySalesPercentage = 'project__additionalPayeeSecondarySalesPercentage',
+  ProjectArtistAddress = 'project__artistAddress',
+  ProjectArtistName = 'project__artistName',
+  ProjectAspectRatio = 'project__aspectRatio',
+  ProjectBaseIpfsUri = 'project__baseIpfsUri',
+  ProjectBaseUri = 'project__baseUri',
+  ProjectComplete = 'project__complete',
+  ProjectCompletedAt = 'project__completedAt',
+  ProjectCreatedAt = 'project__createdAt',
+  ProjectCurationStatus = 'project__curationStatus',
+  ProjectCurrencyAddress = 'project__currencyAddress',
+  ProjectCurrencySymbol = 'project__currencySymbol',
+  ProjectDescription = 'project__description',
+  ProjectDynamic = 'project__dynamic',
+  ProjectExternalAssetDependenciesLocked = 'project__externalAssetDependenciesLocked',
+  ProjectExternalAssetDependencyCount = 'project__externalAssetDependencyCount',
+  ProjectId = 'project__id',
+  ProjectInvocations = 'project__invocations',
+  ProjectIpfsHash = 'project__ipfsHash',
+  ProjectLicense = 'project__license',
+  ProjectLocked = 'project__locked',
+  ProjectMaxInvocations = 'project__maxInvocations',
+  ProjectName = 'project__name',
+  ProjectPaused = 'project__paused',
+  ProjectPricePerTokenInWei = 'project__pricePerTokenInWei',
+  ProjectProjectId = 'project__projectId',
+  ProjectRoyaltyPercentage = 'project__royaltyPercentage',
+  ProjectScript = 'project__script',
+  ProjectScriptCount = 'project__scriptCount',
+  ProjectScriptJson = 'project__scriptJSON',
+  ProjectScriptTypeAndVersion = 'project__scriptTypeAndVersion',
+  ProjectScriptUpdatedAt = 'project__scriptUpdatedAt',
+  ProjectUpdatedAt = 'project__updatedAt',
+  ProjectUseHashString = 'project__useHashString',
+  ProjectUseIpfs = 'project__useIpfs',
+  ProjectWebsite = 'project__website'
 }
 
 export type ProjectMinterConfiguration = {
@@ -1056,6 +2040,8 @@ export type ProjectMinterConfiguration = {
   halfLifeSeconds?: Maybe<Scalars['BigInt']>;
   /** Unique identifier made up of minter contract address-projectId */
   id: Scalars['ID'];
+  /** Maximum number of invocations allowed for the project (on the minter). If less than than a project's maximum invocations defined on a core contract, the minter contract will limit this project's maximum invocations */
+  maxInvocations?: Maybe<Scalars['BigInt']>;
   /** The associated minter */
   minter: Minter;
   /** true if project's token price has been configured on minter */
@@ -1073,6 +2059,7 @@ export type ProjectMinterConfiguration = {
 export type ProjectMinterConfiguration_Filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<ProjectMinterConfiguration_Filter>>>;
   basePrice?: InputMaybe<Scalars['BigInt']>;
   basePrice_gt?: InputMaybe<Scalars['BigInt']>;
   basePrice_gte?: InputMaybe<Scalars['BigInt']>;
@@ -1083,7 +2070,11 @@ export type ProjectMinterConfiguration_Filter = {
   basePrice_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   currencyAddress?: InputMaybe<Scalars['Bytes']>;
   currencyAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  currencyAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  currencyAddress_gte?: InputMaybe<Scalars['Bytes']>;
   currencyAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  currencyAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  currencyAddress_lte?: InputMaybe<Scalars['Bytes']>;
   currencyAddress_not?: InputMaybe<Scalars['Bytes']>;
   currencyAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
   currencyAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -1151,6 +2142,14 @@ export type ProjectMinterConfiguration_Filter = {
   id_lte?: InputMaybe<Scalars['ID']>;
   id_not?: InputMaybe<Scalars['ID']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  maxInvocations?: InputMaybe<Scalars['BigInt']>;
+  maxInvocations_gt?: InputMaybe<Scalars['BigInt']>;
+  maxInvocations_gte?: InputMaybe<Scalars['BigInt']>;
+  maxInvocations_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  maxInvocations_lt?: InputMaybe<Scalars['BigInt']>;
+  maxInvocations_lte?: InputMaybe<Scalars['BigInt']>;
+  maxInvocations_not?: InputMaybe<Scalars['BigInt']>;
+  maxInvocations_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   minter?: InputMaybe<Scalars['String']>;
   minter_?: InputMaybe<Minter_Filter>;
   minter_contains?: InputMaybe<Scalars['String']>;
@@ -1172,6 +2171,7 @@ export type ProjectMinterConfiguration_Filter = {
   minter_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
   minter_starts_with?: InputMaybe<Scalars['String']>;
   minter_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  or?: InputMaybe<Array<InputMaybe<ProjectMinterConfiguration_Filter>>>;
   priceIsConfigured?: InputMaybe<Scalars['Boolean']>;
   priceIsConfigured_in?: InputMaybe<Array<Scalars['Boolean']>>;
   priceIsConfigured_not?: InputMaybe<Scalars['Boolean']>;
@@ -1227,9 +2227,58 @@ export enum ProjectMinterConfiguration_OrderBy {
   ExtraMinterDetails = 'extraMinterDetails',
   HalfLifeSeconds = 'halfLifeSeconds',
   Id = 'id',
+  MaxInvocations = 'maxInvocations',
   Minter = 'minter',
+  MinterExtraMinterDetails = 'minter__extraMinterDetails',
+  MinterId = 'minter__id',
+  MinterMaximumHalfLifeInSeconds = 'minter__maximumHalfLifeInSeconds',
+  MinterMinimumAuctionLengthInSeconds = 'minter__minimumAuctionLengthInSeconds',
+  MinterMinimumHalfLifeInSeconds = 'minter__minimumHalfLifeInSeconds',
+  MinterType = 'minter__type',
+  MinterUpdatedAt = 'minter__updatedAt',
   PriceIsConfigured = 'priceIsConfigured',
   Project = 'project',
+  ProjectActivatedAt = 'project__activatedAt',
+  ProjectActive = 'project__active',
+  ProjectAdditionalPayee = 'project__additionalPayee',
+  ProjectAdditionalPayeePercentage = 'project__additionalPayeePercentage',
+  ProjectAdditionalPayeeSecondarySalesAddress = 'project__additionalPayeeSecondarySalesAddress',
+  ProjectAdditionalPayeeSecondarySalesPercentage = 'project__additionalPayeeSecondarySalesPercentage',
+  ProjectArtistAddress = 'project__artistAddress',
+  ProjectArtistName = 'project__artistName',
+  ProjectAspectRatio = 'project__aspectRatio',
+  ProjectBaseIpfsUri = 'project__baseIpfsUri',
+  ProjectBaseUri = 'project__baseUri',
+  ProjectComplete = 'project__complete',
+  ProjectCompletedAt = 'project__completedAt',
+  ProjectCreatedAt = 'project__createdAt',
+  ProjectCurationStatus = 'project__curationStatus',
+  ProjectCurrencyAddress = 'project__currencyAddress',
+  ProjectCurrencySymbol = 'project__currencySymbol',
+  ProjectDescription = 'project__description',
+  ProjectDynamic = 'project__dynamic',
+  ProjectExternalAssetDependenciesLocked = 'project__externalAssetDependenciesLocked',
+  ProjectExternalAssetDependencyCount = 'project__externalAssetDependencyCount',
+  ProjectId = 'project__id',
+  ProjectInvocations = 'project__invocations',
+  ProjectIpfsHash = 'project__ipfsHash',
+  ProjectLicense = 'project__license',
+  ProjectLocked = 'project__locked',
+  ProjectMaxInvocations = 'project__maxInvocations',
+  ProjectName = 'project__name',
+  ProjectPaused = 'project__paused',
+  ProjectPricePerTokenInWei = 'project__pricePerTokenInWei',
+  ProjectProjectId = 'project__projectId',
+  ProjectRoyaltyPercentage = 'project__royaltyPercentage',
+  ProjectScript = 'project__script',
+  ProjectScriptCount = 'project__scriptCount',
+  ProjectScriptJson = 'project__scriptJSON',
+  ProjectScriptTypeAndVersion = 'project__scriptTypeAndVersion',
+  ProjectScriptUpdatedAt = 'project__scriptUpdatedAt',
+  ProjectUpdatedAt = 'project__updatedAt',
+  ProjectUseHashString = 'project__useHashString',
+  ProjectUseIpfs = 'project__useIpfs',
+  ProjectWebsite = 'project__website',
   PurchaseToDisabled = 'purchaseToDisabled',
   StartPrice = 'startPrice',
   StartTime = 'startTime'
@@ -1246,6 +2295,7 @@ export type ProjectScript = {
 export type ProjectScript_Filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<ProjectScript_Filter>>>;
   id?: InputMaybe<Scalars['ID']>;
   id_gt?: InputMaybe<Scalars['ID']>;
   id_gte?: InputMaybe<Scalars['ID']>;
@@ -1262,6 +2312,7 @@ export type ProjectScript_Filter = {
   index_lte?: InputMaybe<Scalars['BigInt']>;
   index_not?: InputMaybe<Scalars['BigInt']>;
   index_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  or?: InputMaybe<Array<InputMaybe<ProjectScript_Filter>>>;
   project?: InputMaybe<Scalars['String']>;
   project_?: InputMaybe<Project_Filter>;
   project_contains?: InputMaybe<Scalars['String']>;
@@ -1309,6 +2360,47 @@ export enum ProjectScript_OrderBy {
   Id = 'id',
   Index = 'index',
   Project = 'project',
+  ProjectActivatedAt = 'project__activatedAt',
+  ProjectActive = 'project__active',
+  ProjectAdditionalPayee = 'project__additionalPayee',
+  ProjectAdditionalPayeePercentage = 'project__additionalPayeePercentage',
+  ProjectAdditionalPayeeSecondarySalesAddress = 'project__additionalPayeeSecondarySalesAddress',
+  ProjectAdditionalPayeeSecondarySalesPercentage = 'project__additionalPayeeSecondarySalesPercentage',
+  ProjectArtistAddress = 'project__artistAddress',
+  ProjectArtistName = 'project__artistName',
+  ProjectAspectRatio = 'project__aspectRatio',
+  ProjectBaseIpfsUri = 'project__baseIpfsUri',
+  ProjectBaseUri = 'project__baseUri',
+  ProjectComplete = 'project__complete',
+  ProjectCompletedAt = 'project__completedAt',
+  ProjectCreatedAt = 'project__createdAt',
+  ProjectCurationStatus = 'project__curationStatus',
+  ProjectCurrencyAddress = 'project__currencyAddress',
+  ProjectCurrencySymbol = 'project__currencySymbol',
+  ProjectDescription = 'project__description',
+  ProjectDynamic = 'project__dynamic',
+  ProjectExternalAssetDependenciesLocked = 'project__externalAssetDependenciesLocked',
+  ProjectExternalAssetDependencyCount = 'project__externalAssetDependencyCount',
+  ProjectId = 'project__id',
+  ProjectInvocations = 'project__invocations',
+  ProjectIpfsHash = 'project__ipfsHash',
+  ProjectLicense = 'project__license',
+  ProjectLocked = 'project__locked',
+  ProjectMaxInvocations = 'project__maxInvocations',
+  ProjectName = 'project__name',
+  ProjectPaused = 'project__paused',
+  ProjectPricePerTokenInWei = 'project__pricePerTokenInWei',
+  ProjectProjectId = 'project__projectId',
+  ProjectRoyaltyPercentage = 'project__royaltyPercentage',
+  ProjectScript = 'project__script',
+  ProjectScriptCount = 'project__scriptCount',
+  ProjectScriptJson = 'project__scriptJSON',
+  ProjectScriptTypeAndVersion = 'project__scriptTypeAndVersion',
+  ProjectScriptUpdatedAt = 'project__scriptUpdatedAt',
+  ProjectUpdatedAt = 'project__updatedAt',
+  ProjectUseHashString = 'project__useHashString',
+  ProjectUseIpfs = 'project__useIpfs',
+  ProjectWebsite = 'project__website',
   Script = 'script'
 }
 
@@ -1338,7 +2430,11 @@ export type Project_Filter = {
   additionalPayeePercentage_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   additionalPayeeSecondarySalesAddress?: InputMaybe<Scalars['Bytes']>;
   additionalPayeeSecondarySalesAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  additionalPayeeSecondarySalesAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  additionalPayeeSecondarySalesAddress_gte?: InputMaybe<Scalars['Bytes']>;
   additionalPayeeSecondarySalesAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  additionalPayeeSecondarySalesAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  additionalPayeeSecondarySalesAddress_lte?: InputMaybe<Scalars['Bytes']>;
   additionalPayeeSecondarySalesAddress_not?: InputMaybe<Scalars['Bytes']>;
   additionalPayeeSecondarySalesAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
   additionalPayeeSecondarySalesAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -1351,14 +2447,23 @@ export type Project_Filter = {
   additionalPayeeSecondarySalesPercentage_not?: InputMaybe<Scalars['BigInt']>;
   additionalPayeeSecondarySalesPercentage_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   additionalPayee_contains?: InputMaybe<Scalars['Bytes']>;
+  additionalPayee_gt?: InputMaybe<Scalars['Bytes']>;
+  additionalPayee_gte?: InputMaybe<Scalars['Bytes']>;
   additionalPayee_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  additionalPayee_lt?: InputMaybe<Scalars['Bytes']>;
+  additionalPayee_lte?: InputMaybe<Scalars['Bytes']>;
   additionalPayee_not?: InputMaybe<Scalars['Bytes']>;
   additionalPayee_not_contains?: InputMaybe<Scalars['Bytes']>;
   additionalPayee_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  and?: InputMaybe<Array<InputMaybe<Project_Filter>>>;
   artist?: InputMaybe<Scalars['String']>;
   artistAddress?: InputMaybe<Scalars['Bytes']>;
   artistAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  artistAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  artistAddress_gte?: InputMaybe<Scalars['Bytes']>;
   artistAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  artistAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  artistAddress_lte?: InputMaybe<Scalars['Bytes']>;
   artistAddress_not?: InputMaybe<Scalars['Bytes']>;
   artistAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
   artistAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -1525,7 +2630,11 @@ export type Project_Filter = {
   curationStatus_starts_with_nocase?: InputMaybe<Scalars['String']>;
   currencyAddress?: InputMaybe<Scalars['Bytes']>;
   currencyAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  currencyAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  currencyAddress_gte?: InputMaybe<Scalars['Bytes']>;
   currencyAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  currencyAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  currencyAddress_lte?: InputMaybe<Scalars['Bytes']>;
   currencyAddress_not?: InputMaybe<Scalars['Bytes']>;
   currencyAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
   currencyAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -1695,6 +2804,7 @@ export type Project_Filter = {
   name_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
   name_starts_with?: InputMaybe<Scalars['String']>;
   name_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  or?: InputMaybe<Array<InputMaybe<Project_Filter>>>;
   owners_?: InputMaybe<AccountProject_Filter>;
   paused?: InputMaybe<Scalars['Boolean']>;
   paused_in?: InputMaybe<Array<Scalars['Boolean']>>;
@@ -1737,6 +2847,7 @@ export type Project_Filter = {
   proposedArtistAddressesAndSplits_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
   proposedArtistAddressesAndSplits_starts_with?: InputMaybe<Scalars['String']>;
   proposedArtistAddressesAndSplits_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  receipts_?: InputMaybe<Receipt_Filter>;
   royaltyPercentage?: InputMaybe<Scalars['BigInt']>;
   royaltyPercentage_gt?: InputMaybe<Scalars['BigInt']>;
   royaltyPercentage_gte?: InputMaybe<Scalars['BigInt']>;
@@ -1872,12 +2983,33 @@ export enum Project_OrderBy {
   Artist = 'artist',
   ArtistAddress = 'artistAddress',
   ArtistName = 'artistName',
+  ArtistId = 'artist__id',
   AspectRatio = 'aspectRatio',
   BaseIpfsUri = 'baseIpfsUri',
   BaseUri = 'baseUri',
   Complete = 'complete',
   CompletedAt = 'completedAt',
   Contract = 'contract',
+  ContractAdmin = 'contract__admin',
+  ContractAutoApproveArtistSplitProposals = 'contract__autoApproveArtistSplitProposals',
+  ContractCreatedAt = 'contract__createdAt',
+  ContractCurationRegistry = 'contract__curationRegistry',
+  ContractEnginePlatformProviderAddress = 'contract__enginePlatformProviderAddress',
+  ContractEnginePlatformProviderPercentage = 'contract__enginePlatformProviderPercentage',
+  ContractEnginePlatformProviderSecondarySalesAddress = 'contract__enginePlatformProviderSecondarySalesAddress',
+  ContractEnginePlatformProviderSecondarySalesBps = 'contract__enginePlatformProviderSecondarySalesBPS',
+  ContractId = 'contract__id',
+  ContractNewProjectsForbidden = 'contract__newProjectsForbidden',
+  ContractNextProjectId = 'contract__nextProjectId',
+  ContractPreferredArweaveGateway = 'contract__preferredArweaveGateway',
+  ContractPreferredIpfsGateway = 'contract__preferredIPFSGateway',
+  ContractRandomizerContract = 'contract__randomizerContract',
+  ContractRenderProviderAddress = 'contract__renderProviderAddress',
+  ContractRenderProviderPercentage = 'contract__renderProviderPercentage',
+  ContractRenderProviderSecondarySalesAddress = 'contract__renderProviderSecondarySalesAddress',
+  ContractRenderProviderSecondarySalesBps = 'contract__renderProviderSecondarySalesBPS',
+  ContractType = 'contract__type',
+  ContractUpdatedAt = 'contract__updatedAt',
   CreatedAt = 'createdAt',
   CurationStatus = 'curationStatus',
   CurrencyAddress = 'currencyAddress',
@@ -1894,12 +3026,32 @@ export enum Project_OrderBy {
   Locked = 'locked',
   MaxInvocations = 'maxInvocations',
   MinterConfiguration = 'minterConfiguration',
+  MinterConfigurationBasePrice = 'minterConfiguration__basePrice',
+  MinterConfigurationCurrencyAddress = 'minterConfiguration__currencyAddress',
+  MinterConfigurationCurrencySymbol = 'minterConfiguration__currencySymbol',
+  MinterConfigurationEndTime = 'minterConfiguration__endTime',
+  MinterConfigurationExtraMinterDetails = 'minterConfiguration__extraMinterDetails',
+  MinterConfigurationHalfLifeSeconds = 'minterConfiguration__halfLifeSeconds',
+  MinterConfigurationId = 'minterConfiguration__id',
+  MinterConfigurationMaxInvocations = 'minterConfiguration__maxInvocations',
+  MinterConfigurationPriceIsConfigured = 'minterConfiguration__priceIsConfigured',
+  MinterConfigurationPurchaseToDisabled = 'minterConfiguration__purchaseToDisabled',
+  MinterConfigurationStartPrice = 'minterConfiguration__startPrice',
+  MinterConfigurationStartTime = 'minterConfiguration__startTime',
   Name = 'name',
   Owners = 'owners',
   Paused = 'paused',
   PricePerTokenInWei = 'pricePerTokenInWei',
   ProjectId = 'projectId',
   ProposedArtistAddressesAndSplits = 'proposedArtistAddressesAndSplits',
+  ProposedArtistAddressesAndSplitsAdditionalPayeePrimarySalesAddress = 'proposedArtistAddressesAndSplits__additionalPayeePrimarySalesAddress',
+  ProposedArtistAddressesAndSplitsAdditionalPayeePrimarySalesPercentage = 'proposedArtistAddressesAndSplits__additionalPayeePrimarySalesPercentage',
+  ProposedArtistAddressesAndSplitsAdditionalPayeeSecondarySalesAddress = 'proposedArtistAddressesAndSplits__additionalPayeeSecondarySalesAddress',
+  ProposedArtistAddressesAndSplitsAdditionalPayeeSecondarySalesPercentage = 'proposedArtistAddressesAndSplits__additionalPayeeSecondarySalesPercentage',
+  ProposedArtistAddressesAndSplitsArtistAddress = 'proposedArtistAddressesAndSplits__artistAddress',
+  ProposedArtistAddressesAndSplitsCreatedAt = 'proposedArtistAddressesAndSplits__createdAt',
+  ProposedArtistAddressesAndSplitsId = 'proposedArtistAddressesAndSplits__id',
+  Receipts = 'receipts',
   RoyaltyPercentage = 'royaltyPercentage',
   SaleLookupTables = 'saleLookupTables',
   Script = 'script',
@@ -1939,7 +3091,11 @@ export type ProposedArtistAddressesAndSplit_Filter = {
   _change_block?: InputMaybe<BlockChangedFilter>;
   additionalPayeePrimarySalesAddress?: InputMaybe<Scalars['Bytes']>;
   additionalPayeePrimarySalesAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  additionalPayeePrimarySalesAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  additionalPayeePrimarySalesAddress_gte?: InputMaybe<Scalars['Bytes']>;
   additionalPayeePrimarySalesAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  additionalPayeePrimarySalesAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  additionalPayeePrimarySalesAddress_lte?: InputMaybe<Scalars['Bytes']>;
   additionalPayeePrimarySalesAddress_not?: InputMaybe<Scalars['Bytes']>;
   additionalPayeePrimarySalesAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
   additionalPayeePrimarySalesAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -1953,7 +3109,11 @@ export type ProposedArtistAddressesAndSplit_Filter = {
   additionalPayeePrimarySalesPercentage_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   additionalPayeeSecondarySalesAddress?: InputMaybe<Scalars['Bytes']>;
   additionalPayeeSecondarySalesAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  additionalPayeeSecondarySalesAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  additionalPayeeSecondarySalesAddress_gte?: InputMaybe<Scalars['Bytes']>;
   additionalPayeeSecondarySalesAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  additionalPayeeSecondarySalesAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  additionalPayeeSecondarySalesAddress_lte?: InputMaybe<Scalars['Bytes']>;
   additionalPayeeSecondarySalesAddress_not?: InputMaybe<Scalars['Bytes']>;
   additionalPayeeSecondarySalesAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
   additionalPayeeSecondarySalesAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -1965,9 +3125,14 @@ export type ProposedArtistAddressesAndSplit_Filter = {
   additionalPayeeSecondarySalesPercentage_lte?: InputMaybe<Scalars['BigInt']>;
   additionalPayeeSecondarySalesPercentage_not?: InputMaybe<Scalars['BigInt']>;
   additionalPayeeSecondarySalesPercentage_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  and?: InputMaybe<Array<InputMaybe<ProposedArtistAddressesAndSplit_Filter>>>;
   artistAddress?: InputMaybe<Scalars['Bytes']>;
   artistAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  artistAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  artistAddress_gte?: InputMaybe<Scalars['Bytes']>;
   artistAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  artistAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  artistAddress_lte?: InputMaybe<Scalars['Bytes']>;
   artistAddress_not?: InputMaybe<Scalars['Bytes']>;
   artistAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
   artistAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -1987,6 +3152,7 @@ export type ProposedArtistAddressesAndSplit_Filter = {
   id_lte?: InputMaybe<Scalars['ID']>;
   id_not?: InputMaybe<Scalars['ID']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  or?: InputMaybe<Array<InputMaybe<ProposedArtistAddressesAndSplit_Filter>>>;
   project?: InputMaybe<Scalars['String']>;
   project_?: InputMaybe<Project_Filter>;
   project_contains?: InputMaybe<Scalars['String']>;
@@ -2018,7 +3184,48 @@ export enum ProposedArtistAddressesAndSplit_OrderBy {
   ArtistAddress = 'artistAddress',
   CreatedAt = 'createdAt',
   Id = 'id',
-  Project = 'project'
+  Project = 'project',
+  ProjectActivatedAt = 'project__activatedAt',
+  ProjectActive = 'project__active',
+  ProjectAdditionalPayee = 'project__additionalPayee',
+  ProjectAdditionalPayeePercentage = 'project__additionalPayeePercentage',
+  ProjectAdditionalPayeeSecondarySalesAddress = 'project__additionalPayeeSecondarySalesAddress',
+  ProjectAdditionalPayeeSecondarySalesPercentage = 'project__additionalPayeeSecondarySalesPercentage',
+  ProjectArtistAddress = 'project__artistAddress',
+  ProjectArtistName = 'project__artistName',
+  ProjectAspectRatio = 'project__aspectRatio',
+  ProjectBaseIpfsUri = 'project__baseIpfsUri',
+  ProjectBaseUri = 'project__baseUri',
+  ProjectComplete = 'project__complete',
+  ProjectCompletedAt = 'project__completedAt',
+  ProjectCreatedAt = 'project__createdAt',
+  ProjectCurationStatus = 'project__curationStatus',
+  ProjectCurrencyAddress = 'project__currencyAddress',
+  ProjectCurrencySymbol = 'project__currencySymbol',
+  ProjectDescription = 'project__description',
+  ProjectDynamic = 'project__dynamic',
+  ProjectExternalAssetDependenciesLocked = 'project__externalAssetDependenciesLocked',
+  ProjectExternalAssetDependencyCount = 'project__externalAssetDependencyCount',
+  ProjectId = 'project__id',
+  ProjectInvocations = 'project__invocations',
+  ProjectIpfsHash = 'project__ipfsHash',
+  ProjectLicense = 'project__license',
+  ProjectLocked = 'project__locked',
+  ProjectMaxInvocations = 'project__maxInvocations',
+  ProjectName = 'project__name',
+  ProjectPaused = 'project__paused',
+  ProjectPricePerTokenInWei = 'project__pricePerTokenInWei',
+  ProjectProjectId = 'project__projectId',
+  ProjectRoyaltyPercentage = 'project__royaltyPercentage',
+  ProjectScript = 'project__script',
+  ProjectScriptCount = 'project__scriptCount',
+  ProjectScriptJson = 'project__scriptJSON',
+  ProjectScriptTypeAndVersion = 'project__scriptTypeAndVersion',
+  ProjectScriptUpdatedAt = 'project__scriptUpdatedAt',
+  ProjectUpdatedAt = 'project__updatedAt',
+  ProjectUseHashString = 'project__useHashString',
+  ProjectUseIpfs = 'project__useIpfs',
+  ProjectWebsite = 'project__website'
 }
 
 export type Query = {
@@ -2031,6 +3238,18 @@ export type Query = {
   accounts: Array<Account>;
   contract?: Maybe<Contract>;
   contracts: Array<Contract>;
+  dependencies: Array<Dependency>;
+  dependency?: Maybe<Dependency>;
+  dependencyAdditionalCDN?: Maybe<DependencyAdditionalCdn>;
+  dependencyAdditionalCDNs: Array<DependencyAdditionalCdn>;
+  dependencyAdditionalRepositories: Array<DependencyAdditionalRepository>;
+  dependencyAdditionalRepository?: Maybe<DependencyAdditionalRepository>;
+  dependencyRegistries: Array<DependencyRegistry>;
+  dependencyRegistry?: Maybe<DependencyRegistry>;
+  dependencyScript?: Maybe<DependencyScript>;
+  dependencyScripts: Array<DependencyScript>;
+  engineRegistries: Array<EngineRegistry>;
+  engineRegistry?: Maybe<EngineRegistry>;
   minter?: Maybe<Minter>;
   minterFilter?: Maybe<MinterFilter>;
   minterFilters: Array<MinterFilter>;
@@ -2047,6 +3266,8 @@ export type Query = {
   projects: Array<Project>;
   proposedArtistAddressesAndSplit?: Maybe<ProposedArtistAddressesAndSplit>;
   proposedArtistAddressesAndSplits: Array<ProposedArtistAddressesAndSplit>;
+  receipt?: Maybe<Receipt>;
+  receipts: Array<Receipt>;
   sale?: Maybe<Sale>;
   saleLookupTable?: Maybe<SaleLookupTable>;
   saleLookupTables: Array<SaleLookupTable>;
@@ -2116,6 +3337,114 @@ export type QueryContractsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
   subgraphError?: _SubgraphErrorPolicy_;
   where?: InputMaybe<Contract_Filter>;
+};
+
+
+export type QueryDependenciesArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<Dependency_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<Dependency_Filter>;
+};
+
+
+export type QueryDependencyArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryDependencyAdditionalCdnArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryDependencyAdditionalCdNsArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<DependencyAdditionalCdn_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<DependencyAdditionalCdn_Filter>;
+};
+
+
+export type QueryDependencyAdditionalRepositoriesArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<DependencyAdditionalRepository_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<DependencyAdditionalRepository_Filter>;
+};
+
+
+export type QueryDependencyAdditionalRepositoryArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryDependencyRegistriesArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<DependencyRegistry_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<DependencyRegistry_Filter>;
+};
+
+
+export type QueryDependencyRegistryArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryDependencyScriptArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryDependencyScriptsArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<DependencyScript_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<DependencyScript_Filter>;
+};
+
+
+export type QueryEngineRegistriesArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<EngineRegistry_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<EngineRegistry_Filter>;
+};
+
+
+export type QueryEngineRegistryArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
 };
 
 
@@ -2263,6 +3592,24 @@ export type QueryProposedArtistAddressesAndSplitsArgs = {
 };
 
 
+export type QueryReceiptArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryReceiptsArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<Receipt_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<Receipt_Filter>;
+};
+
+
 export type QuerySaleArgs = {
   block?: InputMaybe<Block_Height>;
   id: Scalars['ID'];
@@ -2352,6 +3699,184 @@ export type QueryWhitelistingsArgs = {
   where?: InputMaybe<Whitelisting_Filter>;
 };
 
+export type Receipt = {
+  __typename?: 'Receipt';
+  /** The associated account */
+  account: Account;
+  /** Unique identifier made up of minter contract address-projectId-accountAddress */
+  id: Scalars['ID'];
+  /** The associated minter */
+  minter: Minter;
+  /** The total net amount posted (sent to settlement contract) for tokens */
+  netPosted: Scalars['BigInt'];
+  /** The total quantity of tokens purchased on the project */
+  numPurchased: Scalars['BigInt'];
+  /** The associated project */
+  project: Project;
+  updatedAt: Scalars['BigInt'];
+};
+
+export type Receipt_Filter = {
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  account?: InputMaybe<Scalars['String']>;
+  account_?: InputMaybe<Account_Filter>;
+  account_contains?: InputMaybe<Scalars['String']>;
+  account_contains_nocase?: InputMaybe<Scalars['String']>;
+  account_ends_with?: InputMaybe<Scalars['String']>;
+  account_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  account_gt?: InputMaybe<Scalars['String']>;
+  account_gte?: InputMaybe<Scalars['String']>;
+  account_in?: InputMaybe<Array<Scalars['String']>>;
+  account_lt?: InputMaybe<Scalars['String']>;
+  account_lte?: InputMaybe<Scalars['String']>;
+  account_not?: InputMaybe<Scalars['String']>;
+  account_not_contains?: InputMaybe<Scalars['String']>;
+  account_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  account_not_ends_with?: InputMaybe<Scalars['String']>;
+  account_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  account_not_in?: InputMaybe<Array<Scalars['String']>>;
+  account_not_starts_with?: InputMaybe<Scalars['String']>;
+  account_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  account_starts_with?: InputMaybe<Scalars['String']>;
+  account_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  and?: InputMaybe<Array<InputMaybe<Receipt_Filter>>>;
+  id?: InputMaybe<Scalars['ID']>;
+  id_gt?: InputMaybe<Scalars['ID']>;
+  id_gte?: InputMaybe<Scalars['ID']>;
+  id_in?: InputMaybe<Array<Scalars['ID']>>;
+  id_lt?: InputMaybe<Scalars['ID']>;
+  id_lte?: InputMaybe<Scalars['ID']>;
+  id_not?: InputMaybe<Scalars['ID']>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  minter?: InputMaybe<Scalars['String']>;
+  minter_?: InputMaybe<Minter_Filter>;
+  minter_contains?: InputMaybe<Scalars['String']>;
+  minter_contains_nocase?: InputMaybe<Scalars['String']>;
+  minter_ends_with?: InputMaybe<Scalars['String']>;
+  minter_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  minter_gt?: InputMaybe<Scalars['String']>;
+  minter_gte?: InputMaybe<Scalars['String']>;
+  minter_in?: InputMaybe<Array<Scalars['String']>>;
+  minter_lt?: InputMaybe<Scalars['String']>;
+  minter_lte?: InputMaybe<Scalars['String']>;
+  minter_not?: InputMaybe<Scalars['String']>;
+  minter_not_contains?: InputMaybe<Scalars['String']>;
+  minter_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  minter_not_ends_with?: InputMaybe<Scalars['String']>;
+  minter_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  minter_not_in?: InputMaybe<Array<Scalars['String']>>;
+  minter_not_starts_with?: InputMaybe<Scalars['String']>;
+  minter_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  minter_starts_with?: InputMaybe<Scalars['String']>;
+  minter_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  netPosted?: InputMaybe<Scalars['BigInt']>;
+  netPosted_gt?: InputMaybe<Scalars['BigInt']>;
+  netPosted_gte?: InputMaybe<Scalars['BigInt']>;
+  netPosted_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  netPosted_lt?: InputMaybe<Scalars['BigInt']>;
+  netPosted_lte?: InputMaybe<Scalars['BigInt']>;
+  netPosted_not?: InputMaybe<Scalars['BigInt']>;
+  netPosted_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  numPurchased?: InputMaybe<Scalars['BigInt']>;
+  numPurchased_gt?: InputMaybe<Scalars['BigInt']>;
+  numPurchased_gte?: InputMaybe<Scalars['BigInt']>;
+  numPurchased_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  numPurchased_lt?: InputMaybe<Scalars['BigInt']>;
+  numPurchased_lte?: InputMaybe<Scalars['BigInt']>;
+  numPurchased_not?: InputMaybe<Scalars['BigInt']>;
+  numPurchased_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  or?: InputMaybe<Array<InputMaybe<Receipt_Filter>>>;
+  project?: InputMaybe<Scalars['String']>;
+  project_?: InputMaybe<Project_Filter>;
+  project_contains?: InputMaybe<Scalars['String']>;
+  project_contains_nocase?: InputMaybe<Scalars['String']>;
+  project_ends_with?: InputMaybe<Scalars['String']>;
+  project_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  project_gt?: InputMaybe<Scalars['String']>;
+  project_gte?: InputMaybe<Scalars['String']>;
+  project_in?: InputMaybe<Array<Scalars['String']>>;
+  project_lt?: InputMaybe<Scalars['String']>;
+  project_lte?: InputMaybe<Scalars['String']>;
+  project_not?: InputMaybe<Scalars['String']>;
+  project_not_contains?: InputMaybe<Scalars['String']>;
+  project_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  project_not_ends_with?: InputMaybe<Scalars['String']>;
+  project_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  project_not_in?: InputMaybe<Array<Scalars['String']>>;
+  project_not_starts_with?: InputMaybe<Scalars['String']>;
+  project_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  project_starts_with?: InputMaybe<Scalars['String']>;
+  project_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  updatedAt?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_gt?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_gte?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  updatedAt_lt?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_lte?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_not?: InputMaybe<Scalars['BigInt']>;
+  updatedAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+};
+
+export enum Receipt_OrderBy {
+  Account = 'account',
+  AccountId = 'account__id',
+  Id = 'id',
+  Minter = 'minter',
+  MinterExtraMinterDetails = 'minter__extraMinterDetails',
+  MinterId = 'minter__id',
+  MinterMaximumHalfLifeInSeconds = 'minter__maximumHalfLifeInSeconds',
+  MinterMinimumAuctionLengthInSeconds = 'minter__minimumAuctionLengthInSeconds',
+  MinterMinimumHalfLifeInSeconds = 'minter__minimumHalfLifeInSeconds',
+  MinterType = 'minter__type',
+  MinterUpdatedAt = 'minter__updatedAt',
+  NetPosted = 'netPosted',
+  NumPurchased = 'numPurchased',
+  Project = 'project',
+  ProjectActivatedAt = 'project__activatedAt',
+  ProjectActive = 'project__active',
+  ProjectAdditionalPayee = 'project__additionalPayee',
+  ProjectAdditionalPayeePercentage = 'project__additionalPayeePercentage',
+  ProjectAdditionalPayeeSecondarySalesAddress = 'project__additionalPayeeSecondarySalesAddress',
+  ProjectAdditionalPayeeSecondarySalesPercentage = 'project__additionalPayeeSecondarySalesPercentage',
+  ProjectArtistAddress = 'project__artistAddress',
+  ProjectArtistName = 'project__artistName',
+  ProjectAspectRatio = 'project__aspectRatio',
+  ProjectBaseIpfsUri = 'project__baseIpfsUri',
+  ProjectBaseUri = 'project__baseUri',
+  ProjectComplete = 'project__complete',
+  ProjectCompletedAt = 'project__completedAt',
+  ProjectCreatedAt = 'project__createdAt',
+  ProjectCurationStatus = 'project__curationStatus',
+  ProjectCurrencyAddress = 'project__currencyAddress',
+  ProjectCurrencySymbol = 'project__currencySymbol',
+  ProjectDescription = 'project__description',
+  ProjectDynamic = 'project__dynamic',
+  ProjectExternalAssetDependenciesLocked = 'project__externalAssetDependenciesLocked',
+  ProjectExternalAssetDependencyCount = 'project__externalAssetDependencyCount',
+  ProjectId = 'project__id',
+  ProjectInvocations = 'project__invocations',
+  ProjectIpfsHash = 'project__ipfsHash',
+  ProjectLicense = 'project__license',
+  ProjectLocked = 'project__locked',
+  ProjectMaxInvocations = 'project__maxInvocations',
+  ProjectName = 'project__name',
+  ProjectPaused = 'project__paused',
+  ProjectPricePerTokenInWei = 'project__pricePerTokenInWei',
+  ProjectProjectId = 'project__projectId',
+  ProjectRoyaltyPercentage = 'project__royaltyPercentage',
+  ProjectScript = 'project__script',
+  ProjectScriptCount = 'project__scriptCount',
+  ProjectScriptJson = 'project__scriptJSON',
+  ProjectScriptTypeAndVersion = 'project__scriptTypeAndVersion',
+  ProjectScriptUpdatedAt = 'project__scriptUpdatedAt',
+  ProjectUpdatedAt = 'project__updatedAt',
+  ProjectUseHashString = 'project__useHashString',
+  ProjectUseIpfs = 'project__useIpfs',
+  ProjectWebsite = 'project__website',
+  UpdatedAt = 'updatedAt'
+}
+
 export type Sale = {
   __typename?: 'Sale';
   /** The block number of the sale */
@@ -2417,6 +3942,7 @@ export type SaleLookupTable = {
 export type SaleLookupTable_Filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<SaleLookupTable_Filter>>>;
   blockNumber?: InputMaybe<Scalars['BigInt']>;
   blockNumber_gt?: InputMaybe<Scalars['BigInt']>;
   blockNumber_gte?: InputMaybe<Scalars['BigInt']>;
@@ -2433,6 +3959,7 @@ export type SaleLookupTable_Filter = {
   id_lte?: InputMaybe<Scalars['ID']>;
   id_not?: InputMaybe<Scalars['ID']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  or?: InputMaybe<Array<InputMaybe<SaleLookupTable_Filter>>>;
   project?: InputMaybe<Scalars['String']>;
   project_?: InputMaybe<Project_Filter>;
   project_contains?: InputMaybe<Scalars['String']>;
@@ -2510,9 +4037,69 @@ export enum SaleLookupTable_OrderBy {
   BlockNumber = 'blockNumber',
   Id = 'id',
   Project = 'project',
+  ProjectActivatedAt = 'project__activatedAt',
+  ProjectActive = 'project__active',
+  ProjectAdditionalPayee = 'project__additionalPayee',
+  ProjectAdditionalPayeePercentage = 'project__additionalPayeePercentage',
+  ProjectAdditionalPayeeSecondarySalesAddress = 'project__additionalPayeeSecondarySalesAddress',
+  ProjectAdditionalPayeeSecondarySalesPercentage = 'project__additionalPayeeSecondarySalesPercentage',
+  ProjectArtistAddress = 'project__artistAddress',
+  ProjectArtistName = 'project__artistName',
+  ProjectAspectRatio = 'project__aspectRatio',
+  ProjectBaseIpfsUri = 'project__baseIpfsUri',
+  ProjectBaseUri = 'project__baseUri',
+  ProjectComplete = 'project__complete',
+  ProjectCompletedAt = 'project__completedAt',
+  ProjectCreatedAt = 'project__createdAt',
+  ProjectCurationStatus = 'project__curationStatus',
+  ProjectCurrencyAddress = 'project__currencyAddress',
+  ProjectCurrencySymbol = 'project__currencySymbol',
+  ProjectDescription = 'project__description',
+  ProjectDynamic = 'project__dynamic',
+  ProjectExternalAssetDependenciesLocked = 'project__externalAssetDependenciesLocked',
+  ProjectExternalAssetDependencyCount = 'project__externalAssetDependencyCount',
+  ProjectId = 'project__id',
+  ProjectInvocations = 'project__invocations',
+  ProjectIpfsHash = 'project__ipfsHash',
+  ProjectLicense = 'project__license',
+  ProjectLocked = 'project__locked',
+  ProjectMaxInvocations = 'project__maxInvocations',
+  ProjectName = 'project__name',
+  ProjectPaused = 'project__paused',
+  ProjectPricePerTokenInWei = 'project__pricePerTokenInWei',
+  ProjectProjectId = 'project__projectId',
+  ProjectRoyaltyPercentage = 'project__royaltyPercentage',
+  ProjectScript = 'project__script',
+  ProjectScriptCount = 'project__scriptCount',
+  ProjectScriptJson = 'project__scriptJSON',
+  ProjectScriptTypeAndVersion = 'project__scriptTypeAndVersion',
+  ProjectScriptUpdatedAt = 'project__scriptUpdatedAt',
+  ProjectUpdatedAt = 'project__updatedAt',
+  ProjectUseHashString = 'project__useHashString',
+  ProjectUseIpfs = 'project__useIpfs',
+  ProjectWebsite = 'project__website',
   Sale = 'sale',
+  SaleBlockNumber = 'sale__blockNumber',
+  SaleBlockTimestamp = 'sale__blockTimestamp',
+  SaleBuyer = 'sale__buyer',
+  SaleExchange = 'sale__exchange',
+  SaleId = 'sale__id',
+  SaleIsPrivate = 'sale__isPrivate',
+  SaleSaleType = 'sale__saleType',
+  SaleSeller = 'sale__seller',
+  SaleSummaryTokensSold = 'sale__summaryTokensSold',
+  SaleTxHash = 'sale__txHash',
   Timestamp = 'timestamp',
-  Token = 'token'
+  Token = 'token',
+  TokenCreatedAt = 'token__createdAt',
+  TokenHash = 'token__hash',
+  TokenId = 'token__id',
+  TokenInvocation = 'token__invocation',
+  TokenNextSaleId = 'token__nextSaleId',
+  TokenTokenId = 'token__tokenId',
+  TokenTransactionHash = 'token__transactionHash',
+  TokenUpdatedAt = 'token__updatedAt',
+  TokenUri = 'token__uri'
 }
 
 export enum SaleType {
@@ -2523,6 +4110,7 @@ export enum SaleType {
 export type Sale_Filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<Sale_Filter>>>;
   blockNumber?: InputMaybe<Scalars['BigInt']>;
   blockNumber_gt?: InputMaybe<Scalars['BigInt']>;
   blockNumber_gte?: InputMaybe<Scalars['BigInt']>;
@@ -2541,7 +4129,11 @@ export type Sale_Filter = {
   blockTimestamp_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   buyer?: InputMaybe<Scalars['Bytes']>;
   buyer_contains?: InputMaybe<Scalars['Bytes']>;
+  buyer_gt?: InputMaybe<Scalars['Bytes']>;
+  buyer_gte?: InputMaybe<Scalars['Bytes']>;
   buyer_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  buyer_lt?: InputMaybe<Scalars['Bytes']>;
+  buyer_lte?: InputMaybe<Scalars['Bytes']>;
   buyer_not?: InputMaybe<Scalars['Bytes']>;
   buyer_not_contains?: InputMaybe<Scalars['Bytes']>;
   buyer_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -2561,6 +4153,7 @@ export type Sale_Filter = {
   isPrivate_in?: InputMaybe<Array<Scalars['Boolean']>>;
   isPrivate_not?: InputMaybe<Scalars['Boolean']>;
   isPrivate_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  or?: InputMaybe<Array<InputMaybe<Sale_Filter>>>;
   payments_?: InputMaybe<Payment_Filter>;
   saleLookupTables_?: InputMaybe<SaleLookupTable_Filter>;
   saleType?: InputMaybe<SaleType>;
@@ -2569,7 +4162,11 @@ export type Sale_Filter = {
   saleType_not_in?: InputMaybe<Array<SaleType>>;
   seller?: InputMaybe<Scalars['Bytes']>;
   seller_contains?: InputMaybe<Scalars['Bytes']>;
+  seller_gt?: InputMaybe<Scalars['Bytes']>;
+  seller_gte?: InputMaybe<Scalars['Bytes']>;
   seller_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  seller_lt?: InputMaybe<Scalars['Bytes']>;
+  seller_lte?: InputMaybe<Scalars['Bytes']>;
   seller_not?: InputMaybe<Scalars['Bytes']>;
   seller_not_contains?: InputMaybe<Scalars['Bytes']>;
   seller_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -2595,7 +4192,11 @@ export type Sale_Filter = {
   summaryTokensSold_starts_with_nocase?: InputMaybe<Scalars['String']>;
   txHash?: InputMaybe<Scalars['Bytes']>;
   txHash_contains?: InputMaybe<Scalars['Bytes']>;
+  txHash_gt?: InputMaybe<Scalars['Bytes']>;
+  txHash_gte?: InputMaybe<Scalars['Bytes']>;
   txHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  txHash_lt?: InputMaybe<Scalars['Bytes']>;
+  txHash_lte?: InputMaybe<Scalars['Bytes']>;
   txHash_not?: InputMaybe<Scalars['Bytes']>;
   txHash_not_contains?: InputMaybe<Scalars['Bytes']>;
   txHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -2626,6 +4227,18 @@ export type Subscription = {
   accounts: Array<Account>;
   contract?: Maybe<Contract>;
   contracts: Array<Contract>;
+  dependencies: Array<Dependency>;
+  dependency?: Maybe<Dependency>;
+  dependencyAdditionalCDN?: Maybe<DependencyAdditionalCdn>;
+  dependencyAdditionalCDNs: Array<DependencyAdditionalCdn>;
+  dependencyAdditionalRepositories: Array<DependencyAdditionalRepository>;
+  dependencyAdditionalRepository?: Maybe<DependencyAdditionalRepository>;
+  dependencyRegistries: Array<DependencyRegistry>;
+  dependencyRegistry?: Maybe<DependencyRegistry>;
+  dependencyScript?: Maybe<DependencyScript>;
+  dependencyScripts: Array<DependencyScript>;
+  engineRegistries: Array<EngineRegistry>;
+  engineRegistry?: Maybe<EngineRegistry>;
   minter?: Maybe<Minter>;
   minterFilter?: Maybe<MinterFilter>;
   minterFilters: Array<MinterFilter>;
@@ -2642,6 +4255,8 @@ export type Subscription = {
   projects: Array<Project>;
   proposedArtistAddressesAndSplit?: Maybe<ProposedArtistAddressesAndSplit>;
   proposedArtistAddressesAndSplits: Array<ProposedArtistAddressesAndSplit>;
+  receipt?: Maybe<Receipt>;
+  receipts: Array<Receipt>;
   sale?: Maybe<Sale>;
   saleLookupTable?: Maybe<SaleLookupTable>;
   saleLookupTables: Array<SaleLookupTable>;
@@ -2711,6 +4326,114 @@ export type SubscriptionContractsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
   subgraphError?: _SubgraphErrorPolicy_;
   where?: InputMaybe<Contract_Filter>;
+};
+
+
+export type SubscriptionDependenciesArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<Dependency_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<Dependency_Filter>;
+};
+
+
+export type SubscriptionDependencyArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionDependencyAdditionalCdnArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionDependencyAdditionalCdNsArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<DependencyAdditionalCdn_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<DependencyAdditionalCdn_Filter>;
+};
+
+
+export type SubscriptionDependencyAdditionalRepositoriesArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<DependencyAdditionalRepository_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<DependencyAdditionalRepository_Filter>;
+};
+
+
+export type SubscriptionDependencyAdditionalRepositoryArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionDependencyRegistriesArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<DependencyRegistry_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<DependencyRegistry_Filter>;
+};
+
+
+export type SubscriptionDependencyRegistryArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionDependencyScriptArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionDependencyScriptsArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<DependencyScript_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<DependencyScript_Filter>;
+};
+
+
+export type SubscriptionEngineRegistriesArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<EngineRegistry_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<EngineRegistry_Filter>;
+};
+
+
+export type SubscriptionEngineRegistryArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
 };
 
 
@@ -2858,6 +4581,24 @@ export type SubscriptionProposedArtistAddressesAndSplitsArgs = {
 };
 
 
+export type SubscriptionReceiptArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionReceiptsArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<Receipt_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<Receipt_Filter>;
+};
+
+
 export type SubscriptionSaleArgs = {
   block?: InputMaybe<Block_Height>;
   id: Scalars['ID'];
@@ -2996,6 +4737,7 @@ export type TokenTransfersArgs = {
 export type Token_Filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<Token_Filter>>>;
   contract?: InputMaybe<Scalars['String']>;
   contract_?: InputMaybe<Contract_Filter>;
   contract_contains?: InputMaybe<Scalars['String']>;
@@ -3027,7 +4769,11 @@ export type Token_Filter = {
   createdAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   hash?: InputMaybe<Scalars['Bytes']>;
   hash_contains?: InputMaybe<Scalars['Bytes']>;
+  hash_gt?: InputMaybe<Scalars['Bytes']>;
+  hash_gte?: InputMaybe<Scalars['Bytes']>;
   hash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  hash_lt?: InputMaybe<Scalars['Bytes']>;
+  hash_lte?: InputMaybe<Scalars['Bytes']>;
   hash_not?: InputMaybe<Scalars['Bytes']>;
   hash_not_contains?: InputMaybe<Scalars['Bytes']>;
   hash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -3055,6 +4801,7 @@ export type Token_Filter = {
   nextSaleId_lte?: InputMaybe<Scalars['BigInt']>;
   nextSaleId_not?: InputMaybe<Scalars['BigInt']>;
   nextSaleId_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  or?: InputMaybe<Array<InputMaybe<Token_Filter>>>;
   owner?: InputMaybe<Scalars['String']>;
   owner_?: InputMaybe<Account_Filter>;
   owner_contains?: InputMaybe<Scalars['String']>;
@@ -3108,7 +4855,11 @@ export type Token_Filter = {
   tokenId_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   transactionHash?: InputMaybe<Scalars['Bytes']>;
   transactionHash_contains?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_gt?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_gte?: InputMaybe<Scalars['Bytes']>;
   transactionHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  transactionHash_lt?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_lte?: InputMaybe<Scalars['Bytes']>;
   transactionHash_not?: InputMaybe<Scalars['Bytes']>;
   transactionHash_not_contains?: InputMaybe<Scalars['Bytes']>;
   transactionHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -3145,13 +4896,75 @@ export type Token_Filter = {
 
 export enum Token_OrderBy {
   Contract = 'contract',
+  ContractAdmin = 'contract__admin',
+  ContractAutoApproveArtistSplitProposals = 'contract__autoApproveArtistSplitProposals',
+  ContractCreatedAt = 'contract__createdAt',
+  ContractCurationRegistry = 'contract__curationRegistry',
+  ContractEnginePlatformProviderAddress = 'contract__enginePlatformProviderAddress',
+  ContractEnginePlatformProviderPercentage = 'contract__enginePlatformProviderPercentage',
+  ContractEnginePlatformProviderSecondarySalesAddress = 'contract__enginePlatformProviderSecondarySalesAddress',
+  ContractEnginePlatformProviderSecondarySalesBps = 'contract__enginePlatformProviderSecondarySalesBPS',
+  ContractId = 'contract__id',
+  ContractNewProjectsForbidden = 'contract__newProjectsForbidden',
+  ContractNextProjectId = 'contract__nextProjectId',
+  ContractPreferredArweaveGateway = 'contract__preferredArweaveGateway',
+  ContractPreferredIpfsGateway = 'contract__preferredIPFSGateway',
+  ContractRandomizerContract = 'contract__randomizerContract',
+  ContractRenderProviderAddress = 'contract__renderProviderAddress',
+  ContractRenderProviderPercentage = 'contract__renderProviderPercentage',
+  ContractRenderProviderSecondarySalesAddress = 'contract__renderProviderSecondarySalesAddress',
+  ContractRenderProviderSecondarySalesBps = 'contract__renderProviderSecondarySalesBPS',
+  ContractType = 'contract__type',
+  ContractUpdatedAt = 'contract__updatedAt',
   CreatedAt = 'createdAt',
   Hash = 'hash',
   Id = 'id',
   Invocation = 'invocation',
   NextSaleId = 'nextSaleId',
   Owner = 'owner',
+  OwnerId = 'owner__id',
   Project = 'project',
+  ProjectActivatedAt = 'project__activatedAt',
+  ProjectActive = 'project__active',
+  ProjectAdditionalPayee = 'project__additionalPayee',
+  ProjectAdditionalPayeePercentage = 'project__additionalPayeePercentage',
+  ProjectAdditionalPayeeSecondarySalesAddress = 'project__additionalPayeeSecondarySalesAddress',
+  ProjectAdditionalPayeeSecondarySalesPercentage = 'project__additionalPayeeSecondarySalesPercentage',
+  ProjectArtistAddress = 'project__artistAddress',
+  ProjectArtistName = 'project__artistName',
+  ProjectAspectRatio = 'project__aspectRatio',
+  ProjectBaseIpfsUri = 'project__baseIpfsUri',
+  ProjectBaseUri = 'project__baseUri',
+  ProjectComplete = 'project__complete',
+  ProjectCompletedAt = 'project__completedAt',
+  ProjectCreatedAt = 'project__createdAt',
+  ProjectCurationStatus = 'project__curationStatus',
+  ProjectCurrencyAddress = 'project__currencyAddress',
+  ProjectCurrencySymbol = 'project__currencySymbol',
+  ProjectDescription = 'project__description',
+  ProjectDynamic = 'project__dynamic',
+  ProjectExternalAssetDependenciesLocked = 'project__externalAssetDependenciesLocked',
+  ProjectExternalAssetDependencyCount = 'project__externalAssetDependencyCount',
+  ProjectId = 'project__id',
+  ProjectInvocations = 'project__invocations',
+  ProjectIpfsHash = 'project__ipfsHash',
+  ProjectLicense = 'project__license',
+  ProjectLocked = 'project__locked',
+  ProjectMaxInvocations = 'project__maxInvocations',
+  ProjectName = 'project__name',
+  ProjectPaused = 'project__paused',
+  ProjectPricePerTokenInWei = 'project__pricePerTokenInWei',
+  ProjectProjectId = 'project__projectId',
+  ProjectRoyaltyPercentage = 'project__royaltyPercentage',
+  ProjectScript = 'project__script',
+  ProjectScriptCount = 'project__scriptCount',
+  ProjectScriptJson = 'project__scriptJSON',
+  ProjectScriptTypeAndVersion = 'project__scriptTypeAndVersion',
+  ProjectScriptUpdatedAt = 'project__scriptUpdatedAt',
+  ProjectUpdatedAt = 'project__updatedAt',
+  ProjectUseHashString = 'project__useHashString',
+  ProjectUseIpfs = 'project__useIpfs',
+  ProjectWebsite = 'project__website',
   SaleLookupTables = 'saleLookupTables',
   TokenId = 'tokenId',
   TransactionHash = 'transactionHash',
@@ -3162,7 +4975,9 @@ export enum Token_OrderBy {
 
 export type Transfer = {
   __typename?: 'Transfer';
-  createdAt: Scalars['BigInt'];
+  blockHash: Scalars['Bytes'];
+  blockNumber: Scalars['BigInt'];
+  blockTimestamp: Scalars['BigInt'];
   from: Scalars['Bytes'];
   id: Scalars['ID'];
   to: Scalars['Bytes'];
@@ -3173,17 +4988,40 @@ export type Transfer = {
 export type Transfer_Filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
-  createdAt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_gt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_gte?: InputMaybe<Scalars['BigInt']>;
-  createdAt_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  createdAt_lt?: InputMaybe<Scalars['BigInt']>;
-  createdAt_lte?: InputMaybe<Scalars['BigInt']>;
-  createdAt_not?: InputMaybe<Scalars['BigInt']>;
-  createdAt_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  and?: InputMaybe<Array<InputMaybe<Transfer_Filter>>>;
+  blockHash?: InputMaybe<Scalars['Bytes']>;
+  blockHash_contains?: InputMaybe<Scalars['Bytes']>;
+  blockHash_gt?: InputMaybe<Scalars['Bytes']>;
+  blockHash_gte?: InputMaybe<Scalars['Bytes']>;
+  blockHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  blockHash_lt?: InputMaybe<Scalars['Bytes']>;
+  blockHash_lte?: InputMaybe<Scalars['Bytes']>;
+  blockHash_not?: InputMaybe<Scalars['Bytes']>;
+  blockHash_not_contains?: InputMaybe<Scalars['Bytes']>;
+  blockHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  blockNumber?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_gt?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_gte?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockNumber_lt?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_lte?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_not?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockTimestamp?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_gt?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_gte?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockTimestamp_lt?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_lte?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_not?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   from?: InputMaybe<Scalars['Bytes']>;
   from_contains?: InputMaybe<Scalars['Bytes']>;
+  from_gt?: InputMaybe<Scalars['Bytes']>;
+  from_gte?: InputMaybe<Scalars['Bytes']>;
   from_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  from_lt?: InputMaybe<Scalars['Bytes']>;
+  from_lte?: InputMaybe<Scalars['Bytes']>;
   from_not?: InputMaybe<Scalars['Bytes']>;
   from_not_contains?: InputMaybe<Scalars['Bytes']>;
   from_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -3195,9 +5033,14 @@ export type Transfer_Filter = {
   id_lte?: InputMaybe<Scalars['ID']>;
   id_not?: InputMaybe<Scalars['ID']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  or?: InputMaybe<Array<InputMaybe<Transfer_Filter>>>;
   to?: InputMaybe<Scalars['Bytes']>;
   to_contains?: InputMaybe<Scalars['Bytes']>;
+  to_gt?: InputMaybe<Scalars['Bytes']>;
+  to_gte?: InputMaybe<Scalars['Bytes']>;
   to_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  to_lt?: InputMaybe<Scalars['Bytes']>;
+  to_lte?: InputMaybe<Scalars['Bytes']>;
   to_not?: InputMaybe<Scalars['Bytes']>;
   to_not_contains?: InputMaybe<Scalars['Bytes']>;
   to_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -3224,18 +5067,33 @@ export type Transfer_Filter = {
   token_starts_with_nocase?: InputMaybe<Scalars['String']>;
   transactionHash?: InputMaybe<Scalars['Bytes']>;
   transactionHash_contains?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_gt?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_gte?: InputMaybe<Scalars['Bytes']>;
   transactionHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  transactionHash_lt?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_lte?: InputMaybe<Scalars['Bytes']>;
   transactionHash_not?: InputMaybe<Scalars['Bytes']>;
   transactionHash_not_contains?: InputMaybe<Scalars['Bytes']>;
   transactionHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
 };
 
 export enum Transfer_OrderBy {
-  CreatedAt = 'createdAt',
+  BlockHash = 'blockHash',
+  BlockNumber = 'blockNumber',
+  BlockTimestamp = 'blockTimestamp',
   From = 'from',
   Id = 'id',
   To = 'to',
   Token = 'token',
+  TokenCreatedAt = 'token__createdAt',
+  TokenHash = 'token__hash',
+  TokenId = 'token__id',
+  TokenInvocation = 'token__invocation',
+  TokenNextSaleId = 'token__nextSaleId',
+  TokenTokenId = 'token__tokenId',
+  TokenTransactionHash = 'token__transactionHash',
+  TokenUpdatedAt = 'token__updatedAt',
+  TokenUri = 'token__uri',
   TransactionHash = 'transactionHash'
 }
 
@@ -3270,6 +5128,7 @@ export type Whitelisting_Filter = {
   account_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
   account_starts_with?: InputMaybe<Scalars['String']>;
   account_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  and?: InputMaybe<Array<InputMaybe<Whitelisting_Filter>>>;
   contract?: InputMaybe<Scalars['String']>;
   contract_?: InputMaybe<Contract_Filter>;
   contract_contains?: InputMaybe<Scalars['String']>;
@@ -3299,11 +5158,33 @@ export type Whitelisting_Filter = {
   id_lte?: InputMaybe<Scalars['ID']>;
   id_not?: InputMaybe<Scalars['ID']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  or?: InputMaybe<Array<InputMaybe<Whitelisting_Filter>>>;
 };
 
 export enum Whitelisting_OrderBy {
   Account = 'account',
+  AccountId = 'account__id',
   Contract = 'contract',
+  ContractAdmin = 'contract__admin',
+  ContractAutoApproveArtistSplitProposals = 'contract__autoApproveArtistSplitProposals',
+  ContractCreatedAt = 'contract__createdAt',
+  ContractCurationRegistry = 'contract__curationRegistry',
+  ContractEnginePlatformProviderAddress = 'contract__enginePlatformProviderAddress',
+  ContractEnginePlatformProviderPercentage = 'contract__enginePlatformProviderPercentage',
+  ContractEnginePlatformProviderSecondarySalesAddress = 'contract__enginePlatformProviderSecondarySalesAddress',
+  ContractEnginePlatformProviderSecondarySalesBps = 'contract__enginePlatformProviderSecondarySalesBPS',
+  ContractId = 'contract__id',
+  ContractNewProjectsForbidden = 'contract__newProjectsForbidden',
+  ContractNextProjectId = 'contract__nextProjectId',
+  ContractPreferredArweaveGateway = 'contract__preferredArweaveGateway',
+  ContractPreferredIpfsGateway = 'contract__preferredIPFSGateway',
+  ContractRandomizerContract = 'contract__randomizerContract',
+  ContractRenderProviderAddress = 'contract__renderProviderAddress',
+  ContractRenderProviderPercentage = 'contract__renderProviderPercentage',
+  ContractRenderProviderSecondarySalesAddress = 'contract__renderProviderSecondarySalesAddress',
+  ContractRenderProviderSecondarySalesBps = 'contract__renderProviderSecondarySalesBPS',
+  ContractType = 'contract__type',
+  ContractUpdatedAt = 'contract__updatedAt',
   Id = 'id'
 }
 
@@ -3341,7 +5222,7 @@ export enum _SubgraphErrorPolicy_ {
   Deny = 'deny'
 }
 
-export type ProjectDetailFragment = { __typename?: 'Project', projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, paused: boolean, complete: boolean, artistName?: string | null, contract: { __typename?: 'Contract', id: string } };
+export type ProjectDetailFragment = { __typename?: 'Project', id: string, projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, paused: boolean, complete: boolean, artistName?: string | null, contract: { __typename?: 'Contract', id: string } };
 
 export type GetAllProjectsQueryVariables = Exact<{
   first: Scalars['Int'];
@@ -3349,10 +5230,11 @@ export type GetAllProjectsQueryVariables = Exact<{
 }>;
 
 
-export type GetAllProjectsQuery = { __typename?: 'Query', projects: Array<{ __typename?: 'Project', projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, paused: boolean, complete: boolean, artistName?: string | null, contract: { __typename?: 'Contract', id: string } }> };
+export type GetAllProjectsQuery = { __typename?: 'Query', projects: Array<{ __typename?: 'Project', id: string, projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, paused: boolean, complete: boolean, artistName?: string | null, contract: { __typename?: 'Contract', id: string } }> };
 
 export type GetWalletTokensQueryVariables = Exact<{
   wallet: Scalars['String'];
+  contracts: Array<Scalars['String']> | Scalars['String'];
   first: Scalars['Int'];
   skip?: InputMaybe<Scalars['Int']>;
 }>;
@@ -3367,7 +5249,7 @@ export type GetContractOpenProjectsQueryVariables = Exact<{
 }>;
 
 
-export type GetContractOpenProjectsQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', projects?: Array<{ __typename?: 'Project', projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, paused: boolean, complete: boolean, artistName?: string | null, contract: { __typename?: 'Contract', id: string } }> | null } | null };
+export type GetContractOpenProjectsQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', projects?: Array<{ __typename?: 'Project', id: string, projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, paused: boolean, complete: boolean, artistName?: string | null, contract: { __typename?: 'Contract', id: string } }> | null } | null };
 
 export type GetContractProjectQueryVariables = Exact<{
   contract: Scalars['ID'];
@@ -3375,7 +5257,7 @@ export type GetContractProjectQueryVariables = Exact<{
 }>;
 
 
-export type GetContractProjectQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', projects?: Array<{ __typename?: 'Project', projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, paused: boolean, complete: boolean, artistName?: string | null, contract: { __typename?: 'Contract', id: string } }> | null } | null };
+export type GetContractProjectQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', projects?: Array<{ __typename?: 'Project', id: string, projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, paused: boolean, complete: boolean, artistName?: string | null, contract: { __typename?: 'Contract', id: string } }> | null } | null };
 
 export type GetContractProjectsWithCurationStatusQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -3385,7 +5267,7 @@ export type GetContractProjectsWithCurationStatusQueryVariables = Exact<{
 }>;
 
 
-export type GetContractProjectsWithCurationStatusQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', projects?: Array<{ __typename?: 'Project', projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, curationStatus?: string | null, contract: { __typename?: 'Contract', id: string } }> | null } | null };
+export type GetContractProjectsWithCurationStatusQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', projects?: Array<{ __typename?: 'Project', id: string, projectId: any, name?: string | null, invocations: any, maxInvocations: any, active: boolean, curationStatus?: string | null, contract: { __typename?: 'Contract', id: string } }> | null } | null };
 
 export type GetEngineContractsQueryVariables = Exact<{
   ids?: InputMaybe<Array<Scalars['ID']> | Scalars['ID']>;
@@ -3393,6 +5275,20 @@ export type GetEngineContractsQueryVariables = Exact<{
 
 
 export type GetEngineContractsQuery = { __typename?: 'Query', contracts: Array<{ __typename?: 'Contract', id: string }> };
+
+export type GetProjectInvocationsQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type GetProjectInvocationsQuery = { __typename?: 'Query', projects: Array<{ __typename?: 'Project', invocations: any }> };
+
+export type GetTokenOwnerQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type GetTokenOwnerQuery = { __typename?: 'Query', tokens: Array<{ __typename?: 'Token', owner: { __typename?: 'Account', id: string } }> };
 
 
 
@@ -3479,6 +5375,24 @@ export type ResolversTypes = {
   Contract_filter: Contract_Filter;
   Contract_orderBy: Contract_OrderBy;
   CoreType: CoreType;
+  Dependency: ResolverTypeWrapper<Dependency>;
+  DependencyAdditionalCDN: ResolverTypeWrapper<DependencyAdditionalCdn>;
+  DependencyAdditionalCDN_filter: DependencyAdditionalCdn_Filter;
+  DependencyAdditionalCDN_orderBy: DependencyAdditionalCdn_OrderBy;
+  DependencyAdditionalRepository: ResolverTypeWrapper<DependencyAdditionalRepository>;
+  DependencyAdditionalRepository_filter: DependencyAdditionalRepository_Filter;
+  DependencyAdditionalRepository_orderBy: DependencyAdditionalRepository_OrderBy;
+  DependencyRegistry: ResolverTypeWrapper<DependencyRegistry>;
+  DependencyRegistry_filter: DependencyRegistry_Filter;
+  DependencyRegistry_orderBy: DependencyRegistry_OrderBy;
+  DependencyScript: ResolverTypeWrapper<DependencyScript>;
+  DependencyScript_filter: DependencyScript_Filter;
+  DependencyScript_orderBy: DependencyScript_OrderBy;
+  Dependency_filter: Dependency_Filter;
+  Dependency_orderBy: Dependency_OrderBy;
+  EngineRegistry: ResolverTypeWrapper<EngineRegistry>;
+  EngineRegistry_filter: EngineRegistry_Filter;
+  EngineRegistry_orderBy: EngineRegistry_OrderBy;
   Exchange: Exchange;
   Float: ResolverTypeWrapper<Scalars['Float']>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
@@ -3487,7 +5401,6 @@ export type ResolversTypes = {
   MinterFilter: ResolverTypeWrapper<MinterFilter>;
   MinterFilter_filter: MinterFilter_Filter;
   MinterFilter_orderBy: MinterFilter_OrderBy;
-  MinterType: MinterType;
   Minter_filter: Minter_Filter;
   Minter_orderBy: Minter_OrderBy;
   OrderDirection: OrderDirection;
@@ -3512,6 +5425,9 @@ export type ResolversTypes = {
   ProposedArtistAddressesAndSplit_filter: ProposedArtistAddressesAndSplit_Filter;
   ProposedArtistAddressesAndSplit_orderBy: ProposedArtistAddressesAndSplit_OrderBy;
   Query: ResolverTypeWrapper<{}>;
+  Receipt: ResolverTypeWrapper<Receipt>;
+  Receipt_filter: Receipt_Filter;
+  Receipt_orderBy: Receipt_OrderBy;
   Sale: ResolverTypeWrapper<Sale>;
   SaleLookupTable: ResolverTypeWrapper<SaleLookupTable>;
   SaleLookupTable_filter: SaleLookupTable_Filter;
@@ -3549,6 +5465,18 @@ export type ResolversParentTypes = {
   Bytes: Scalars['Bytes'];
   Contract: Contract;
   Contract_filter: Contract_Filter;
+  Dependency: Dependency;
+  DependencyAdditionalCDN: DependencyAdditionalCdn;
+  DependencyAdditionalCDN_filter: DependencyAdditionalCdn_Filter;
+  DependencyAdditionalRepository: DependencyAdditionalRepository;
+  DependencyAdditionalRepository_filter: DependencyAdditionalRepository_Filter;
+  DependencyRegistry: DependencyRegistry;
+  DependencyRegistry_filter: DependencyRegistry_Filter;
+  DependencyScript: DependencyScript;
+  DependencyScript_filter: DependencyScript_Filter;
+  Dependency_filter: Dependency_Filter;
+  EngineRegistry: EngineRegistry;
+  EngineRegistry_filter: EngineRegistry_Filter;
   Float: Scalars['Float'];
   ID: Scalars['ID'];
   Int: Scalars['Int'];
@@ -3569,6 +5497,8 @@ export type ResolversParentTypes = {
   ProposedArtistAddressesAndSplit: ProposedArtistAddressesAndSplit;
   ProposedArtistAddressesAndSplit_filter: ProposedArtistAddressesAndSplit_Filter;
   Query: {};
+  Receipt: Receipt;
+  Receipt_filter: Receipt_Filter;
   Sale: Sale;
   SaleLookupTable: SaleLookupTable;
   SaleLookupTable_filter: SaleLookupTable_Filter;
@@ -3605,6 +5535,7 @@ export type AccountResolvers<ContextType = any, ParentType extends ResolversPare
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   projectsCreated?: Resolver<Maybe<Array<ResolversTypes['Project']>>, ParentType, ContextType, RequireFields<AccountProjectsCreatedArgs, 'first' | 'skip'>>;
   projectsOwned?: Resolver<Maybe<Array<ResolversTypes['AccountProject']>>, ParentType, ContextType, RequireFields<AccountProjectsOwnedArgs, 'first' | 'skip'>>;
+  receipts?: Resolver<Maybe<Array<ResolversTypes['Receipt']>>, ParentType, ContextType, RequireFields<AccountReceiptsArgs, 'first' | 'skip'>>;
   tokens?: Resolver<Maybe<Array<ResolversTypes['Token']>>, ParentType, ContextType, RequireFields<AccountTokensArgs, 'first' | 'skip'>>;
   whitelistedOn?: Resolver<Maybe<Array<ResolversTypes['Whitelisting']>>, ParentType, ContextType, RequireFields<AccountWhitelistedOnArgs, 'first' | 'skip'>>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -3632,9 +5563,14 @@ export interface BytesScalarConfig extends GraphQLScalarTypeConfig<ResolversType
 
 export type ContractResolvers<ContextType = any, ParentType extends ResolversParentTypes['Contract'] = ResolversParentTypes['Contract']> = {
   admin?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  autoApproveArtistSplitProposals?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   curationRegistry?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
-  dependencyRegistry?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  dependencyRegistry?: Resolver<Maybe<ResolversTypes['DependencyRegistry']>, ParentType, ContextType>;
+  enginePlatformProviderAddress?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  enginePlatformProviderPercentage?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  enginePlatformProviderSecondarySalesAddress?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  enginePlatformProviderSecondarySalesBPS?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   mintWhitelisted?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
   minterFilter?: Resolver<Maybe<ResolversTypes['MinterFilter']>, ParentType, ContextType>;
@@ -3644,6 +5580,7 @@ export type ContractResolvers<ContextType = any, ParentType extends ResolversPar
   preferredIPFSGateway?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   projects?: Resolver<Maybe<Array<ResolversTypes['Project']>>, ParentType, ContextType, RequireFields<ContractProjectsArgs, 'first' | 'skip'>>;
   randomizerContract?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  registeredOn?: Resolver<Maybe<ResolversTypes['EngineRegistry']>, ParentType, ContextType>;
   renderProviderAddress?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   renderProviderPercentage?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   renderProviderSecondarySalesAddress?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
@@ -3655,6 +5592,63 @@ export type ContractResolvers<ContextType = any, ParentType extends ResolversPar
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type DependencyResolvers<ContextType = any, ParentType extends ResolversParentTypes['Dependency'] = ResolversParentTypes['Dependency']> = {
+  additionalCDNCount?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  additionalCDNs?: Resolver<Array<ResolversTypes['DependencyAdditionalCDN']>, ParentType, ContextType, RequireFields<DependencyAdditionalCdNsArgs, 'first' | 'skip'>>;
+  additionalRepositories?: Resolver<Array<ResolversTypes['DependencyAdditionalRepository']>, ParentType, ContextType, RequireFields<DependencyAdditionalRepositoriesArgs, 'first' | 'skip'>>;
+  additionalRepositoryCount?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  dependencyRegistry?: Resolver<ResolversTypes['DependencyRegistry'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  preferredCDN?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  preferredRepository?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  referenceWebsite?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  script?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  scriptCount?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  scripts?: Resolver<Array<ResolversTypes['DependencyScript']>, ParentType, ContextType, RequireFields<DependencyScriptsArgs, 'first' | 'skip'>>;
+  updatedAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type DependencyAdditionalCdnResolvers<ContextType = any, ParentType extends ResolversParentTypes['DependencyAdditionalCDN'] = ResolversParentTypes['DependencyAdditionalCDN']> = {
+  cdn?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  dependency?: Resolver<ResolversTypes['Dependency'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  index?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type DependencyAdditionalRepositoryResolvers<ContextType = any, ParentType extends ResolversParentTypes['DependencyAdditionalRepository'] = ResolversParentTypes['DependencyAdditionalRepository']> = {
+  dependency?: Resolver<ResolversTypes['Dependency'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  index?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  repository?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type DependencyRegistryResolvers<ContextType = any, ParentType extends ResolversParentTypes['DependencyRegistry'] = ResolversParentTypes['DependencyRegistry']> = {
+  dependencies?: Resolver<Maybe<Array<ResolversTypes['Dependency']>>, ParentType, ContextType, RequireFields<DependencyRegistryDependenciesArgs, 'first' | 'skip'>>;
+  id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  owner?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  supportedCoreContracts?: Resolver<Array<ResolversTypes['Contract']>, ParentType, ContextType, RequireFields<DependencyRegistrySupportedCoreContractsArgs, 'first' | 'skip'>>;
+  updatedAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type DependencyScriptResolvers<ContextType = any, ParentType extends ResolversParentTypes['DependencyScript'] = ResolversParentTypes['DependencyScript']> = {
+  address?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  dependency?: Resolver<ResolversTypes['Dependency'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  index?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  script?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type EngineRegistryResolvers<ContextType = any, ParentType extends ResolversParentTypes['EngineRegistry'] = ResolversParentTypes['EngineRegistry']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  registeredContracts?: Resolver<Maybe<Array<ResolversTypes['Contract']>>, ParentType, ContextType, RequireFields<EngineRegistryRegisteredContractsArgs, 'first' | 'skip'>>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MinterResolvers<ContextType = any, ParentType extends ResolversParentTypes['Minter'] = ResolversParentTypes['Minter']> = {
   coreContract?: Resolver<ResolversTypes['Contract'], ParentType, ContextType>;
   extraMinterDetails?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -3663,7 +5657,8 @@ export type MinterResolvers<ContextType = any, ParentType extends ResolversParen
   minimumAuctionLengthInSeconds?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
   minimumHalfLifeInSeconds?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
   minterFilter?: Resolver<ResolversTypes['MinterFilter'], ParentType, ContextType>;
-  type?: Resolver<ResolversTypes['MinterType'], ParentType, ContextType>;
+  receipts?: Resolver<Maybe<Array<ResolversTypes['Receipt']>>, ParentType, ContextType, RequireFields<MinterReceiptsArgs, 'first' | 'skip'>>;
+  type?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -3725,6 +5720,7 @@ export type ProjectResolvers<ContextType = any, ParentType extends ResolversPare
   pricePerTokenInWei?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   projectId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   proposedArtistAddressesAndSplits?: Resolver<Maybe<ResolversTypes['ProposedArtistAddressesAndSplit']>, ParentType, ContextType>;
+  receipts?: Resolver<Maybe<Array<ResolversTypes['Receipt']>>, ParentType, ContextType, RequireFields<ProjectReceiptsArgs, 'first' | 'skip'>>;
   royaltyPercentage?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
   saleLookupTables?: Resolver<Array<ResolversTypes['SaleLookupTable']>, ParentType, ContextType, RequireFields<ProjectSaleLookupTablesArgs, 'first' | 'skip'>>;
   script?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -3742,7 +5738,9 @@ export type ProjectResolvers<ContextType = any, ParentType extends ResolversPare
 };
 
 export type ProjectExternalAssetDependencyResolvers<ContextType = any, ParentType extends ResolversParentTypes['ProjectExternalAssetDependency'] = ResolversParentTypes['ProjectExternalAssetDependency']> = {
+  bytecodeAddress?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
   cid?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  data?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   dependencyType?: Resolver<ResolversTypes['ProjectExternalAssetDependencyType'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   index?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
@@ -3758,6 +5756,7 @@ export type ProjectMinterConfigurationResolvers<ContextType = any, ParentType ex
   extraMinterDetails?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   halfLifeSeconds?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  maxInvocations?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
   minter?: Resolver<ResolversTypes['Minter'], ParentType, ContextType>;
   priceIsConfigured?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>;
@@ -3795,6 +5794,18 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   accounts?: Resolver<Array<ResolversTypes['Account']>, ParentType, ContextType, RequireFields<QueryAccountsArgs, 'first' | 'skip' | 'subgraphError'>>;
   contract?: Resolver<Maybe<ResolversTypes['Contract']>, ParentType, ContextType, RequireFields<QueryContractArgs, 'id' | 'subgraphError'>>;
   contracts?: Resolver<Array<ResolversTypes['Contract']>, ParentType, ContextType, RequireFields<QueryContractsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  dependencies?: Resolver<Array<ResolversTypes['Dependency']>, ParentType, ContextType, RequireFields<QueryDependenciesArgs, 'first' | 'skip' | 'subgraphError'>>;
+  dependency?: Resolver<Maybe<ResolversTypes['Dependency']>, ParentType, ContextType, RequireFields<QueryDependencyArgs, 'id' | 'subgraphError'>>;
+  dependencyAdditionalCDN?: Resolver<Maybe<ResolversTypes['DependencyAdditionalCDN']>, ParentType, ContextType, RequireFields<QueryDependencyAdditionalCdnArgs, 'id' | 'subgraphError'>>;
+  dependencyAdditionalCDNs?: Resolver<Array<ResolversTypes['DependencyAdditionalCDN']>, ParentType, ContextType, RequireFields<QueryDependencyAdditionalCdNsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  dependencyAdditionalRepositories?: Resolver<Array<ResolversTypes['DependencyAdditionalRepository']>, ParentType, ContextType, RequireFields<QueryDependencyAdditionalRepositoriesArgs, 'first' | 'skip' | 'subgraphError'>>;
+  dependencyAdditionalRepository?: Resolver<Maybe<ResolversTypes['DependencyAdditionalRepository']>, ParentType, ContextType, RequireFields<QueryDependencyAdditionalRepositoryArgs, 'id' | 'subgraphError'>>;
+  dependencyRegistries?: Resolver<Array<ResolversTypes['DependencyRegistry']>, ParentType, ContextType, RequireFields<QueryDependencyRegistriesArgs, 'first' | 'skip' | 'subgraphError'>>;
+  dependencyRegistry?: Resolver<Maybe<ResolversTypes['DependencyRegistry']>, ParentType, ContextType, RequireFields<QueryDependencyRegistryArgs, 'id' | 'subgraphError'>>;
+  dependencyScript?: Resolver<Maybe<ResolversTypes['DependencyScript']>, ParentType, ContextType, RequireFields<QueryDependencyScriptArgs, 'id' | 'subgraphError'>>;
+  dependencyScripts?: Resolver<Array<ResolversTypes['DependencyScript']>, ParentType, ContextType, RequireFields<QueryDependencyScriptsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  engineRegistries?: Resolver<Array<ResolversTypes['EngineRegistry']>, ParentType, ContextType, RequireFields<QueryEngineRegistriesArgs, 'first' | 'skip' | 'subgraphError'>>;
+  engineRegistry?: Resolver<Maybe<ResolversTypes['EngineRegistry']>, ParentType, ContextType, RequireFields<QueryEngineRegistryArgs, 'id' | 'subgraphError'>>;
   minter?: Resolver<Maybe<ResolversTypes['Minter']>, ParentType, ContextType, RequireFields<QueryMinterArgs, 'id' | 'subgraphError'>>;
   minterFilter?: Resolver<Maybe<ResolversTypes['MinterFilter']>, ParentType, ContextType, RequireFields<QueryMinterFilterArgs, 'id' | 'subgraphError'>>;
   minterFilters?: Resolver<Array<ResolversTypes['MinterFilter']>, ParentType, ContextType, RequireFields<QueryMinterFiltersArgs, 'first' | 'skip' | 'subgraphError'>>;
@@ -3811,6 +5822,8 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   projects?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectsArgs, 'first' | 'skip' | 'subgraphError'>>;
   proposedArtistAddressesAndSplit?: Resolver<Maybe<ResolversTypes['ProposedArtistAddressesAndSplit']>, ParentType, ContextType, RequireFields<QueryProposedArtistAddressesAndSplitArgs, 'id' | 'subgraphError'>>;
   proposedArtistAddressesAndSplits?: Resolver<Array<ResolversTypes['ProposedArtistAddressesAndSplit']>, ParentType, ContextType, RequireFields<QueryProposedArtistAddressesAndSplitsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  receipt?: Resolver<Maybe<ResolversTypes['Receipt']>, ParentType, ContextType, RequireFields<QueryReceiptArgs, 'id' | 'subgraphError'>>;
+  receipts?: Resolver<Array<ResolversTypes['Receipt']>, ParentType, ContextType, RequireFields<QueryReceiptsArgs, 'first' | 'skip' | 'subgraphError'>>;
   sale?: Resolver<Maybe<ResolversTypes['Sale']>, ParentType, ContextType, RequireFields<QuerySaleArgs, 'id' | 'subgraphError'>>;
   saleLookupTable?: Resolver<Maybe<ResolversTypes['SaleLookupTable']>, ParentType, ContextType, RequireFields<QuerySaleLookupTableArgs, 'id' | 'subgraphError'>>;
   saleLookupTables?: Resolver<Array<ResolversTypes['SaleLookupTable']>, ParentType, ContextType, RequireFields<QuerySaleLookupTablesArgs, 'first' | 'skip' | 'subgraphError'>>;
@@ -3821,6 +5834,17 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   transfers?: Resolver<Array<ResolversTypes['Transfer']>, ParentType, ContextType, RequireFields<QueryTransfersArgs, 'first' | 'skip' | 'subgraphError'>>;
   whitelisting?: Resolver<Maybe<ResolversTypes['Whitelisting']>, ParentType, ContextType, RequireFields<QueryWhitelistingArgs, 'id' | 'subgraphError'>>;
   whitelistings?: Resolver<Array<ResolversTypes['Whitelisting']>, ParentType, ContextType, RequireFields<QueryWhitelistingsArgs, 'first' | 'skip' | 'subgraphError'>>;
+};
+
+export type ReceiptResolvers<ContextType = any, ParentType extends ResolversParentTypes['Receipt'] = ResolversParentTypes['Receipt']> = {
+  account?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  minter?: Resolver<ResolversTypes['Minter'], ParentType, ContextType>;
+  netPosted?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  numPurchased?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type SaleResolvers<ContextType = any, ParentType extends ResolversParentTypes['Sale'] = ResolversParentTypes['Sale']> = {
@@ -3857,6 +5881,18 @@ export type SubscriptionResolvers<ContextType = any, ParentType extends Resolver
   accounts?: SubscriptionResolver<Array<ResolversTypes['Account']>, "accounts", ParentType, ContextType, RequireFields<SubscriptionAccountsArgs, 'first' | 'skip' | 'subgraphError'>>;
   contract?: SubscriptionResolver<Maybe<ResolversTypes['Contract']>, "contract", ParentType, ContextType, RequireFields<SubscriptionContractArgs, 'id' | 'subgraphError'>>;
   contracts?: SubscriptionResolver<Array<ResolversTypes['Contract']>, "contracts", ParentType, ContextType, RequireFields<SubscriptionContractsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  dependencies?: SubscriptionResolver<Array<ResolversTypes['Dependency']>, "dependencies", ParentType, ContextType, RequireFields<SubscriptionDependenciesArgs, 'first' | 'skip' | 'subgraphError'>>;
+  dependency?: SubscriptionResolver<Maybe<ResolversTypes['Dependency']>, "dependency", ParentType, ContextType, RequireFields<SubscriptionDependencyArgs, 'id' | 'subgraphError'>>;
+  dependencyAdditionalCDN?: SubscriptionResolver<Maybe<ResolversTypes['DependencyAdditionalCDN']>, "dependencyAdditionalCDN", ParentType, ContextType, RequireFields<SubscriptionDependencyAdditionalCdnArgs, 'id' | 'subgraphError'>>;
+  dependencyAdditionalCDNs?: SubscriptionResolver<Array<ResolversTypes['DependencyAdditionalCDN']>, "dependencyAdditionalCDNs", ParentType, ContextType, RequireFields<SubscriptionDependencyAdditionalCdNsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  dependencyAdditionalRepositories?: SubscriptionResolver<Array<ResolversTypes['DependencyAdditionalRepository']>, "dependencyAdditionalRepositories", ParentType, ContextType, RequireFields<SubscriptionDependencyAdditionalRepositoriesArgs, 'first' | 'skip' | 'subgraphError'>>;
+  dependencyAdditionalRepository?: SubscriptionResolver<Maybe<ResolversTypes['DependencyAdditionalRepository']>, "dependencyAdditionalRepository", ParentType, ContextType, RequireFields<SubscriptionDependencyAdditionalRepositoryArgs, 'id' | 'subgraphError'>>;
+  dependencyRegistries?: SubscriptionResolver<Array<ResolversTypes['DependencyRegistry']>, "dependencyRegistries", ParentType, ContextType, RequireFields<SubscriptionDependencyRegistriesArgs, 'first' | 'skip' | 'subgraphError'>>;
+  dependencyRegistry?: SubscriptionResolver<Maybe<ResolversTypes['DependencyRegistry']>, "dependencyRegistry", ParentType, ContextType, RequireFields<SubscriptionDependencyRegistryArgs, 'id' | 'subgraphError'>>;
+  dependencyScript?: SubscriptionResolver<Maybe<ResolversTypes['DependencyScript']>, "dependencyScript", ParentType, ContextType, RequireFields<SubscriptionDependencyScriptArgs, 'id' | 'subgraphError'>>;
+  dependencyScripts?: SubscriptionResolver<Array<ResolversTypes['DependencyScript']>, "dependencyScripts", ParentType, ContextType, RequireFields<SubscriptionDependencyScriptsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  engineRegistries?: SubscriptionResolver<Array<ResolversTypes['EngineRegistry']>, "engineRegistries", ParentType, ContextType, RequireFields<SubscriptionEngineRegistriesArgs, 'first' | 'skip' | 'subgraphError'>>;
+  engineRegistry?: SubscriptionResolver<Maybe<ResolversTypes['EngineRegistry']>, "engineRegistry", ParentType, ContextType, RequireFields<SubscriptionEngineRegistryArgs, 'id' | 'subgraphError'>>;
   minter?: SubscriptionResolver<Maybe<ResolversTypes['Minter']>, "minter", ParentType, ContextType, RequireFields<SubscriptionMinterArgs, 'id' | 'subgraphError'>>;
   minterFilter?: SubscriptionResolver<Maybe<ResolversTypes['MinterFilter']>, "minterFilter", ParentType, ContextType, RequireFields<SubscriptionMinterFilterArgs, 'id' | 'subgraphError'>>;
   minterFilters?: SubscriptionResolver<Array<ResolversTypes['MinterFilter']>, "minterFilters", ParentType, ContextType, RequireFields<SubscriptionMinterFiltersArgs, 'first' | 'skip' | 'subgraphError'>>;
@@ -3873,6 +5909,8 @@ export type SubscriptionResolvers<ContextType = any, ParentType extends Resolver
   projects?: SubscriptionResolver<Array<ResolversTypes['Project']>, "projects", ParentType, ContextType, RequireFields<SubscriptionProjectsArgs, 'first' | 'skip' | 'subgraphError'>>;
   proposedArtistAddressesAndSplit?: SubscriptionResolver<Maybe<ResolversTypes['ProposedArtistAddressesAndSplit']>, "proposedArtistAddressesAndSplit", ParentType, ContextType, RequireFields<SubscriptionProposedArtistAddressesAndSplitArgs, 'id' | 'subgraphError'>>;
   proposedArtistAddressesAndSplits?: SubscriptionResolver<Array<ResolversTypes['ProposedArtistAddressesAndSplit']>, "proposedArtistAddressesAndSplits", ParentType, ContextType, RequireFields<SubscriptionProposedArtistAddressesAndSplitsArgs, 'first' | 'skip' | 'subgraphError'>>;
+  receipt?: SubscriptionResolver<Maybe<ResolversTypes['Receipt']>, "receipt", ParentType, ContextType, RequireFields<SubscriptionReceiptArgs, 'id' | 'subgraphError'>>;
+  receipts?: SubscriptionResolver<Array<ResolversTypes['Receipt']>, "receipts", ParentType, ContextType, RequireFields<SubscriptionReceiptsArgs, 'first' | 'skip' | 'subgraphError'>>;
   sale?: SubscriptionResolver<Maybe<ResolversTypes['Sale']>, "sale", ParentType, ContextType, RequireFields<SubscriptionSaleArgs, 'id' | 'subgraphError'>>;
   saleLookupTable?: SubscriptionResolver<Maybe<ResolversTypes['SaleLookupTable']>, "saleLookupTable", ParentType, ContextType, RequireFields<SubscriptionSaleLookupTableArgs, 'id' | 'subgraphError'>>;
   saleLookupTables?: SubscriptionResolver<Array<ResolversTypes['SaleLookupTable']>, "saleLookupTables", ParentType, ContextType, RequireFields<SubscriptionSaleLookupTablesArgs, 'first' | 'skip' | 'subgraphError'>>;
@@ -3904,7 +5942,9 @@ export type TokenResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type TransferResolvers<ContextType = any, ParentType extends ResolversParentTypes['Transfer'] = ResolversParentTypes['Transfer']> = {
-  createdAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  blockHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   from?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   to?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
@@ -3941,6 +5981,12 @@ export type Resolvers<ContextType = any> = {
   BigInt?: GraphQLScalarType;
   Bytes?: GraphQLScalarType;
   Contract?: ContractResolvers<ContextType>;
+  Dependency?: DependencyResolvers<ContextType>;
+  DependencyAdditionalCDN?: DependencyAdditionalCdnResolvers<ContextType>;
+  DependencyAdditionalRepository?: DependencyAdditionalRepositoryResolvers<ContextType>;
+  DependencyRegistry?: DependencyRegistryResolvers<ContextType>;
+  DependencyScript?: DependencyScriptResolvers<ContextType>;
+  EngineRegistry?: EngineRegistryResolvers<ContextType>;
   Minter?: MinterResolvers<ContextType>;
   MinterFilter?: MinterFilterResolvers<ContextType>;
   Payment?: PaymentResolvers<ContextType>;
@@ -3950,6 +5996,7 @@ export type Resolvers<ContextType = any> = {
   ProjectScript?: ProjectScriptResolvers<ContextType>;
   ProposedArtistAddressesAndSplit?: ProposedArtistAddressesAndSplitResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Receipt?: ReceiptResolvers<ContextType>;
   Sale?: SaleResolvers<ContextType>;
   SaleLookupTable?: SaleLookupTableResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
@@ -3966,10 +6013,12 @@ export type DirectiveResolvers<ContextType = any> = {
   subgraphId?: SubgraphIdDirectiveResolver<any, any, ContextType>;
 };
 
-export const ProjectDetailFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProjectDetail"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Project"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projectId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"invocations"}},{"kind":"Field","name":{"kind":"Name","value":"maxInvocations"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"paused"}},{"kind":"Field","name":{"kind":"Name","value":"complete"}},{"kind":"Field","name":{"kind":"Name","value":"artistName"}},{"kind":"Field","name":{"kind":"Name","value":"contract"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ProjectDetailFragment, unknown>;
+export const ProjectDetailFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProjectDetail"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Project"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"projectId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"invocations"}},{"kind":"Field","name":{"kind":"Name","value":"maxInvocations"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"paused"}},{"kind":"Field","name":{"kind":"Name","value":"complete"}},{"kind":"Field","name":{"kind":"Name","value":"artistName"}},{"kind":"Field","name":{"kind":"Name","value":"contract"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ProjectDetailFragment, unknown>;
 export const GetAllProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getAllProjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"EnumValue","value":"projectId"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetAllProjectsQuery, GetAllProjectsQueryVariables>;
-export const GetWalletTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getWalletTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"wallet"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokens"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"wallet"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"invocation"}},{"kind":"Field","name":{"kind":"Name","value":"project"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetWalletTokensQuery, GetWalletTokensQueryVariables>;
+export const GetWalletTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getWalletTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"wallet"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokens"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"wallet"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"contract_in"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"invocation"}},{"kind":"Field","name":{"kind":"Name","value":"project"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetWalletTokensQuery, GetWalletTokensQueryVariables>;
 export const GetContractOpenProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getContractOpenProjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contract"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contract"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contract"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"EnumValue","value":"projectId"}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"paused"},"value":{"kind":"BooleanValue","value":false}},{"kind":"ObjectField","name":{"kind":"Name","value":"active"},"value":{"kind":"BooleanValue","value":true}},{"kind":"ObjectField","name":{"kind":"Name","value":"complete"},"value":{"kind":"BooleanValue","value":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetContractOpenProjectsQuery, GetContractOpenProjectsQueryVariables>;
 export const GetContractProjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getContractProject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contract"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"projectId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BigInt"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contract"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contract"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"projectId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"projectId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetContractProjectQuery, GetContractProjectQueryVariables>;
-export const GetContractProjectsWithCurationStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getContractProjectsWithCurationStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"curationStatus"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contract"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"curationStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"curationStatus"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"active"},"value":{"kind":"BooleanValue","value":true}}]}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"EnumValue","value":"projectId"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projectId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"invocations"}},{"kind":"Field","name":{"kind":"Name","value":"maxInvocations"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"curationStatus"}},{"kind":"Field","name":{"kind":"Name","value":"contract"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetContractProjectsWithCurationStatusQuery, GetContractProjectsWithCurationStatusQueryVariables>;
+export const GetContractProjectsWithCurationStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getContractProjectsWithCurationStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"curationStatus"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contract"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"curationStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"curationStatus"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"active"},"value":{"kind":"BooleanValue","value":true}}]}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"EnumValue","value":"projectId"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"projectId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"invocations"}},{"kind":"Field","name":{"kind":"Name","value":"maxInvocations"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"curationStatus"}},{"kind":"Field","name":{"kind":"Name","value":"contract"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetContractProjectsWithCurationStatusQuery, GetContractProjectsWithCurationStatusQueryVariables>;
 export const GetEngineContractsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEngineContracts"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ids"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contracts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_not_in"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ids"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GetEngineContractsQuery, GetEngineContractsQueryVariables>;
+export const GetProjectInvocationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getProjectInvocations"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"invocations"}}]}}]}}]} as unknown as DocumentNode<GetProjectInvocationsQuery, GetProjectInvocationsQueryVariables>;
+export const GetTokenOwnerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getTokenOwner"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokens"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<GetTokenOwnerQuery, GetTokenOwnerQueryVariables>;
