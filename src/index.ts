@@ -11,13 +11,12 @@ const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 
 import { ReservoirListBot } from './Classes/APIBots/ReservoirListBot'
 import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
-import { getEngineContracts } from './GraphQL/Subgraph/querySubgraph'
-
-// Special handlers.
-// const {
-//   getPBABProjects,
-//   getArtBlocksXPaceProjects,
-// } = require('./Utils/parseArtBlocksAPI')
+import {
+  getArtBlocksXBMProjects,
+  getArtBlocksXPaceProjects,
+  getEngineContracts,
+  getEngineProjects,
+} from './GraphQL/Subgraph/querySubgraph'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
@@ -43,11 +42,11 @@ const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects']
 const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 
 // PBAB Chat
-// const CHANNEL_PBAB_CHAT = projectConfig.chIdByName['engine-chat']
+const CHANNEL_ENGINE_CHAT = projectConfig.chIdByName['engine-chat']
 
 // AB x Pace
-// const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
-// const CHANNEL_AB_X_BM = projectConfig.chIdByName['art-blocks-x-bright-moments']
+const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
+const CHANNEL_AB_X_BM = projectConfig.chIdByName['art-blocks-x-bright-moments']
 
 // AB Art Chat
 const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat']
@@ -148,9 +147,9 @@ bot.on('ready', () => {
 })
 
 const artIndexerBot = new ArtIndexerBot()
-// const pbabIndexerBot = new ArtIndexerBot(getPBABProjects)
-// const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
-// const abXbmIndexerBot = new ArtIndexerBot(getArtBlocksXBMProjects)
+const pbabIndexerBot = new ArtIndexerBot(getEngineProjects)
+const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
+const abXbmIndexerBot = new ArtIndexerBot(getArtBlocksXBMProjects)
 
 export const mintBot = new MintBot(bot)
 
@@ -176,15 +175,15 @@ bot.on(Events.MessageCreate, async (msg) => {
       case CHANNEL_BLOCK_TALK:
         artIndexerBot.handleNumberMessage(msg)
         break
-      // case CHANNEL_PBAB_CHAT:
-      //   pbabIndexerBot.handleNumberMessage(msg)
-      //   break
-      // case CHANNEL_AB_X_PACE:
-      //   abXpaceIndexerBot.handleNumberMessage(msg)
-      //   break
-      // case CHANNEL_AB_X_BM:
-      //   abXbmIndexerBot.handleNumberMessage(msg)
-      //   break
+      case CHANNEL_ENGINE_CHAT:
+        pbabIndexerBot.handleNumberMessage(msg)
+        break
+      case CHANNEL_AB_X_PACE:
+        abXpaceIndexerBot.handleNumberMessage(msg)
+        break
+      case CHANNEL_AB_X_BM:
+        abXbmIndexerBot.handleNumberMessage(msg)
+        break
       case CHANNEL_ART_CHAT:
         artIndexerBot.handleNumberMessage(msg)
         break

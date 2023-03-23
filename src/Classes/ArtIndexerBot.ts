@@ -357,7 +357,7 @@ export class ArtIndexerBot {
 
       wallet = wallet.toLowerCase()
 
-      let tokens: any[] = []
+      let tokens = []
       if (this.walletTokens[wallet]) {
         tokens = this.walletTokens[wallet]
       } else {

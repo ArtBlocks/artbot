@@ -22,9 +22,8 @@ const hasuraClient = createClient({
 const maxProjectsPerQuery = 1000
 
 /**
- * Queries Hasura to get start_datetime of all projects
- * @returns Map of "contractAddr-projectId"->start_datetime
- * Returns empty dict on error (namely, if Hasura not configured)
+ * Queries Hasura to get Hasura-specific project details
+ * (namely project's birthday and up to date curation status)
  */
 export async function getProjectsHasuraDetails(): Promise<
   ProjectsMetadataDetailsFragment[]

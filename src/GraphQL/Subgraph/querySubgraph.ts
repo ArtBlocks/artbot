@@ -1,17 +1,17 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
 import { createClient } from 'urql/core'
+import { GetProjectInContractsDocument } from './generated/graphql'
 import {
-  GetEngineContractsDocument,
-  GetProjectInvocationsDocument,
-} from './generated/graphql'
-import {
-  GetContractProjectDocument,
+  GetProjectDocument,
+  GetContractProjectsDocument,
   ProjectDetailFragment,
   GetAllProjectsDocument,
   GetContractOpenProjectsDocument,
   GetWalletTokensDocument,
   GetTokenOwnerDocument,
+  GetEngineContractsDocument,
+  GetProjectInvocationsDocument,
 } from './generated/graphql'
 
 const fetch = require('node-fetch')
@@ -171,24 +171,113 @@ export async function getArtblocksOpenProjects(): Promise<
   }
 }
 
+export async function getArtBlocksXPaceProjects() {
+  return await getContractsProjects([COLLAB_CONTRACTS.AB_X_PACE])
+}
+
+export async function getArtBlocksXBMProjects(): Promise<
+  ProjectDetailFragment[]
+> {
+  return await getContractsProjects([COLLAB_CONTRACTS.AB_X_BM])
+}
+
+export async function getProjectInContracts(
+  projectId: number,
+  contracts: string[]
+): Promise<ProjectDetailFragment> {
+  const { data } = await client
+    .query(GetProjectInContractsDocument, {
+      contracts: contracts,
+      projectId: projectId,
+    })
+    .toPromise()
+
+  if (!data || !data.projects.length) {
+    throw Error('No data returned from getProject subgraph query')
+  }
+
+  return data.projects[0]
+}
+
+export async function getArtBlocksProject(
+  projectId: number
+): Promise<ProjectDetailFragment> {
+  const contractsToGet = Object.values(CORE_CONTRACTS)
+  return await getProjectInContracts(projectId, contractsToGet)
+}
+
+export async function getEngineProjects(): Promise<ProjectDetailFragment[]> {
+  const contractsToGet = (await getEngineContracts()) ?? []
+  return await getContractsProjects(contractsToGet)
+}
+
 export async function getContractProject(
   projectId: number,
   contractAddress: string
 ): Promise<ProjectDetailFragment> {
   const { data } = await client
-    .query(GetContractProjectDocument, {
-      first: maxProjectsPerQuery,
-      projectId: projectId,
-      contract: contractAddress,
+    .query(GetProjectDocument, {
+      id: `${contractAddress}-${projectId}`,
     })
     .toPromise()
 
-  if (!data || !data.contract?.projects || !data.contract?.projects[0]) {
-    console.log(projectId, contractAddress, data)
-    throw Error('No data returned from getContractProject subgraph query')
+  if (!data || !data.projects || !data.projects[0]) {
+    throw Error('No data returned from getProject subgraph query')
   }
 
-  return data.contract?.projects[0]
+  return data.projects[0]
+}
+
+export async function getProject(
+  projectId: number,
+  contractAddress?: string
+): Promise<ProjectDetailFragment> {
+  if (contractAddress) {
+    return getContractProject(projectId, contractAddress)
+  } else {
+    return getArtBlocksProject(projectId)
+  }
+}
+
+async function getContractProjects(
+  contractAddress: string
+): Promise<ProjectDetailFragment[]> {
+  const maxTokensPerQuery = 1000
+
+  const allProjects: ProjectDetailFragment[] = []
+  let loop = true
+  while (loop) {
+    const { data } = await client
+      .query(GetContractProjectsDocument, {
+        contract: contractAddress,
+        first: maxTokensPerQuery,
+        skip: allProjects.length,
+      })
+      .toPromise()
+
+    if (!data || !data.contract || !data.contract?.projects) {
+      throw Error('No data returned from getContractProjects subgraph query')
+    }
+
+    allProjects.push(...data.contract.projects)
+    if (data.contract.projects.length !== maxTokensPerQuery) {
+      loop = false
+    }
+  }
+  return allProjects
+}
+
+async function getContractsProjects(
+  contractsToGet: string[]
+): Promise<ProjectDetailFragment[]> {
+  try {
+    const allArrays = await Promise.all([
+      ...contractsToGet.map(getContractProjects),
+    ])
+    return allArrays.flat()
+  } catch (err) {
+    throw new Error(err)
+  }
 }
 
 export async function getTokenOwnerAddress(tokenId: string) {

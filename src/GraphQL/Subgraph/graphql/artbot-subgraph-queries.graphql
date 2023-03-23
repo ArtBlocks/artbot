@@ -37,6 +37,14 @@ query getWalletTokens(
   }
 }
 
+query getContractProjects($contract: ID!, $first: Int!, $skip: Int) {
+  contract(id: $contract) {
+    projects(first: $first, skip: $skip, orderBy: projectId) {
+      ...ProjectDetail
+    }
+  }
+}
+
 query getContractOpenProjects($contract: ID!, $first: Int!, $skip: Int) {
   contract(id: $contract) {
     projects(
@@ -50,44 +58,24 @@ query getContractOpenProjects($contract: ID!, $first: Int!, $skip: Int) {
   }
 }
 
-query getContractProject($contract: ID!, $projectId: BigInt!) {
-  contract(id: $contract) {
-    projects(where: { projectId: $projectId }) {
-      ...ProjectDetail
-    }
-  }
-}
-
-query getContractProjectsWithCurationStatus(
-  $id: ID!
-  $first: Int!
-  $skip: Int
-  $curationStatus: String
-) {
-  contract(id: $id) {
-    projects(
-      where: { curationStatus: $curationStatus, active: true }
-      first: $first
-      skip: $skip
-      orderBy: projectId
-    ) {
-      id
-      projectId
-      name
-      invocations
-      maxInvocations
-      active
-      curationStatus
-      contract {
-        id
-      }
-    }
+query getProject($id: ID!) {
+  projects(where: { id: $id }) {
+    ...ProjectDetail
   }
 }
 
 query getEngineContracts($ids: [ID!]) {
   contracts(where: { id_not_in: $ids }) {
     id
+  }
+}
+
+query getProjectInContracts($contracts: [String!], $projectId: BigInt!) {
+  projects(
+    where: { projectId: $projectId, contract_in: $contracts }
+    first: 1
+  ) {
+    ...ProjectDetail
   }
 }
 
