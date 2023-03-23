@@ -11,6 +11,7 @@ import {
   isExplorationsContract,
   isEngineContract,
   getCollectionType,
+  ensOrAddress,
 } from './utils'
 
 type ReservoirSale = {
@@ -165,8 +166,8 @@ export class ReservoirSaleBot extends APIPollBot {
     const artBlocksResponse = await axios.get(tokenUrl)
     const artBlocksData = artBlocksResponse?.data
 
-    let sellerText = await this.ensOrAddress(sale.from)
-    let buyerText = await this.ensOrAddress(sale.to)
+    let sellerText = await ensOrAddress(sale.from)
+    let buyerText = await ensOrAddress(sale.to)
     const platformUrl = this.getPlatformUrl(
       platform,
       sale.token.contract,
@@ -266,7 +267,7 @@ export class ReservoirSaleBot extends APIPollBot {
     // Create embed we will be sending
     const embed = new EmbedBuilder()
 
-    const buyerText = await this.ensOrAddress(sale0.to)
+    const buyerText = await ensOrAddress(sale0.to)
 
     // Get sale 0 token info for thumbnail, etc
     const tokenUrl = getTokenApiUrl(sale0.token.contract, sale0.token.tokenId)
@@ -292,7 +293,7 @@ export class ReservoirSaleBot extends APIPollBot {
         sale0.token.tokenId,
         sale.token.tokenId
       )
-      const sellerText = await this.ensOrAddress(sale.from)
+      const sellerText = await ensOrAddress(sale.from)
 
       const platform = sale.fillSource.toLowerCase()
       const platformUrl = this.getPlatformUrl(

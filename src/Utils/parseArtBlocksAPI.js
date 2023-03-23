@@ -187,6 +187,16 @@ const getWalletTokens = gql`
   }
 `
 
+const getTokenOwner = gql`
+  query getTokenOwner($id: ID!) {
+    tokens(where: { id: $id }) {
+      owner {
+        id
+      }
+    }
+  }
+`
+
 /*
  * helper function to get project count of a single
  * art blocks contract (uses pagination)
@@ -729,6 +739,20 @@ async function getAllWalletTokens(walletAddress) {
       }
     }
     return allTokens
+  } catch (err) {
+    console.error(err)
+    return undefined
+  }
+}
+
+export async function getTokenOwnerAddress(tokenId) {
+  try {
+    const result = await client
+      .query(getTokenOwner, {
+        id: tokenId,
+      })
+      .toPromise()
+    return result.data.tokens[0]?.owner?.id
   } catch (err) {
     console.error(err)
     return undefined
