@@ -1,6 +1,10 @@
 import { AxiosError } from 'axios'
 import { Message } from 'discord.js'
-import { getProjectInvocations } from '../Utils/parseArtBlocksAPI'
+import {
+  getProjectInvocations,
+  getTokenOwnerAddress,
+} from '../Utils/parseArtBlocksAPI'
+import { ensOrAddress } from './APIBots/utils'
 
 const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
@@ -182,32 +186,42 @@ export class ProjectBot {
       title = artBlocksData.platform + ' - ' + title
     }
 
-    const moreDetailsText = `Add "?details" to your command!`
+    const ownerAddress = await getTokenOwnerAddress(
+      `${this.coreContract}-${tokenID}`
+    )
+    let ownerText = ownerAddress ? await ensOrAddress(ownerAddress) : ''
+    if (ownerText.startsWith('0x') && !ownerText.endsWith('.eth')) {
+      ownerText = ownerText.substring(0, 6) + '...' + ownerText.substring(38)
+    }
 
+    const ownerProfileLink = ownerAddress
+      ? 'https://www.artblocks.io/user/' + ownerAddress
+      : ''
     // If user did *not* request full details, return just a large image,
     // along with a link to the OpenSea page and ArtBlocks live script.
     if (!detailsRequested) {
-      const imageContent = new EmbedBuilder()
+      const embedContent = new EmbedBuilder()
         // Set the title of the field.
         .setTitle(title)
         // Add link to title.
         .setURL(titleLink)
-        .addFields(
-          {
-            name: 'Live Script',
-            value: `[Generator](${artBlocksData.generator_url})`,
-            inline: true,
-          },
-          {
-            name: 'Want More Info?',
-            value: moreDetailsText,
-            inline: true,
-          }
-        )
+
         // Set the full image for embed.
         .setImage(artBlocksData.image)
 
-      msg.channel.send({ embeds: [imageContent] })
+      if (ownerText) {
+        embedContent.addFields({
+          name: 'Owner',
+          value: `[${ownerText}](${ownerProfileLink})`,
+          inline: true,
+        })
+      }
+      embedContent.addFields({
+        name: 'Live Script',
+        value: `[Generator](${artBlocksData.generator_url})`,
+        inline: true,
+      })
+      msg.channel.send({ embeds: [embedContent] })
       return
     }
 
@@ -228,38 +242,28 @@ export class ProjectBot {
       .setColor(EMBED_COLOR)
       // Set the main content of the embed
       .setThumbnail(artBlocksData.image)
-      // Add "Live Script" field.
-      .addFields(
-        {
-          name: 'Live Script',
-          value: `[Generator](${artBlocksData.generator_url})`,
-          inline: true,
-        },
-        {
-          name: 'Features',
-          value: assetFeatures,
-        }
-      )
+    // Add "Live Script" field.
 
-    console.log(embedContent)
-  }
-
-  parseOwnerInfo(ownerAccount: any) {
-    const address = ownerAccount.address
-    const addressPreview =
-      address !== null ? address.slice(0, 8) : UNKNOWN_ADDRESS
-    const addressOpenSeaURL = `https://opensea.io/accounts/${address}`
-    let ownerUsername =
-      ownerAccount.user !== null ? ownerAccount.user.username : UNKNOWN_USERNAME
-    if (ownerUsername === null) {
-      ownerUsername = UNKNOWN_USERNAME
+    if (ownerText) {
+      embedContent.addFields({
+        name: 'Owner',
+        value: `[${ownerText}](${ownerProfileLink})`,
+        inline: true,
+      })
     }
+    embedContent.addFields(
+      {
+        name: 'Live Script',
+        value: `[Generator](${artBlocksData.generator_url})`,
+        inline: true,
+      },
+      {
+        name: 'Features',
+        value: assetFeatures,
+      }
+    )
 
-    return {
-      name: 'Owner',
-      value: `[${addressPreview}](${addressOpenSeaURL}) (${ownerUsername})`,
-      inline: true,
-    }
+    msg.channel.send({ embeds: [embedContent] })
   }
 
   parseSaleInfo(saleInfo: any) {
