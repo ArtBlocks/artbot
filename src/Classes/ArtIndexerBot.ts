@@ -76,12 +76,12 @@ class ArtIndexerBot {
       const collectionInfo = await getProjectsCurationStatus()
       const collections = collectionInfo[0]
       const heritageStatuses = collectionInfo[1]
+      console.log(
+        `ArtIndexerBot: Building ${projects.length} ProjectBots using: ${this.projectFetch.name}`
+      )
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i]
         if (project.invocations === '0') continue
-        console.log(
-          `Refreshing project cache for Project ${project.projectId} ${project.name}`
-        )
         let bday = bdays[`${project.contract.id}-${project.projectId}`]
         const collection = this.toProjectKey(
           collections[`${project.contract.id}-${project.projectId}`]

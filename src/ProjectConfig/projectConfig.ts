@@ -188,6 +188,9 @@ class ProjectConfig {
     // This loops through all bots that need to be instatiated asynchronously,
     // gets the relevant configuration from projectBotsJson, calls the subgraph
     // to get project information, and then initializes the project bot.
+    console.log(
+      `ProjectConfig: Initializing ${botsToInstatiate.size} project bots...`
+    )
     const promises = Array.from(botsToInstatiate).map(async (botId: string) => {
       const [projectId, contractName] = botId.split('-')
       const namedMappings = projectBotsJson[botId]?.namedMappings
@@ -204,9 +207,7 @@ class ProjectConfig {
       const projectNumber = parseInt(projectId)
       const { id, invocations, maxInvocations, name, active, contract } =
         await getContractProject(projectNumber, configContract)
-      console.log(
-        `Refreshing project cache for Project ${projectNumber} ${name}`
-      )
+
       projectBots[botId] = new ProjectBot(
         id,
         projectNumber,
