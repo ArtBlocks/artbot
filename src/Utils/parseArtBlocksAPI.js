@@ -570,7 +570,7 @@ async function getArtBlocksAndCollabProjects() {
  *     - id: string Contract Address
  */
 async function getArtBlocksXPaceProjects() {
-  return await getContractsProjects([COLLAB_CONTRACTS.AB_X_PACE])
+  return await getContractsProjects(COLLAB_CONTRACTS.AB_X_PACE)
 }
 
 /**
