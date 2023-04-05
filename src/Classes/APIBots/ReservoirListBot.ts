@@ -146,7 +146,7 @@ export class ReservoirListBot extends APIPollBot {
 
     let title = `${artBlocksData.name} - ${artBlocksData.artist}`
 
-    if (artBlocksData?.platform === 'Art Blocks x Pace') {
+    if (artBlocksData?.platform.includes('Art Blocks x Pace')) {
       curationStatus = 'AB x Pace'
     } else if (artBlocksData?.platform === 'Art Blocks × Bright Moments') {
       curationStatus = 'AB x Bright Moments'

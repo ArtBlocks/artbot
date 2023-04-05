@@ -213,7 +213,7 @@ export class ReservoirSaleBot extends APIPollBot {
         artBlocksData.curation_status.slice(1).toLowerCase()
       : ''
 
-    if (artBlocksData?.platform === 'Art Blocks x Pace') {
+    if (artBlocksData?.platform.includes('Art Blocks x Pace')) {
       curationStatus = 'AB x Pace'
     } else if (artBlocksData?.platform === 'Art Blocks × Bright Moments') {
       curationStatus = 'AB x Bright Moments'
