@@ -197,6 +197,10 @@ export class ProjectBot {
       ownerText = ownerText.substring(0, 6) + '...' + ownerText.substring(38)
     }
 
+    if (artBlocksData.image.includes('mp4')) {
+      artBlocksData.image.replace('mp4', 'gif')
+    }
+
     const ownerProfileLink = ownerAddress
       ? 'https://www.artblocks.io/user/' + ownerAddress
       : ''
@@ -329,6 +333,10 @@ export class ProjectBot {
         return
       }
       const title = `:tada:  Happy Birthday to ${artBlocksData.collection_name}!  :tada:`
+
+      if (artBlocksData.image.includes('mp4')) {
+        artBlocksData.image.replace('mp4', 'gif')
+      }
 
       const embedContent = new EmbedBuilder()
         .setColor('#9370DB')
