@@ -5,7 +5,7 @@ import {
   getProjectInvocations,
   getTokenOwnerAddress,
 } from '../Utils/parseArtBlocksAPI'
-import { ensOrAddress } from './APIBots/utils'
+import { ensOrAddress, replaceVideoWithGIF } from './APIBots/utils'
 
 const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
@@ -197,9 +197,7 @@ export class ProjectBot {
       ownerText = ownerText.substring(0, 6) + '...' + ownerText.substring(38)
     }
 
-    if (artBlocksData.image.includes('mp4')) {
-      artBlocksData.image.replace('mp4', 'gif')
-    }
+    replaceVideoWithGIF(artBlocksData.image)
 
     const ownerProfileLink = ownerAddress
       ? 'https://www.artblocks.io/user/' + ownerAddress
@@ -334,9 +332,7 @@ export class ProjectBot {
       }
       const title = `:tada:  Happy Birthday to ${artBlocksData.collection_name}!  :tada:`
 
-      if (artBlocksData.image.includes('mp4')) {
-        artBlocksData.image.replace('mp4', 'gif')
-      }
+      replaceVideoWithGIF(artBlocksData.image)
 
       const embedContent = new EmbedBuilder()
         .setColor('#9370DB')
