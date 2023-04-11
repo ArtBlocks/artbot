@@ -216,9 +216,9 @@ export async function replaceVideoWithGIF(url: string) {
     const gifURL = url.replace('mp4', 'gif')
 
     // some GIFs are not available, so we fallback to PNG
-    let artBlocksResponse
+
     try {
-      artBlocksResponse = await axios.get(gifURL)
+      await axios.get(gifURL)
     } catch (e) {
       const axiosError = e as AxiosError
       if (axiosError && e.response?.status === 404) {

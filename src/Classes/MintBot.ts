@@ -109,7 +109,7 @@ export class MintBot {
         try {
           const artBlocksData = artBlocksResponse.data
           if (artBlocksData.image) {
-            artBlocksData.image = replaceVideoWithGIF(artBlocksData.image)
+            artBlocksData.image = await replaceVideoWithGIF(artBlocksData.image)
 
             const imageRes = await axios.get(artBlocksData.image)
             // Double check to ensure image/gif is available
