@@ -1,7 +1,7 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js'
 import { ENGINE_CONTRACTS, mintBot } from '../index'
 import axios, { AxiosError } from 'axios'
-import { MINT_UTM, getTokenApiUrl } from './APIBots/utils'
+import { MINT_UTM, getTokenApiUrl, replaceVideoWithGIF } from './APIBots/utils'
 import { ensOrAddress } from './APIBots/utils'
 import { TwitterBot } from './TwitterBot'
 
@@ -109,8 +109,10 @@ export class MintBot {
         try {
           const artBlocksData = artBlocksResponse.data
           if (artBlocksData.image) {
+            replaceVideoWithGIF(artBlocksData.image)
+
             const imageRes = await axios.get(artBlocksData.image)
-            // Double check to ensure image is available
+            // Double check to ensure image/gif is available
             if (imageRes.status === 200) {
               delete this.mintsToPost[id]
               mint.image = artBlocksData.image

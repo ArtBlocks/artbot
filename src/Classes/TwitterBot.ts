@@ -2,7 +2,12 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 import { TwitterApi } from 'twitter-api-v2'
 import { Mint, CollectionType } from './MintBot'
-import { ensOrAddress, getCollectionType, timeout } from './APIBots/utils'
+import {
+  ensOrAddress,
+  getCollectionType,
+  timeout,
+  replaceVideoWithGIF,
+} from './APIBots/utils'
 import axios from 'axios'
 
 const TWITTER_TIMEOUT_MS = 14 * 1000
@@ -37,6 +42,10 @@ export class TwitterBot {
       console.error('No artblock image defined', JSON.stringify(artBlock))
       return
     }
+    // now that we support animated projects with GIF/MP4 outputs this logic's needed to make sure we only post GIF to Discord/Twitter
+    // TODO: mint tweets aren't posting right now. Need to fix this and handle .gif extensions in uploadTwitterImage()
+    // replaceVideoWithGIF(artBlock.image)
+
     const imgResp = await axios.get(imageUrl, {
       responseType: 'arraybuffer',
     })
