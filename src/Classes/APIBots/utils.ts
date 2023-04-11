@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv'
 import { COLLAB_CONTRACTS, ENGINE_CONTRACTS } from '../../index'
 import { CollectionType } from '../MintBot'
+import { AxiosError } from 'axios'
 dotenv.config()
 
 const axios = require('axios')
@@ -210,12 +211,27 @@ export function timeout(
 }
 
 // defaulting our discord embeds to always send GIFs
-export function replaceVideoWithGIF(videoURL: string) {
-  if (videoURL.includes('mp4')) {
-    return videoURL.replace('mp4', 'gif')
+export async function replaceVideoWithGIF(url: string) {
+  if (url.includes('mp4')) {
+    const gifURL = url.replace('mp4', 'gif')
+
+    // some GIFs are not available, so we fallback to PNG
+    let artBlocksResponse
+    try {
+      artBlocksResponse = await axios.get(gifURL)
+    } catch (e) {
+      const axiosError = e as AxiosError
+      if (axiosError && e.response?.status === 404) {
+        console.log('GIF not found, returning PNG')
+      }
+      console.log(`Error on fetching token API for ${gifURL}`, e)
+      return url.replace('mp4', 'png')
+    }
+
+    return gifURL
   }
 
-  return videoURL
+  return url
 }
 
 module.exports.ensOrAddress = ensOrAddress

@@ -161,7 +161,7 @@ export class ReservoirListBot extends APIPollBot {
     }
     // Update thumbnail image to use larger variant from Art Blocks API.
     if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
-      replaceVideoWithGIF(artBlocksData.image)
+      artBlocksData.image = replaceVideoWithGIF(artBlocksData.image)
       embed.setThumbnail(artBlocksData.image)
     }
 
