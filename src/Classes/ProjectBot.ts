@@ -197,7 +197,7 @@ export class ProjectBot {
       ownerText = ownerText.substring(0, 6) + '...' + ownerText.substring(38)
     }
 
-    replaceVideoWithGIF(artBlocksData.image)
+    artBlocksData.image = replaceVideoWithGIF(artBlocksData.image)
 
     const ownerProfileLink = ownerAddress
       ? 'https://www.artblocks.io/user/' + ownerAddress
@@ -332,7 +332,7 @@ export class ProjectBot {
       }
       const title = `:tada:  Happy Birthday to ${artBlocksData.collection_name}!  :tada:`
 
-      replaceVideoWithGIF(artBlocksData.image)
+      artBlocksData.image = replaceVideoWithGIF(artBlocksData.image)
 
       const embedContent = new EmbedBuilder()
         .setColor('#9370DB')

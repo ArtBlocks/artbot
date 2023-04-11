@@ -212,8 +212,10 @@ export function timeout(
 // defaulting our discord embeds to always send GIFs
 export function replaceVideoWithGIF(videoURL: string) {
   if (videoURL.includes('mp4')) {
-    videoURL.replace('mp4', 'gif')
+    return videoURL.replace('mp4', 'gif')
   }
+
+  return videoURL
 }
 
 module.exports.ensOrAddress = ensOrAddress

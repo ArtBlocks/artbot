@@ -228,7 +228,7 @@ export class ReservoirSaleBot extends APIPollBot {
     }
     // Update thumbnail image to use larger variant from Art Blocks API.
     if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
-      replaceVideoWithGIF(artBlocksData.image)
+      artBlocksData.image = replaceVideoWithGIF(artBlocksData.image)
       embed.setThumbnail(artBlocksData.image)
     }
     embed.addFields(
@@ -279,7 +279,7 @@ export class ReservoirSaleBot extends APIPollBot {
     const artBlocksResponse = await axios.get(tokenUrl)
     const artBlocksData = artBlocksResponse?.data
     if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
-      replaceVideoWithGIF(artBlocksData.image)
+      artBlocksData.image = replaceVideoWithGIF(artBlocksData.image)
       embed.setThumbnail(artBlocksData.image)
     }
 
