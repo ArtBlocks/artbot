@@ -497,7 +497,8 @@
     "projectBotHandlers": {
       "default": "284",
       "stringTriggers": {
-        "329": ["latent spirits", "latent spirit", "latent", "spirits"]
+        "329": ["latent spirits", "latent spirit", "latent", "spirits"],
+        "423": ["solar transits", "solar transit", "solar", "transits", "transit"]
       }
     }
   },
