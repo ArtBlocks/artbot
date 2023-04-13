@@ -3,23 +3,20 @@ dotenv.config()
 import { Client, Events, GatewayIntentBits } from 'discord.js'
 const express = require('express')
 const bodyParser = require('body-parser')
-const getArtBlocksFactoryProjects =
-  require('./Utils/parseArtBlocksAPI').getArtBlocksFactoryProjects
 
-const ArtIndexerBot = require('./Classes/ArtIndexerBot').ArtIndexerBot
+import { ArtIndexerBot } from './Classes/ArtIndexerBot'
+
 import { MintBot } from './Classes/MintBot'
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 
-import { getEngineContracts } from './Utils/parseArtBlocksAPI'
 import { ReservoirListBot } from './Classes/APIBots/ReservoirListBot'
 import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
-
-// Special handlers.
-const {
-  getPBABProjects,
-  getArtBlocksXPaceProjects,
+import {
   getArtBlocksXBMProjects,
-} = require('./Utils/parseArtBlocksAPI')
+  getArtBlocksXPaceProjects,
+  getEngineContracts,
+  getEngineProjects,
+} from './GraphQL/Subgraph/querySubgraph'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
@@ -45,7 +42,7 @@ const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects']
 const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 
 // PBAB Chat
-const CHANNEL_PBAB_CHAT = projectConfig.chIdByName['engine-chat']
+const CHANNEL_ENGINE_CHAT = projectConfig.chIdByName['engine-chat']
 
 // AB x Pace
 const CHANNEL_AB_X_PACE = projectConfig.chIdByName['art-blocks-x-pace']
@@ -149,9 +146,8 @@ bot.on('ready', () => {
   artIndexerBot.startBirthdayRoutine(bot.channels.cache, projectConfig)
 })
 
-const factoryParty = new ArtIndexerBot(getArtBlocksFactoryProjects)
 const artIndexerBot = new ArtIndexerBot()
-const pbabIndexerBot = new ArtIndexerBot(getPBABProjects)
+const pbabIndexerBot = new ArtIndexerBot(getEngineProjects)
 const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
 const abXbmIndexerBot = new ArtIndexerBot(getArtBlocksXBMProjects)
 
@@ -174,12 +170,12 @@ bot.on(Events.MessageCreate, async (msg) => {
   if (msgContent.startsWith('#')) {
     switch (channelID) {
       case CHANNEL_FACTORY:
-        factoryParty.handleNumberMessage(msg)
+        artIndexerBot.handleNumberMessage(msg)
         break
       case CHANNEL_BLOCK_TALK:
         artIndexerBot.handleNumberMessage(msg)
         break
-      case CHANNEL_PBAB_CHAT:
+      case CHANNEL_ENGINE_CHAT:
         pbabIndexerBot.handleNumberMessage(msg)
         break
       case CHANNEL_AB_X_PACE:
@@ -249,7 +245,7 @@ const initReservoirBots = async () => {
   const allContracts = Object.values(CORE_CONTRACTS)
     .concat(Object.values(COLLAB_CONTRACTS))
     .concat(Object.values(EXPLORATIONS_CONTRACTS))
-    .concat(await ENGINE_CONTRACTS)
+    .concat((await ENGINE_CONTRACTS) ?? [])
 
   const RESERVOIR_CONTRACT_LIMIT = 20
   const numBotInstances = Math.ceil(

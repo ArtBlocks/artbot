@@ -16,7 +16,7 @@ const PROJECT_BOTS = ARTBOT_IS_PROD
   ? require('./projectBots.json')
   : require('./projectBots_dev.json')
 import { ProjectBot } from '../Classes/ProjectBot'
-const { getContractProject } = require('../Utils/parseArtBlocksAPI')
+import { getProject } from '../GraphQL/Subgraph/querySubgraph'
 const PARTNER_CONTRACTS = require('../ProjectConfig/partnerContracts.json')
 const EXPLORATIONS_CONTRACTS = require('../ProjectConfig/explorationsContracts.json')
 const COLLAB_CONTRACTS = require('../ProjectConfig/collaborationContracts.json')
@@ -206,7 +206,7 @@ class ProjectConfig {
       }
       const projectNumber = parseInt(projectId)
       const { id, invocations, maxInvocations, name, active, contract } =
-        await getContractProject(projectNumber, configContract)
+        await getProject(projectNumber, configContract)
 
       projectBots[botId] = new ProjectBot(
         id,
@@ -214,7 +214,7 @@ class ProjectConfig {
         contract.id,
         invocations,
         maxInvocations,
-        name,
+        name ?? 'Unknown',
         active,
         namedMappings
       )

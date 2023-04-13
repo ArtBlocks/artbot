@@ -4,7 +4,7 @@ import { PROJECTBOT_UTM } from './APIBots/utils'
 import {
   getProjectInvocations,
   getTokenOwnerAddress,
-} from '../Utils/parseArtBlocksAPI'
+} from '../GraphQL/Subgraph/querySubgraph'
 import { ensOrAddress, replaceVideoWithGIF } from './APIBots/utils'
 
 const { EmbedBuilder } = require('discord.js')

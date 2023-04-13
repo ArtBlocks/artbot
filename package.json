@@ -7,7 +7,10 @@
     "start": "ts-node src/index.ts",
     "test": "jest",
     "format": "prettier --write .",
-    "lint": "eslint . --ext ts --ext tsx --ext js"
+    "lint": "eslint . --ext ts --ext tsx --ext js",
+    "codegen": "yarn codegen-hasura && yarn codegen-subgraph",
+    "codegen-hasura": "graphql-codegen --require dotenv/config --config ./codegen.hasura.ts dotenv_config_path=./.env",
+    "codegen-subgraph": "graphql-codegen --config ./codegen.subgraph.ts"
   },
   "keywords": [
     "artblocks",
@@ -18,9 +21,9 @@
   "author": "duggan roberts",
   "license": "MIT",
   "dependencies": {
+    "@graphql-tools/utils": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^5.41.0",
     "@typescript-eslint/parser": "^5.41.0",
-    "@urql/core": "^2.3.6",
     "axios": "^1.1.3",
     "body-parser": "^1.15.2",
     "discord.js": "^14.6.0",
@@ -32,7 +35,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "ethers": "^5.7.0",
     "googleapis": "^92.0.0",
-    "graphql": "^16.2.0",
+    "graphql": "^16.6.0",
     "jest": "^28.0.3",
     "lodash.deburr": "^4.1.0",
     "ms": "^2.0.0",
@@ -44,7 +47,20 @@
     "ts-node": "^10.9.1",
     "twitter-api-v2": "^1.14.1",
     "typescript": "^4.8.4",
+    "urql": "^3.0.3",
     "web3": "^1.7.0",
     "ws": "^8.8.0"
+  },
+  "devDependencies": {
+    "@ardatan/aggregate-error": "^0.0.6",
+    "@graphql-codegen/cli": "^2.13.11",
+    "@graphql-codegen/typed-document-node": "^2.3.6",
+    "@graphql-codegen/typescript": "^2.8.1",
+    "@graphql-codegen/typescript-operations": "^2.5.5",
+    "@graphql-codegen/typescript-resolvers": "2.7.6",
+    "@graphql-codegen/typescript-urql": "^3.7.3",
+    "@graphql-codegen/urql-introspection": "^2.2.1",
+    "@urql/exchange-retry": "^1.0.0",
+    "graphql-tag": "^2.12.6"
   }
 }
