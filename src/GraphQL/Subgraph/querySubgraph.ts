@@ -172,7 +172,10 @@ export async function getArtblocksOpenProjects(): Promise<
 }
 
 export async function getArtBlocksXPaceProjects() {
-  return await getContractsProjects([COLLAB_CONTRACTS.AB_X_PACE])
+  return await getContractsProjects([
+    COLLAB_CONTRACTS.AB_X_PACE,
+    COLLAB_CONTRACTS.AB_X_PACE_V3,
+  ])
 }
 
 export async function getArtBlocksXBMProjects(): Promise<

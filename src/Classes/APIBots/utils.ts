@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv'
 import { ProjectsMetadataDetailsFragment } from '../../GraphQL/Hasura/generated/graphql'
 import { COLLAB_CONTRACTS, ENGINE_CONTRACTS } from '../../index'
 import { CollectionType } from '../MintBot'
+import { AxiosError } from 'axios'
 dotenv.config()
 
 const axios = require('axios')
@@ -240,6 +241,30 @@ export function timeout(
   return new Promise((resolve, reject) => {
     setTimeout(() => reject(failureMessage), timeoutMs)
   })
+}
+
+// defaulting our discord embeds to always send GIFs
+export async function replaceVideoWithGIF(url: string) {
+  if (url.includes('mp4')) {
+    const gifURL = url.replace('mp4', 'gif')
+
+    // some GIFs are not available, so we fallback to PNG
+
+    try {
+      await axios.get(gifURL)
+    } catch (e) {
+      const axiosError = e as AxiosError
+      if (axiosError && e.response?.status === 404) {
+        console.log('GIF not found, returning PNG')
+      }
+      console.log(`Error on fetching token API for ${gifURL}`, e)
+      return url.replace('mp4', 'png')
+    }
+
+    return gifURL
+  }
+
+  return url
 }
 
 module.exports.ensOrAddress = ensOrAddress

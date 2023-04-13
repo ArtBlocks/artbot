@@ -37,6 +37,10 @@ export class TwitterBot {
       console.error('No artblock image defined', JSON.stringify(artBlock))
       return
     }
+    // now that we support animated projects with GIF/MP4 outputs this logic's needed to make sure we only post GIF to Discord/Twitter
+    // TODO: mint tweets aren't posting right now. Need to fix this and handle .gif extensions in uploadTwitterImage()
+    // artBlocksData.image = replaceVideoWithGIF(artBlock.image)
+
     const imgResp = await axios.get(imageUrl, {
       responseType: 'arraybuffer',
     })

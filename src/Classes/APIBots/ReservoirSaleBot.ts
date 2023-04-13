@@ -13,6 +13,7 @@ import {
   getCollectionType,
   SALE_UTM,
   ensOrAddress,
+  replaceVideoWithGIF,
 } from './utils'
 
 type ReservoirSale = {
@@ -213,7 +214,7 @@ export class ReservoirSaleBot extends APIPollBot {
         artBlocksData.curation_status.slice(1).toLowerCase()
       : ''
 
-    if (artBlocksData?.platform === 'Art Blocks x Pace') {
+    if (artBlocksData?.platform.includes('Art Blocks x Pace')) {
       curationStatus = 'AB x Pace'
     } else if (artBlocksData?.platform === 'Art Blocks × Bright Moments') {
       curationStatus = 'AB x Bright Moments'
@@ -227,6 +228,7 @@ export class ReservoirSaleBot extends APIPollBot {
     }
     // Update thumbnail image to use larger variant from Art Blocks API.
     if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
+      artBlocksData.image = await replaceVideoWithGIF(artBlocksData.image)
       embed.setThumbnail(artBlocksData.image)
     }
     embed.addFields(
@@ -277,6 +279,7 @@ export class ReservoirSaleBot extends APIPollBot {
     const artBlocksResponse = await axios.get(tokenUrl)
     const artBlocksData = artBlocksResponse?.data
     if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
+      artBlocksData.image = await replaceVideoWithGIF(artBlocksData.image)
       embed.setThumbnail(artBlocksData.image)
     }
 

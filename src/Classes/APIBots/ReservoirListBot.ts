@@ -13,6 +13,7 @@ import {
   getTokenApiUrl,
   isEngineContract,
   isExplorationsContract,
+  replaceVideoWithGIF,
 } from './utils'
 
 type ReservoirListing = {
@@ -146,7 +147,7 @@ export class ReservoirListBot extends APIPollBot {
 
     let title = `${artBlocksData.name} - ${artBlocksData.artist}`
 
-    if (artBlocksData?.platform === 'Art Blocks x Pace') {
+    if (artBlocksData?.platform.includes('Art Blocks x Pace')) {
       curationStatus = 'AB x Pace'
     } else if (artBlocksData?.platform === 'Art Blocks × Bright Moments') {
       curationStatus = 'AB x Bright Moments'
@@ -160,6 +161,7 @@ export class ReservoirListBot extends APIPollBot {
     }
     // Update thumbnail image to use larger variant from Art Blocks API.
     if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
+      artBlocksData.image = await replaceVideoWithGIF(artBlocksData.image)
       embed.setThumbnail(artBlocksData.image)
     }
 

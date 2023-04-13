@@ -497,7 +497,8 @@
     "projectBotHandlers": {
       "default": "284",
       "stringTriggers": {
-        "329": ["latent spirits", "latent spirit", "latent", "spirits"]
+        "329": ["latent spirits", "latent spirit", "latent", "spirits"],
+        "423": ["solar transits", "solar transit", "solar", "transits", "transit"]
       }
     }
   },
@@ -634,6 +635,12 @@
     "name": "charlotte-dann",
     "projectBotHandlers": {
       "default": "417"
+    }
+  },
+  "1088507940396351619":{
+    "name": "kim-asendorf",
+    "projectBotHandlers": {
+      "default": "426"
     }
   },
   
