@@ -45,16 +45,19 @@ query getContractProjects($contract: ID!, $first: Int!, $skip: Int) {
   }
 }
 
-query getContractOpenProjects($contract: ID!, $first: Int!, $skip: Int) {
-  contract(id: $contract) {
-    projects(
-      first: $first
-      skip: $skip
-      orderBy: projectId
-      where: { paused: false, active: true, complete: false }
-    ) {
-      ...ProjectDetail
+query getOpenProjects($contracts: [String!], $first: Int!, $skip: Int) {
+  projects(
+    first: $first
+    skip: $skip
+    orderBy: projectId
+    where: {
+      paused: false
+      active: true
+      complete: false
+      contract_in: $contracts
     }
+  ) {
+    ...ProjectDetail
   }
 }
 
