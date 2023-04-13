@@ -1,17 +1,17 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
 import { createClient } from 'urql/core'
-import { GetProjectInContractsDocument } from './generated/graphql'
 import {
   GetProjectDocument,
   GetContractProjectsDocument,
   ProjectDetailFragment,
   GetAllProjectsDocument,
-  GetContractOpenProjectsDocument,
   GetWalletTokensDocument,
   GetTokenOwnerDocument,
   GetEngineContractsDocument,
   GetProjectInvocationsDocument,
+  GetOpenProjectsDocument,
+  GetProjectInContractsDocument,
 } from './generated/graphql'
 
 const fetch = require('node-fetch')
@@ -139,30 +139,28 @@ export async function getArtblocksOpenProjects(): Promise<
   try {
     const projects: ProjectDetailFragment[] = []
 
-    Object.values(CORE_CONTRACTS).forEach(async (contract: string) => {
-      let loop = true
-      while (loop) {
-        const { data } = await client
-          .query(GetContractOpenProjectsDocument, {
-            first: maxProjectsPerQuery,
-            skip: projects.length,
-            contract: contract,
-          })
-          .toPromise()
-        if (!data || !data.contract?.projects) {
-          throw Error(
-            'No data returned from getArtblocksOpenProjects subgraph query'
-          )
-        }
-
-        data.contract?.projects.forEach((project: ProjectDetailFragment) => {
-          projects.push(project)
+    let loop = true
+    while (loop) {
+      const { data } = await client
+        .query(GetOpenProjectsDocument, {
+          first: maxProjectsPerQuery,
+          skip: projects.length,
+          contracts: Object.values(CORE_CONTRACTS),
         })
-        if (data.contract?.projects?.length !== maxProjectsPerQuery) {
-          loop = false
-        }
+        .toPromise()
+      if (!data || !data.projects) {
+        throw Error(
+          'No data returned from getArtblocksOpenProjects subgraph query'
+        )
       }
-    })
+
+      data.projects.forEach((project: ProjectDetailFragment) => {
+        projects.push(project)
+      })
+      if (data.projects?.length !== maxProjectsPerQuery) {
+        loop = false
+      }
+    }
 
     return projects
   } catch (err) {
