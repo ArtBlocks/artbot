@@ -429,7 +429,8 @@ export enum Contract_Type_Names_Enum {
   GenArt721CoreV2EngineFlex = 'GenArt721CoreV2_ENGINE_FLEX',
   GenArt721CoreV2Pbab = 'GenArt721CoreV2_PBAB',
   GenArt721CoreV3 = 'GenArt721CoreV3',
-  GenArt721CoreV3Engine = 'GenArt721CoreV3_Engine'
+  GenArt721CoreV3Engine = 'GenArt721CoreV3_Engine',
+  GenArt721CoreV3EngineFlex = 'GenArt721CoreV3_Engine_Flex'
 }
 
 /** Boolean expression to compare columns of type "contract_type_names_enum". All fields are combined with logical 'AND'. */
@@ -3099,7 +3100,9 @@ export enum Order_By {
 /** columns and relationships of "project_external_asset_dependencies" */
 export type Project_External_Asset_Dependencies = {
   __typename?: 'project_external_asset_dependencies';
+  bytecode_address?: Maybe<Scalars['String']>;
   cid: Scalars['String'];
+  data?: Maybe<Scalars['String']>;
   dependency_type: Project_External_Asset_Dependency_Types_Enum;
   index: Scalars['Int'];
   /** An object relationship */
@@ -3132,7 +3135,9 @@ export type Project_External_Asset_Dependencies_Bool_Exp = {
   _and?: InputMaybe<Array<Project_External_Asset_Dependencies_Bool_Exp>>;
   _not?: InputMaybe<Project_External_Asset_Dependencies_Bool_Exp>;
   _or?: InputMaybe<Array<Project_External_Asset_Dependencies_Bool_Exp>>;
+  bytecode_address?: InputMaybe<String_Comparison_Exp>;
   cid?: InputMaybe<String_Comparison_Exp>;
+  data?: InputMaybe<String_Comparison_Exp>;
   dependency_type?: InputMaybe<Project_External_Asset_Dependency_Types_Enum_Comparison_Exp>;
   index?: InputMaybe<Int_Comparison_Exp>;
   project?: InputMaybe<Projects_Metadata_Bool_Exp>;
@@ -3141,21 +3146,27 @@ export type Project_External_Asset_Dependencies_Bool_Exp = {
 
 /** order by max() on columns of table "project_external_asset_dependencies" */
 export type Project_External_Asset_Dependencies_Max_Order_By = {
+  bytecode_address?: InputMaybe<Order_By>;
   cid?: InputMaybe<Order_By>;
+  data?: InputMaybe<Order_By>;
   index?: InputMaybe<Order_By>;
   project_id?: InputMaybe<Order_By>;
 };
 
 /** order by min() on columns of table "project_external_asset_dependencies" */
 export type Project_External_Asset_Dependencies_Min_Order_By = {
+  bytecode_address?: InputMaybe<Order_By>;
   cid?: InputMaybe<Order_By>;
+  data?: InputMaybe<Order_By>;
   index?: InputMaybe<Order_By>;
   project_id?: InputMaybe<Order_By>;
 };
 
 /** Ordering options when selecting data from "project_external_asset_dependencies". */
 export type Project_External_Asset_Dependencies_Order_By = {
+  bytecode_address?: InputMaybe<Order_By>;
   cid?: InputMaybe<Order_By>;
+  data?: InputMaybe<Order_By>;
   dependency_type?: InputMaybe<Order_By>;
   index?: InputMaybe<Order_By>;
   project?: InputMaybe<Projects_Metadata_Order_By>;
@@ -3165,7 +3176,11 @@ export type Project_External_Asset_Dependencies_Order_By = {
 /** select columns of table "project_external_asset_dependencies" */
 export enum Project_External_Asset_Dependencies_Select_Column {
   /** column name */
+  BytecodeAddress = 'bytecode_address',
+  /** column name */
   Cid = 'cid',
+  /** column name */
+  Data = 'data',
   /** column name */
   DependencyType = 'dependency_type',
   /** column name */
@@ -3199,7 +3214,9 @@ export type Project_External_Asset_Dependencies_Stream_Cursor_Input = {
 
 /** Initial value of the column from where the streaming should start */
 export type Project_External_Asset_Dependencies_Stream_Cursor_Value_Input = {
+  bytecode_address?: InputMaybe<Scalars['String']>;
   cid?: InputMaybe<Scalars['String']>;
+  data?: InputMaybe<Scalars['String']>;
   dependency_type?: InputMaybe<Project_External_Asset_Dependency_Types_Enum>;
   index?: InputMaybe<Scalars['Int']>;
   project_id?: InputMaybe<Scalars['String']>;
@@ -3227,7 +3244,8 @@ export type Project_External_Asset_Dependencies_Variance_Order_By = {
 
 export enum Project_External_Asset_Dependency_Types_Enum {
   Arweave = 'ARWEAVE',
-  Ipfs = 'IPFS'
+  Ipfs = 'IPFS',
+  Onchain = 'ONCHAIN'
 }
 
 /** Boolean expression to compare columns of type "project_external_asset_dependency_types_enum". All fields are combined with logical 'AND'. */
@@ -3939,7 +3957,6 @@ export type Projects_Metadata = {
   base_uri?: Maybe<Scalars['String']>;
   charitable_giving_details?: Maybe<Scalars['String']>;
   complete: Scalars['Boolean'];
-  /** A computed field, executes function "completed_at" */
   completed_at?: Maybe<Scalars['timestamptz']>;
   /** An object relationship */
   contract: Contracts_Metadata;
@@ -4372,6 +4389,7 @@ export type Projects_Metadata_Max_Fields = {
   aspect_ratio?: Maybe<Scalars['numeric']>;
   base_uri?: Maybe<Scalars['String']>;
   charitable_giving_details?: Maybe<Scalars['String']>;
+  completed_at?: Maybe<Scalars['timestamptz']>;
   contract_address?: Maybe<Scalars['String']>;
   creative_credit?: Maybe<Scalars['String']>;
   currency_address?: Maybe<Scalars['String']>;
@@ -4420,6 +4438,7 @@ export type Projects_Metadata_Max_Order_By = {
   aspect_ratio?: InputMaybe<Order_By>;
   base_uri?: InputMaybe<Order_By>;
   charitable_giving_details?: InputMaybe<Order_By>;
+  completed_at?: InputMaybe<Order_By>;
   contract_address?: InputMaybe<Order_By>;
   creative_credit?: InputMaybe<Order_By>;
   currency_address?: InputMaybe<Order_By>;
@@ -4469,6 +4488,7 @@ export type Projects_Metadata_Min_Fields = {
   aspect_ratio?: Maybe<Scalars['numeric']>;
   base_uri?: Maybe<Scalars['String']>;
   charitable_giving_details?: Maybe<Scalars['String']>;
+  completed_at?: Maybe<Scalars['timestamptz']>;
   contract_address?: Maybe<Scalars['String']>;
   creative_credit?: Maybe<Scalars['String']>;
   currency_address?: Maybe<Scalars['String']>;
@@ -4517,6 +4537,7 @@ export type Projects_Metadata_Min_Order_By = {
   aspect_ratio?: InputMaybe<Order_By>;
   base_uri?: InputMaybe<Order_By>;
   charitable_giving_details?: InputMaybe<Order_By>;
+  completed_at?: InputMaybe<Order_By>;
   contract_address?: InputMaybe<Order_By>;
   creative_credit?: InputMaybe<Order_By>;
   currency_address?: InputMaybe<Order_By>;
@@ -4672,6 +4693,8 @@ export enum Projects_Metadata_Select_Column {
   CharitableGivingDetails = 'charitable_giving_details',
   /** column name */
   Complete = 'complete',
+  /** column name */
+  CompletedAt = 'completed_at',
   /** column name */
   ContractAddress = 'contract_address',
   /** column name */
@@ -4934,6 +4957,7 @@ export type Projects_Metadata_Stream_Cursor_Value_Input = {
   base_uri?: InputMaybe<Scalars['String']>;
   charitable_giving_details?: InputMaybe<Scalars['String']>;
   complete?: InputMaybe<Scalars['Boolean']>;
+  completed_at?: InputMaybe<Scalars['timestamptz']>;
   contract_address?: InputMaybe<Scalars['String']>;
   creative_credit?: InputMaybe<Scalars['String']>;
   curation_status?: InputMaybe<Curation_Statuses_Enum>;
@@ -5358,12 +5382,6 @@ export type Query_Root = {
   tags: Array<Tags>;
   /** fetch data from the table: "tags" using primary key columns */
   tags_by_pk?: Maybe<Tags>;
-  /** fetch data from the table: "terms_of_service" */
-  terms_of_service: Array<Terms_Of_Service>;
-  /** fetch aggregated fields from the table: "terms_of_service" */
-  terms_of_service_aggregate: Terms_Of_Service_Aggregate;
-  /** fetch data from the table: "terms_of_service" using primary key columns */
-  terms_of_service_by_pk?: Maybe<Terms_Of_Service>;
   /** fetch data from the table: "tokens_metadata" */
   tokens_metadata: Array<Tokens_Metadata>;
   /** fetch aggregated fields from the table: "tokens_metadata" */
@@ -6052,29 +6070,6 @@ export type Query_RootTags_By_PkArgs = {
 };
 
 
-export type Query_RootTerms_Of_ServiceArgs = {
-  distinct_on?: InputMaybe<Array<Terms_Of_Service_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Terms_Of_Service_Order_By>>;
-  where?: InputMaybe<Terms_Of_Service_Bool_Exp>;
-};
-
-
-export type Query_RootTerms_Of_Service_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Terms_Of_Service_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Terms_Of_Service_Order_By>>;
-  where?: InputMaybe<Terms_Of_Service_Bool_Exp>;
-};
-
-
-export type Query_RootTerms_Of_Service_By_PkArgs = {
-  id: Scalars['Int'];
-};
-
-
 export type Query_RootTokens_MetadataArgs = {
   distinct_on?: InputMaybe<Array<Tokens_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -6683,14 +6678,6 @@ export type Subscription_Root = {
   tags_by_pk?: Maybe<Tags>;
   /** fetch data from the table in a streaming manner: "tags" */
   tags_stream: Array<Tags>;
-  /** fetch data from the table: "terms_of_service" */
-  terms_of_service: Array<Terms_Of_Service>;
-  /** fetch aggregated fields from the table: "terms_of_service" */
-  terms_of_service_aggregate: Terms_Of_Service_Aggregate;
-  /** fetch data from the table: "terms_of_service" using primary key columns */
-  terms_of_service_by_pk?: Maybe<Terms_Of_Service>;
-  /** fetch data from the table in a streaming manner: "terms_of_service" */
-  terms_of_service_stream: Array<Terms_Of_Service>;
   /** fetch data from the table: "tokens_metadata" */
   tokens_metadata: Array<Tokens_Metadata>;
   /** fetch aggregated fields from the table: "tokens_metadata" */
@@ -7588,36 +7575,6 @@ export type Subscription_RootTags_StreamArgs = {
 };
 
 
-export type Subscription_RootTerms_Of_ServiceArgs = {
-  distinct_on?: InputMaybe<Array<Terms_Of_Service_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Terms_Of_Service_Order_By>>;
-  where?: InputMaybe<Terms_Of_Service_Bool_Exp>;
-};
-
-
-export type Subscription_RootTerms_Of_Service_AggregateArgs = {
-  distinct_on?: InputMaybe<Array<Terms_Of_Service_Select_Column>>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  order_by?: InputMaybe<Array<Terms_Of_Service_Order_By>>;
-  where?: InputMaybe<Terms_Of_Service_Bool_Exp>;
-};
-
-
-export type Subscription_RootTerms_Of_Service_By_PkArgs = {
-  id: Scalars['Int'];
-};
-
-
-export type Subscription_RootTerms_Of_Service_StreamArgs = {
-  batch_size: Scalars['Int'];
-  cursor: Array<InputMaybe<Terms_Of_Service_Stream_Cursor_Input>>;
-  where?: InputMaybe<Terms_Of_Service_Bool_Exp>;
-};
-
-
 export type Subscription_RootTokens_MetadataArgs = {
   distinct_on?: InputMaybe<Array<Tokens_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -7948,150 +7905,6 @@ export type Tags_Stream_Cursor_Value_Input = {
   type?: InputMaybe<Tag_Types_Enum>;
 };
 
-/** columns and relationships of "terms_of_service" */
-export type Terms_Of_Service = {
-  __typename?: 'terms_of_service';
-  content: Scalars['String'];
-  created_at: Scalars['timestamptz'];
-  id: Scalars['Int'];
-};
-
-/** aggregated selection of "terms_of_service" */
-export type Terms_Of_Service_Aggregate = {
-  __typename?: 'terms_of_service_aggregate';
-  aggregate?: Maybe<Terms_Of_Service_Aggregate_Fields>;
-  nodes: Array<Terms_Of_Service>;
-};
-
-/** aggregate fields of "terms_of_service" */
-export type Terms_Of_Service_Aggregate_Fields = {
-  __typename?: 'terms_of_service_aggregate_fields';
-  avg?: Maybe<Terms_Of_Service_Avg_Fields>;
-  count: Scalars['Int'];
-  max?: Maybe<Terms_Of_Service_Max_Fields>;
-  min?: Maybe<Terms_Of_Service_Min_Fields>;
-  stddev?: Maybe<Terms_Of_Service_Stddev_Fields>;
-  stddev_pop?: Maybe<Terms_Of_Service_Stddev_Pop_Fields>;
-  stddev_samp?: Maybe<Terms_Of_Service_Stddev_Samp_Fields>;
-  sum?: Maybe<Terms_Of_Service_Sum_Fields>;
-  var_pop?: Maybe<Terms_Of_Service_Var_Pop_Fields>;
-  var_samp?: Maybe<Terms_Of_Service_Var_Samp_Fields>;
-  variance?: Maybe<Terms_Of_Service_Variance_Fields>;
-};
-
-
-/** aggregate fields of "terms_of_service" */
-export type Terms_Of_Service_Aggregate_FieldsCountArgs = {
-  columns?: InputMaybe<Array<Terms_Of_Service_Select_Column>>;
-  distinct?: InputMaybe<Scalars['Boolean']>;
-};
-
-/** aggregate avg on columns */
-export type Terms_Of_Service_Avg_Fields = {
-  __typename?: 'terms_of_service_avg_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** Boolean expression to filter rows from the table "terms_of_service". All fields are combined with a logical 'AND'. */
-export type Terms_Of_Service_Bool_Exp = {
-  _and?: InputMaybe<Array<Terms_Of_Service_Bool_Exp>>;
-  _not?: InputMaybe<Terms_Of_Service_Bool_Exp>;
-  _or?: InputMaybe<Array<Terms_Of_Service_Bool_Exp>>;
-  content?: InputMaybe<String_Comparison_Exp>;
-  created_at?: InputMaybe<Timestamptz_Comparison_Exp>;
-  id?: InputMaybe<Int_Comparison_Exp>;
-};
-
-/** aggregate max on columns */
-export type Terms_Of_Service_Max_Fields = {
-  __typename?: 'terms_of_service_max_fields';
-  content?: Maybe<Scalars['String']>;
-  created_at?: Maybe<Scalars['timestamptz']>;
-  id?: Maybe<Scalars['Int']>;
-};
-
-/** aggregate min on columns */
-export type Terms_Of_Service_Min_Fields = {
-  __typename?: 'terms_of_service_min_fields';
-  content?: Maybe<Scalars['String']>;
-  created_at?: Maybe<Scalars['timestamptz']>;
-  id?: Maybe<Scalars['Int']>;
-};
-
-/** Ordering options when selecting data from "terms_of_service". */
-export type Terms_Of_Service_Order_By = {
-  content?: InputMaybe<Order_By>;
-  created_at?: InputMaybe<Order_By>;
-  id?: InputMaybe<Order_By>;
-};
-
-/** select columns of table "terms_of_service" */
-export enum Terms_Of_Service_Select_Column {
-  /** column name */
-  Content = 'content',
-  /** column name */
-  CreatedAt = 'created_at',
-  /** column name */
-  Id = 'id'
-}
-
-/** aggregate stddev on columns */
-export type Terms_Of_Service_Stddev_Fields = {
-  __typename?: 'terms_of_service_stddev_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_pop on columns */
-export type Terms_Of_Service_Stddev_Pop_Fields = {
-  __typename?: 'terms_of_service_stddev_pop_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate stddev_samp on columns */
-export type Terms_Of_Service_Stddev_Samp_Fields = {
-  __typename?: 'terms_of_service_stddev_samp_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** Streaming cursor of the table "terms_of_service" */
-export type Terms_Of_Service_Stream_Cursor_Input = {
-  /** Stream column input with initial value */
-  initial_value: Terms_Of_Service_Stream_Cursor_Value_Input;
-  /** cursor ordering */
-  ordering?: InputMaybe<Cursor_Ordering>;
-};
-
-/** Initial value of the column from where the streaming should start */
-export type Terms_Of_Service_Stream_Cursor_Value_Input = {
-  content?: InputMaybe<Scalars['String']>;
-  created_at?: InputMaybe<Scalars['timestamptz']>;
-  id?: InputMaybe<Scalars['Int']>;
-};
-
-/** aggregate sum on columns */
-export type Terms_Of_Service_Sum_Fields = {
-  __typename?: 'terms_of_service_sum_fields';
-  id?: Maybe<Scalars['Int']>;
-};
-
-/** aggregate var_pop on columns */
-export type Terms_Of_Service_Var_Pop_Fields = {
-  __typename?: 'terms_of_service_var_pop_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate var_samp on columns */
-export type Terms_Of_Service_Var_Samp_Fields = {
-  __typename?: 'terms_of_service_var_samp_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
-/** aggregate variance on columns */
-export type Terms_Of_Service_Variance_Fields = {
-  __typename?: 'terms_of_service_variance_fields';
-  id?: Maybe<Scalars['Float']>;
-};
-
 /** Boolean expression to compare columns of type "timestamp". All fields are combined with logical 'AND'. */
 export type Timestamp_Comparison_Exp = {
   _eq?: InputMaybe<Scalars['timestamp']>;
@@ -8166,6 +7979,10 @@ export type Tokens_Metadata = {
   /** An object relationship */
   owner?: Maybe<Users>;
   owner_address: Scalars['String'];
+  /** returns the preview asset url based on preview_render_type and availability */
+  preview_asset_url?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "primary_asset_url" */
+  primary_asset_url?: Maybe<Scalars['String']>;
   /** An object relationship */
   project: Projects_Metadata;
   project_id: Scalars['String'];
@@ -8395,6 +8212,8 @@ export type Tokens_Metadata_Bool_Exp = {
   minted_at?: InputMaybe<Timestamptz_Comparison_Exp>;
   owner?: InputMaybe<Users_Bool_Exp>;
   owner_address?: InputMaybe<String_Comparison_Exp>;
+  preview_asset_url?: InputMaybe<String_Comparison_Exp>;
+  primary_asset_url?: InputMaybe<String_Comparison_Exp>;
   project?: InputMaybe<Projects_Metadata_Bool_Exp>;
   project_id?: InputMaybe<String_Comparison_Exp>;
   project_name?: InputMaybe<String_Comparison_Exp>;
@@ -8551,6 +8370,8 @@ export type Tokens_Metadata_Order_By = {
   minted_at?: InputMaybe<Order_By>;
   owner?: InputMaybe<Users_Order_By>;
   owner_address?: InputMaybe<Order_By>;
+  preview_asset_url?: InputMaybe<Order_By>;
+  primary_asset_url?: InputMaybe<Order_By>;
   project?: InputMaybe<Projects_Metadata_Order_By>;
   project_id?: InputMaybe<Order_By>;
   project_name?: InputMaybe<Order_By>;
@@ -10229,24 +10050,6 @@ export type ResolversTypes = {
   tags_select_column: Tags_Select_Column;
   tags_stream_cursor_input: Tags_Stream_Cursor_Input;
   tags_stream_cursor_value_input: Tags_Stream_Cursor_Value_Input;
-  terms_of_service: ResolverTypeWrapper<Terms_Of_Service>;
-  terms_of_service_aggregate: ResolverTypeWrapper<Terms_Of_Service_Aggregate>;
-  terms_of_service_aggregate_fields: ResolverTypeWrapper<Terms_Of_Service_Aggregate_Fields>;
-  terms_of_service_avg_fields: ResolverTypeWrapper<Terms_Of_Service_Avg_Fields>;
-  terms_of_service_bool_exp: Terms_Of_Service_Bool_Exp;
-  terms_of_service_max_fields: ResolverTypeWrapper<Terms_Of_Service_Max_Fields>;
-  terms_of_service_min_fields: ResolverTypeWrapper<Terms_Of_Service_Min_Fields>;
-  terms_of_service_order_by: Terms_Of_Service_Order_By;
-  terms_of_service_select_column: Terms_Of_Service_Select_Column;
-  terms_of_service_stddev_fields: ResolverTypeWrapper<Terms_Of_Service_Stddev_Fields>;
-  terms_of_service_stddev_pop_fields: ResolverTypeWrapper<Terms_Of_Service_Stddev_Pop_Fields>;
-  terms_of_service_stddev_samp_fields: ResolverTypeWrapper<Terms_Of_Service_Stddev_Samp_Fields>;
-  terms_of_service_stream_cursor_input: Terms_Of_Service_Stream_Cursor_Input;
-  terms_of_service_stream_cursor_value_input: Terms_Of_Service_Stream_Cursor_Value_Input;
-  terms_of_service_sum_fields: ResolverTypeWrapper<Terms_Of_Service_Sum_Fields>;
-  terms_of_service_var_pop_fields: ResolverTypeWrapper<Terms_Of_Service_Var_Pop_Fields>;
-  terms_of_service_var_samp_fields: ResolverTypeWrapper<Terms_Of_Service_Var_Samp_Fields>;
-  terms_of_service_variance_fields: ResolverTypeWrapper<Terms_Of_Service_Variance_Fields>;
   timestamp: ResolverTypeWrapper<Scalars['timestamp']>;
   timestamp_comparison_exp: Timestamp_Comparison_Exp;
   timestamptz: ResolverTypeWrapper<Scalars['timestamptz']>;
@@ -10797,23 +10600,6 @@ export type ResolversParentTypes = {
   tags_order_by: Tags_Order_By;
   tags_stream_cursor_input: Tags_Stream_Cursor_Input;
   tags_stream_cursor_value_input: Tags_Stream_Cursor_Value_Input;
-  terms_of_service: Terms_Of_Service;
-  terms_of_service_aggregate: Terms_Of_Service_Aggregate;
-  terms_of_service_aggregate_fields: Terms_Of_Service_Aggregate_Fields;
-  terms_of_service_avg_fields: Terms_Of_Service_Avg_Fields;
-  terms_of_service_bool_exp: Terms_Of_Service_Bool_Exp;
-  terms_of_service_max_fields: Terms_Of_Service_Max_Fields;
-  terms_of_service_min_fields: Terms_Of_Service_Min_Fields;
-  terms_of_service_order_by: Terms_Of_Service_Order_By;
-  terms_of_service_stddev_fields: Terms_Of_Service_Stddev_Fields;
-  terms_of_service_stddev_pop_fields: Terms_Of_Service_Stddev_Pop_Fields;
-  terms_of_service_stddev_samp_fields: Terms_Of_Service_Stddev_Samp_Fields;
-  terms_of_service_stream_cursor_input: Terms_Of_Service_Stream_Cursor_Input;
-  terms_of_service_stream_cursor_value_input: Terms_Of_Service_Stream_Cursor_Value_Input;
-  terms_of_service_sum_fields: Terms_Of_Service_Sum_Fields;
-  terms_of_service_var_pop_fields: Terms_Of_Service_Var_Pop_Fields;
-  terms_of_service_var_samp_fields: Terms_Of_Service_Var_Samp_Fields;
-  terms_of_service_variance_fields: Terms_Of_Service_Variance_Fields;
   timestamp: Scalars['timestamp'];
   timestamp_comparison_exp: Timestamp_Comparison_Exp;
   timestamptz: Scalars['timestamptz'];
@@ -11674,7 +11460,9 @@ export interface NumericScalarConfig extends GraphQLScalarTypeConfig<ResolversTy
 }
 
 export type Project_External_Asset_DependenciesResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_external_asset_dependencies'] = ResolversParentTypes['project_external_asset_dependencies']> = {
+  bytecode_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   cid?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  data?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   dependency_type?: Resolver<ResolversTypes['project_external_asset_dependency_types_enum'], ParentType, ContextType>;
   index?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   project?: Resolver<ResolversTypes['projects_metadata'], ParentType, ContextType>;
@@ -11967,6 +11755,7 @@ export type Projects_Metadata_Max_FieldsResolvers<ContextType = any, ParentType 
   aspect_ratio?: Resolver<Maybe<ResolversTypes['numeric']>, ParentType, ContextType>;
   base_uri?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   charitable_giving_details?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  completed_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   contract_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   creative_credit?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   currency_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -12015,6 +11804,7 @@ export type Projects_Metadata_Min_FieldsResolvers<ContextType = any, ParentType 
   aspect_ratio?: Resolver<Maybe<ResolversTypes['numeric']>, ParentType, ContextType>;
   base_uri?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   charitable_giving_details?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  completed_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   contract_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   creative_credit?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   currency_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -12264,9 +12054,6 @@ export type Query_RootResolvers<ContextType = any, ParentType extends ResolversP
   search_users_aggregate?: Resolver<ResolversTypes['user_profiles_aggregate'], ParentType, ContextType, RequireFields<Query_RootSearch_Users_AggregateArgs, 'args'>>;
   tags?: Resolver<Array<ResolversTypes['tags']>, ParentType, ContextType, Partial<Query_RootTagsArgs>>;
   tags_by_pk?: Resolver<Maybe<ResolversTypes['tags']>, ParentType, ContextType, RequireFields<Query_RootTags_By_PkArgs, 'name'>>;
-  terms_of_service?: Resolver<Array<ResolversTypes['terms_of_service']>, ParentType, ContextType, Partial<Query_RootTerms_Of_ServiceArgs>>;
-  terms_of_service_aggregate?: Resolver<ResolversTypes['terms_of_service_aggregate'], ParentType, ContextType, Partial<Query_RootTerms_Of_Service_AggregateArgs>>;
-  terms_of_service_by_pk?: Resolver<Maybe<ResolversTypes['terms_of_service']>, ParentType, ContextType, RequireFields<Query_RootTerms_Of_Service_By_PkArgs, 'id'>>;
   tokens_metadata?: Resolver<Array<ResolversTypes['tokens_metadata']>, ParentType, ContextType, Partial<Query_RootTokens_MetadataArgs>>;
   tokens_metadata_aggregate?: Resolver<ResolversTypes['tokens_metadata_aggregate'], ParentType, ContextType, Partial<Query_RootTokens_Metadata_AggregateArgs>>;
   tokens_metadata_by_pk?: Resolver<Maybe<ResolversTypes['tokens_metadata']>, ParentType, ContextType, RequireFields<Query_RootTokens_Metadata_By_PkArgs, 'id'>>;
@@ -12457,10 +12244,6 @@ export type Subscription_RootResolvers<ContextType = any, ParentType extends Res
   tags?: SubscriptionResolver<Array<ResolversTypes['tags']>, "tags", ParentType, ContextType, Partial<Subscription_RootTagsArgs>>;
   tags_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['tags']>, "tags_by_pk", ParentType, ContextType, RequireFields<Subscription_RootTags_By_PkArgs, 'name'>>;
   tags_stream?: SubscriptionResolver<Array<ResolversTypes['tags']>, "tags_stream", ParentType, ContextType, RequireFields<Subscription_RootTags_StreamArgs, 'batch_size' | 'cursor'>>;
-  terms_of_service?: SubscriptionResolver<Array<ResolversTypes['terms_of_service']>, "terms_of_service", ParentType, ContextType, Partial<Subscription_RootTerms_Of_ServiceArgs>>;
-  terms_of_service_aggregate?: SubscriptionResolver<ResolversTypes['terms_of_service_aggregate'], "terms_of_service_aggregate", ParentType, ContextType, Partial<Subscription_RootTerms_Of_Service_AggregateArgs>>;
-  terms_of_service_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['terms_of_service']>, "terms_of_service_by_pk", ParentType, ContextType, RequireFields<Subscription_RootTerms_Of_Service_By_PkArgs, 'id'>>;
-  terms_of_service_stream?: SubscriptionResolver<Array<ResolversTypes['terms_of_service']>, "terms_of_service_stream", ParentType, ContextType, RequireFields<Subscription_RootTerms_Of_Service_StreamArgs, 'batch_size' | 'cursor'>>;
   tokens_metadata?: SubscriptionResolver<Array<ResolversTypes['tokens_metadata']>, "tokens_metadata", ParentType, ContextType, Partial<Subscription_RootTokens_MetadataArgs>>;
   tokens_metadata_aggregate?: SubscriptionResolver<ResolversTypes['tokens_metadata_aggregate'], "tokens_metadata_aggregate", ParentType, ContextType, Partial<Subscription_RootTokens_Metadata_AggregateArgs>>;
   tokens_metadata_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['tokens_metadata']>, "tokens_metadata_by_pk", ParentType, ContextType, RequireFields<Subscription_RootTokens_Metadata_By_PkArgs, 'id'>>;
@@ -12499,88 +12282,6 @@ export type TagsResolvers<ContextType = any, ParentType extends ResolversParentT
   status?: Resolver<ResolversTypes['tag_status_enum'], ParentType, ContextType>;
   tagline?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   type?: Resolver<ResolversTypes['tag_types_enum'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type Terms_Of_ServiceResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service'] = ResolversParentTypes['terms_of_service']> = {
-  content?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  created_at?: Resolver<ResolversTypes['timestamptz'], ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type Terms_Of_Service_AggregateResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_aggregate'] = ResolversParentTypes['terms_of_service_aggregate']> = {
-  aggregate?: Resolver<Maybe<ResolversTypes['terms_of_service_aggregate_fields']>, ParentType, ContextType>;
-  nodes?: Resolver<Array<ResolversTypes['terms_of_service']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type Terms_Of_Service_Aggregate_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_aggregate_fields'] = ResolversParentTypes['terms_of_service_aggregate_fields']> = {
-  avg?: Resolver<Maybe<ResolversTypes['terms_of_service_avg_fields']>, ParentType, ContextType>;
-  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType, Partial<Terms_Of_Service_Aggregate_FieldsCountArgs>>;
-  max?: Resolver<Maybe<ResolversTypes['terms_of_service_max_fields']>, ParentType, ContextType>;
-  min?: Resolver<Maybe<ResolversTypes['terms_of_service_min_fields']>, ParentType, ContextType>;
-  stddev?: Resolver<Maybe<ResolversTypes['terms_of_service_stddev_fields']>, ParentType, ContextType>;
-  stddev_pop?: Resolver<Maybe<ResolversTypes['terms_of_service_stddev_pop_fields']>, ParentType, ContextType>;
-  stddev_samp?: Resolver<Maybe<ResolversTypes['terms_of_service_stddev_samp_fields']>, ParentType, ContextType>;
-  sum?: Resolver<Maybe<ResolversTypes['terms_of_service_sum_fields']>, ParentType, ContextType>;
-  var_pop?: Resolver<Maybe<ResolversTypes['terms_of_service_var_pop_fields']>, ParentType, ContextType>;
-  var_samp?: Resolver<Maybe<ResolversTypes['terms_of_service_var_samp_fields']>, ParentType, ContextType>;
-  variance?: Resolver<Maybe<ResolversTypes['terms_of_service_variance_fields']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type Terms_Of_Service_Avg_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_avg_fields'] = ResolversParentTypes['terms_of_service_avg_fields']> = {
-  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type Terms_Of_Service_Max_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_max_fields'] = ResolversParentTypes['terms_of_service_max_fields']> = {
-  content?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  created_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
-  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type Terms_Of_Service_Min_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_min_fields'] = ResolversParentTypes['terms_of_service_min_fields']> = {
-  content?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  created_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
-  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type Terms_Of_Service_Stddev_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_stddev_fields'] = ResolversParentTypes['terms_of_service_stddev_fields']> = {
-  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type Terms_Of_Service_Stddev_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_stddev_pop_fields'] = ResolversParentTypes['terms_of_service_stddev_pop_fields']> = {
-  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type Terms_Of_Service_Stddev_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_stddev_samp_fields'] = ResolversParentTypes['terms_of_service_stddev_samp_fields']> = {
-  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type Terms_Of_Service_Sum_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_sum_fields'] = ResolversParentTypes['terms_of_service_sum_fields']> = {
-  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type Terms_Of_Service_Var_Pop_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_var_pop_fields'] = ResolversParentTypes['terms_of_service_var_pop_fields']> = {
-  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type Terms_Of_Service_Var_Samp_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_var_samp_fields'] = ResolversParentTypes['terms_of_service_var_samp_fields']> = {
-  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type Terms_Of_Service_Variance_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['terms_of_service_variance_fields'] = ResolversParentTypes['terms_of_service_variance_fields']> = {
-  id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -12626,6 +12327,8 @@ export type Tokens_MetadataResolvers<ContextType = any, ParentType extends Resol
   minted_at?: Resolver<ResolversTypes['timestamptz'], ParentType, ContextType>;
   owner?: Resolver<Maybe<ResolversTypes['users']>, ParentType, ContextType>;
   owner_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  preview_asset_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  primary_asset_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   project?: Resolver<ResolversTypes['projects_metadata'], ParentType, ContextType>;
   project_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   project_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -13149,19 +12852,6 @@ export type Resolvers<ContextType = any> = {
   seed_float?: GraphQLScalarType;
   subscription_root?: Subscription_RootResolvers<ContextType>;
   tags?: TagsResolvers<ContextType>;
-  terms_of_service?: Terms_Of_ServiceResolvers<ContextType>;
-  terms_of_service_aggregate?: Terms_Of_Service_AggregateResolvers<ContextType>;
-  terms_of_service_aggregate_fields?: Terms_Of_Service_Aggregate_FieldsResolvers<ContextType>;
-  terms_of_service_avg_fields?: Terms_Of_Service_Avg_FieldsResolvers<ContextType>;
-  terms_of_service_max_fields?: Terms_Of_Service_Max_FieldsResolvers<ContextType>;
-  terms_of_service_min_fields?: Terms_Of_Service_Min_FieldsResolvers<ContextType>;
-  terms_of_service_stddev_fields?: Terms_Of_Service_Stddev_FieldsResolvers<ContextType>;
-  terms_of_service_stddev_pop_fields?: Terms_Of_Service_Stddev_Pop_FieldsResolvers<ContextType>;
-  terms_of_service_stddev_samp_fields?: Terms_Of_Service_Stddev_Samp_FieldsResolvers<ContextType>;
-  terms_of_service_sum_fields?: Terms_Of_Service_Sum_FieldsResolvers<ContextType>;
-  terms_of_service_var_pop_fields?: Terms_Of_Service_Var_Pop_FieldsResolvers<ContextType>;
-  terms_of_service_var_samp_fields?: Terms_Of_Service_Var_Samp_FieldsResolvers<ContextType>;
-  terms_of_service_variance_fields?: Terms_Of_Service_Variance_FieldsResolvers<ContextType>;
   timestamp?: GraphQLScalarType;
   timestamptz?: GraphQLScalarType;
   tokens_metadata?: Tokens_MetadataResolvers<ContextType>;
