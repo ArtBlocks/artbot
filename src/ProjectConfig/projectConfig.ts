@@ -203,6 +203,7 @@ class ProjectConfig {
         console.warn(
           `Bot ${botId} had a contractName, but there was no matching contract in partnerContracts.json. Has it been defined?`
         )
+        return
       }
       const projectNumber = parseInt(projectId)
       const { id, invocations, maxInvocations, name, active, contract } =
