@@ -15,6 +15,7 @@ For example, this is what it would look like for Project 143, Phase by Loren Bed
 - Project Title: "Phase"
 - Project ID: 143
 - Artist Channel ID: 877060147619446814
+- Artist Channel Name: "Loren Bednar"
 
 Note: you can find the channel ID for a given channel by right-clicking it in Discord and selecting "Copy ID".
 
@@ -23,3 +24,4 @@ Note: you can find the channel ID for a given channel by right-clicking it in Di
 - Project Title:
 - Project ID:
 - Artist Channel ID:
+- Artist Channel Name:

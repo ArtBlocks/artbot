@@ -499,7 +499,13 @@
       "default": "284",
       "stringTriggers": {
         "329": ["latent spirits", "latent spirit", "latent", "spirits"],
-        "423": ["solar transits", "solar transit", "solar", "transits", "transit"]
+        "423": [
+          "solar transits",
+          "solar transit",
+          "solar",
+          "transits",
+          "transit"
+        ]
       }
     }
   },
@@ -638,13 +644,19 @@
       "default": "417"
     }
   },
-  "1088507940396351619":{
+  "1088507940396351619": {
     "name": "kim-asendorf",
     "projectBotHandlers": {
       "default": "426"
     }
   },
-  
+  "1098639953044443237": {
+    "name": "nathaniel-x-sasha",
+    "projectBotHandlers": {
+      "default": "433"
+    }
+  },
+
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
     "projectBotHandlers": {
