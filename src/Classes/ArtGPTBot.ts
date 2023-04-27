@@ -46,11 +46,11 @@ export class ArtGPTBot {
     this.currentRequestCount = 0
     // expect this to be set to `true` within initializeLangchain()
     this.isLangChainWarmedUp = false
-    this.model = new OpenAI()
-    // Beef up the OpenAI
-    this.model.modelName = 'gpt-3.5-turbo'
-    this.model.temperature = 0
-    this.model.maxTokens = 2048
+    this.model = new OpenAI({
+      modelName: 'gpt-3.5-turbo',
+      temperature: 0,
+      maxTokens: 512,
+    })
     this.pineconeClient = new PineconeClient()
     this.initializeLangchain()
   }
@@ -82,7 +82,7 @@ export class ArtGPTBot {
       { pineconeIndex }
     )
     this.langChain = VectorDBQAChain.fromLLM(this.model, this.vectorStore, {
-      k: 5,
+      k: 4, // This is the number of documents to include as context (4 is default).
       // Can turn this on (and log `response.sourceDocuments`) for debuggings purposes.
       returnSourceDocuments: false,
     })
