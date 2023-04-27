@@ -78,7 +78,7 @@ export class ArtGPTBot {
     )
     this.langChain = VectorDBQAChain.fromLLM(this.model, this.vectorStore, {
       k: 1,
-      returnSourceDocuments: true,
+      returnSourceDocuments: true, // TODO: Make this configurable (or just turn it off)
     })
 
     // We are now warmed up!
@@ -140,7 +140,6 @@ export class ArtGPTBot {
       return
     } else {
       const response = await this.langChain.call({ query: query })
-      // TODO: Actually the message w/ GPT-3.5.
       const message = `
       Beep boop bop ... I'm still learning, so please be patient with me.
       
