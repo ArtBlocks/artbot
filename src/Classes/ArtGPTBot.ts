@@ -117,7 +117,7 @@ export class ArtGPTBot {
       const message = `
       Invalid format, enter ${this.queryString} followed by the query for ArtGPT.
   `
-      this.sendEmbed(msg, this.queryString, ARTBOT_WARNING, message)
+      this.sendEmbedReply(msg, this.queryString, ARTBOT_WARNING, message)
       return
     } else if (!this.isLangChainWarmedUp || !this.langChain) {
       // Validate warm-up
@@ -126,7 +126,7 @@ export class ArtGPTBot {
 
       Please try again in a few minutes.
   `
-      this.sendEmbed(msg, this.queryString, ARTBOT_WARNING, message)
+      this.sendEmbedReply(msg, this.queryString, ARTBOT_WARNING, message)
       return
     } else if (this.isRateLimited() === true) {
       // Validate rate-limit
@@ -137,12 +137,21 @@ export class ArtGPTBot {
       
       Please try again later.
   `
-      this.sendEmbed(msg, this.queryString, ARTBOT_WARNING, message)
+      this.sendEmbedReply(msg, this.queryString, ARTBOT_WARNING, message)
       return
     } else {
+      // Give a "I'm thinking response" while we wait for the response.
+      this.sendEmbedReply(
+        msg,
+        this.queryString,
+        ARTBOT_GREEN,
+        "Your question has been recieved! I'm working on an answer..."
+      )
+
+      // Query the langchain
       let response = await this.langChain.call({ query: query })
+      // Summarize response to be less than ARTBOT_MAX_CHARS_RESPONSE if it is too long.
       if (response.text.length > ARTBOT_MAX_CHARS_RESPONSE) {
-        // Update response to be less than ARTBOT_MAX_CHARS_RESPONSE
         console.log('Summarizing response...')
         response = await this.langChain.call({
           query: `
@@ -152,20 +161,22 @@ export class ArtGPTBot {
         `,
         })
       }
+
+      // Provide the real response.
       const message = `
-      **NOTE: I am still in beta, my answers may be wrong.**
+      *NOTE: I am still in beta, my answers may be wrong.*
       
-      *Q:*
+      **Q:**
       "${query}"
 
-      *A:*
+      **A:**
       ${response.text}
       `
-      this.sendEmbed(msg, this.queryString, ARTBOT_GREEN, message)
+      this.sendEmbedReply(msg, this.queryString, ARTBOT_GREEN, message)
     }
   }
 
-  async sendEmbed(
+  async sendEmbedReply(
     msg: Message,
     title: string,
     color: number,
@@ -176,6 +187,6 @@ export class ArtGPTBot {
       .setColor(color)
       .setDescription(description)
 
-    await msg.channel.send({ embeds: [embed] })
+    await msg.reply({ embeds: [embed] })
   }
 }
