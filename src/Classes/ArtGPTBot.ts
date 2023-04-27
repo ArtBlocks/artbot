@@ -78,7 +78,8 @@ export class ArtGPTBot {
     )
     this.langChain = VectorDBQAChain.fromLLM(this.model, this.vectorStore, {
       k: 5,
-      returnSourceDocuments: true, // Keep this on for logging purposes.
+      // Can turn this on (and log `response.sourceDocuments`) for debuggings purposes.
+      returnSourceDocuments: false,
     })
 
     // We are now warmed up!
@@ -142,6 +143,7 @@ export class ArtGPTBot {
       let response = await this.langChain.call({ query: query })
       if (response.text.length > ARTBOT_MAX_CHARS_RESPONSE) {
         // Update response to be less than ARTBOT_MAX_CHARS_RESPONSE
+        console.log('Summarizing response...')
         response = await this.langChain.call({
           query: `
         Please summarize the following response to be less than ${ARTBOT_MAX_CHARS_RESPONSE} characters:
@@ -150,11 +152,6 @@ export class ArtGPTBot {
         `,
         })
       }
-      console.log(
-        `ArtGPTBot (source-docs): ${query} -> ${JSON.stringify(
-          response.sourceDocuments
-        )}`
-      )
       const message = `
       **NOTE: I am still in beta, my answers may be wrong.**
       
