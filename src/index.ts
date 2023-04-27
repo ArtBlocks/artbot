@@ -19,6 +19,7 @@ import {
 } from './GraphQL/Subgraph/querySubgraph'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
+const artGPTResponse = require('./Utils/artGPTResponse').artGPTResponse
 
 // Misc. server configuration info.
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN
@@ -158,6 +159,7 @@ bot.on(Events.MessageCreate, async (msg) => {
   const msgContent = msg.content
   const msgContentLowercase = msgContent.toLowerCase()
   const channelID = msg.channel.id
+  const artBotID = bot.user?.id
 
   // If there is not a channel ID configured where the message was sent
   // short-circuit handling the message
@@ -195,8 +197,23 @@ bot.on(Events.MessageCreate, async (msg) => {
     return
   }
 
+  // Handle special requests to ArtBotGPT.
+  if (msgContentLowercase.startsWith('?artgpt')) {
+    artGPTResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
+      (gptResponse: string) => {
+        if (gptResponse !== null && gptResponse !== undefined) {
+          if (typeof gptResponse === 'string') {
+            msg.reply(gptResponse)
+          } else {
+            msg.reply({ embeds: [gptResponse] })
+          }
+        }
+      }
+    )
+    return
+  }
+
   // Handle special info questions that ArtBot knows how to answer.
-  const artBotID = bot.user?.id
   smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
     (smartResponse: string) => {
       if (smartResponse !== null && smartResponse !== undefined) {

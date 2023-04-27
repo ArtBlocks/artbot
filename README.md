@@ -1,4 +1,5 @@
 # ArtBot: The Art Blocks Discord Bot
+
 ![Build status](https://github.com/ArtBlocks/artbot/actions/workflows/build-check.yml/badge.svg)
 [![GitPOAPs](https://public-api.gitpoap.io/v1/repo/ArtBlocks/artbot/badge)](https://www.gitpoap.io/gh/ArtBlocks/artbot)
 
@@ -51,17 +52,27 @@ The core engine of Artbot is built around the discord.js package. It serves seve
 
   - All projects and their metadata are retrieved from the subgraph on startup in the `ArtIndexerBot.ts` class, which in turn creates a `ProjectBot` for every project. `#[n] [project_name]`, `#?`, etc queries are triaged by the `ArtIndexerBot` class, and the corresponding `ProjectBot` is triggered to respond.
   - Curated artist channels are handled a bit differently. ProjectBots for the artist's projects are defined in `ProjectConfig/channels.json` and are triggered by the artist's name in the query. e.g. `#1 ringer` in `#dmitri-cherniak` will trigger the Ringer project bot.
-     - Additional configuration for these projects can be defined in `ProjectConfig/projectBots.json`. See [Adding query support for a project](#adding-query-support-for-a-project) for more details.
+    - Additional configuration for these projects can be defined in `ProjectConfig/projectBots.json`. See [Adding query support for a project](#adding-query-support-for-a-project) for more details.
 
 - Sales/Listing Feeds
 
-  Artbot also provides a feeds for sales and listings of Art Blocks projects. It polls the (incredible) [Reservoir API](https://docs.reservoir.tools/reference/overview) to get the latest activity across all marketplaces (using the `ReservoirListBot.ts` and `ReservoirSaleBot.ts` classes, respectively), and then posts them to the appropriate Discord channels (`Utils/activityTriager.js`). 
+  Artbot also provides a feeds for sales and listings of Art Blocks projects. It polls the (incredible) [Reservoir API](https://docs.reservoir.tools/reference/overview) to get the latest activity across all marketplaces (using the `ReservoirListBot.ts` and `ReservoirSaleBot.ts` classes, respectively), and then posts them to the appropriate Discord channels (`Utils/activityTriager.ts`).
 
 - SmartBot Responses
 
-  Artbot has been taught to respond to some specific queries about gas price, curated/playground/factory, etc. when directly queried. This logic lives in `Utils/smartBotResponse.js`.
+  Artbot has been taught to respond to some specific queries about gas price, curated/playground/factory, etc. when directly queried. This logic lives in `Utils/smartBotResponse.ts`.
+
+- ArtBotGPT Responses
+
+  Artbot has been given the power of GPT-3.5 and given the data of our public docs and smart-contracts repos:
+
+  - https://github.com/ArtBlocks/artblocks-docs
+  - https://github.com/ArtBlocks/artblocks-contracts
+
+  This logic lives in `Utils/artGPTResponse.ts` and is queried in Discord via `?artGPT` commands.
 
 ## Adding query support for a project
+
 ### Definitions
 
 #### Bot ID
@@ -117,7 +128,6 @@ Here are the currently valid contract names.
   - json file defining trigger names for single tokens. See `ringerSingles.json` for example.
 - `NamedMappings/<projectName>Seets.json`
   - json file defining trigger names for single tokens. See `ringerSets.json` for example.
-
 
 ## PBAB instructions
 
