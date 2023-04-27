@@ -52,7 +52,11 @@ export async function artGPTResponse(
       .setColor(randomColor())
       // Set the main content of the embed
       .setDescription(
-        `Hi, I'm ArtBot! I'm here to help you with your question. I'm still learning, so please be patient with me.`
+        `
+        Hi, I'm ArtBot! I'm here to help you with your question. I'm still learning, so please be patient with me.
+        
+        This is what you asked me: ${msgContentLowercase}
+        `
       )
   )
 }
