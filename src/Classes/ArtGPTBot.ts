@@ -165,11 +165,7 @@ export class ArtGPTBot {
       // Provide the real response.
       const message = `
       *NOTE: I am still in beta, my answers may be wrong.*
-      
-      **Q:**
-      "${query}"
 
-      **A:**
       ${response.text}
       `
       this.sendEmbedReply(msg, this.queryString, ARTBOT_GREEN, message)
