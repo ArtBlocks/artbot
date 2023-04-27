@@ -69,7 +69,7 @@ The core engine of Artbot is built around the discord.js package. It serves seve
   - https://github.com/ArtBlocks/artblocks-docs
   - https://github.com/ArtBlocks/artblocks-contracts
 
-  This logic lives in `Utils/artGPTResponse.ts` and is queried in Discord via `?artGPT` commands.
+  This logic lives in `Classes/ArtGPTBot.ts` and is queried in Discord via `?artGPT` commands.
 
 ## Adding query support for a project
 

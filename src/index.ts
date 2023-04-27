@@ -5,6 +5,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 
 import { ArtIndexerBot } from './Classes/ArtIndexerBot'
+import { ArtGPTBot } from './Classes/ArtGPTBot'
 
 import { MintBot } from './Classes/MintBot'
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
@@ -19,7 +20,6 @@ import {
 } from './GraphQL/Subgraph/querySubgraph'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
-const artGPTResponse = require('./Utils/artGPTResponse').artGPTResponse
 
 // Misc. server configuration info.
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN
@@ -148,6 +148,7 @@ bot.on('ready', () => {
 })
 
 const artIndexerBot = new ArtIndexerBot()
+const artGPTBot = new ArtGPTBot()
 const pbabIndexerBot = new ArtIndexerBot(getEngineProjects)
 const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
 const abXbmIndexerBot = new ArtIndexerBot(getArtBlocksXBMProjects)
@@ -198,18 +199,8 @@ bot.on(Events.MessageCreate, async (msg) => {
   }
 
   // Handle special requests to ArtBotGPT.
-  if (msgContentLowercase.startsWith('?artgpt')) {
-    artGPTResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
-      (gptResponse: string) => {
-        if (gptResponse !== null && gptResponse !== undefined) {
-          if (typeof gptResponse === 'string') {
-            msg.reply(gptResponse)
-          } else {
-            msg.reply({ embeds: [gptResponse] })
-          }
-        }
-      }
-    )
+  if (msgContentLowercase.startsWith(artGPTBot.queryString)) {
+    artGPTBot.handleRequest(msg)
     return
   }
 
