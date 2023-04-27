@@ -4,6 +4,9 @@ import { AxiosError } from 'axios'
 const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
 
+// ArtBot username
+const ARTBOT_USERNAME = 'artbot'
+
 // Color consts
 const ARTBOT_GREEN = 0x00ff00
 const ARTBOT_WARNING = 0xffff00
@@ -33,60 +36,86 @@ export class ArtGPTBot {
       this.currentRequestCount = 0
     }
 
+    // Increment the request count
+    this.currentRequestCount++
+
     // Check if we're over the request limit
     return this.currentRequestCount >= MAX_REQUESTS_PER_HOUR
   }
 
   async handleRequest(msg: Message) {
+    /*
+     * NOTE: It is important to check if the message author is the ArtBot
+     *       Itself to avoid a recursive infinite loop.
+     */
+    if (msg.author.username == ARTBOT_USERNAME) {
+      return null
+    }
+
     let content = msg.content
     if (content.length <= this.queryString.length) {
-      msg.channel.send(
-        `Invalid format, enter ${this.queryString} followed by the query for ArtGPT.`
-      )
+      msg.channel.send({
+        embeds: [
+          new EmbedBuilder()
+            // Set the title of the field
+            .setTitle(this.queryString)
+            // Set the color of the embed
+            .setColor(ARTBOT_WARNING)
+            // Set the main content of the embed
+            .setDescription(
+              `Invalid format, enter ${this.queryString} followed by the query for ArtGPT.`
+            ),
+        ],
+      })
       return
     }
 
     // Validate rate-limit
     if (this.isRateLimited() === true) {
-      msg.channel.send(
-        new EmbedBuilder()
-          // Set the title of the field
-          .setTitle(this.queryString)
-          // Set the color of the embed
-          .setColor(ARTBOT_WARNING)
-          // Set the main content of the embed
-          .setDescription(
-            `
+      msg.channel.send({
+        embeds: [
+          new EmbedBuilder()
+            // Set the title of the field
+            .setTitle(this.queryString)
+            // Set the color of the embed
+            .setColor(ARTBOT_WARNING)
+            // Set the main content of the embed
+            .setDescription(
+              `
           I'm sorry, I'm rate-limited right now.
 
           I currently can only process ${MAX_REQUESTS_PER_HOUR} requests per hour.
           
           Please try again later.
           `
-          )
-      )
+            ),
+        ],
+      })
+      return
     }
 
     // TODO: Actually the message w/ GPT-3.5.
 
-    msg.channel.send(
-      new EmbedBuilder()
-        // Set the title of the field
-        .setTitle(this.queryString)
-        // Set the color of the embed
-        .setColor(ARTBOT_GREEN)
-        // Set the main content of the embed
-        .setDescription(
-          `
+    msg.channel.send({
+      embeds: [
+        new EmbedBuilder()
+          // Set the title of the field
+          .setTitle(this.queryString)
+          // Set the color of the embed
+          .setColor(ARTBOT_GREEN)
+          // Set the main content of the embed
+          .setDescription(
+            `
         Hi, I'm ArtBot! 
         
         I'm here to help you with your questions. 
         
         I'm still learning, so please be patient with me.
         
-        This is what you asked me: ${content}
+        This is what you asked me: "${content}"
         `
-        )
-    )
+          ),
+      ],
+    })
   }
 }
