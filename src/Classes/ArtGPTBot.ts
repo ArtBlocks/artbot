@@ -47,6 +47,10 @@ export class ArtGPTBot {
     // expect this to be set to `true` within initializeLangchain()
     this.isLangChainWarmedUp = false
     this.model = new OpenAI()
+    // Beef up the OpenAI
+    this.model.modelName = 'gpt-3.5-turbo'
+    this.model.temperature = 0
+    this.model.maxTokens = 2048
     this.pineconeClient = new PineconeClient()
     this.initializeLangchain()
   }
@@ -82,11 +86,6 @@ export class ArtGPTBot {
       // Can turn this on (and log `response.sourceDocuments`) for debuggings purposes.
       returnSourceDocuments: false,
     })
-
-    // Beef up the OpenAI
-    this.model.modelName = 'gpt-3.5-turbo'
-    this.model.temperature = 0
-    this.model.maxTokens = 2048
 
     // We are now warmed up!
     this.isLangChainWarmedUp = true
