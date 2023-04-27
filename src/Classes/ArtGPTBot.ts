@@ -17,6 +17,7 @@ const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME
 
 // ArtBot username
 const ARTBOT_USERNAME = 'artbot'
+const ARTBOT_MAX_CHARS_RESPONSE = 4000
 
 // Color consts
 const ARTBOT_GREEN = 0x00ff00
@@ -46,7 +47,6 @@ export class ArtGPTBot {
     // expect this to be set to `true` within initializeLangchain()
     this.isLangChainWarmedUp = false
     this.model = new OpenAI()
-    this.model.temperature = 0.1 // TODO: Make this configurable
     this.pineconeClient = new PineconeClient()
     this.initializeLangchain()
   }
@@ -77,8 +77,8 @@ export class ArtGPTBot {
       { pineconeIndex }
     )
     this.langChain = VectorDBQAChain.fromLLM(this.model, this.vectorStore, {
-      k: 1,
-      returnSourceDocuments: true, // TODO: Make this configurable (or just turn it off)
+      k: 5,
+      returnSourceDocuments: true, // Keep this on for logging purposes.
     })
 
     // We are now warmed up!
@@ -139,22 +139,30 @@ export class ArtGPTBot {
       this.sendEmbed(msg, this.queryString, ARTBOT_WARNING, message)
       return
     } else {
-      const response = await this.langChain.call({ query: query })
+      let response = await this.langChain.call({ query: query })
+      if (response.text.length > ARTBOT_MAX_CHARS_RESPONSE) {
+        // Update response to be less than ARTBOT_MAX_CHARS_RESPONSE
+        response = await this.langChain.call({
+          query: `
+        Please summarize the following response to be less than ${ARTBOT_MAX_CHARS_RESPONSE} characters:
+        ---
+        ${query}
+        `,
+        })
+      }
+      console.log(
+        `ArtGPTBot (source-docs): ${query} -> ${JSON.stringify(
+          response.sourceDocuments
+        )}`
+      )
       const message = `
-      Beep boop bop ... I'm still learning, so please be patient with me.
+      **NOTE: I am still in beta, my answers may be wrong.**
       
-      *This is what you asked me:*
+      *Q:*
       "${query}"
 
-      *Here is my response:*
+      *A:*
       ${response.text}
-
-      *Here are the source documents I used to generate this response:*
-      ${
-        response.sourceDocuments.length > 0
-          ? JSON.stringify(response.sourceDocuments)
-          : 'I made it up...'
-      }
       `
       this.sendEmbed(msg, this.queryString, ARTBOT_GREEN, message)
     }
