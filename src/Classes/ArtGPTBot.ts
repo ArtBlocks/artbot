@@ -46,6 +46,7 @@ export class ArtGPTBot {
     // expect this to be set to `true` within initializeLangchain()
     this.isLangChainWarmedUp = false
     this.model = new OpenAI()
+    this.model.temperature = 0.1 // TODO: Make this configurable
     this.pineconeClient = new PineconeClient()
     this.initializeLangchain()
   }
@@ -150,7 +151,11 @@ export class ArtGPTBot {
       ${response.text}
 
       *Here are the source documents I used to generate this response:*
-      ${response.sourceDocuments ?? 'I made it up...'}
+      ${
+        response.sourceDocuments.length > 0
+          ? JSON.stringify(response.sourceDocuments)
+          : 'I made it up...'
+      }
       `
       this.sendEmbed(msg, this.queryString, ARTBOT_GREEN, message)
     }
