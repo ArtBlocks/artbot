@@ -65,6 +65,7 @@ export class ArtGPTBot {
       console.error('PINECONE_INDEX_NAME not found in environment variables.')
       return
     }
+
     // Initialize langchain setup
     await this.pineconeClient.init({
       apiKey: PINECONE_API_KEY,
@@ -81,6 +82,11 @@ export class ArtGPTBot {
       // Can turn this on (and log `response.sourceDocuments`) for debuggings purposes.
       returnSourceDocuments: false,
     })
+
+    // Beef up the OpenAI
+    this.model.modelName = 'gpt-3.5-turbo'
+    this.model.temperature = 0
+    this.model.maxTokens = 2048
 
     // We are now warmed up!
     this.isLangChainWarmedUp = true
