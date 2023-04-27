@@ -52,70 +52,52 @@ export class ArtGPTBot {
       return null
     }
 
-    let content = msg.content
+    const content = msg.content
+    const query = content.substring(this.queryString.length + 1, content.length)
     if (content.length <= this.queryString.length) {
-      msg.channel.send({
-        embeds: [
-          new EmbedBuilder()
-            // Set the title of the field
-            .setTitle(this.queryString)
-            // Set the color of the embed
-            .setColor(ARTBOT_WARNING)
-            // Set the main content of the embed
-            .setDescription(
-              `Invalid format, enter ${this.queryString} followed by the query for ArtGPT.`
-            ),
-        ],
-      })
+      // Validate request format
+      const message = `
+      Invalid format, enter ${this.queryString} followed by the query for ArtGPT.
+  `
+      this.sendEmbed(msg, this.queryString, ARTBOT_WARNING, message)
       return
-    }
+    } else if (this.isRateLimited() === true) {
+      // Validate rate-limit
+      const message = `
+      I'm sorry, I'm rate-limited right now.
 
-    // Validate rate-limit
-    if (this.isRateLimited() === true) {
-      msg.channel.send({
-        embeds: [
-          new EmbedBuilder()
-            // Set the title of the field
-            .setTitle(this.queryString)
-            // Set the color of the embed
-            .setColor(ARTBOT_WARNING)
-            // Set the main content of the embed
-            .setDescription(
-              `
-          I'm sorry, I'm rate-limited right now.
-
-          I currently can only process ${MAX_REQUESTS_PER_HOUR} requests per hour.
-          
-          Please try again later.
-          `
-            ),
-        ],
-      })
+      I currently can only process ${MAX_REQUESTS_PER_HOUR} requests per hour.
+      
+      Please try again later.
+  `
+      this.sendEmbed(msg, this.queryString, ARTBOT_WARNING, message)
       return
+    } else {
+      // TODO: Actually the message w/ GPT-3.5.
+      const message = `
+      Hi, I'm ArtBot! 
+      
+      I'm here to help you with your questions. 
+      
+      I'm still learning, so please be patient with me.
+      
+      This is what you asked me: "${query}"
+      `
+      this.sendEmbed(msg, this.queryString, ARTBOT_GREEN, message)
     }
+  }
 
-    // TODO: Actually the message w/ GPT-3.5.
+  async sendEmbed(
+    msg: Message,
+    title: string,
+    color: number,
+    description: string
+  ) {
+    const embed = new EmbedBuilder()
+      .setTitle(title)
+      .setColor(color)
+      .setDescription(description)
 
-    msg.channel.send({
-      embeds: [
-        new EmbedBuilder()
-          // Set the title of the field
-          .setTitle(this.queryString)
-          // Set the color of the embed
-          .setColor(ARTBOT_GREEN)
-          // Set the main content of the embed
-          .setDescription(
-            `
-        Hi, I'm ArtBot! 
-        
-        I'm here to help you with your questions. 
-        
-        I'm still learning, so please be patient with me.
-        
-        This is what you asked me: "${content}"
-        `
-          ),
-      ],
-    })
+    await msg.channel.send({ embeds: [embed] })
   }
 }
