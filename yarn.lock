@@ -1825,6 +1825,13 @@
     tslib "^2.4.0"
     webcrypto-core "^1.7.4"
 
+"@pinecone-database/pinecone@^0.0.14":
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/@pinecone-database/pinecone/-/pinecone-0.0.14.tgz#a74e387843327c2d2cfdecf294e233e2ab95e230"
+  integrity sha512-uQspP/fGB2xhS/PWVD9/XnNnzuTfjukuX9IKH0EYqJMXd0Yx+ewcRADVFrF5RBeBWXBWrpGhIhvWE0hTPy/BAg==
+  dependencies:
+    cross-fetch "^3.1.5"
+
 "@repeaterjs/repeater@3.0.4":
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/@repeaterjs/repeater/-/repeater-3.0.4.tgz#a04d63f4d1bf5540a41b01a921c9a7fddc3bd1ca"
