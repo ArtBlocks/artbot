@@ -1,13 +1,16 @@
-import { Message, ColorResolvable } from 'discord.js'
+import { Message } from 'discord.js'
 import { AxiosError } from 'axios'
 
 const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
 
-// Returns a random color
-function randomColor(): ColorResolvable {
-  return `#${Math.floor(Math.random() * 16777215).toString(16)}`
-}
+// Color consts
+const ARTBOT_GREEN = 0x00ff00
+const ARTBOT_WARNING = 0xffff00
+
+// Rate limit constants
+const MAX_REQUESTS_PER_HOUR = 10
+const HOUR_IN_MILLISECONDS = 3600000
 
 /**
  * Bot for handling GPT-3.5 powered requests.
@@ -22,6 +25,18 @@ export class ArtGPTBot {
     this.currentRequestCount = 0
   }
 
+  isRateLimited(): boolean {
+    // Check if we're in a new hour
+    if (Date.now() - this.lastRequestTimestamp > HOUR_IN_MILLISECONDS) {
+      // If so, reset the request count
+      this.lastRequestTimestamp = Date.now()
+      this.currentRequestCount = 0
+    }
+
+    // Check if we're over the request limit
+    return this.currentRequestCount >= MAX_REQUESTS_PER_HOUR
+  }
+
   async handleRequest(msg: Message) {
     let content = msg.content
     if (content.length <= this.queryString.length) {
@@ -31,16 +46,35 @@ export class ArtGPTBot {
       return
     }
 
-    // TODO: Validate rate-limit
+    // Validate rate-limit
+    if (this.isRateLimited() === true) {
+      msg.channel.send(
+        new EmbedBuilder()
+          // Set the title of the field
+          .setTitle(this.queryString)
+          // Set the color of the embed
+          .setColor(ARTBOT_WARNING)
+          // Set the main content of the embed
+          .setDescription(
+            `
+          I'm sorry, I'm rate-limited right now.
+
+          I currently can only process ${MAX_REQUESTS_PER_HOUR} requests per hour.
+          
+          Please try again later.
+          `
+          )
+      )
+    }
 
     // TODO: Actually the message w/ GPT-3.5.
 
     msg.channel.send(
       new EmbedBuilder()
         // Set the title of the field
-        .setTitle('I am ArtBot GPT')
+        .setTitle(this.queryString)
         // Set the color of the embed
-        .setColor(randomColor())
+        .setColor(ARTBOT_GREEN)
         // Set the main content of the embed
         .setDescription(
           `
