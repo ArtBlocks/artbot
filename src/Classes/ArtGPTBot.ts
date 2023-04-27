@@ -143,11 +143,14 @@ export class ArtGPTBot {
       const message = `
       Beep boop bop ... I'm still learning, so please be patient with me.
       
-      This is what you asked me: 
+      *This is what you asked me:*
       "${query}"
 
-      Here is your response:
-      "${JSON.stringify(response)}"
+      *Here is my response:*
+      ${response.text}
+
+      *Here are the source documents I used to generate this response:*
+      ${response.sourceDocuments ?? 'I made it up...'}
       `
       this.sendEmbed(msg, this.queryString, ARTBOT_GREEN, message)
     }
