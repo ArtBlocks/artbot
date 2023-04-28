@@ -7,14 +7,19 @@ import { VectorOperationsApi } from '@pinecone-database/pinecone/dist/pinecone-g
 const fetch = require('node-fetch')
 dotenv.config()
 
-// NOTE: This file is an active work-in-progress and currently intended to be run as a script.
-//       Currently, this script can be run by calling `npx ts-node src/Utils/ArtGPT/dataIngestor.ts`
-//       from the root of the repo.
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// This script will crawl the specified GH repos and ingest all .sol and .md files.
+// It will then generate embeddings for each file and store them in Pinecone.
+//
+// USAGE: `npx ts-node src/Utils/ArtGPT/dataIngestor.ts <GH_REPO_URL>`,
+//         or import as a module and call `ingest([<GH_REPO_URLs>])`
+//
 // TODOs:
 // - [ ] Add additional TODOs
 // - [X] Add support for passing in a repo URL as a command line argument
 // - [X] Update this script to be run in both CLI mode and as a module
 // - [ ] Experiment with different chunk sizes and overlaps
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Default GH repos to ingest if not explicitly specified
 const GH_API_BASE_URI = 'https://api.github.com/repos/'
@@ -90,7 +95,11 @@ async function crawlRepo(repoUrl: string) {
   return fileUrls
 }
 
-async function ingest(repos: string[] = GH_REPOS): Promise<void> {
+/**
+ * Ingests data from GH repos into Pinecone
+ * @param repos - GH repos to ingest
+ */
+export async function ingest(repos: string[] = GH_REPOS): Promise<void> {
   const client = new PineconeClient()
 
   await client.init({
@@ -111,8 +120,6 @@ async function ingest(repos: string[] = GH_REPOS): Promise<void> {
     await fetchAndProcessGHFiles(crawledFileUrls, pineconeIndex)
   }
 }
-
-export { ingest }
 
 // Check if the file is being run directly
 if (require.main === module) {
