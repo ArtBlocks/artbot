@@ -13,12 +13,6 @@ dotenv.config()
 //
 // USAGE: `npx ts-node src/Utils/ArtGPT/dataIngestor.ts <GH_REPO_URL>`,
 //         or import as a module and call `ingest([<GH_REPO_URLs>])`
-//
-// TODOs:
-// - [ ] Add additional TODOs
-// - [X] Add support for passing in a repo URL as a command line argument
-// - [X] Update this script to be run in both CLI mode and as a module
-// - [ ] Experiment with different chunk sizes and overlaps
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Default GH repos to ingest if not explicitly specified

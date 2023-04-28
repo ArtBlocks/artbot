@@ -32,7 +32,7 @@ const ARTBOT_WARNING = 0xffff00
 const ARTBOT_ERROR = 0xff0000
 
 // Rate limit constants
-const MAX_REQUESTS_PER_HOUR = 10
+const MAX_REQUESTS_PER_HOUR = 50
 const HOUR_IN_MILLISECONDS = 3600000
 
 /**
