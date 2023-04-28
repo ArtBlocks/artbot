@@ -3,7 +3,7 @@ import { Message, EmbedBuilder } from 'discord.js'
 import { PineconeClient } from '@pinecone-database/pinecone'
 import { VectorDBQAChain } from 'langchain/chains'
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
-import { OpenAI } from 'langchain/llms/openai'
+import { OpenAIChat } from 'langchain/llms/openai'
 import { PineconeStore } from 'langchain/vectorstores/pinecone'
 import { VectorOperationsApi } from '@pinecone-database/pinecone/dist/pinecone-generated-ts-fetch'
 
@@ -43,7 +43,7 @@ export class ArtGPTBot {
   lastRequestTimestamp: number
   currentRequestCount: number
   isLangChainWarmedUp: boolean
-  model: OpenAI
+  model: OpenAIChat
   pineconeClient: PineconeClient
   pineconeIndex: VectorOperationsApi | undefined // Initialized async
   vectorStore: PineconeStore | undefined // Initialized async
@@ -54,13 +54,20 @@ export class ArtGPTBot {
     this.currentRequestCount = 0
     // expect this to be set to `true` within initializeLangchain()
     this.isLangChainWarmedUp = false
-    this.model = new OpenAI({
+    this.model = new OpenAIChat({
       modelName: 'gpt-3.5-turbo',
       temperature: 0,
-      // TODO: figure why setting -1 breaks with current setup
-      // Manually setting this value is causing issues if vector store retrieves
-      // too many documents...
-      maxTokens: -1,
+      // TODO: To improve performance, we should update this to -1 to auto-assign maxTokens
+      //       once https://github.com/hwchase17/langchainjs/pull/1043 is merged upstream
+      //       or https://github.com/ArtBlocks/artbot/pull/504 is resolved.
+      maxTokens: 256,
+      prefixMessages: [
+        {
+          role: 'system',
+          content:
+            'You are an software integration and project support assistant, that has been trained on github repositories containing Solidity smart contracts, associated APIs, and documentation that covers the Art Blocks technology and onboarding processes.',
+        },
+      ],
     })
     this.pineconeClient = new PineconeClient()
     this.initializeLangchain()
