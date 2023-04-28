@@ -6,7 +6,6 @@ import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { OpenAI } from 'langchain/llms/openai'
 import { PineconeStore } from 'langchain/vectorstores/pinecone'
 import { VectorOperationsApi } from '@pinecone-database/pinecone/dist/pinecone-generated-ts-fetch'
-import { ChainValues } from 'langchain/dist/schema'
 
 // LLM Environment Variables
 const PINECONE_API_KEY = process.env.PINECONE_API_KEY
