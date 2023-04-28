@@ -1,10 +1,13 @@
-import * as dotenv from 'dotenv'
-
 import { PineconeClient } from '@pinecone-database/pinecone'
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { PineconeStore } from 'langchain/vectorstores/pinecone'
 import { VectorOperationsApi } from '@pinecone-database/pinecone/dist/pinecone-generated-ts-fetch'
+
+import * as dotenv from 'dotenv'
+dotenv.config()
+
+const fetch = require('node-fetch')
 
 // NOTE: This file is an active work-in-progress and currently intended to be run as a script.
 //       Currently, this script can be run by calling `npx ts-node src/Utils/ArtGPT/dataIngestor.ts`
@@ -14,10 +17,6 @@ import { VectorOperationsApi } from '@pinecone-database/pinecone/dist/pinecone-g
 // - [ ] Add support for passing in a repo URL as a command line argument
 // - [ ] Update this script to be run in both CLI mode and as a module
 // - [ ] Experiment with different chunk sizes and overlaps
-
-const fetch = require('node-fetch')
-
-dotenv.config()
 
 async function fetchAndProcessFile(
   url: string,
@@ -42,7 +41,23 @@ async function fetchAndProcessFile(
   console.log(`Done embedding and storing ${url} in Pinecone`)
 }
 
-async function processRepo(repoUrl: string) {
+async function processRepo(
+  repoUrl: string,
+  pineconeIndex: VectorOperationsApi
+) {
+  const response = await fetch(repoUrl)
+  const repoContent = await response.json()
+
+  for (const item of repoContent) {
+    if (item.type === 'file' && item.path.endsWith('.sol')) {
+      await fetchAndProcessFile(item.url, pineconeIndex)
+    } else if (item.type === 'dir') {
+      await processRepo(item.url, pineconeIndex)
+    }
+  }
+}
+
+;(async () => {
   const client = new PineconeClient()
   await client.init({
     apiKey: process.env.PINECONE_API_KEY as string,
@@ -50,18 +65,7 @@ async function processRepo(repoUrl: string) {
   })
   const pineconeIndex = client.Index(process.env.PINECONE_INDEX_NAME as string)
 
-  const response = await fetch(repoUrl)
-  const repoContent = await response.json()
-
-  const fileUrls = repoContent
-    .filter((item: any) => item.type === 'file' && item.path.endsWith('.sol'))
-    .map((item: any) => item.url)
-
-  for (const fileUrl of fileUrls) {
-    await fetchAndProcessFile(fileUrl, pineconeIndex)
-  }
-}
-
-const repoUrl =
-  'https://api.github.com/repos/ArtBlocks/artblocks-contracts/contents/contracts?ref=main'
-processRepo(repoUrl)
+  const repoUrl =
+    'https://api.github.com/repos/ArtBlocks/artblocks-contracts/contents/contracts?ref=main'
+  await processRepo(repoUrl, pineconeIndex)
+})()
