@@ -22,7 +22,13 @@ async function fetchAndProcessFile(
   url: string,
   pineconeIndex: VectorOperationsApi
 ) {
-  const response = await fetch(url)
+  let response
+  try {
+    response = await fetch(url)
+  } catch (error) {
+    console.error(`Error fetching ${url}: ${error}`)
+    return
+  }
   const data = await response.json()
   const buff = Buffer.from(data.content, 'base64')
   const text = buff.toString('utf-8')
@@ -35,10 +41,14 @@ async function fetchAndProcessFile(
   const docs = await splitter.createDocuments([text])
 
   // this actually hits openai embeddings api under the hood to generate embeddings
-  await PineconeStore.fromDocuments(docs, new OpenAIEmbeddings(), {
-    pineconeIndex,
-  })
-  console.log(`Done embedding and storing ${url} in Pinecone`)
+  try {
+    await PineconeStore.fromDocuments(docs, new OpenAIEmbeddings(), {
+      pineconeIndex,
+    })
+    console.log(`Done embedding and storing ${url} in Pinecone`)
+  } catch (error) {
+    console.error(`Error embedding and storing ${url} in Pinecone: ${error}`)
+  }
 }
 
 async function processRepo(
@@ -65,7 +75,13 @@ async function processRepo(
   })
   const pineconeIndex = client.Index(process.env.PINECONE_INDEX_NAME as string)
 
-  const repoUrl =
+  // TODO: fix this
+  // const docsRepoURL =
+  //   'https://api.github.com/repos/ArtBlocks/artblocks-docs/contents/contracts?ref=main'
+  // await processRepo(docsRepoURL, pineconeIndex)
+
+  // TODO: start searching at top of directory, rather than in /contracts
+  const contractsRepoURL =
     'https://api.github.com/repos/ArtBlocks/artblocks-contracts/contents/contracts?ref=main'
-  await processRepo(repoUrl, pineconeIndex)
+  await processRepo(contractsRepoURL, pineconeIndex)
 })()
