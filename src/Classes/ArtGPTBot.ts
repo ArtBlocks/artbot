@@ -162,8 +162,6 @@ export class ArtGPTBot {
       return null
     }
 
-    // TODO: Filter out messages that are not in known servers / channels
-
     const content = msg.content
     const query = content.substring(this.queryString.length + 1, content.length)
     if (this.inValidServerChannel(msg) === false) {
