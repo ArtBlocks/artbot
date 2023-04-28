@@ -59,7 +59,10 @@ async function processRepo(
   const repoContent = await response.json()
 
   for (const item of repoContent) {
-    if (item.type === 'file' && item.path.endsWith('.sol')) {
+    if (
+      item.type === 'file' &&
+      (item.path.endsWith('.sol') || item.path.endsWith('.md'))
+    ) {
       await fetchAndProcessFile(item.url, pineconeIndex)
     } else if (item.type === 'dir') {
       await processRepo(item.url, pineconeIndex)
