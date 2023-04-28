@@ -6,6 +6,15 @@ import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { PineconeStore } from 'langchain/vectorstores/pinecone'
 import { VectorOperationsApi } from '@pinecone-database/pinecone/dist/pinecone-generated-ts-fetch'
 
+// NOTE: This file is an active work-in-progress and currently intended to be run as a script.
+//       Currently, this script can be run by calling `npx ts-node src/Utils/ArtGPT/dataIngestor.ts`
+//       from the root of the repo.
+// TODOs:
+// - [ ] Add additional TODOs
+// - [ ] Add support for passing in a repo URL as a command line argument
+// - [ ] Update this script to be run in both CLI mode and as a module
+// - [ ] Experiment with different chunk sizes and overlaps
+
 const fetch = require('node-fetch')
 
 dotenv.config()
