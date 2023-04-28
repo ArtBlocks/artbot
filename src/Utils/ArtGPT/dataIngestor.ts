@@ -1,5 +1,4 @@
 import * as dotenv from 'dotenv'
-
 import { PineconeClient } from '@pinecone-database/pinecone'
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
