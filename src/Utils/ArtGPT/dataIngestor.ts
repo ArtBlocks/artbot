@@ -1,23 +1,20 @@
 import * as dotenv from 'dotenv'
+
 import { PineconeClient } from '@pinecone-database/pinecone'
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { PineconeStore } from 'langchain/vectorstores/pinecone'
+import { VectorOperationsApi } from '@pinecone-database/pinecone/dist/pinecone-generated-ts-fetch'
+
 const fetch = require('node-fetch')
 
 dotenv.config()
 
-// prototype function to embed a single document and store it in Pinecone
-;(async function proto() {
-  const client = new PineconeClient()
-  await client.init({
-    apiKey: process.env.PINECONE_API_KEY as string,
-    environment: process.env.PINECONE_ENVIRONMENT as string,
-  })
-  const pineconeIndex = client.Index(process.env.PINECONE_INDEX as string)
-  const response = await fetch(
-    'https://api.github.com/repos/ArtBlocks/artblocks-contracts/contents/contracts/GenArt721CoreV3.sol?ref=main'
-  )
+async function fetchAndProcessFile(
+  url: string,
+  pineconeIndex: VectorOperationsApi
+) {
+  const response = await fetch(url)
   const data = await response.json()
   const buff = Buffer.from(data.content, 'base64')
   const text = buff.toString('utf-8')
@@ -33,9 +30,29 @@ dotenv.config()
   await PineconeStore.fromDocuments(docs, new OpenAIEmbeddings(), {
     pineconeIndex,
   })
-  console.log('done embedding and storing in pinecone')
-})()
+  console.log(`Done embedding and storing ${url} in Pinecone`)
+}
 
-// (async function main() {
+async function processRepo(repoUrl: string) {
+  const client = new PineconeClient()
+  await client.init({
+    apiKey: process.env.PINECONE_API_KEY as string,
+    environment: process.env.PINECONE_ENV as string,
+  })
+  const pineconeIndex = client.Index(process.env.PINECONE_INDEX_NAME as string)
 
-// })()
+  const response = await fetch(repoUrl)
+  const repoContent = await response.json()
+
+  const fileUrls = repoContent
+    .filter((item: any) => item.type === 'file' && item.path.endsWith('.sol'))
+    .map((item: any) => item.url)
+
+  for (const fileUrl of fileUrls) {
+    await fetchAndProcessFile(fileUrl, pineconeIndex)
+  }
+}
+
+const repoUrl =
+  'https://api.github.com/repos/ArtBlocks/artblocks-contracts/contents/contracts?ref=main'
+processRepo(repoUrl)
