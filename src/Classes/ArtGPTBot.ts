@@ -6,6 +6,7 @@ import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { OpenAI } from 'langchain/llms/openai'
 import { PineconeStore } from 'langchain/vectorstores/pinecone'
 import { VectorOperationsApi } from '@pinecone-database/pinecone/dist/pinecone-generated-ts-fetch'
+import { ChainValues } from 'langchain/dist/schema'
 
 // LLM Environment Variables
 const PINECONE_API_KEY = process.env.PINECONE_API_KEY
@@ -22,6 +23,7 @@ const ARTBOT_MAX_CHARS_RESPONSE = 4000
 // Color consts
 const ARTBOT_GREEN = 0x00ff00
 const ARTBOT_WARNING = 0xffff00
+const ARTBOT_ERROR = 0xff0000
 
 // Rate limit constants
 const MAX_REQUESTS_PER_HOUR = 10
@@ -55,6 +57,9 @@ export class ArtGPTBot {
     this.initializeLangchain()
   }
 
+  /**
+   * Helper to initialize langchain setup.
+   */
   async initializeLangchain() {
     // Validity check the environment variables
     if (!PINECONE_API_KEY) {
@@ -91,6 +96,9 @@ export class ArtGPTBot {
     this.isLangChainWarmedUp = true
   }
 
+  /**
+   * Helper to determine if the bot is currently rate-limited.
+   */
   isRateLimited(): boolean {
     // Check if we're in a new hour
     if (Date.now() - this.lastRequestTimestamp > HOUR_IN_MILLISECONDS) {
@@ -106,6 +114,10 @@ export class ArtGPTBot {
     return this.currentRequestCount >= MAX_REQUESTS_PER_HOUR
   }
 
+  /**
+   * Send an embed reply to a message.
+   * @param msg The message to reply to.
+   */
   async handleRequest(msg: Message) {
     /*
      * NOTE: It is important to check if the message author is the ArtBot
@@ -154,17 +166,31 @@ export class ArtGPTBot {
       )
 
       // Query the langchain
-      let response = await this.langChain.call({ query: query })
+      let response
+      try {
+        response = await this.langChain.call({ query: query })
+      } catch (error) {
+        console.error(`Error calling langchain: ${error}`)
+        this.sendErrorReply(msg)
+        return
+      }
+
       // Summarize response to be less than ARTBOT_MAX_CHARS_RESPONSE if it is too long.
       if (response.text.length > ARTBOT_MAX_CHARS_RESPONSE) {
         console.log('Summarizing response...')
-        response = await this.langChain.call({
-          query: `
-        Please summarize the following response to be less than ${ARTBOT_MAX_CHARS_RESPONSE} characters:
-        ---
-        ${query}
-        `,
-        })
+        try {
+          response = await this.langChain.call({
+            query: `
+          Please summarize the following response to be less than ${ARTBOT_MAX_CHARS_RESPONSE} characters:
+          ---
+          ${query}
+          `,
+          })
+        } catch (error) {
+          console.error(`Error summarizing with langchain: ${error}`)
+          this.sendErrorReply(msg)
+          return
+        }
       }
 
       // Provide the real response.
@@ -177,6 +203,13 @@ export class ArtGPTBot {
     }
   }
 
+  /**
+   * Send an embed reply to a message.
+   * @param msg The message to reply to.
+   * @param title The title of the embed.
+   * @param color The color of the embed.
+   * @param description The description of the embed.
+   */
   async sendEmbedReply(
     msg: Message,
     title: string,
@@ -189,5 +222,18 @@ export class ArtGPTBot {
       .setDescription(description)
 
     await msg.reply({ embeds: [embed] })
+  }
+
+  /**
+   * Send an error reply to a message.
+   * @param msg The message to reply to.
+   */
+  async sendErrorReply(msg: Message) {
+    this.sendEmbedReply(
+      msg,
+      this.queryString,
+      ARTBOT_ERROR,
+      "I'm sorry, I encountered an error. Please try again later."
+    )
   }
 }
