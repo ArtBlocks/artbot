@@ -1,10 +1,12 @@
 import { Message, EmbedBuilder } from 'discord.js'
 
 import { PineconeClient } from '@pinecone-database/pinecone'
-import { VectorDBQAChain } from 'langchain/chains'
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
-import { OpenAI } from 'langchain/llms/openai'
-import { PineconeStore } from 'langchain/vectorstores/pinecone'
+// NOTE: Update to `langchain` once https://github.com/hwchase17/langchainjs/pull/1043
+//       is merged and published to npm
+import { VectorDBQAChain } from 'langchain/langchain/chains'
+import { OpenAIEmbeddings } from 'langchain/langchain/embeddings/openai'
+import { OpenAI } from 'langchain/langchain/llms/openai'
+import { PineconeStore } from 'langchain/langchain/vectorstores/pinecone'
 import { VectorOperationsApi } from '@pinecone-database/pinecone/dist/pinecone-generated-ts-fetch'
 
 // LLM Environment Variables

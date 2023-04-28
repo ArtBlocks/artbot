@@ -4,6 +4,7 @@
   "description": "A bot to provide info for artblocks",
   "main": "index.js",
   "scripts": {
+    "postinstall": "cd ./node_modules/langchain && yarn install && yarn run build && cd ../..",
     "start": "ts-node src/index.ts",
     "test": "jest",
     "format": "prettier --write .",
@@ -38,7 +39,7 @@
     "googleapis": "^92.0.0",
     "graphql": "^16.6.0",
     "jest": "^28.0.3",
-    "langchain": "^0.0.64",
+    "langchain": "https://github.com/ArtBlocks/langchainjs#OpenAIChat-token-estimation-fix",
     "lodash.deburr": "^4.1.0",
     "ms": "^2.0.0",
     "node-fetch": "^2.6.1",

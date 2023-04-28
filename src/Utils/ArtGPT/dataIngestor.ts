@@ -1,8 +1,10 @@
 import * as dotenv from 'dotenv'
 import { PineconeClient } from '@pinecone-database/pinecone'
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
-import { PineconeStore } from 'langchain/vectorstores/pinecone'
+// NOTE: Update to `langchain` once https://github.com/hwchase17/langchainjs/pull/1043
+//       is merged and published to npm
+import { RecursiveCharacterTextSplitter } from 'langchain/langchain/text_splitter'
+import { OpenAIEmbeddings } from 'langchain/langchain/embeddings/openai'
+import { PineconeStore } from 'langchain/langchain/vectorstores/pinecone'
 import { VectorOperationsApi } from '@pinecone-database/pinecone/dist/pinecone-generated-ts-fetch'
 const fetch = require('node-fetch')
 dotenv.config()
