@@ -19,6 +19,13 @@ const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME
 const ARTBOT_USERNAME = 'artbot'
 const ARTBOT_MAX_CHARS_RESPONSE = 4000
 
+// Discord consts
+const DISCORD_INC_SERVER_ID = '822311470133542912'
+const DISCORD_COMMUNITY_SERVER_ID = '411959613370400778'
+const DISCORD_TEST_SERVER_ID = '785144843986665472'
+const DISCORD_COMMUNITY_ARTIST_TECH_CHANNEL_ID = '909525641622347806'
+const DISCORD_COMMUNITY_PARTNERSHIP_ARTISTS_CHANNEL_ID = '971541479333965824'
+
 // Color consts
 const ARTBOT_GREEN = 0x00ff00
 const ARTBOT_WARNING = 0xffff00
@@ -117,6 +124,32 @@ export class ArtGPTBot {
   }
 
   /**
+   * Helper to determine if the bot is being queries in valid server and channel.
+   */
+  inValidServerChannel(msg: Message): boolean {
+    const serverID = msg.guild ? msg.guild.id : ''
+    const channelID = msg.channel ? msg.channel.id : ''
+
+    if (
+      serverID == DISCORD_INC_SERVER_ID ||
+      serverID == DISCORD_TEST_SERVER_ID
+    ) {
+      // Handle all messages in the Inc and test servers
+      return true
+    } else if (serverID == DISCORD_COMMUNITY_SERVER_ID) {
+      // In the community server, only field reqeusts in the
+      // #artist-tech and #partnership-artists channels for now
+      if (
+        channelID == DISCORD_COMMUNITY_ARTIST_TECH_CHANNEL_ID ||
+        channelID == DISCORD_COMMUNITY_PARTNERSHIP_ARTISTS_CHANNEL_ID
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+
+  /**
    * Send an embed reply to a message.
    * @param msg The message to reply to.
    */
@@ -129,14 +162,23 @@ export class ArtGPTBot {
       return null
     }
 
+    // TODO: Filter out messages that are not in known servers / channels
+
     const content = msg.content
     const query = content.substring(this.queryString.length + 1, content.length)
-    if (content.length <= this.queryString.length) {
+    if (this.inValidServerChannel(msg) === false) {
+      // Validate server / channel
+      this.sendWarningReply(
+        msg,
+        "I'm sorry, I'm not currently available in this server / channel."
+      )
+      return
+    } else if (content.length <= this.queryString.length) {
       // Validate request format
-      const message = `
-      Invalid format, enter ${this.queryString} followed by the query for ArtGPT.
-  `
-      this.sendEmbedReply(msg, this.queryString, ARTBOT_WARNING, message)
+      this.sendWarningReply(
+        msg,
+        `Invalid format, enter ${this.queryString} followed by the query for ArtGPT.`
+      )
       return
     } else if (!this.isLangChainWarmedUp || !this.langChain) {
       // Validate warm-up
@@ -145,7 +187,7 @@ export class ArtGPTBot {
 
       Please try again in a few minutes.
   `
-      this.sendEmbedReply(msg, this.queryString, ARTBOT_WARNING, message)
+      this.sendWarningReply(msg, message)
       return
     } else if (this.isRateLimited() === true) {
       // Validate rate-limit
@@ -156,13 +198,12 @@ export class ArtGPTBot {
       
       Please try again later.
   `
-      this.sendEmbedReply(msg, this.queryString, ARTBOT_WARNING, message)
+      this.sendWarningReply(msg, message)
       return
     } else {
       // Give a "I'm thinking response" while we wait for the response.
       this.sendEmbedReply(
         msg,
-        this.queryString,
         ARTBOT_GREEN,
         "Your question has been recieved! I'm working on an answer..."
       )
@@ -172,6 +213,7 @@ export class ArtGPTBot {
       try {
         response = await this.langChain.call({ query: query })
       } catch (error) {
+        // TODO: Remove extra logging once we're confident in the bot.
         console.log(error.response.data)
         console.log(error)
         console.error(`Error calling langchain: ${error}`)
@@ -203,7 +245,7 @@ export class ArtGPTBot {
 
       ${response.text}
       `
-      this.sendEmbedReply(msg, this.queryString, ARTBOT_GREEN, message)
+      this.sendEmbedReply(msg, ARTBOT_GREEN, message)
     }
   }
 
@@ -214,18 +256,21 @@ export class ArtGPTBot {
    * @param color The color of the embed.
    * @param description The description of the embed.
    */
-  async sendEmbedReply(
-    msg: Message,
-    title: string,
-    color: number,
-    description: string
-  ) {
+  async sendEmbedReply(msg: Message, color: number, description: string) {
     const embed = new EmbedBuilder()
-      .setTitle(title)
+      .setTitle(this.queryString)
       .setColor(color)
       .setDescription(description)
 
     await msg.reply({ embeds: [embed] })
+  }
+
+  /**
+   * Send an warning reply to a message.
+   * @param msg The message to reply to.
+   */
+  async sendWarningReply(msg: Message, warning: string) {
+    this.sendEmbedReply(msg, ARTBOT_WARNING, warning)
   }
 
   /**
@@ -235,7 +280,6 @@ export class ArtGPTBot {
   async sendErrorReply(msg: Message) {
     this.sendEmbedReply(
       msg,
-      this.queryString,
       ARTBOT_ERROR,
       "I'm sorry, I encountered an error. Please try again later."
     )
