@@ -60,7 +60,7 @@ export class ArtGPTBot {
       // TODO: figure why setting -1 breaks with current setup
       // Manually setting this value is causing issues if vector store retrieves
       // too many documents...
-      maxTokens: 1000,
+      maxTokens: -1,
     })
     this.pineconeClient = new PineconeClient()
     this.initializeLangchain()
@@ -96,7 +96,7 @@ export class ArtGPTBot {
       { pineconeIndex }
     )
     this.langChain = VectorDBQAChain.fromLLM(this.model, this.vectorStore, {
-      k: 4, // This is the number of documents to include as context (4 is default).
+      k: 2, // This is the number of documents to include as context (4 is default).
       // Can turn this on (and log `response.sourceDocuments`) for debuggings purposes.
       returnSourceDocuments: false,
     })
@@ -211,10 +211,10 @@ export class ArtGPTBot {
       try {
         response = await this.langChain.call({ query: query })
       } catch (error) {
-        // TODO: Remove extra logging once we're confident in the bot.
-        console.log(error.response.data)
-        console.log(error)
         console.error(`Error calling langchain: ${error}`)
+        // TODO: Remove extra logging once we're confident in the bot.
+        console.log(error.response?.data)
+        console.log(error)
         this.sendErrorReply(msg)
         return
       }
