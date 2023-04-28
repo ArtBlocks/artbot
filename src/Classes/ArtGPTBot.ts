@@ -50,7 +50,10 @@ export class ArtGPTBot {
     this.model = new OpenAI({
       modelName: 'gpt-3.5-turbo',
       temperature: 0,
-      maxTokens: 512,
+      // TODO: figure why setting -1 breaks with current setup
+      // Manually setting this value is causing issues if vector store retrieves
+      // too many documents...
+      maxTokens: 1000,
     })
     this.pineconeClient = new PineconeClient()
     this.initializeLangchain()
@@ -169,6 +172,8 @@ export class ArtGPTBot {
       try {
         response = await this.langChain.call({ query: query })
       } catch (error) {
+        console.log(error.response.data)
+        console.log(error)
         console.error(`Error calling langchain: ${error}`)
         this.sendErrorReply(msg)
         return
