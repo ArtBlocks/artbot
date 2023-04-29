@@ -10,7 +10,8 @@
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "codegen": "yarn codegen-hasura && yarn codegen-subgraph",
     "codegen-hasura": "graphql-codegen --require dotenv/config --config ./codegen.hasura.ts dotenv_config_path=./.env",
-    "codegen-subgraph": "graphql-codegen --config ./codegen.subgraph.ts"
+    "codegen-subgraph": "graphql-codegen --config ./codegen.subgraph.ts",
+    "postinstall": "cp -f ./src/Utils/ArtGPT/openai-chat.cjs ./node_modules/langchain/dist/llms/openai-chat.cjs"
   },
   "keywords": [
     "artblocks",
@@ -38,7 +39,7 @@
     "googleapis": "^92.0.0",
     "graphql": "^16.6.0",
     "jest": "^28.0.3",
-    "langchain": "^0.0.64",
+    "langchain": "0.0.66",
     "lodash.deburr": "^4.1.0",
     "ms": "^2.0.0",
     "node-fetch": "^2.6.1",
