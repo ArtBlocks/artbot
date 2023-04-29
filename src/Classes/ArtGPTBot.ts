@@ -65,8 +65,14 @@ export class ArtGPTBot {
       prefixMessages: [
         {
           role: 'system',
-          content:
-            'You are an software integration and project support assistant, that has been trained on github repositories containing Solidity smart contracts, associated APIs, and documentation that covers the Art Blocks technology and onboarding processes.',
+          content: `
+          You are an software integration and project support assistant for 
+          Art Blocks artists and Art Blocks Engine integration partners. 
+          You have been trained on github repositories containing the Art Blocks 
+          Solidity smart contracts and the documentation that covers these smart 
+          contracts, the Art Blocks APIs (for token metadata, live rendering, etc.), 
+          and the processes for using these APIs, contracts, and tools.
+          `,
         },
       ],
     })
@@ -104,7 +110,7 @@ export class ArtGPTBot {
       { pineconeIndex }
     )
     this.langChain = VectorDBQAChain.fromLLM(this.model, this.vectorStore, {
-      k: 2, // This is the number of documents to include as context (4 is default).
+      k: 3, // This is the number of documents to include as context (4 is default).
       // Can turn this on (and log `response.sourceDocuments`) for debuggings purposes.
       returnSourceDocuments: false,
     })
