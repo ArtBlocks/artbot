@@ -57,10 +57,11 @@ export class ArtGPTBot {
     this.model = new OpenAIChat({
       modelName: 'gpt-3.5-turbo',
       temperature: 0,
-      // TODO: To improve performance, we should update this to -1 to auto-assign maxTokens
-      //       once https://github.com/hwchase17/langchainjs/pull/1043 is merged upstream
-      //       or https://github.com/ArtBlocks/artbot/pull/504 is resolved.
-      maxTokens: 256,
+      // To improve performance, set this -1 to auto-assign maxTokens.
+      // Note that until https://github.com/hwchase17/langchainjs/pull/1043 is merged upstream
+      // this requires locking us to version 0.0.66 of langchainjs, and using the monkey-patching
+      // hack in our package.json postinstall script to get it to work.
+      maxTokens: -1,
       prefixMessages: [
         {
           role: 'system',

@@ -668,10 +668,10 @@
   resolved "https://registry.yarnpkg.com/@discordjs/util/-/util-0.1.0.tgz#e42ca1bf407bc6d9adf252877d1b206e32ba369a"
   integrity sha512-e7d+PaTLVQav6rOc2tojh2y6FE8S7REkqLldq1XF4soCx74XB/DIjbVbVLtBemf0nLW77ntz0v+o5DytKwFNLQ==
 
-"@dqbd/tiktoken@^1.0.4":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@dqbd/tiktoken/-/tiktoken-1.0.6.tgz#96bfd0a4909726c61551a8c783493f01841bd163"
-  integrity sha512-umSdeZTy/SbPPKVuZKV/XKyFPmXSN145CcM3iHjBbmhlohBJg7vaDp4cPCW+xNlWL6L2U1sp7T2BD+di2sUKdA==
+"@dqbd/tiktoken@^1.0.7":
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@dqbd/tiktoken/-/tiktoken-1.0.7.tgz#612871cf91eba5599c804f100c573aa4d8596f57"
+  integrity sha512-bhR5k5W+8GLzysjk8zTMVygQZsgvf7W1F0IlL4ZQ5ugjo5rCyiwGM5d8DYriXspytfu98tv59niang3/T+FoDw==
 
 "@eslint/eslintrc@^1.3.3":
   version "1.3.3"
@@ -5874,13 +5874,13 @@ kleur@^3.0.3:
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
 
-langchain@^0.0.64:
-  version "0.0.64"
-  resolved "https://registry.yarnpkg.com/langchain/-/langchain-0.0.64.tgz#f37ecef998cbee558a99b66feccd343b2aaef123"
-  integrity sha512-EPR5igtuSemtPAesQ8oa8SF/xjTA+bYJW00JNJ/8PYkPNiU+uc+cifOEH3H/DFam+oDY9XhR7WV+GhBEskVNNA==
+langchain@0.0.66:
+  version "0.0.66"
+  resolved "https://registry.yarnpkg.com/langchain/-/langchain-0.0.66.tgz#dff1c78dde3837854298253c63952660c3ee7e27"
+  integrity sha512-HsVdXFDp2+YB12tvpMFOK6kIXaLvFzJKQUzitr5VEamhZCFUoojZgcS7ckRjxJIv+aVWbEzCi3KJI/2kPKsMkA==
   dependencies:
     "@anthropic-ai/sdk" "^0.4.3"
-    "@dqbd/tiktoken" "^1.0.4"
+    "@dqbd/tiktoken" "^1.0.7"
     binary-extensions "^2.2.0"
     browser-or-node "^2.1.1"
     expr-eval "^2.0.2"
