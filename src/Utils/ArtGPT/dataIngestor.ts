@@ -29,6 +29,7 @@ const CHUNK_SIZE = 4000
 const CHUNK_OVERLAP = 200
 
 async function fetchAndProcessGHFiles(
+  repo: string,
   urls: string,
   pineconeIndex: VectorOperationsApi
 ) {
@@ -44,7 +45,21 @@ async function fetchAndProcessGHFiles(
       chunkOverlap: CHUNK_OVERLAP,
     })
 
-    const docs = await splitter.createDocuments([text])
+    // note: this assumes we are only dealing with .sol and .md files
+    const type = data.name.endsWith('.sol')
+      ? 'contract source code'
+      : 'documentation'
+    const docs = await splitter.createDocuments(
+      [text],
+      // adding metdata tags
+      [
+        {
+          repoName: repo,
+          fileName: data.name,
+          type,
+        },
+      ]
+    )
 
     // this actually hits openai embeddings api under the hood to generate embeddings
     await PineconeStore.fromDocuments(docs, new OpenAIEmbeddings(), {
@@ -111,7 +126,7 @@ export async function ingest(repos: string[] = GH_REPOS): Promise<void> {
     const startRepoUrl = getStartRepoUrl(repo)
     const crawledFileUrls = await crawlRepo(startRepoUrl)
     console.log(`Found ${crawledFileUrls.length} files to process`)
-    await fetchAndProcessGHFiles(crawledFileUrls, pineconeIndex)
+    await fetchAndProcessGHFiles(repo, crawledFileUrls, pineconeIndex)
   }
 }
 
