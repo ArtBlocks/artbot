@@ -110,7 +110,7 @@ export class ArtGPTBot {
       { pineconeIndex }
     )
     this.langChain = VectorDBQAChain.fromLLM(this.model, this.vectorStore, {
-      k: 3, // This is the number of documents to include as context (4 is default).
+      k: 2, // This is the number of documents to include as context (4 is default).
       // Can turn this on (and log `response.sourceDocuments`) for debuggings purposes.
       returnSourceDocuments: false,
     })

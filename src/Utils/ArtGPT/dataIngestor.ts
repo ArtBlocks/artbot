@@ -25,8 +25,8 @@ const GH_REQ_OPTIONS = {
   },
 }
 // Data chunking parameters
-const CHUNK_SIZE = 4000
-const CHUNK_OVERLAP = 200
+const CHUNK_SIZE = 6000
+const CHUNK_OVERLAP = 1000
 
 async function fetchAndProcessGHFiles(
   repo: string,
