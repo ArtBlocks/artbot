@@ -57,11 +57,6 @@ export class ArtGPTBot {
     this.model = new OpenAIChat({
       modelName: 'gpt-3.5-turbo',
       temperature: 0,
-      // To improve performance, set this -1 to auto-assign maxTokens.
-      // Note that until https://github.com/hwchase17/langchainjs/pull/1043 is merged upstream
-      // this requires locking us to version 0.0.66 of langchainjs, and using the monkey-patching
-      // hack in our package.json postinstall script to get it to work.
-      maxTokens: -1,
       prefixMessages: [
         {
           role: 'system',
@@ -112,7 +107,7 @@ export class ArtGPTBot {
     this.langChain = VectorDBQAChain.fromLLM(this.model, this.vectorStore, {
       k: 2, // This is the number of documents to include as context (4 is default).
       // Can turn this on (and log `response.sourceDocuments`) for debuggings purposes.
-      returnSourceDocuments: false,
+      returnSourceDocuments: true,
     })
 
     // We are now warmed up!
@@ -225,21 +220,37 @@ export class ArtGPTBot {
       try {
         response = await this.langChain.call({ query: query })
       } catch (error) {
-        console.error(`Error calling langchain: ${error}`)
-        // TODO: Remove extra logging once we're confident in the bot.
-        console.log(error.response?.data)
-        console.log(error)
+        console.error(`Error calling langchain: ${JSON.stringify(error)}`)
+        console.error(
+          `Error response data: ${JSON.stringify(error.response?.data)}`
+        )
         this.sendErrorReply(msg)
         return
       }
+      const sourceDocuments = response.sourceDocuments
+      const sourceLocations = sourceDocuments.map((doc: any) => ({
+        repoName: doc.metadata.repoName,
+        fileName: doc.metadata.fileName,
+      }))
+      let sourceLocationsString = ''
+      sourceLocations.forEach((location: any) => {
+        sourceLocationsString += `
+        - ${location.fileName} in ${location.repoName}
+        `
+      })
 
       // Summarize response to be less than ARTBOT_MAX_CHARS_RESPONSE if it is too long.
-      if (response.text.length > ARTBOT_MAX_CHARS_RESPONSE) {
+      if (
+        response.text.length + sourceLocationsString.length >
+        ARTBOT_MAX_CHARS_RESPONSE
+      ) {
         console.log('Summarizing response...')
         try {
           response = await this.langChain.call({
             query: `
-          Please summarize the following response to be less than ${ARTBOT_MAX_CHARS_RESPONSE} characters:
+          Please summarize the following response to be less than ${
+            ARTBOT_MAX_CHARS_RESPONSE - sourceLocationsString.length
+          } characters:
           ---
           ${query}
           `,
@@ -256,6 +267,11 @@ export class ArtGPTBot {
       *NOTE: I am still in beta, my answers may be wrong.*
 
       ${response.text}
+
+      ---
+
+      *Source Documents:*
+      ${sourceLocationsString}
       `
       this.sendEmbedReply(msg, ARTBOT_GREEN, message)
     }

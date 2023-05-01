@@ -10,8 +10,7 @@
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "codegen": "yarn codegen-hasura && yarn codegen-subgraph",
     "codegen-hasura": "graphql-codegen --require dotenv/config --config ./codegen.hasura.ts dotenv_config_path=./.env",
-    "codegen-subgraph": "graphql-codegen --config ./codegen.subgraph.ts",
-    "postinstall": "cp -f ./src/Utils/ArtGPT/openai-chat.cjs ./node_modules/langchain/dist/llms/openai-chat.cjs"
+    "codegen-subgraph": "graphql-codegen --config ./codegen.subgraph.ts"
   },
   "keywords": [
     "artblocks",
