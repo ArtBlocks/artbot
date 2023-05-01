@@ -38,7 +38,7 @@
     "googleapis": "^92.0.0",
     "graphql": "^16.6.0",
     "jest": "^28.0.3",
-    "langchain": "0.0.66",
+    "langchain": "^0.0.66",
     "lodash.deburr": "^4.1.0",
     "ms": "^2.0.0",
     "node-fetch": "^2.6.1",

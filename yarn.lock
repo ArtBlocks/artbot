@@ -5874,7 +5874,7 @@ kleur@^3.0.3:
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
 
-langchain@0.0.66:
+langchain@^0.0.66:
   version "0.0.66"
   resolved "https://registry.yarnpkg.com/langchain/-/langchain-0.0.66.tgz#dff1c78dde3837854298253c63952660c3ee7e27"
   integrity sha512-HsVdXFDp2+YB12tvpMFOK6kIXaLvFzJKQUzitr5VEamhZCFUoojZgcS7ckRjxJIv+aVWbEzCi3KJI/2kPKsMkA==
