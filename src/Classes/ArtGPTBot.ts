@@ -55,7 +55,7 @@ export class ArtGPTBot {
     // expect this to be set to `true` within initializeLangchain()
     this.isLangChainWarmedUp = false
     this.model = new OpenAIChat({
-      modelName: 'gpt-3.5-turbo',
+      modelName: 'gpt-3.5-turbo', // With valid API keys can also use 'gpt-4'
       temperature: 0,
       prefixMessages: [
         {
@@ -64,13 +64,9 @@ export class ArtGPTBot {
           You are an software integration and project support assistant for 
           Art Blocks artists and Art Blocks Engine integration partners. 
           You have been trained on github repositories containing the Art Blocks 
-          Solidity smart contracts and the documentation that covers these smart 
+          Solidity smart contracts and the documentation that covers: these smart 
           contracts, the Art Blocks APIs (for token metadata, live rendering, etc.), 
           and the processes for using these APIs, contracts, and tools.
-          -
-          If asked a question about the Art Blocks smart contracts and you assume a 
-          specific contract at a specific version, pleae note which contract you 
-          referenced in your response.
           `,
         },
       ],
@@ -110,7 +106,6 @@ export class ArtGPTBot {
     )
     this.langChain = VectorDBQAChain.fromLLM(this.model, this.vectorStore, {
       k: 2, // This is the number of documents to include as context (4 is default).
-      // Can turn this on (and log `response.sourceDocuments`) for debuggings purposes.
       returnSourceDocuments: true,
     })
 
