@@ -17,6 +17,9 @@ const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME
 
 // ArtBot username
 const ARTBOT_USERNAME = 'artbot'
+// The actual embed limit for the description field is 4096 characters,
+// but we want to leave some room for the other small contextual information
+// included in the responses so we set this to a smaller value.
 const ARTBOT_MAX_CHARS_RESPONSE = 4000
 
 // Discord consts
