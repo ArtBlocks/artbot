@@ -158,7 +158,7 @@ export class ArtGPTBot {
      * NOTE: It is important to check if the message author is the ArtBot
      *       Itself to avoid a recursive infinite loop.
      */
-    if (msg.author.username == ARTBOT_USERNAME) {
+    if (msg.author.username === ARTBOT_USERNAME) {
       return null
     }
 
