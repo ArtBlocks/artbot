@@ -174,7 +174,8 @@ export class ReservoirListBot extends APIPollBot {
       {
         name: 'Live Script',
         value: `[view on artblocks.io](${
-          artBlocksData.external_url + LISTING_UTM
+          (artBlocksData.external_url ?? artBlocksData.generator_url) +
+          LISTING_UTM
         })`,
         inline: true,
       }
