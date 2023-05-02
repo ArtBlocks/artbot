@@ -168,9 +168,8 @@ export class ProjectBot {
     const artBlocksData = artBlocksResponse.data
 
     const titleLink =
-      artBlocksData.external_url !== ''
-        ? artBlocksData.external_url + PROJECTBOT_UTM
-        : artBlocksData.generator_url + PROJECTBOT_UTM
+      (artBlocksData.external_url ?? artBlocksData.generator_url) +
+      PROJECTBOT_UTM
 
     let title = artBlocksData.name + ' - ' + artBlocksData.artist
 
