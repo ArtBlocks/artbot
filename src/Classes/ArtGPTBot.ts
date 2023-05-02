@@ -20,11 +20,9 @@ const ARTBOT_USERNAME = 'artbot'
 const ARTBOT_MAX_CHARS_RESPONSE = 4000
 
 // Discord consts
-const DISCORD_INC_SERVER_ID = '822311470133542912'
-const DISCORD_COMMUNITY_SERVER_ID = '411959613370400778'
 const DISCORD_TEST_SERVER_ID = '785144843986665472'
-const DISCORD_COMMUNITY_ARTIST_TECH_CHANNEL_ID = '909525641622347806'
-const DISCORD_COMMUNITY_PARTNERSHIP_ARTISTS_CHANNEL_ID = '971541479333965824'
+const DISCORD_INC_SERVER_ID = '822311470133542912'
+const DISCORD_INC_ARTGPT_CHANNEL_ID = '1103051072756519012'
 
 // Color consts
 const ARTBOT_GREEN = 0x00ff00
@@ -138,19 +136,13 @@ export class ArtGPTBot {
     const serverID = msg.guild ? msg.guild.id : ''
     const channelID = msg.channel ? msg.channel.id : ''
 
-    if (
-      serverID == DISCORD_INC_SERVER_ID ||
-      serverID == DISCORD_TEST_SERVER_ID
-    ) {
-      // Handle all messages in the Inc and test servers
+    // For now, we only handle messages in the Inc and test servers
+    if (serverID == DISCORD_TEST_SERVER_ID) {
+      // Handle all messages in the test server
       return true
-    } else if (serverID == DISCORD_COMMUNITY_SERVER_ID) {
-      // In the community server, only field reqeusts in the
-      // #artist-tech and #partnership-artists channels for now
-      if (
-        channelID == DISCORD_COMMUNITY_ARTIST_TECH_CHANNEL_ID ||
-        channelID == DISCORD_COMMUNITY_PARTNERSHIP_ARTISTS_CHANNEL_ID
-      ) {
+    } else if (serverID == DISCORD_INC_SERVER_ID) {
+      // Only handle messages in the specified #artgpt channel
+      if (channelID == DISCORD_INC_ARTGPT_CHANNEL_ID) {
         return true
       }
     }
