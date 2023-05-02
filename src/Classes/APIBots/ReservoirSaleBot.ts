@@ -240,7 +240,7 @@ export class ReservoirSaleBot extends APIPollBot {
       {
         name: 'Live Script',
         value: `[view on artblocks.io](${
-          artBlocksData.external_url + SALE_UTM
+          (artBlocksData.external_url ?? artBlocksData.generator_url) + SALE_UTM
         })`,
         inline: true,
       }
