@@ -167,12 +167,9 @@ export class ProjectBot {
     )
     const artBlocksData = artBlocksResponse.data
 
-    const osUrl = `https://api.opensea.io/api/v1/asset/${this.coreContract}/${tokenID}/`
-
     const titleLink =
-      artBlocksData.external_url !== ''
-        ? artBlocksData.external_url + PROJECTBOT_UTM
-        : osUrl
+      (artBlocksData.external_url ?? artBlocksData.generator_url) +
+      PROJECTBOT_UTM
 
     let title = artBlocksData.name + ' - ' + artBlocksData.artist
 
