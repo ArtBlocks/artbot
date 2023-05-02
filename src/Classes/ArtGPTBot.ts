@@ -137,12 +137,12 @@ export class ArtGPTBot {
     const channelID = msg.channel ? msg.channel.id : ''
 
     // For now, we only handle messages in the Inc and test servers
-    if (serverID == DISCORD_TEST_SERVER_ID) {
+    if (serverID === DISCORD_TEST_SERVER_ID) {
       // Handle all messages in the test server
       return true
-    } else if (serverID == DISCORD_INC_SERVER_ID) {
+    } else if (serverID === DISCORD_INC_SERVER_ID) {
       // Only handle messages in the specified #artgpt channel
-      if (channelID == DISCORD_INC_ARTGPT_CHANNEL_ID) {
+      if (channelID === DISCORD_INC_ARTGPT_CHANNEL_ID) {
         return true
       }
     }
