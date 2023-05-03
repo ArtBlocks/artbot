@@ -5,6 +5,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 
 import { ArtIndexerBot } from './Classes/ArtIndexerBot'
+import { ArtGPTBot } from './Classes/ArtGPTBot'
 
 import { MintBot } from './Classes/MintBot'
 const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
@@ -147,6 +148,7 @@ bot.on('ready', () => {
 })
 
 const artIndexerBot = new ArtIndexerBot()
+const artGPTBot = new ArtGPTBot()
 const pbabIndexerBot = new ArtIndexerBot(getEngineProjects)
 const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
 const abXbmIndexerBot = new ArtIndexerBot(getArtBlocksXBMProjects)
@@ -158,6 +160,7 @@ bot.on(Events.MessageCreate, async (msg) => {
   const msgContent = msg.content
   const msgContentLowercase = msgContent.toLowerCase()
   const channelID = msg.channel.id
+  const artBotID = bot.user?.id
 
   // If there is not a channel ID configured where the message was sent
   // short-circuit handling the message
@@ -195,8 +198,13 @@ bot.on(Events.MessageCreate, async (msg) => {
     return
   }
 
+  // Handle special requests to ArtBotGPT.
+  if (msgContentLowercase.startsWith(artGPTBot.queryString)) {
+    artGPTBot.handleRequest(msg)
+    return
+  }
+
   // Handle special info questions that ArtBot knows how to answer.
-  const artBotID = bot.user?.id
   smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
     (smartResponse: string) => {
       if (smartResponse !== null && smartResponse !== undefined) {
