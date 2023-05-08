@@ -157,7 +157,7 @@ export function sendEmbedToSaleChannels(
     if (artBlocksData.artist.includes('ixnayokay')) {
       sendEmbedToChannel(bot, embed, IXNAYOKAY_SALES)
     }
-    if (artBlocksData.artist.includes('Owen Moore')) {
+    if (artBlocksData.artist.includes('Owen Moore') || artBlocksData.collection_name.includes('WaveShapes')) {
       sendEmbedToChannel(bot, embed, OWMO_SALES)
     }
     if (artBlocksData.platform.includes('Plottables')) {
