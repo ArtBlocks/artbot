@@ -33,6 +33,14 @@ const BLOCKED_ENGINE_CONTRACTS: {
 const client = createClient({
   url: PUBLIC_HASURA_ENDPOINT,
   fetch: fetch,
+  fetchOptions: process.env.HASURA_GRAPHQL_ADMIN_SECRET
+    ? () => ({
+        headers: {
+          'x-hasura-admin-secret':
+            process.env.HASURA_GRAPHQL_ADMIN_SECRET ?? '',
+        },
+      })
+    : undefined,
   requestPolicy: 'network-only',
 })
 
