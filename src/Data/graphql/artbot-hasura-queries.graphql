@@ -1,0 +1,114 @@
+fragment ProjectDetail on projects_metadata {
+  id
+  project_id
+  name
+  invocations
+  max_invocations
+  active
+  paused
+  complete
+  artist_name
+  contract_address
+  start_datetime
+  vertical_name
+  heritage_curation_status
+  vertical {
+    category_name
+  }
+}
+
+query getAllProjects($first: Int!, $skip: Int) {
+  projects_metadata(
+    limit: $first
+    offset: $skip
+    order_by: { project_id: asc }
+  ) {
+    ...ProjectDetail
+  }
+}
+
+query getProjectInContracts($contracts: [String!], $projectId: String!) {
+  projects_metadata(
+    where: {
+      project_id: { _eq: $projectId }
+      contract_address: { _in: $contracts }
+    }
+    limit: 1
+  ) {
+    ...ProjectDetail
+  }
+}
+
+query getWalletTokens(
+  $wallet: String!
+  $contracts: [String!]!
+  $first: Int!
+  $skip: Int
+) {
+  tokens_metadata(
+    limit: $first
+    offset: $skip
+    where: {
+      owner_address: { _eq: $wallet }
+      contract_address: { _in: $contracts }
+    }
+  ) {
+    invocation
+    project {
+      name
+    }
+  }
+}
+
+query getContractProjects($contract: String!, $first: Int!, $skip: Int) {
+  projects_metadata(
+    limit: $first
+    offset: $skip
+    order_by: { project_id: asc }
+    where: { contract_address: { _eq: $contract } }
+  ) {
+    ...ProjectDetail
+  }
+}
+
+query getOpenProjects($contracts: [String!], $first: Int!, $skip: Int) {
+  projects_metadata(
+    limit: $first
+    offset: $skip
+    order_by: { project_id: asc }
+    where: {
+      paused: { _eq: false }
+      active: { _eq: true }
+      complete: { _eq: false }
+      contract_address: { _in: $contracts }
+    }
+  ) {
+    ...ProjectDetail
+  }
+}
+
+query getProject($id: String!) {
+  projects_metadata(where: { id: { _eq: $id } }) {
+    ...ProjectDetail
+  }
+}
+
+query getEngineContracts($ids: [String!]) {
+  contracts_metadata(where: { address: { _nin: $ids } }) {
+    address
+  }
+}
+
+query getProjectInvocations($id: String!) {
+  projects_metadata(where: { id: { _eq: $id } }) {
+    invocations
+  }
+}
+
+query getTokenOwner($id: String!) {
+  tokens_metadata(where: { id: { _eq: $id } }) {
+    owner {
+      public_address
+    }
+  }
+}

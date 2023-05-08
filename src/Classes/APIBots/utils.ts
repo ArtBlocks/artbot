@@ -1,8 +1,9 @@
 import * as dotenv from 'dotenv'
-import { ProjectsMetadataDetailsFragment } from '../../GraphQL/Hasura/generated/graphql'
+
 import { COLLAB_CONTRACTS, ENGINE_CONTRACTS } from '../../index'
 import { CollectionType } from '../MintBot'
 import { AxiosError } from 'axios'
+import { ProjectDetailFragment } from '../../Data/generated/graphql'
 dotenv.config()
 
 const axios = require('axios')
@@ -163,9 +164,9 @@ export function isExplorationsContract(contractAddress: string): boolean {
   )
 }
 
-export function buildBirthdayMapping(
-  projects: ProjectsMetadataDetailsFragment[]
-): { [id: string]: string } {
+export function buildBirthdayMapping(projects: ProjectDetailFragment[]): {
+  [id: string]: string
+} {
   const birthdayMapping: { [id: string]: string } = {}
   projects.forEach((proj) => {
     birthdayMapping[proj.id] = proj.start_datetime
@@ -175,7 +176,7 @@ export function buildBirthdayMapping(
 }
 
 export function buildCollectionMapping(
-  projects: ProjectsMetadataDetailsFragment[]
+  projects: ProjectDetailFragment[]
 ): { [id: string]: string }[] {
   const collectionMapping: { [id: string]: string } = {}
   const heritageStatuses: { [id: string]: string } = {}

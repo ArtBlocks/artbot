@@ -1,13 +1,14 @@
 import { Channel, Collection, Message } from 'discord.js'
 import * as dotenv from 'dotenv'
-import { getProjectsHasuraDetails } from '../GraphQL/Hasura/queryHasura'
-import {
-  getAllProjects,
-  getAllTokensInWallet,
-  getArtblocksOpenProjects,
-} from '../GraphQL/Subgraph/querySubgraph'
+
 import { ProjectBot } from './ProjectBot'
 import { buildBirthdayMapping, buildCollectionMapping } from './APIBots/utils'
+import {
+  getAllProjects,
+  getArtblocksOpenProjects,
+  getAllTokensInWallet,
+} from '../Data/queryGraphQL'
+import { ProjectDetailFragment } from '../Data/generated/graphql'
 dotenv.config()
 
 const deburr = require('lodash.deburr')
@@ -38,7 +39,7 @@ BIRTHDAY_CHECK_TIME.setSeconds(0)
 BIRTHDAY_CHECK_TIME.setMilliseconds(0)
 
 export class ArtIndexerBot {
-  projectFetch: () => any
+  projectFetch: () => Promise<ProjectDetailFragment[]>
   projects: { [id: string]: ProjectBot }
   artists: { [id: string]: ProjectBot[] }
   birthdays: { [id: string]: ProjectBot[] }
@@ -71,12 +72,9 @@ export class ArtIndexerBot {
   async buildProjectBots() {
     try {
       const projects = await this.projectFetch()
-      const hasuraDetails = await getProjectsHasuraDetails().catch((e) => {
-        console.log('Hasura error or not set up', e)
-        return [] // Don't break if Hasura is not set up
-      })
-      const bdays = buildBirthdayMapping(hasuraDetails)
-      const collectionInfo = buildCollectionMapping(hasuraDetails)
+
+      const bdays = buildBirthdayMapping(projects)
+      const collectionInfo = buildCollectionMapping(projects)
       const collections = collectionInfo[0]
       const heritageStatuses = collectionInfo[1]
       console.log(
@@ -85,29 +83,29 @@ export class ArtIndexerBot {
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i]
         if (project.invocations === '0') continue
-        let bday = bdays[`${project.contract.id}-${project.projectId}`]
+        let bday = bdays[`${project.contract_address}-${project.project_id}`]
         const collection = this.toProjectKey(
-          collections[`${project.contract.id}-${project.projectId}`]
+          collections[`${project.contract_address}-${project.project_id}`]
         )
         const heritageStatus = this.toProjectKey(
-          heritageStatuses[`${project.contract.id}-${project.projectId}`]
+          heritageStatuses[`${project.contract_address}-${project.project_id}`]
         )
         const newBot = new ProjectBot(
           project.id,
-          project.projectId,
-          project.contract.id,
+          parseInt(project.project_id),
+          project.contract_address,
           project.invocations,
-          project.maxInvocations,
-          project.name,
+          project.max_invocations,
+          project.name ?? 'unknown',
           project.active,
           undefined,
-          project.artistName,
+          project.artist_name ?? 'unknown artist',
           collection ?? undefined,
           heritageStatus ?? undefined,
           bday ? new Date(bday) : undefined
         )
 
-        const projectKey = this.toProjectKey(project.name)
+        const projectKey = this.toProjectKey(project.name ?? 'unknown project')
         this.projects[projectKey] = newBot
 
         if (bday) {
@@ -116,7 +114,9 @@ export class ArtIndexerBot {
           this.birthdays[bday] = this.birthdays[bday] ?? []
           this.birthdays[bday].push(newBot)
         }
-        const artistName = this.toProjectKey(project.artistName)
+        const artistName = this.toProjectKey(
+          project.artist_name ?? 'unknown artist'
+        )
         this.artists[artistName] = this.artists[artistName] ?? []
         this.artists[artistName].push(newBot)
 
