@@ -2,16 +2,10 @@ import type { CodegenConfig } from '@graphql-codegen/cli'
 
 const config: CodegenConfig = {
   overwrite: true,
-  schema: {
-    [process.env.HASURA_GRAPHQL_ENDPOINT ?? '']: {
-      headers: {
-        apikey: process.env.HASURA_GRAPHQL_ADMIN_SECRET,
-      },
-    },
-  },
-  documents: ['./src/GraphQL/Hasura/**/*.graphql'],
+  schema: 'https://data.artblocks.io/v1/graphql',
+  documents: ['./src/Data/**/*.graphql'],
   generates: {
-    'src/GraphQL/Hasura/generated/graphql.ts': {
+    'src/Data/generated/graphql.ts': {
       plugins: [
         'typescript',
         'typescript-operations',
