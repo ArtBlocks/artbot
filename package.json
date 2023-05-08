@@ -8,9 +8,7 @@
     "test": "jest",
     "format": "prettier --write .",
     "lint": "eslint . --ext ts --ext tsx --ext js",
-    "codegen": "yarn codegen-hasura && yarn codegen-subgraph",
-    "codegen-hasura": "graphql-codegen --require dotenv/config --config ./codegen.hasura.ts dotenv_config_path=./.env",
-    "codegen-subgraph": "graphql-codegen --config ./codegen.subgraph.ts"
+    "codegen": "graphql-codegen --config ./codegen.ts"
   },
   "keywords": [
     "artblocks",

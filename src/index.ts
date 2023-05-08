@@ -16,7 +16,7 @@ import {
   getArtBlocksXPaceProjects,
   getEngineContracts,
   getEngineProjects,
-} from './GraphQL/Subgraph/querySubgraph'
+} from './Data/queryGraphQL'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 

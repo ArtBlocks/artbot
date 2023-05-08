@@ -1,55 +1,50 @@
 import * as dotenv from 'dotenv'
-dotenv.config()
 import { createClient } from 'urql/core'
 import {
-  GetProjectDocument,
-  GetContractProjectsDocument,
   ProjectDetailFragment,
   GetAllProjectsDocument,
-  GetWalletTokensDocument,
-  GetTokenOwnerDocument,
   GetEngineContractsDocument,
-  GetProjectInvocationsDocument,
+  GetWalletTokensDocument,
   GetOpenProjectsDocument,
+  GetProjectDocument,
+  GetContractProjectsDocument,
+  GetTokenOwnerDocument,
+  GetProjectInvocationsDocument,
   GetProjectInContractsDocument,
 } from './generated/graphql'
 
+dotenv.config()
 const fetch = require('node-fetch')
 
-const HOSTED_API_URL =
-  'https://api.thegraph.com/subgraphs/name/artblocks/art-blocks'
-
-const DECENTRALIZED_API_URL = `https://gateway.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/5So3nipgHT3ks7pEPDQ6YgSFhfEmADrh481P9z1ZtcMA`
-
-let API_URL = HOSTED_API_URL
-if (process.env.GRAPH_API_KEY && process.env.USE_DECENTRALIZED_API === 'true') {
-  API_URL = DECENTRALIZED_API_URL
-}
-
-const maxProjectsPerQuery = 1000
+export const PUBLIC_HASURA_ENDPOINT = 'https://data.artblocks.io/v1/graphql'
 const CORE_CONTRACTS: {
   [id: string]: string
-} = require('../../ProjectConfig/coreContracts.json')
+} = require('../ProjectConfig/coreContracts.json')
 const COLLAB_CONTRACTS: {
   [id: string]: string
-} = require('../../ProjectConfig/collaborationContracts.json')
+} = require('../ProjectConfig/collaborationContracts.json')
 const EXPLORATION_CONTRACTS: {
   [id: string]: string
-} = require('../../ProjectConfig/explorationsContracts.json')
+} = require('../ProjectConfig/explorationsContracts.json')
 const BLOCKED_ENGINE_CONTRACTS: {
   [id: string]: string
-} = require('../../ProjectConfig/blockedEngineContracts.json')
+} = require('../ProjectConfig/blockedEngineContracts.json')
 
 const client = createClient({
-  url: API_URL,
+  url: PUBLIC_HASURA_ENDPOINT,
   fetch: fetch,
-  fetchOptions: () => ({
-    headers: {
-      'x-hasura-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET,
-    },
-  }),
+  fetchOptions: process.env.HASURA_GRAPHQL_ADMIN_SECRET
+    ? () => ({
+        headers: {
+          'x-hasura-admin-secret':
+            process.env.HASURA_GRAPHQL_ADMIN_SECRET ?? '',
+        },
+      })
+    : undefined,
   requestPolicy: 'network-only',
 })
+
+const maxProjectsPerQuery = 1000
 
 export async function getAllProjects(): Promise<ProjectDetailFragment[]> {
   try {
@@ -65,8 +60,8 @@ export async function getAllProjects(): Promise<ProjectDetailFragment[]> {
       if (!data) {
         throw Error('No data returned from getAllProjects subgraph query')
       }
-      allProjects.push(...data.projects)
-      if (data.projects.length !== maxProjectsPerQuery) {
+      allProjects.push(...data.projects_metadata)
+      if (data.projects_metadata.length !== maxProjectsPerQuery) {
         loop = false
       }
     }
@@ -93,7 +88,7 @@ export async function getEngineContracts() {
       throw Error('No data returned from getEngineContracts subgraph query')
     }
 
-    return data.contracts.map(({ id }) => id)
+    return data.contracts_metadata.map(({ address }) => address)
   } catch (err) {
     console.error(err)
     return undefined
@@ -121,8 +116,8 @@ export async function getAllTokensInWallet(walletAddress: string) {
       if (!data) {
         throw Error('No data returned from getAllTokensInWallet subgraph query')
       }
-      allTokens.push(...data.tokens)
-      if (data.tokens.length !== maxTokensPerQuery) {
+      allTokens.push(...data.tokens_metadata)
+      if (data.tokens_metadata.length !== maxTokensPerQuery) {
         loop = false
       }
     }
@@ -148,16 +143,16 @@ export async function getArtblocksOpenProjects(): Promise<
           contracts: Object.values(CORE_CONTRACTS),
         })
         .toPromise()
-      if (!data || !data.projects) {
+      if (!data || !data.projects_metadata) {
         throw Error(
           'No data returned from getArtblocksOpenProjects subgraph query'
         )
       }
 
-      data.projects.forEach((project: ProjectDetailFragment) => {
+      data.projects_metadata.forEach((project: ProjectDetailFragment) => {
         projects.push(project)
       })
-      if (data.projects?.length !== maxProjectsPerQuery) {
+      if (data.projects_metadata?.length !== maxProjectsPerQuery) {
         loop = false
       }
     }
@@ -182,31 +177,6 @@ export async function getArtBlocksXBMProjects(): Promise<
   return await getContractsProjects([COLLAB_CONTRACTS.AB_X_BM])
 }
 
-export async function getProjectInContracts(
-  projectId: number,
-  contracts: string[]
-): Promise<ProjectDetailFragment> {
-  const { data } = await client
-    .query(GetProjectInContractsDocument, {
-      contracts: contracts,
-      projectId: projectId,
-    })
-    .toPromise()
-
-  if (!data || !data.projects.length) {
-    throw Error('No data returned from getProject subgraph query')
-  }
-
-  return data.projects[0]
-}
-
-export async function getArtBlocksProject(
-  projectId: number
-): Promise<ProjectDetailFragment> {
-  const contractsToGet = Object.values(CORE_CONTRACTS)
-  return await getProjectInContracts(projectId, contractsToGet)
-}
-
 export async function getEngineProjects(): Promise<ProjectDetailFragment[]> {
   const contractsToGet = (await getEngineContracts()) ?? []
   return await getContractsProjects(contractsToGet)
@@ -222,11 +192,36 @@ export async function getContractProject(
     })
     .toPromise()
 
-  if (!data || !data.projects || !data.projects[0]) {
+  if (!data || !data.projects_metadata || !data.projects_metadata[0]) {
     throw Error('No data returned from getProject subgraph query')
   }
 
-  return data.projects[0]
+  return data.projects_metadata[0]
+}
+
+export async function getProjectInContracts(
+  projectId: number,
+  contracts: string[]
+): Promise<ProjectDetailFragment> {
+  const { data } = await client
+    .query(GetProjectInContractsDocument, {
+      contracts: contracts,
+      projectId: projectId.toString(),
+    })
+    .toPromise()
+
+  if (!data || !data.projects_metadata.length) {
+    throw Error('No data returned from getProject subgraph query')
+  }
+
+  return data.projects_metadata[0]
+}
+
+export async function getArtBlocksProject(
+  projectId: number
+): Promise<ProjectDetailFragment> {
+  const contractsToGet = Object.values(CORE_CONTRACTS)
+  return await getProjectInContracts(projectId, contractsToGet)
 }
 
 export async function getProject(
@@ -256,12 +251,12 @@ async function getContractProjects(
       })
       .toPromise()
 
-    if (!data || !data.contract || !data.contract?.projects) {
+    if (!data || !data.projects_metadata) {
       throw Error('No data returned from getContractProjects subgraph query')
     }
 
-    allProjects.push(...data.contract.projects)
-    if (data.contract.projects.length !== maxTokensPerQuery) {
+    allProjects.push(...data.projects_metadata)
+    if (data.projects_metadata.length !== maxTokensPerQuery) {
       loop = false
     }
   }
@@ -289,13 +284,17 @@ export async function getTokenOwnerAddress(tokenId: string) {
       })
       .toPromise()
 
-    if (!data || !data.tokens?.length || !data.tokens[0]?.owner?.id) {
+    if (
+      !data ||
+      !data.tokens_metadata?.length ||
+      !data.tokens_metadata[0]?.owner?.public_address
+    ) {
       console.log(error)
       console.log(data, tokenId)
       throw Error('No data returned from get token owner subgraph query')
     }
 
-    return data.tokens[0]?.owner?.id
+    return data.tokens_metadata[0]?.owner?.public_address
   } catch (err) {
     console.error(err)
     return undefined
@@ -313,7 +312,9 @@ export async function getProjectInvocations(projectId: string) {
     if (!data) {
       throw Error('No data returned from getProjectInvocations subgraph query')
     }
-    return data.projects.length > 0 ? data.projects[0].invocations : null
+    return data.projects_metadata.length > 0
+      ? data.projects_metadata[0].invocations
+      : null
   } catch (err) {
     console.error(err)
     return undefined

@@ -516,7 +516,7 @@ export type Contract_Types_Stream_Cursor_Value_Input = {
   type?: InputMaybe<Contract_Type_Names_Enum>;
 };
 
-/** columns and relationships of "contracts_metadata" */
+/** This table details the contract deployments & metadata for Art Blocks and all Engine partners. Updates are made when a core contract is deployed. */
 export type Contracts_Metadata = {
   __typename?: 'contracts_metadata';
   address: Scalars['String'];
@@ -558,7 +558,7 @@ export type Contracts_Metadata = {
 };
 
 
-/** columns and relationships of "contracts_metadata" */
+/** This table details the contract deployments & metadata for Art Blocks and all Engine partners. Updates are made when a core contract is deployed. */
 export type Contracts_MetadataAllowlisted_UsersArgs = {
   distinct_on?: InputMaybe<Array<Contract_Allowlistings_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -568,7 +568,7 @@ export type Contracts_MetadataAllowlisted_UsersArgs = {
 };
 
 
-/** columns and relationships of "contracts_metadata" */
+/** This table details the contract deployments & metadata for Art Blocks and all Engine partners. Updates are made when a core contract is deployed. */
 export type Contracts_MetadataProjectsArgs = {
   distinct_on?: InputMaybe<Array<Projects_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -578,7 +578,7 @@ export type Contracts_MetadataProjectsArgs = {
 };
 
 
-/** columns and relationships of "contracts_metadata" */
+/** This table details the contract deployments & metadata for Art Blocks and all Engine partners. Updates are made when a core contract is deployed. */
 export type Contracts_MetadataProjects_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Projects_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -2257,7 +2257,7 @@ export type Entity_Tags_Variance_Order_By = {
   id?: InputMaybe<Order_By>;
 };
 
-/** columns and relationships of "favorites" */
+/** This table lists a users’ favorites (tokens, projects, other users) */
 export type Favorites = {
   __typename?: 'favorites';
   favorited_project_id?: Maybe<Scalars['String']>;
@@ -2690,7 +2690,7 @@ export type Media_Stream_Cursor_Value_Input = {
   owner_id?: InputMaybe<Scalars['String']>;
 };
 
-/** columns and relationships of "minter_filters_metadata" */
+/** Newly-deployed minters (ie. Set Price minter, Dutch Auction with Settlement minter, etc) must be approved by the Art Blocks minter-filter contract before they may be included for purchasing on an artist’s project. This table tracks a minter-filter’s approved contracts. */
 export type Minter_Filters_Metadata = {
   __typename?: 'minter_filters_metadata';
   address: Scalars['String'];
@@ -2699,7 +2699,7 @@ export type Minter_Filters_Metadata = {
 };
 
 
-/** columns and relationships of "minter_filters_metadata" */
+/** Newly-deployed minters (ie. Set Price minter, Dutch Auction with Settlement minter, etc) must be approved by the Art Blocks minter-filter contract before they may be included for purchasing on an artist’s project. This table tracks a minter-filter’s approved contracts. */
 export type Minter_Filters_MetadataAllowed_MintersArgs = {
   distinct_on?: InputMaybe<Array<Minters_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -2782,7 +2782,7 @@ export type Minter_Type_Names_Enum_Comparison_Exp = {
   _nin?: InputMaybe<Array<Minter_Type_Names_Enum>>;
 };
 
-/** columns and relationships of "minter_types" */
+/** Minters are versioned within this table, and the metadata (ie. labels & descriptions) describing the functionality/features of a particular minter version are listed here. Data is updated after the AB team deploys a new generic minter type to the blockchain and public subgraph. */
 export type Minter_Types = {
   __typename?: 'minter_types';
   description_template: Scalars['String'];
@@ -2840,7 +2840,7 @@ export type Minter_Types_Stream_Cursor_Value_Input = {
   type?: InputMaybe<Minter_Type_Names_Enum>;
 };
 
-/** columns and relationships of "minters_metadata" */
+/** This table details the auction and metadata pertaining to Art Blocks “minters” - or, the varieties of purchasing mechanics available for projects. Data is updated after the AB team deploys a new generic minter type to the blockchain and public subgraph. */
 export type Minters_Metadata = {
   __typename?: 'minters_metadata';
   address: Scalars['String'];
@@ -2864,13 +2864,13 @@ export type Minters_Metadata = {
 };
 
 
-/** columns and relationships of "minters_metadata" */
+/** This table details the auction and metadata pertaining to Art Blocks “minters” - or, the varieties of purchasing mechanics available for projects. Data is updated after the AB team deploys a new generic minter type to the blockchain and public subgraph. */
 export type Minters_MetadataExtra_Minter_DetailsArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
 
 
-/** columns and relationships of "minters_metadata" */
+/** This table details the auction and metadata pertaining to Art Blocks “minters” - or, the varieties of purchasing mechanics available for projects. Data is updated after the AB team deploys a new generic minter type to the blockchain and public subgraph. */
 export type Minters_MetadataReceiptsArgs = {
   distinct_on?: InputMaybe<Array<Receipt_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -2880,7 +2880,7 @@ export type Minters_MetadataReceiptsArgs = {
 };
 
 
-/** columns and relationships of "minters_metadata" */
+/** This table details the auction and metadata pertaining to Art Blocks “minters” - or, the varieties of purchasing mechanics available for projects. Data is updated after the AB team deploys a new generic minter type to the blockchain and public subgraph. */
 export type Minters_MetadataReceipts_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Receipt_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -3257,7 +3257,7 @@ export type Project_External_Asset_Dependency_Types_Enum_Comparison_Exp = {
   _nin?: InputMaybe<Array<Project_External_Asset_Dependency_Types_Enum>>;
 };
 
-/** columns and relationships of "project_minter_configurations" */
+/** This table holds metadata related to a minter that’s been configured by an artist for their project. Rows are added when an artist selects & assigns a minter type to their project that they’ve not previously used for the project in question. */
 export type Project_Minter_Configurations = {
   __typename?: 'project_minter_configurations';
   /** A computed field, executes function "approximate_exp_da_end_time" */
@@ -3284,13 +3284,13 @@ export type Project_Minter_Configurations = {
 };
 
 
-/** columns and relationships of "project_minter_configurations" */
+/** This table holds metadata related to a minter that’s been configured by an artist for their project. Rows are added when an artist selects & assigns a minter type to their project that they’ve not previously used for the project in question. */
 export type Project_Minter_ConfigurationsExtra_Minter_DetailsArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
 
 
-/** columns and relationships of "project_minter_configurations" */
+/** This table holds metadata related to a minter that’s been configured by an artist for their project. Rows are added when an artist selects & assigns a minter type to their project that they’ve not previously used for the project in question. */
 export type Project_Minter_ConfigurationsOffchain_Extra_Minter_DetailsArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
@@ -3403,7 +3403,7 @@ export type Project_Minter_Configurations_Stream_Cursor_Value_Input = {
   start_time?: InputMaybe<Scalars['timestamptz']>;
 };
 
-/** columns and relationships of "project_scripts" */
+/** This table holds the artist script files used for all projects (all scripts are primarily stored on-chain, and this table exists here for convenience purposes). Note that multiple scripts are combined when multiple indexes exist for a given projectID. This table is updated when an artist uploads, edits, or deletes a script in their project shell. */
 export type Project_Scripts = {
   __typename?: 'project_scripts';
   index: Scalars['Int'];
@@ -3861,7 +3861,7 @@ export type Project_Verticals_Stream_Cursor_Value_Input = {
   name?: InputMaybe<Verticals_Enum>;
 };
 
-/** columns and relationships of "projects_features" */
+/** Artists may choose to name arbitrary traits & patterns (“features”) within the outputs of their project. These features are listed here and calculated via the features_script. This table is updated when an artist uploads, edits, or deletes a feature in their project shell. */
 export type Projects_Features = {
   __typename?: 'projects_features';
   enable_artist_update_after_completion: Scalars['Boolean'];
@@ -3875,13 +3875,13 @@ export type Projects_Features = {
 };
 
 
-/** columns and relationships of "projects_features" */
+/** Artists may choose to name arbitrary traits & patterns (“features”) within the outputs of their project. These features are listed here and calculated via the features_script. This table is updated when an artist uploads, edits, or deletes a feature in their project shell. */
 export type Projects_FeaturesFeature_FieldsArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
 
 
-/** columns and relationships of "projects_features" */
+/** Artists may choose to name arbitrary traits & patterns (“features”) within the outputs of their project. These features are listed here and calculated via the features_script. This table is updated when an artist uploads, edits, or deletes a feature in their project shell. */
 export type Projects_FeaturesFeature_Fields_CountsArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
@@ -3937,7 +3937,7 @@ export type Projects_Features_Stream_Cursor_Value_Input = {
   project_id?: InputMaybe<Scalars['String']>;
 };
 
-/** columns and relationships of "projects_metadata" */
+/** This table holds entries for every project and information on all project-related settings. */
 export type Projects_Metadata = {
   __typename?: 'projects_metadata';
   activated_at?: Maybe<Scalars['timestamptz']>;
@@ -3954,6 +3954,10 @@ export type Projects_Metadata = {
   artist_interview?: Maybe<Scalars['String']>;
   artist_name?: Maybe<Scalars['String']>;
   aspect_ratio: Scalars['numeric'];
+  /** A computed field, executes function "project_auction_end_time" */
+  auction_end_time?: Maybe<Scalars['timestamptz']>;
+  /** A computed field, executes function "project_auction_start_time" */
+  auction_start_time?: Maybe<Scalars['timestamptz']>;
   base_uri?: Maybe<Scalars['String']>;
   charitable_giving_details?: Maybe<Scalars['String']>;
   complete: Scalars['Boolean'];
@@ -4064,7 +4068,7 @@ export type Projects_Metadata = {
 };
 
 
-/** columns and relationships of "projects_metadata" */
+/** This table holds entries for every project and information on all project-related settings. */
 export type Projects_MetadataExternal_Asset_DependenciesArgs = {
   distinct_on?: InputMaybe<Array<Project_External_Asset_Dependencies_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4074,7 +4078,7 @@ export type Projects_MetadataExternal_Asset_DependenciesArgs = {
 };
 
 
-/** columns and relationships of "projects_metadata" */
+/** This table holds entries for every project and information on all project-related settings. */
 export type Projects_MetadataFavoritesArgs = {
   distinct_on?: InputMaybe<Array<Favorites_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4084,7 +4088,7 @@ export type Projects_MetadataFavoritesArgs = {
 };
 
 
-/** columns and relationships of "projects_metadata" */
+/** This table holds entries for every project and information on all project-related settings. */
 export type Projects_MetadataFavorites_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Favorites_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4094,7 +4098,7 @@ export type Projects_MetadataFavorites_AggregateArgs = {
 };
 
 
-/** columns and relationships of "projects_metadata" */
+/** This table holds entries for every project and information on all project-related settings. */
 export type Projects_MetadataFeatured_TokenArgs = {
   args: Featured_Token_Projects_Metadata_Args;
   distinct_on?: InputMaybe<Array<Tokens_Metadata_Select_Column>>;
@@ -4105,7 +4109,7 @@ export type Projects_MetadataFeatured_TokenArgs = {
 };
 
 
-/** columns and relationships of "projects_metadata" */
+/** This table holds entries for every project and information on all project-related settings. */
 export type Projects_MetadataReceiptsArgs = {
   distinct_on?: InputMaybe<Array<Receipt_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4115,7 +4119,7 @@ export type Projects_MetadataReceiptsArgs = {
 };
 
 
-/** columns and relationships of "projects_metadata" */
+/** This table holds entries for every project and information on all project-related settings. */
 export type Projects_MetadataReceipts_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Receipt_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4125,13 +4129,13 @@ export type Projects_MetadataReceipts_AggregateArgs = {
 };
 
 
-/** columns and relationships of "projects_metadata" */
+/** This table holds entries for every project and information on all project-related settings. */
 export type Projects_MetadataScript_JsonArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
 
 
-/** columns and relationships of "projects_metadata" */
+/** This table holds entries for every project and information on all project-related settings. */
 export type Projects_MetadataScriptsArgs = {
   distinct_on?: InputMaybe<Array<Project_Scripts_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4141,7 +4145,7 @@ export type Projects_MetadataScriptsArgs = {
 };
 
 
-/** columns and relationships of "projects_metadata" */
+/** This table holds entries for every project and information on all project-related settings. */
 export type Projects_MetadataTagsArgs = {
   distinct_on?: InputMaybe<Array<Entity_Tags_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4151,7 +4155,7 @@ export type Projects_MetadataTagsArgs = {
 };
 
 
-/** columns and relationships of "projects_metadata" */
+/** This table holds entries for every project and information on all project-related settings. */
 export type Projects_MetadataTokensArgs = {
   distinct_on?: InputMaybe<Array<Tokens_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4161,7 +4165,7 @@ export type Projects_MetadataTokensArgs = {
 };
 
 
-/** columns and relationships of "projects_metadata" */
+/** This table holds entries for every project and information on all project-related settings. */
 export type Projects_MetadataTokens_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Tokens_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4295,6 +4299,8 @@ export type Projects_Metadata_Bool_Exp = {
   artist_interview?: InputMaybe<String_Comparison_Exp>;
   artist_name?: InputMaybe<String_Comparison_Exp>;
   aspect_ratio?: InputMaybe<Numeric_Comparison_Exp>;
+  auction_end_time?: InputMaybe<Timestamptz_Comparison_Exp>;
+  auction_start_time?: InputMaybe<Timestamptz_Comparison_Exp>;
   base_uri?: InputMaybe<String_Comparison_Exp>;
   charitable_giving_details?: InputMaybe<String_Comparison_Exp>;
   complete?: InputMaybe<Boolean_Comparison_Exp>;
@@ -4586,6 +4592,8 @@ export type Projects_Metadata_Order_By = {
   artist_interview?: InputMaybe<Order_By>;
   artist_name?: InputMaybe<Order_By>;
   aspect_ratio?: InputMaybe<Order_By>;
+  auction_end_time?: InputMaybe<Order_By>;
+  auction_start_time?: InputMaybe<Order_By>;
   base_uri?: InputMaybe<Order_By>;
   charitable_giving_details?: InputMaybe<Order_By>;
   complete?: InputMaybe<Order_By>;
@@ -7931,7 +7939,7 @@ export type Timestamptz_Comparison_Exp = {
   _nin?: InputMaybe<Array<Scalars['timestamptz']>>;
 };
 
-/** columns and relationships of "tokens_metadata" */
+/** All token details are added here after a new Art Blocks token is minted. Data will be updated upon a listing, sale, or transfer of the token. */
 export type Tokens_Metadata = {
   __typename?: 'tokens_metadata';
   /** An object relationship */
@@ -7995,7 +8003,7 @@ export type Tokens_Metadata = {
 };
 
 
-/** columns and relationships of "tokens_metadata" */
+/** All token details are added here after a new Art Blocks token is minted. Data will be updated upon a listing, sale, or transfer of the token. */
 export type Tokens_MetadataFavoritesArgs = {
   distinct_on?: InputMaybe<Array<Favorites_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -8005,7 +8013,7 @@ export type Tokens_MetadataFavoritesArgs = {
 };
 
 
-/** columns and relationships of "tokens_metadata" */
+/** All token details are added here after a new Art Blocks token is minted. Data will be updated upon a listing, sale, or transfer of the token. */
 export type Tokens_MetadataFavorites_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Favorites_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -8015,7 +8023,7 @@ export type Tokens_MetadataFavorites_AggregateArgs = {
 };
 
 
-/** columns and relationships of "tokens_metadata" */
+/** All token details are added here after a new Art Blocks token is minted. Data will be updated upon a listing, sale, or transfer of the token. */
 export type Tokens_MetadataFeaturesArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
@@ -8711,7 +8719,7 @@ export type Tokens_Metadata_Variance_Order_By = {
   video_id?: InputMaybe<Order_By>;
 };
 
-/** columns and relationships of "user_profiles" */
+/** Art Blocks public profiles */
 export type User_Profiles = {
   __typename?: 'user_profiles';
   bio?: Maybe<Scalars['String']>;
@@ -8890,7 +8898,7 @@ export type User_Profiles_Variance_Fields = {
   profile_picture_id?: Maybe<Scalars['Float']>;
 };
 
-/** columns and relationships of "users" */
+/** Art Blocks users */
 export type Users = {
   __typename?: 'users';
   /** An array relationship */
@@ -8935,7 +8943,7 @@ export type Users = {
 };
 
 
-/** columns and relationships of "users" */
+/** Art Blocks users */
 export type UsersAllowlisted_OnArgs = {
   distinct_on?: InputMaybe<Array<Contract_Allowlistings_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -8945,7 +8953,7 @@ export type UsersAllowlisted_OnArgs = {
 };
 
 
-/** columns and relationships of "users" */
+/** Art Blocks users */
 export type UsersFavoritesArgs = {
   distinct_on?: InputMaybe<Array<Favorites_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -8955,7 +8963,7 @@ export type UsersFavoritesArgs = {
 };
 
 
-/** columns and relationships of "users" */
+/** Art Blocks users */
 export type UsersFavorites_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Favorites_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -8965,13 +8973,13 @@ export type UsersFavorites_AggregateArgs = {
 };
 
 
-/** columns and relationships of "users" */
+/** Art Blocks users */
 export type UsersFeature_FlagsArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
 
 
-/** columns and relationships of "users" */
+/** Art Blocks users */
 export type UsersProjects_CreatedArgs = {
   distinct_on?: InputMaybe<Array<Projects_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -8981,7 +8989,7 @@ export type UsersProjects_CreatedArgs = {
 };
 
 
-/** columns and relationships of "users" */
+/** Art Blocks users */
 export type UsersProjects_Created_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Projects_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -8991,7 +8999,7 @@ export type UsersProjects_Created_AggregateArgs = {
 };
 
 
-/** columns and relationships of "users" */
+/** Art Blocks users */
 export type UsersReceiptsArgs = {
   distinct_on?: InputMaybe<Array<Receipt_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -9001,7 +9009,7 @@ export type UsersReceiptsArgs = {
 };
 
 
-/** columns and relationships of "users" */
+/** Art Blocks users */
 export type UsersReceipts_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Receipt_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -9011,7 +9019,7 @@ export type UsersReceipts_AggregateArgs = {
 };
 
 
-/** columns and relationships of "users" */
+/** Art Blocks users */
 export type UsersTagsArgs = {
   distinct_on?: InputMaybe<Array<Entity_Tags_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -9021,7 +9029,7 @@ export type UsersTagsArgs = {
 };
 
 
-/** columns and relationships of "users" */
+/** Art Blocks users */
 export type UsersTokensArgs = {
   distinct_on?: InputMaybe<Array<Tokens_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -9031,7 +9039,7 @@ export type UsersTokensArgs = {
 };
 
 
-/** columns and relationships of "users" */
+/** Art Blocks users */
 export type UsersTokens_AggregateArgs = {
   distinct_on?: InputMaybe<Array<Tokens_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -9493,15 +9501,79 @@ export type Webflow_Spectrum_Articles_Stream_Cursor_Value_Input = {
   webflow_item_id?: InputMaybe<Scalars['String']>;
 };
 
-export type ProjectsMetadataDetailsFragment = { __typename?: 'projects_metadata', id: string, start_datetime?: any | null, vertical_name: string, heritage_curation_status?: string | null, vertical: { __typename?: 'project_verticals', category_name: string } };
+export type ProjectDetailFragment = { __typename?: 'projects_metadata', id: string, project_id: string, name?: string | null, invocations?: any | null, max_invocations: number, active: boolean, paused: boolean, complete: boolean, artist_name?: string | null, contract_address: string, start_datetime?: any | null, vertical_name: string, heritage_curation_status?: string | null, vertical: { __typename?: 'project_verticals', category_name: string } };
 
-export type GetAllProjectsHasuraDetailsQueryVariables = Exact<{
+export type GetAllProjectsQueryVariables = Exact<{
   first: Scalars['Int'];
-  skip: Scalars['Int'];
+  skip?: InputMaybe<Scalars['Int']>;
 }>;
 
 
-export type GetAllProjectsHasuraDetailsQuery = { __typename?: 'query_root', projects_metadata: Array<{ __typename?: 'projects_metadata', id: string, start_datetime?: any | null, vertical_name: string, heritage_curation_status?: string | null, vertical: { __typename?: 'project_verticals', category_name: string } }> };
+export type GetAllProjectsQuery = { __typename?: 'query_root', projects_metadata: Array<{ __typename?: 'projects_metadata', id: string, project_id: string, name?: string | null, invocations?: any | null, max_invocations: number, active: boolean, paused: boolean, complete: boolean, artist_name?: string | null, contract_address: string, start_datetime?: any | null, vertical_name: string, heritage_curation_status?: string | null, vertical: { __typename?: 'project_verticals', category_name: string } }> };
+
+export type GetProjectInContractsQueryVariables = Exact<{
+  contracts?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
+  projectId: Scalars['String'];
+}>;
+
+
+export type GetProjectInContractsQuery = { __typename?: 'query_root', projects_metadata: Array<{ __typename?: 'projects_metadata', id: string, project_id: string, name?: string | null, invocations?: any | null, max_invocations: number, active: boolean, paused: boolean, complete: boolean, artist_name?: string | null, contract_address: string, start_datetime?: any | null, vertical_name: string, heritage_curation_status?: string | null, vertical: { __typename?: 'project_verticals', category_name: string } }> };
+
+export type GetWalletTokensQueryVariables = Exact<{
+  wallet: Scalars['String'];
+  contracts: Array<Scalars['String']> | Scalars['String'];
+  first: Scalars['Int'];
+  skip?: InputMaybe<Scalars['Int']>;
+}>;
+
+
+export type GetWalletTokensQuery = { __typename?: 'query_root', tokens_metadata: Array<{ __typename?: 'tokens_metadata', invocation: number, project: { __typename?: 'projects_metadata', name?: string | null } }> };
+
+export type GetContractProjectsQueryVariables = Exact<{
+  contract: Scalars['String'];
+  first: Scalars['Int'];
+  skip?: InputMaybe<Scalars['Int']>;
+}>;
+
+
+export type GetContractProjectsQuery = { __typename?: 'query_root', projects_metadata: Array<{ __typename?: 'projects_metadata', id: string, project_id: string, name?: string | null, invocations?: any | null, max_invocations: number, active: boolean, paused: boolean, complete: boolean, artist_name?: string | null, contract_address: string, start_datetime?: any | null, vertical_name: string, heritage_curation_status?: string | null, vertical: { __typename?: 'project_verticals', category_name: string } }> };
+
+export type GetOpenProjectsQueryVariables = Exact<{
+  contracts?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
+  first: Scalars['Int'];
+  skip?: InputMaybe<Scalars['Int']>;
+}>;
+
+
+export type GetOpenProjectsQuery = { __typename?: 'query_root', projects_metadata: Array<{ __typename?: 'projects_metadata', id: string, project_id: string, name?: string | null, invocations?: any | null, max_invocations: number, active: boolean, paused: boolean, complete: boolean, artist_name?: string | null, contract_address: string, start_datetime?: any | null, vertical_name: string, heritage_curation_status?: string | null, vertical: { __typename?: 'project_verticals', category_name: string } }> };
+
+export type GetProjectQueryVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type GetProjectQuery = { __typename?: 'query_root', projects_metadata: Array<{ __typename?: 'projects_metadata', id: string, project_id: string, name?: string | null, invocations?: any | null, max_invocations: number, active: boolean, paused: boolean, complete: boolean, artist_name?: string | null, contract_address: string, start_datetime?: any | null, vertical_name: string, heritage_curation_status?: string | null, vertical: { __typename?: 'project_verticals', category_name: string } }> };
+
+export type GetEngineContractsQueryVariables = Exact<{
+  ids?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
+}>;
+
+
+export type GetEngineContractsQuery = { __typename?: 'query_root', contracts_metadata: Array<{ __typename?: 'contracts_metadata', address: string }> };
+
+export type GetProjectInvocationsQueryVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type GetProjectInvocationsQuery = { __typename?: 'query_root', projects_metadata: Array<{ __typename?: 'projects_metadata', invocations?: any | null }> };
+
+export type GetTokenOwnerQueryVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type GetTokenOwnerQuery = { __typename?: 'query_root', tokens_metadata: Array<{ __typename?: 'tokens_metadata', owner?: { __typename?: 'users', public_address: string } | null }> };
 
 
 
@@ -11623,6 +11695,8 @@ export type Projects_MetadataResolvers<ContextType = any, ParentType extends Res
   artist_interview?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   artist_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   aspect_ratio?: Resolver<ResolversTypes['numeric'], ParentType, ContextType>;
+  auction_end_time?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  auction_start_time?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   base_uri?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   charitable_giving_details?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   complete?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -12896,5 +12970,13 @@ export type DirectiveResolvers<ContextType = any> = {
   cached?: CachedDirectiveResolver<any, any, ContextType>;
 };
 
-export const ProjectsMetadataDetailsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProjectsMetadataDetails"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"projects_metadata"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"start_datetime"}},{"kind":"Field","name":{"kind":"Name","value":"vertical_name"}},{"kind":"Field","name":{"kind":"Name","value":"heritage_curation_status"}},{"kind":"Field","name":{"kind":"Name","value":"vertical"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"category_name"}}]}}]}}]} as unknown as DocumentNode<ProjectsMetadataDetailsFragment, unknown>;
-export const GetAllProjectsHasuraDetailsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getAllProjectsHasuraDetails"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectsMetadataDetails"}}]}}]}},...ProjectsMetadataDetailsFragmentDoc.definitions]} as unknown as DocumentNode<GetAllProjectsHasuraDetailsQuery, GetAllProjectsHasuraDetailsQueryVariables>;
+export const ProjectDetailFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProjectDetail"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"projects_metadata"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"project_id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"invocations"}},{"kind":"Field","name":{"kind":"Name","value":"max_invocations"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"paused"}},{"kind":"Field","name":{"kind":"Name","value":"complete"}},{"kind":"Field","name":{"kind":"Name","value":"artist_name"}},{"kind":"Field","name":{"kind":"Name","value":"contract_address"}},{"kind":"Field","name":{"kind":"Name","value":"start_datetime"}},{"kind":"Field","name":{"kind":"Name","value":"vertical_name"}},{"kind":"Field","name":{"kind":"Name","value":"heritage_curation_status"}},{"kind":"Field","name":{"kind":"Name","value":"vertical"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"category_name"}}]}}]}}]} as unknown as DocumentNode<ProjectDetailFragment, unknown>;
+export const GetAllProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getAllProjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"project_id"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetAllProjectsQuery, GetAllProjectsQueryVariables>;
+export const GetProjectInContractsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getProjectInContracts"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"projectId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"project_id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"projectId"}}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"contract_address"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_in"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"1"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetProjectInContractsQuery, GetProjectInContractsQueryVariables>;
+export const GetWalletTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getWalletTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"wallet"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokens_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"owner_address"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"wallet"}}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"contract_address"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_in"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"invocation"}},{"kind":"Field","name":{"kind":"Name","value":"project"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetWalletTokensQuery, GetWalletTokensQueryVariables>;
+export const GetContractProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getContractProjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contract"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"project_id"},"value":{"kind":"EnumValue","value":"asc"}}]}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"contract_address"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contract"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetContractProjectsQuery, GetContractProjectsQueryVariables>;
+export const GetOpenProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getOpenProjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"project_id"},"value":{"kind":"EnumValue","value":"asc"}}]}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"paused"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"BooleanValue","value":false}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"active"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"BooleanValue","value":true}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"complete"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"BooleanValue","value":false}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"contract_address"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_in"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetOpenProjectsQuery, GetOpenProjectsQueryVariables>;
+export const GetProjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getProject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetProjectQuery, GetProjectQueryVariables>;
+export const GetEngineContractsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEngineContracts"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ids"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contracts_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"address"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_nin"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ids"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"address"}}]}}]}}]} as unknown as DocumentNode<GetEngineContractsQuery, GetEngineContractsQueryVariables>;
+export const GetProjectInvocationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getProjectInvocations"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"invocations"}}]}}]}}]} as unknown as DocumentNode<GetProjectInvocationsQuery, GetProjectInvocationsQueryVariables>;
+export const GetTokenOwnerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getTokenOwner"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokens_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"public_address"}}]}}]}}]}}]} as unknown as DocumentNode<GetTokenOwnerQuery, GetTokenOwnerQueryVariables>;
