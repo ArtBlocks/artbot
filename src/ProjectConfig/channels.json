@@ -448,7 +448,10 @@
   "920399256454594652": {
     "name": "samsy",
     "projectBotHandlers": {
-      "default": "232"
+      "default": "232",
+      "stringTriggers": {
+        "430": ["fushi no reality", "fushi", "reality"]
+      }
     }
   },
   "923461105374855188": {
@@ -656,7 +659,16 @@
       "default": "433"
     }
   },
-
+  "1103726461795442781": {
+    "name": "kazuhiro-tanimoto",
+    "projectBotHandlers": {
+      "default": "428",
+      "stringTriggers": {
+        "323": ["ghost in the code", "ghost"],
+        "375": ["wabi sabi", "wabi"]
+      }
+    }
+  },
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
     "projectBotHandlers": {
