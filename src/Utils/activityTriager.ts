@@ -28,6 +28,7 @@ const PLOTTABLES_SALES = projectConfig.chIdByName['plottables-sales']
 const PLOTTABLES_LISTINGS = projectConfig.chIdByName['plottables-listings']
 
 const FLUTTER_SALES = projectConfig.chIdByName['flutter-sales']
+const TENDER_SALES = projectConfig.chIdByName['tender-sales']
 
 // Addresses which should be omitted entirely from event feeds.
 export const BAN_ADDRESSES = new Set([
@@ -157,7 +158,10 @@ export function sendEmbedToSaleChannels(
     if (artBlocksData.artist.includes('ixnayokay')) {
       sendEmbedToChannel(bot, embed, IXNAYOKAY_SALES)
     }
-    if (artBlocksData.artist.includes('Owen Moore') || artBlocksData.collection_name.includes('WaveShapes')) {
+    if (
+      artBlocksData.artist.includes('Owen Moore') ||
+      artBlocksData.collection_name.includes('WaveShapes')
+    ) {
       sendEmbedToChannel(bot, embed, OWMO_SALES)
     }
     if (artBlocksData.platform.includes('Plottables')) {
@@ -165,6 +169,15 @@ export function sendEmbedToSaleChannels(
     }
     if (artBlocksData.platform.includes('Flutter')) {
       sendEmbedToChannel(bot, embed, FLUTTER_SALES)
+    }
+
+    if (
+      artBlocksData.platform.includes('Tender') ||
+      artBlocksData.platform.includes('MOMENT') ||
+      artBlocksData.platform.includes('Bright Moments') ||
+      artBlocksData.platform.includes('Art Blocks')
+    ) {
+      sendEmbedToChannel(bot, embed, TENDER_SALES)
     }
   } catch (e) {
     console.warn(e)
