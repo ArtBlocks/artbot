@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 import { Message } from 'discord.js'
-import { PROJECTBOT_UTM } from './APIBots/utils'
+import { PROJECTBOT_UTM, getTokenUrl } from './APIBots/utils'
 
 import { ensOrAddress, replaceVideoWithGIF } from './APIBots/utils'
 import {
@@ -169,7 +169,7 @@ export class ProjectBot {
     const artBlocksData = artBlocksResponse.data
 
     const titleLink =
-      (artBlocksData.external_url || artBlocksData.generator_url) +
+      getTokenUrl(artBlocksData.external_url, this.coreContract, tokenID) +
       PROJECTBOT_UTM
 
     let title = artBlocksData.name + ' - ' + artBlocksData.artist

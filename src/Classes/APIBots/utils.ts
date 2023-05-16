@@ -222,6 +222,21 @@ export async function getCollectionType(
   throw new Error('Unknown collection type')
 }
 
+export function getTokenUrl(
+  external_url: string,
+  contractAddr: string,
+  tokenId: string
+): string {
+  if (external_url && !external_url.includes('generator.artblocks.io')) {
+    return external_url
+  }
+  return buildArtBlocksTokenURL(contractAddr, tokenId)
+}
+
+function buildArtBlocksTokenURL(contractAddr: string, tokenId: string): string {
+  return `https://www.artblocks.io/token/${contractAddr}-${tokenId}`
+}
+
 export function buildOpenseaURL(contractAddr: string, tokenId: string): string {
   return `https://opensea.io/assets/ethereum/${contractAddr}/${tokenId}`
 }

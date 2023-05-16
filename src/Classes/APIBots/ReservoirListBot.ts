@@ -11,6 +11,7 @@ import {
   ensOrAddress,
   getCollectionType,
   getTokenApiUrl,
+  getTokenUrl,
   isEngineContract,
   isExplorationsContract,
   replaceVideoWithGIF,
@@ -136,9 +137,14 @@ export class ReservoirListBot extends APIPollBot {
     )
 
     // Get Art Blocks metadata response for the item.
-    const tokenUrl = getTokenApiUrl(listing.contract, tokenID)
-    const artBlocksResponse = await axios.get(tokenUrl)
+    const tokenApiUrl = getTokenApiUrl(listing.contract, tokenID)
+    const artBlocksResponse = await axios.get(tokenApiUrl)
     const artBlocksData = artBlocksResponse?.data
+    const tokenUrl = getTokenUrl(
+      artBlocksData.external_url,
+      listing.contract,
+      tokenID
+    )
 
     let curationStatus = artBlocksData?.curation_status
       ? artBlocksData.curation_status[0].toUpperCase() +
@@ -173,10 +179,7 @@ export class ReservoirListBot extends APIPollBot {
       },
       {
         name: 'Live Script',
-        value: `[view on artblocks.io](${
-          (artBlocksData.external_url || artBlocksData.generator_url) +
-          LISTING_UTM
-        })`,
+        value: `[view on artblocks.io](${tokenUrl + LISTING_UTM})`,
         inline: true,
       }
     )
