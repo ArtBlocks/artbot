@@ -1,7 +1,12 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js'
 import { ENGINE_CONTRACTS, mintBot } from '../index'
 import axios, { AxiosError } from 'axios'
-import { MINT_UTM, getTokenApiUrl, replaceVideoWithGIF } from './APIBots/utils'
+import {
+  MINT_UTM,
+  getTokenApiUrl,
+  getTokenUrl,
+  replaceVideoWithGIF,
+} from './APIBots/utils'
 import { ensOrAddress } from './APIBots/utils'
 import { TwitterBot } from './TwitterBot'
 
@@ -119,7 +124,11 @@ export class MintBot {
               mint.generatorLink = artBlocksData.generator_url
               mint.tokenName = artBlocksData.name
               mint.artistName = artBlocksData.artist
-              mint.artblocksUrl = artBlocksData.external_url
+              mint.artblocksUrl = getTokenUrl(
+                artBlocksData.external_url,
+                mint.contractAddress,
+                mint.tokenId
+              )
               mint.postToDiscord()
               this.twitterBot?.sendToTwitter(mint)
             }

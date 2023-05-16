@@ -14,6 +14,7 @@ import {
   SALE_UTM,
   ensOrAddress,
   replaceVideoWithGIF,
+  getTokenUrl,
 } from './utils'
 
 type ReservoirSale = {
@@ -164,9 +165,15 @@ export class ReservoirSaleBot extends APIPollBot {
     }
 
     // Get Art Blocks metadata response for the item.
-    const tokenUrl = getTokenApiUrl(sale.token.contract, tokenID)
-    const artBlocksResponse = await axios.get(tokenUrl)
+    const tokenApiUrl = getTokenApiUrl(sale.token.contract, tokenID)
+    const artBlocksResponse = await axios.get(tokenApiUrl)
     const artBlocksData = artBlocksResponse?.data
+
+    const tokenUrl = getTokenUrl(
+      artBlocksData.external_url,
+      sale.token.contract,
+      tokenID
+    )
 
     let sellerText = await ensOrAddress(sale.from)
     let buyerText = await ensOrAddress(sale.to)
@@ -174,7 +181,7 @@ export class ReservoirSaleBot extends APIPollBot {
       platform,
       sale.token.contract,
       sale.token.tokenId,
-      artBlocksData.external_url
+      tokenUrl
     )
 
     if (platform.includes('opensea')) {
@@ -239,9 +246,7 @@ export class ReservoirSaleBot extends APIPollBot {
       },
       {
         name: 'Live Script',
-        value: `[view on artblocks.io](${
-          (artBlocksData.external_url || artBlocksData.generator_url) + SALE_UTM
-        })`,
+        value: `[view on artblocks.io](${tokenUrl + SALE_UTM})`,
         inline: true,
       }
     )
