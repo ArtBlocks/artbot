@@ -119,12 +119,12 @@ Here are the currently valid contract names.
   - json file defining trigger names for single tokens. See `ringerSets.json` for example.
 
 
-## PBAB instructions
+## Engine instructions
 
 These instructions explain how to configure Art Bot to serve project data in relevant channels.
 
 1. Invite ArtBot to your server by clicking [here](https://discord.com/oauth2/authorize?client_id=794646394420854824&scope=bot&permissions=19520). Note that you must have the "Manage Server" permission on the desired server to invite Art Bot.
-2. As a PBAB partner you most likely have a contract of your own. To configure this you will have to follow the [optional configuration](#optional-configuration) scheme in `ProjectConfig/partnerContracts.json` by adding a new entry.
+2. As a Engine partner you most likely have a contract of your own. To configure this you will have to follow the [optional configuration](#optional-configuration) scheme in `ProjectConfig/partnerContracts.json` by adding a new entry.
 
 > :warning: Address must be all lowercase characters
 
