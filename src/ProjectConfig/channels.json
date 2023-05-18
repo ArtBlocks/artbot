@@ -669,6 +669,18 @@
       }
     }
   },
+  "1072990174914564308": {
+    "name": "laya-x-santiago",
+    "projectBotHandlers": {
+      "default": "412"
+    }
+  },
+  "1107786602060722186": {
+    "name": "operator",
+    "projectBotHandlers": {
+      "default": "455"
+    }
+  },
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
     "projectBotHandlers": {
