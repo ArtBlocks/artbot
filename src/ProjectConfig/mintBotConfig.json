@@ -5,5 +5,6 @@
   "COLLAB": ["artblocks-mints"],
   "ENGINE": ["engine-mints"],
   "PLOTTABLES": ["plottables-mints"],
-  "DOODLE": ["doodle-mints"]
+  "DOODLE": ["doodle-mints"],
+  "ROZENDAAL": ["rozendaal-mints"]
 }
