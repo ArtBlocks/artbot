@@ -113,14 +113,15 @@ export class MintBot {
 
         try {
           const artBlocksData = artBlocksResponse.data
-          if (artBlocksData.image) {
-            artBlocksData.image = await replaceVideoWithGIF(artBlocksData.image)
+          let assetUrl = artBlocksData?.preview_asset_url
+          if (assetUrl) {
+            assetUrl = await replaceVideoWithGIF(assetUrl)
 
-            const imageRes = await axios.get(artBlocksData.image)
+            const imageRes = await axios.get(assetUrl)
             // Double check to ensure image/gif is available
             if (imageRes.status === 200) {
               delete this.mintsToPost[id]
-              mint.image = artBlocksData.image
+              mint.image = assetUrl
               mint.generatorLink = artBlocksData.generator_url
               mint.tokenName = artBlocksData.name
               mint.artistName = artBlocksData.artist

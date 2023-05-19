@@ -195,7 +195,7 @@ export class ProjectBot {
       ownerText = ownerText.substring(0, 6) + '...' + ownerText.substring(38)
     }
 
-    artBlocksData.image = await replaceVideoWithGIF(artBlocksData.image)
+    const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url)
 
     const ownerProfileLink = ownerAddress
       ? 'https://www.artblocks.io/user/' + ownerAddress
@@ -209,7 +209,7 @@ export class ProjectBot {
         // Add link to title.
         .setURL(titleLink)
         // Set the full image for embed.
-        .setImage(artBlocksData.image)
+        .setImage(assetUrl)
 
       if (ownerText) {
         embedContent.addFields({
@@ -243,7 +243,7 @@ export class ProjectBot {
       // Set the color of the embed.
       .setColor(EMBED_COLOR)
       // Set the main content of the embed
-      .setThumbnail(artBlocksData.image)
+      .setThumbnail(assetUrl)
 
     if (ownerText) {
       embedContent.addFields({
@@ -320,9 +320,10 @@ export class ProjectBot {
         }`
       )
       const artBlocksData = await artBlocksResponse.data
+      let assetUrl = artBlocksData?.preview_asset_url
       if (
         !artBlocksData ||
-        !artBlocksData.image ||
+        !assetUrl ||
         !artBlocksData.collection_name ||
         !artBlocksData.artist
       ) {
@@ -330,12 +331,12 @@ export class ProjectBot {
       }
       const title = `:tada:  Happy Birthday to ${artBlocksData.collection_name}!  :tada:`
 
-      artBlocksData.image = await replaceVideoWithGIF(artBlocksData.image)
+      assetUrl = await replaceVideoWithGIF(assetUrl)
 
       const embedContent = new EmbedBuilder()
         .setColor('#9370DB')
         .setTitle(title)
-        .setImage(artBlocksData.image)
+        .setImage(assetUrl)
         .setDescription(
           `${
             this.projectName

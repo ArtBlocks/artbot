@@ -234,9 +234,10 @@ export class ReservoirSaleBot extends APIPollBot {
       }
     }
     // Update thumbnail image to use larger variant from Art Blocks API.
-    if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
-      artBlocksData.image = await replaceVideoWithGIF(artBlocksData.image)
-      embed.setThumbnail(artBlocksData.image)
+    let assetUrl = artBlocksData?.preview_asset_url
+    if (assetUrl && !assetUrl.includes('undefined')) {
+      assetUrl = await replaceVideoWithGIF(assetUrl)
+      embed.setThumbnail(assetUrl)
     }
     embed.addFields(
       {
@@ -283,9 +284,10 @@ export class ReservoirSaleBot extends APIPollBot {
     const tokenUrl = getTokenApiUrl(sale0.token.contract, sale0.token.tokenId)
     const artBlocksResponse = await axios.get(tokenUrl)
     const artBlocksData = artBlocksResponse?.data
-    if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
-      artBlocksData.image = await replaceVideoWithGIF(artBlocksData.image)
-      embed.setThumbnail(artBlocksData.image)
+    let assetUrl = artBlocksData?.preview_asset_url
+    if (assetUrl && !assetUrl.includes('undefined')) {
+      assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url)
+      embed.setThumbnail(assetUrl)
     }
 
     let totalCost = 0

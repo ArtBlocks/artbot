@@ -166,9 +166,10 @@ export class ReservoirListBot extends APIPollBot {
       }
     }
     // Update thumbnail image to use larger variant from Art Blocks API.
-    if (artBlocksData?.image && !artBlocksData.image.includes('undefined')) {
-      artBlocksData.image = await replaceVideoWithGIF(artBlocksData.image)
-      embed.setThumbnail(artBlocksData.image)
+    let assetUrl = artBlocksData?.preview_asset_url
+    if (assetUrl && !assetUrl.includes('undefined')) {
+      assetUrl = await replaceVideoWithGIF(assetUrl)
+      embed.setThumbnail(assetUrl)
     }
 
     embed.addFields(
