@@ -331,6 +331,17 @@ export async function smartBotResponse(
   ) {
     grantThanks++
 
+    if (
+      process.env.CONTEST_AMT &&
+      grantThanks == parseInt(process.env.CONTEST_AMT)
+    ) {
+      return new EmbedBuilder()
+        .setColor('#ffc204')
+        .setDescription(
+          `Grant thanks YOU ${msgAuthor} for being the ${process.env.CONTEST_AMT}th person to thank him - you win a free Exstasis piece! Please DM Grant to claim your prize`
+        )
+    }
+
     return new EmbedBuilder()
       .setColor(randomColor())
       .setDescription(
