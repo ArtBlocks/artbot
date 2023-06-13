@@ -331,12 +331,14 @@ export async function smartBotResponse(
   ) {
     grantThanks++
 
-    const contestAmt = 50
-    if (process.env.CONTEST_ENABLED && grantThanks === contestAmt) {
+    if (
+      process.env.CONTEST_AMT &&
+      grantThanks == parseInt(process.env.CONTEST_AMT)
+    ) {
       return new EmbedBuilder()
-        .setColor(ARTBOT_GREEN)
+        .setColor('#ffc204')
         .setDescription(
-          `Grant thanks YOU ${msgAuthor} for being the ${contestAmt}th person to thank him - you win a free Exstasis piece! Please DM Grant to claim your prize`
+          `Grant thanks YOU ${msgAuthor} for being the ${process.env.CONTEST_AMT}th person to thank him - you win a free Exstasis piece! Please DM Grant to claim your prize`
         )
     }
 
