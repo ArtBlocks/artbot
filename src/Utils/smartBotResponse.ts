@@ -392,8 +392,8 @@ export async function smartBotResponse(
   }
 
    // Handle requests for goose!
-  if (msgContentLowercase.includes('goosemorning')) {
-    return ':goose:'
+  if (msgContentLowercase.includes('goosemorning') || (msgContentLowercase.includes('goose morning')) {
+    return '<:goose:1028047420636020786>'
   }
 
   // Handle requests for help!
