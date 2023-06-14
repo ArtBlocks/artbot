@@ -391,6 +391,11 @@ export async function smartBotResponse(
     return 'gm'
   }
 
+   // Handle requests for goose!
+  if (msgContentLowercase.includes('goosemorning')) {
+    return ':goose:'
+  }
+
   // Handle requests for help!
   const mentionsHelp: boolean = msgContentLowercase.includes('help')
   if (containsQuestion && mentionsHelp) {
