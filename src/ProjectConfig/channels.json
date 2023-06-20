@@ -687,6 +687,20 @@
       "default": "418"
     }
   },
+  "1118942811346182285": {
+    "name": "steve-pikelny",
+    "projectBotHandlers": {
+      "default": "457",
+      "stringTriggers": {
+        "387": ["pointers"],
+        "316": ["maps of nothing", "maps"],
+        "152": ["fake internet money", "fim", "money"],
+        "102": ["i saw it in a dream", "dream"],
+        "44": ["crypto god king", "cgk", "king"]
+      }
+    }
+  },
+  
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
     "projectBotHandlers": {
