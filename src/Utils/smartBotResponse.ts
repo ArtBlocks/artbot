@@ -7,7 +7,6 @@ const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 // Discord channel IDs.
 const CHANNEL_HELP: string = projectConfig.chIdByName['help']
 const CHANNEL_SNOWFRO: string = projectConfig.chIdByName['snowfro']
-const GASSTATION_API_KEY = process.env.GASSTATION_API_KEY
 
 const CHANNEL_FOR_SALE_LISTINGS: string =
   projectConfig.chIdByName['for-sale-listings']
@@ -228,27 +227,22 @@ let grantThanks = 0
 
 // Returns a message containing information about the current gas prices.
 async function generateGasPriceMessage() {
-  const gasStationResponse = await fetch(
-    `https://ethgasstation.info/api/ethgasAPI.json?api-key=${GASSTATION_API_KEY}`
+  const gasResponse = await fetch(
+    `https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${process.env.ETHERSCAN_API_KEY}`
   )
-  const gasStationData = await gasStationResponse.json()
-  let fireString = ''
-  if (gasStationData.average > 4000) {
-    fireString = ':fire::fire:'
-  } else if (gasStationData.average > 2000) {
-    fireString = ':fire:'
-  }
+  const gasData = await gasResponse.json()
+
   return (
     new EmbedBuilder()
       // Set the title of the field
-      .setTitle(`${fireString}:fuelpump: Gas Prices :fuelpump:${fireString}`)
+      .setTitle(`:fuelpump: Gas Prices :fuelpump:`)
       // Set the color of the embed
       .setColor(ARTBOT_GREEN)
       // Set the main content of the embed
       .setDescription(
-        `:rocket:RAPID: ${gasStationData.fastest / 10} :airplane:FAST: ${
-          gasStationData.fast / 10
-        } :blue_car:STANDARD: ${gasStationData.average / 10}`
+        `:rocket: Fast: ${gasData.result.FastGasPrice}
+         :airplane: Standard: ${gasData.result.ProposeGasPrice}
+         :turtle: Slow: ${gasData.result.SafeGasPrice}`
       )
   )
 }
@@ -380,7 +374,7 @@ export async function smartBotResponse(
     return 'gm'
   }
 
-   // Handle requests for goose!
+  // Handle requests for goose!
   if (msgContentLowercase.includes('goosemorning')) {
     return ':goose:'
   }
