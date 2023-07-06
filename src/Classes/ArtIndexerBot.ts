@@ -2,7 +2,7 @@ import { Channel, Collection, Message } from 'discord.js'
 import * as dotenv from 'dotenv'
 
 import { ProjectBot } from './ProjectBot'
-import { buildBirthdayMapping, buildCollectionMapping } from './APIBots/utils'
+import { buildCollectionMapping } from './APIBots/utils'
 import {
   getAllProjects,
   getArtblocksOpenProjects,
@@ -72,8 +72,6 @@ export class ArtIndexerBot {
   async buildProjectBots() {
     try {
       const projects = await this.projectFetch()
-
-      const bdays = buildBirthdayMapping(projects)
       const collectionInfo = buildCollectionMapping(projects)
       const collections = collectionInfo[0]
       const heritageStatuses = collectionInfo[1]
@@ -83,7 +81,7 @@ export class ArtIndexerBot {
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i]
         if (project.invocations === '0') continue
-        let bday = bdays[`${project.contract_address}-${project.project_id}`]
+        let bday = project.start_datetime
         const collection = this.toProjectKey(
           collections[`${project.contract_address}-${project.project_id}`]
         )

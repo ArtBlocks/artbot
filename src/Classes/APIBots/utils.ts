@@ -164,17 +164,8 @@ export function isExplorationsContract(contractAddress: string): boolean {
   )
 }
 
-export function buildBirthdayMapping(projects: ProjectDetailFragment[]): {
-  [id: string]: string
-} {
-  const birthdayMapping: { [id: string]: string } = {}
-  projects.forEach((proj) => {
-    birthdayMapping[proj.id] = proj.start_datetime
-  })
-
-  return birthdayMapping
-}
-
+// Collection mapping maps project ID to curated/presents/collaboration/engine
+// Heritage statuses maps project ID to factory/playground/curated series x
 export function buildCollectionMapping(
   projects: ProjectDetailFragment[]
 ): { [id: string]: string }[] {
@@ -200,6 +191,10 @@ export async function isEngineContract(
   return ((await ENGINE_CONTRACTS) ?? []).includes(
     contractAddress.toLowerCase()
   )
+}
+
+export function isCoreContract(contractAddress: string): boolean {
+  return Object.values(CORE_CONTRACTS).includes(contractAddress.toLowerCase())
 }
 
 export async function getCollectionType(

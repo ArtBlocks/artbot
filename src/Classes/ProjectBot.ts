@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 import { Message } from 'discord.js'
-import { PROJECTBOT_UTM, getTokenUrl } from './APIBots/utils'
+import { PROJECTBOT_UTM, getTokenUrl, isCoreContract } from './APIBots/utils'
 
 import { ensOrAddress, replaceVideoWithGIF } from './APIBots/utils'
 import {
@@ -349,22 +349,22 @@ export class ProjectBot {
         })
         `
         )
-        .setFooter(`${artBlocksData.name}`)
+        .setFooter({
+          text: artBlocksData.name,
+        })
 
       // Send all birthdays to #block-talk
-
       let channel = channels.get(projectConfig.chIdByName['block-talk'])
       channel.send({ embeds: [embedContent] })
 
-      if (projectConfig.projectToChannel[this.projectNumber]) {
+      if (
+        isCoreContract(this.coreContract) &&
+        projectConfig.projectToChannel[this.projectNumber]
+      ) {
         // Send in artist channel if one exists
         channel = channels.get(
           projectConfig.projectToChannel[this.projectNumber]
         )
-        channel.send({ embeds: [embedContent] })
-      } else {
-        // Otherwise send in #factory-projects
-        channel = channels.get(projectConfig.chIdByName['factory-projects'])
         channel.send({ embeds: [embedContent] })
       }
     } catch (err) {
