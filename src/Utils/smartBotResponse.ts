@@ -319,6 +319,9 @@ export async function smartBotResponse(
       msgContentLowercase.includes('efcharistó') || // greek
       msgContentLowercase.includes('dyakuyu tobi') || // ukrainian
       msgContentLowercase.includes('blagodaryu vas') || // russian
+      msgContentLowercase.includes('谢谢') || // simplified chinese
+      msgContentLowercase.includes('謝謝') || // traditional chinese
+      msgContentLowercase.includes('xie xie') || // pinyin chinese
       msgContentLowercase.includes('danke')) && // german
     (msgContentLowercase.includes('grant') ||
       msgContentLowercase.includes('grant-san'))
