@@ -700,7 +700,6 @@
       }
     }
   },
-  
   "880280317477404713": {
     "name": "doodle-labs-the-lab",
     "projectBotHandlers": {
@@ -812,6 +811,15 @@
   },
   "987113563753701459": {
     "name": "tender-sales"
+  },
+  "1076664032146235432": {
+    "name": "hodlers-mints"
+  },
+  "1074004089551196180": {
+    "name": "hodlers-sales"
+  },
+  "1050375648323051650": {
+    "name": "hodlers-listings"
   },
   "1109104401135718460": {
     "name": "rozendaal-mints"
