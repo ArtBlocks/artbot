@@ -15,37 +15,16 @@ import {
   ensOrAddress,
   replaceVideoWithGIF,
   getTokenUrl,
+  ArrayElement,
 } from './utils'
-
-type ReservoirSale = {
-  from: string
-  to: string
-  saleId: string
-  fillSource: string
-  orderSource: string
-  orderKind: string
-  token: {
-    contract: string
-    tokenId: string
-  }
-  price: {
-    currency: {
-      symbol: string
-    }
-    amount: {
-      decimal: number
-      native: number
-    }
-  }
-  timestamp: number
-}
-
-type ReservoirSaleResponse = {
-  sales: ReservoirSale[]
-  continuation: string
-}
-
+import { paths } from '@reservoir0x/reservoir-sdk'
 /** API Poller for Reservoir Sale events */
+
+type ReservoirSaleResponse =
+  paths['/sales/v5']['get']['responses']['200']['schema']
+type ReservoirSales =
+  paths['/sales/v5']['get']['responses']['200']['schema']['sales']
+type ReservoirSale = ArrayElement<NonNullable<ReservoirSales>>
 export class ReservoirSaleBot extends APIPollBot {
   contract: string
   saleIds: Set<string>
@@ -62,11 +41,24 @@ export class ReservoirSaleBot extends APIPollBot {
     contract = ''
   ) {
     apiEndpoint =
-      apiEndpoint + '&startTimestamp=' + (Date.now() / 1000).toFixed()
+      apiEndpoint + '&startTimestamp=' + (Date.now() / 1000 - 1e6).toFixed()
     super(apiEndpoint, refreshRateMs, bot, headers)
     this.contract = contract
-    this.lastUpdatedTime = Math.floor(this.lastUpdatedTime / 1000)
+    this.lastUpdatedTime = Math.floor(this.lastUpdatedTime / 1000 - 1e6)
     this.saleIds = new Set()
+  }
+
+  async pollApi() {
+    try {
+      const response = await axios.get<
+        paths['/sales/v5']['get']['responses']['200']['schema']
+      >(this.apiEndpoint, {
+        headers: this.headers,
+      })
+      await this.handleAPIResponse(response.data)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   /**
@@ -78,25 +70,34 @@ export class ReservoirSaleBot extends APIPollBot {
   async handleAPIResponse(responseData: ReservoirSaleResponse) {
     let maxTime = 0
     const sales: { [id: string]: ReservoirSale[] } = {}
-    for (const data of responseData.sales) {
-      const eventTime = data.timestamp
+    if (!responseData.sales) {
+      return
+    }
+    for (const sale of responseData.sales) {
+      const eventTime = sale.timestamp ?? 0
       // Only deal with event if it is new and unique saleId
-      if (this.lastUpdatedTime < eventTime && !this.saleIds.has(data.saleId)) {
-        this.saleIds.add(data.saleId)
+      if (
+        this.lastUpdatedTime < eventTime &&
+        sale.saleId &&
+        !this.saleIds.has(sale.saleId)
+      ) {
+        this.saleIds.add(sale.saleId)
         // Only worrying about batch sales messages for Friendship Bracelets
         if (
-          !isExplorationsContract(data.token.contract) ||
-          parseInt(data.token.tokenId) / 1e6 > 1 // To make sure non-FB explorations aren't batched
+          !isExplorationsContract(sale?.token?.contract ?? '') ||
+          parseInt(sale.token?.tokenId ?? '0') / 1e6 > 1 // To make sure non-FB explorations aren't batched
         ) {
-          this.buildDiscordMessage(data).catch((err) => {
+          this.buildDiscordMessage(sale).catch((err) => {
             console.error('Error sending sale message', err)
           })
         } else {
           // Instantiate array for address if it doesn't exist yet
-          if (!sales[data.to]) {
-            sales[data.to] = []
+          if (sale.to) {
+            if (!sales[sale.to]) {
+              sales[sale.to] = []
+            }
+            sales[sale.to].push(sale)
           }
-          sales[data.to].push(data)
         }
       }
 
@@ -137,16 +138,17 @@ export class ReservoirSaleBot extends APIPollBot {
     // Create embed we will be sending
     const embed = new EmbedBuilder()
     // Parsing Reservoir sale message to get info
-    const tokenID = sale.token.tokenId
+    const contract = sale.token?.contract ?? ''
+    const tokenID = sale.token?.tokenId ?? ''
 
     if (sale.orderKind === 'mint') {
       return // Don't send mint events
     }
     const priceText = 'Sale Price'
-    const price = sale.price.amount.decimal
-    const currency = sale.price.currency.symbol
-    const owner = sale.from
-    let platform = sale.fillSource.toLowerCase()
+    const price = sale.price?.amount?.decimal
+    const currency = sale.price?.currency?.symbol
+    const owner = sale.from ?? ''
+    let platform = sale.fillSource?.toLowerCase() ?? ''
 
     if (platform.includes('artblocks')) {
       embed.setColor(this.artblocksSaleColor)
@@ -165,33 +167,34 @@ export class ReservoirSaleBot extends APIPollBot {
     }
 
     // Get Art Blocks metadata response for the item.
-    const tokenApiUrl = getTokenApiUrl(sale.token.contract, tokenID)
+    const tokenApiUrl = getTokenApiUrl(contract, tokenID)
     const artBlocksResponse = await axios.get(tokenApiUrl)
     const artBlocksData = artBlocksResponse?.data
 
-    const tokenUrl = getTokenUrl(
-      artBlocksData.external_url,
-      sale.token.contract,
-      tokenID
-    )
+    const tokenUrl = getTokenUrl(artBlocksData.external_url, contract, tokenID)
 
-    let sellerText = await ensOrAddress(sale.from)
-    let buyerText = await ensOrAddress(sale.to)
+    let sellerText = await ensOrAddress(sale.from ?? '')
+    let buyerText = await ensOrAddress(sale.to ?? '')
     const platformUrl = this.getPlatformUrl(
       platform,
-      sale.token.contract,
-      sale.token.tokenId,
+      contract,
+      tokenID,
       tokenUrl
+    )
+    console.log(
+      sale.paidFullRoyalty,
+      sale.feeBreakdown,
+      `${contract}-${tokenID}`
     )
 
     if (platform.includes('opensea')) {
       if (!sellerText.includes('.eth')) {
-        const sellerOS = await this.osName(sale.from)
+        const sellerOS = await this.osName(sale.from ?? '')
         sellerText =
           sellerOS === '' ? sellerText : `${sellerText} (OS: ${sellerOS})`
       }
       if (!buyerText.includes('.eth')) {
-        const buyerOS = await this.osName(sale.to)
+        const buyerOS = await this.osName(sale.to ?? '')
         buyerText = buyerOS === '' ? buyerText : `${buyerText} (OS: ${buyerOS})`
       }
     }
@@ -225,9 +228,9 @@ export class ReservoirSaleBot extends APIPollBot {
       curationStatus = 'AB x Pace'
     } else if (artBlocksData?.platform === 'Art Blocks × Bright Moments') {
       curationStatus = 'AB x Bright Moments'
-    } else if (isExplorationsContract(sale.token.contract)) {
+    } else if (isExplorationsContract(contract)) {
       curationStatus = 'Explorations'
-    } else if (await isEngineContract(sale.token.contract)) {
+    } else if (await isEngineContract(contract)) {
       curationStatus = 'Engine'
       if (artBlocksData?.platform) {
         title = `${artBlocksData.platform} - ${title}`
@@ -263,7 +266,7 @@ export class ReservoirSaleBot extends APIPollBot {
         this.bot,
         embed,
         artBlocksData,
-        await getCollectionType(sale.token.contract)
+        await getCollectionType(contract)
       )
     }
   }
@@ -271,17 +274,20 @@ export class ReservoirSaleBot extends APIPollBot {
   async buildSweepDiscordMessage(sales: ReservoirSale[]) {
     const sale0 = sales[0]
 
-    if (BAN_ADDRESSES.has(sale0.to)) {
+    if (BAN_ADDRESSES.has(sale0.to ?? '')) {
       console.log(`Skipping message propagation for ${sale0.to}`)
       return
     }
     // Create embed we will be sending
     const embed = new EmbedBuilder()
 
-    const buyerText = await ensOrAddress(sale0.to)
+    const buyerText = await ensOrAddress(sale0.to ?? '')
 
     // Get sale 0 token info for thumbnail, etc
-    const tokenUrl = getTokenApiUrl(sale0.token.contract, sale0.token.tokenId)
+    const tokenUrl = getTokenApiUrl(
+      sale0.token?.contract ?? '',
+      sale0.token?.tokenId ?? ''
+    )
     const artBlocksResponse = await axios.get(tokenUrl)
     const artBlocksData = artBlocksResponse?.data
     let assetUrl = artBlocksData?.preview_asset_url
@@ -298,21 +304,21 @@ export class ReservoirSaleBot extends APIPollBot {
         return // Don't send mint events
       }
       const tokenName =
-        'Friendship Bracelets #' + (parseInt(sale.token.tokenId) % 1e6)
-      const price = sale.price.amount.decimal
-      const currency = sale.price.currency.symbol
-      totalCost += sale.price.amount.native
+        'Friendship Bracelets #' + (parseInt(sale.token?.tokenId ?? '') % 1e6)
+      const price = sale.price?.amount?.decimal
+      const currency = sale.price?.currency?.symbol
+      totalCost += sale.price?.amount?.native ?? 0
       const ab_url = artBlocksData.external_url.replace(
-        sale0.token.tokenId,
-        sale.token.tokenId
+        sale0.token?.tokenId,
+        sale.token?.tokenId
       )
-      const sellerText = await ensOrAddress(sale.from)
+      const sellerText = await ensOrAddress(sale.from ?? '')
 
-      const platform = sale.fillSource.toLowerCase()
+      const platform = sale.fillSource?.toLowerCase()
       const platformUrl = this.getPlatformUrl(
-        platform,
-        sale.token.contract,
-        sale.token.tokenId,
+        platform ?? '',
+        sale.token?.contract ?? '',
+        sale.token?.tokenId ?? '',
         ab_url
       )
       embed.addFields([

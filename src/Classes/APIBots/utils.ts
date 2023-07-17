@@ -277,6 +277,8 @@ export async function replaceVideoWithGIF(url: string) {
 
   return url
 }
+export type ArrayElement<ArrayType extends readonly unknown[]> =
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never
 
 module.exports.ensOrAddress = ensOrAddress
 module.exports.getOSName = getOSName

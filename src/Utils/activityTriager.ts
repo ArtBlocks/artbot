@@ -107,6 +107,9 @@ function sendEmbedToChannel(
   embed: EmbedBuilder,
   channelId: string
 ) {
+  if (!channelId) {
+    return
+  }
   const channel = bot.channels?.cache?.get(channelId) as TextChannel
   channel
     .send({

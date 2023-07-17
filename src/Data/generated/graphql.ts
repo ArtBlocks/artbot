@@ -5,6 +5,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -13,6 +14,9 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  Date: any;
+  DateTime: any;
+  JSON: any;
   bigint: any;
   float8: any;
   jsonb: any;
@@ -21,6 +25,92 @@ export type Scalars = {
   seed_float: any;
   timestamp: any;
   timestamptz: any;
+  uuid: any;
+};
+
+export type ArtistEditorialPage = {
+  __typename?: 'ArtistEditorialPage';
+  ExhibitionsSection?: Maybe<ComponentArtistEditorialPageExhibitions>;
+  FeaturedWorkSection?: Maybe<ComponentArtistEditorialPageFeaturedWork>;
+  PressSection?: Maybe<ComponentArtistEditorialPagePress>;
+  ReleasesSection?: Maybe<ComponentArtistEditorialPageProjectsCreated>;
+  SpectrumArticlesSection?: Maybe<ComponentArtistEditorialPageSpectrumArticles>;
+  artistName: Scalars['String'];
+  avatar?: Maybe<UploadFileEntityResponse>;
+  bio?: Maybe<Scalars['String']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  headerImage?: Maybe<UploadFileEntityResponse>;
+  instagram?: Maybe<Scalars['String']>;
+  publishedAt?: Maybe<Scalars['DateTime']>;
+  seoMetaDescription?: Maybe<Scalars['String']>;
+  slug: Scalars['String'];
+  twitter?: Maybe<Scalars['String']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  userProfileAddress?: Maybe<Scalars['String']>;
+  website?: Maybe<Scalars['String']>;
+};
+
+export type ArtistEditorialPageEntity = {
+  __typename?: 'ArtistEditorialPageEntity';
+  attributes?: Maybe<ArtistEditorialPage>;
+  id?: Maybe<Scalars['ID']>;
+};
+
+export type ArtistEditorialPageEntityResponse = {
+  __typename?: 'ArtistEditorialPageEntityResponse';
+  data?: Maybe<ArtistEditorialPageEntity>;
+};
+
+export type ArtistEditorialPageEntityResponseCollection = {
+  __typename?: 'ArtistEditorialPageEntityResponseCollection';
+  data: Array<ArtistEditorialPageEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type ArtistEditorialPageFiltersInput = {
+  ExhibitionsSection?: InputMaybe<ComponentArtistEditorialPageExhibitionsFiltersInput>;
+  FeaturedWorkSection?: InputMaybe<ComponentArtistEditorialPageFeaturedWorkFiltersInput>;
+  PressSection?: InputMaybe<ComponentArtistEditorialPagePressFiltersInput>;
+  ReleasesSection?: InputMaybe<ComponentArtistEditorialPageProjectsCreatedFiltersInput>;
+  SpectrumArticlesSection?: InputMaybe<ComponentArtistEditorialPageSpectrumArticlesFiltersInput>;
+  and?: InputMaybe<Array<InputMaybe<ArtistEditorialPageFiltersInput>>>;
+  artistName?: InputMaybe<StringFilterInput>;
+  bio?: InputMaybe<StringFilterInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  instagram?: InputMaybe<StringFilterInput>;
+  not?: InputMaybe<ArtistEditorialPageFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ArtistEditorialPageFiltersInput>>>;
+  publishedAt?: InputMaybe<DateTimeFilterInput>;
+  seoMetaDescription?: InputMaybe<StringFilterInput>;
+  slug?: InputMaybe<StringFilterInput>;
+  twitter?: InputMaybe<StringFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+  userProfileAddress?: InputMaybe<StringFilterInput>;
+  website?: InputMaybe<StringFilterInput>;
+};
+
+export type ArtistEditorialPageFiltersInput_Remote_Rel_Projects_MetadataartistPage = {
+  ExhibitionsSection?: InputMaybe<ComponentArtistEditorialPageExhibitionsFiltersInput>;
+  FeaturedWorkSection?: InputMaybe<ComponentArtistEditorialPageFeaturedWorkFiltersInput>;
+  PressSection?: InputMaybe<ComponentArtistEditorialPagePressFiltersInput>;
+  ReleasesSection?: InputMaybe<ComponentArtistEditorialPageProjectsCreatedFiltersInput_Remote_Rel_Projects_MetadataartistPage>;
+  SpectrumArticlesSection?: InputMaybe<ComponentArtistEditorialPageSpectrumArticlesFiltersInput>;
+  and?: InputMaybe<Array<InputMaybe<ArtistEditorialPageFiltersInput>>>;
+  artistName?: InputMaybe<StringFilterInput>;
+  bio?: InputMaybe<StringFilterInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  instagram?: InputMaybe<StringFilterInput>;
+  not?: InputMaybe<ArtistEditorialPageFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ArtistEditorialPageFiltersInput>>>;
+  publishedAt?: InputMaybe<DateTimeFilterInput>;
+  seoMetaDescription?: InputMaybe<StringFilterInput>;
+  slug?: InputMaybe<StringFilterInput>;
+  twitter?: InputMaybe<StringFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+  userProfileAddress?: InputMaybe<StringFilterInput>;
+  website?: InputMaybe<StringFilterInput>;
 };
 
 export type AuthMessageOutput = {
@@ -30,6 +120,7 @@ export type AuthMessageOutput = {
 
 export type AuthenticateInput = {
   contracts?: InputMaybe<Array<Scalars['String']>>;
+  message: Scalars['String'];
   publicAddress: Scalars['String'];
   signature: Scalars['String'];
 };
@@ -53,6 +144,348 @@ export type Boolean_Comparison_Exp = {
   _nin?: InputMaybe<Array<Scalars['Boolean']>>;
 };
 
+export type ComponentArtistEditorialPageExhibitions = {
+  __typename?: 'ComponentArtistEditorialPageExhibitions';
+  exhibitionItem?: Maybe<Array<Maybe<ComponentGalleryGridItemGalleryGridItem>>>;
+  id: Scalars['ID'];
+};
+
+
+export type ComponentArtistEditorialPageExhibitionsExhibitionItemArgs = {
+  filters?: InputMaybe<ComponentGalleryGridItemGalleryGridItemFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+};
+
+export type ComponentArtistEditorialPageExhibitionsFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ComponentArtistEditorialPageExhibitionsFiltersInput>>>;
+  exhibitionItem?: InputMaybe<ComponentGalleryGridItemGalleryGridItemFiltersInput>;
+  not?: InputMaybe<ComponentArtistEditorialPageExhibitionsFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentArtistEditorialPageExhibitionsFiltersInput>>>;
+};
+
+export type ComponentArtistEditorialPageFeaturedWork = {
+  __typename?: 'ComponentArtistEditorialPageFeaturedWork';
+  FeaturedWorkItem?: Maybe<Array<Maybe<ComponentImageWithCaptionImageWithCaption>>>;
+  id: Scalars['ID'];
+};
+
+
+export type ComponentArtistEditorialPageFeaturedWorkFeaturedWorkItemArgs = {
+  filters?: InputMaybe<ComponentImageWithCaptionImageWithCaptionFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+};
+
+export type ComponentArtistEditorialPageFeaturedWorkFiltersInput = {
+  FeaturedWorkItem?: InputMaybe<ComponentImageWithCaptionImageWithCaptionFiltersInput>;
+  and?: InputMaybe<Array<InputMaybe<ComponentArtistEditorialPageFeaturedWorkFiltersInput>>>;
+  not?: InputMaybe<ComponentArtistEditorialPageFeaturedWorkFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentArtistEditorialPageFeaturedWorkFiltersInput>>>;
+};
+
+export type ComponentArtistEditorialPagePress = {
+  __typename?: 'ComponentArtistEditorialPagePress';
+  PressItem?: Maybe<Array<Maybe<ComponentPressItemPressItem>>>;
+  id: Scalars['ID'];
+};
+
+
+export type ComponentArtistEditorialPagePressPressItemArgs = {
+  filters?: InputMaybe<ComponentPressItemPressItemFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+};
+
+export type ComponentArtistEditorialPagePressFiltersInput = {
+  PressItem?: InputMaybe<ComponentPressItemPressItemFiltersInput>;
+  and?: InputMaybe<Array<InputMaybe<ComponentArtistEditorialPagePressFiltersInput>>>;
+  not?: InputMaybe<ComponentArtistEditorialPagePressFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentArtistEditorialPagePressFiltersInput>>>;
+};
+
+export type ComponentArtistEditorialPageProjectsCreated = {
+  __typename?: 'ComponentArtistEditorialPageProjectsCreated';
+  id: Scalars['ID'];
+  projectMetadata?: Maybe<Array<Maybe<ComponentProjectMetadataProjectMetadata>>>;
+};
+
+
+export type ComponentArtistEditorialPageProjectsCreatedProjectMetadataArgs = {
+  filters?: InputMaybe<ComponentProjectMetadataProjectMetadataFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+};
+
+export type ComponentArtistEditorialPageProjectsCreatedFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ComponentArtistEditorialPageProjectsCreatedFiltersInput>>>;
+  not?: InputMaybe<ComponentArtistEditorialPageProjectsCreatedFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentArtistEditorialPageProjectsCreatedFiltersInput>>>;
+  projectMetadata?: InputMaybe<ComponentProjectMetadataProjectMetadataFiltersInput>;
+};
+
+export type ComponentArtistEditorialPageProjectsCreatedFiltersInput_Remote_Rel_Projects_MetadataartistPage = {
+  and?: InputMaybe<Array<InputMaybe<ComponentArtistEditorialPageProjectsCreatedFiltersInput>>>;
+  not?: InputMaybe<ComponentArtistEditorialPageProjectsCreatedFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentArtistEditorialPageProjectsCreatedFiltersInput>>>;
+  projectMetadata?: InputMaybe<ComponentProjectMetadataProjectMetadataFiltersInput_Remote_Rel_Projects_MetadataartistPage>;
+};
+
+export type ComponentArtistEditorialPageSpectrumArticles = {
+  __typename?: 'ComponentArtistEditorialPageSpectrumArticles';
+  SpectrumArticle?: Maybe<Array<Maybe<ComponentSpectrumArticleSpectrumArticle>>>;
+  id: Scalars['ID'];
+};
+
+
+export type ComponentArtistEditorialPageSpectrumArticlesSpectrumArticleArgs = {
+  filters?: InputMaybe<ComponentSpectrumArticleSpectrumArticleFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+};
+
+export type ComponentArtistEditorialPageSpectrumArticlesFiltersInput = {
+  SpectrumArticle?: InputMaybe<ComponentSpectrumArticleSpectrumArticleFiltersInput>;
+  and?: InputMaybe<Array<InputMaybe<ComponentArtistEditorialPageSpectrumArticlesFiltersInput>>>;
+  not?: InputMaybe<ComponentArtistEditorialPageSpectrumArticlesFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentArtistEditorialPageSpectrumArticlesFiltersInput>>>;
+};
+
+export type ComponentGalleryGridItemGalleryGridItem = {
+  __typename?: 'ComponentGalleryGridItemGalleryGridItem';
+  id: Scalars['ID'];
+  image?: Maybe<UploadFileEntityResponse>;
+  subtitle?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+};
+
+export type ComponentGalleryGridItemGalleryGridItemFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ComponentGalleryGridItemGalleryGridItemFiltersInput>>>;
+  not?: InputMaybe<ComponentGalleryGridItemGalleryGridItemFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentGalleryGridItemGalleryGridItemFiltersInput>>>;
+  subtitle?: InputMaybe<StringFilterInput>;
+  title?: InputMaybe<StringFilterInput>;
+  url?: InputMaybe<StringFilterInput>;
+};
+
+export type ComponentImageWithCaptionImageWithCaption = {
+  __typename?: 'ComponentImageWithCaptionImageWithCaption';
+  caption?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  image?: Maybe<UploadFileEntityResponse>;
+  url?: Maybe<Scalars['String']>;
+};
+
+export type ComponentImageWithCaptionImageWithCaptionFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ComponentImageWithCaptionImageWithCaptionFiltersInput>>>;
+  caption?: InputMaybe<StringFilterInput>;
+  not?: InputMaybe<ComponentImageWithCaptionImageWithCaptionFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentImageWithCaptionImageWithCaptionFiltersInput>>>;
+  url?: InputMaybe<StringFilterInput>;
+};
+
+export type ComponentPressItemPressItem = {
+  __typename?: 'ComponentPressItemPressItem';
+  date?: Maybe<Scalars['Date']>;
+  id: Scalars['ID'];
+  publication?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+};
+
+export type ComponentPressItemPressItemFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ComponentPressItemPressItemFiltersInput>>>;
+  date?: InputMaybe<DateFilterInput>;
+  not?: InputMaybe<ComponentPressItemPressItemFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentPressItemPressItemFiltersInput>>>;
+  publication?: InputMaybe<StringFilterInput>;
+  title?: InputMaybe<StringFilterInput>;
+  url?: InputMaybe<StringFilterInput>;
+};
+
+export type ComponentProjectMetadataProjectMetadata = {
+  __typename?: 'ComponentProjectMetadataProjectMetadata';
+  Project?: Maybe<Projects_Metadata>;
+  id: Scalars['ID'];
+  projectId?: Maybe<Scalars['String']>;
+};
+
+export type ComponentProjectMetadataProjectMetadataFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ComponentProjectMetadataProjectMetadataFiltersInput>>>;
+  not?: InputMaybe<ComponentProjectMetadataProjectMetadataFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentProjectMetadataProjectMetadataFiltersInput>>>;
+  projectId?: InputMaybe<StringFilterInput>;
+};
+
+export type ComponentProjectMetadataProjectMetadataFiltersInput_Remote_Rel_Projects_MetadataartistPage = {
+  and?: InputMaybe<Array<InputMaybe<ComponentProjectMetadataProjectMetadataFiltersInput>>>;
+  not?: InputMaybe<ComponentProjectMetadataProjectMetadataFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentProjectMetadataProjectMetadataFiltersInput>>>;
+  projectId?: InputMaybe<StringFilterInput_Remote_Rel_Projects_MetadataartistPage>;
+};
+
+export type ComponentProjectSaleInfoRowProjectSaleInfoRow = {
+  __typename?: 'ComponentProjectSaleInfoRowProjectSaleInfoRow';
+  AuctionEndPrice?: Maybe<Scalars['Float']>;
+  AuctionEndTime?: Maybe<Scalars['DateTime']>;
+  AuctionStartPrice: Scalars['Float'];
+  AuctionStartTime: Scalars['DateTime'];
+  AuctionType: Scalars['String'];
+  MinterMaxInvocations?: Maybe<Scalars['Int']>;
+  id: Scalars['ID'];
+};
+
+export type ComponentProjectSaleInfoRowProjectSaleInfoRowFiltersInput = {
+  AuctionEndPrice?: InputMaybe<FloatFilterInput>;
+  AuctionEndTime?: InputMaybe<DateTimeFilterInput>;
+  AuctionStartPrice?: InputMaybe<FloatFilterInput>;
+  AuctionStartTime?: InputMaybe<DateTimeFilterInput>;
+  AuctionType?: InputMaybe<StringFilterInput>;
+  MinterMaxInvocations?: InputMaybe<IntFilterInput>;
+  and?: InputMaybe<Array<InputMaybe<ComponentProjectSaleInfoRowProjectSaleInfoRowFiltersInput>>>;
+  not?: InputMaybe<ComponentProjectSaleInfoRowProjectSaleInfoRowFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentProjectSaleInfoRowProjectSaleInfoRowFiltersInput>>>;
+};
+
+export type ComponentSpectrumArticleSpectrumArticle = {
+  __typename?: 'ComponentSpectrumArticleSpectrumArticle';
+  id: Scalars['ID'];
+  previewImage?: Maybe<UploadFileEntityResponse>;
+  title?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+};
+
+export type ComponentSpectrumArticleSpectrumArticleFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ComponentSpectrumArticleSpectrumArticleFiltersInput>>>;
+  not?: InputMaybe<ComponentSpectrumArticleSpectrumArticleFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentSpectrumArticleSpectrumArticleFiltersInput>>>;
+  title?: InputMaybe<StringFilterInput>;
+  url?: InputMaybe<StringFilterInput>;
+};
+
+export type DateFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<Scalars['Date']>>>;
+  between?: InputMaybe<Array<InputMaybe<Scalars['Date']>>>;
+  contains?: InputMaybe<Scalars['Date']>;
+  containsi?: InputMaybe<Scalars['Date']>;
+  endsWith?: InputMaybe<Scalars['Date']>;
+  eq?: InputMaybe<Scalars['Date']>;
+  eqi?: InputMaybe<Scalars['Date']>;
+  gt?: InputMaybe<Scalars['Date']>;
+  gte?: InputMaybe<Scalars['Date']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['Date']>>>;
+  lt?: InputMaybe<Scalars['Date']>;
+  lte?: InputMaybe<Scalars['Date']>;
+  ne?: InputMaybe<Scalars['Date']>;
+  not?: InputMaybe<DateFilterInput>;
+  notContains?: InputMaybe<Scalars['Date']>;
+  notContainsi?: InputMaybe<Scalars['Date']>;
+  notIn?: InputMaybe<Array<InputMaybe<Scalars['Date']>>>;
+  notNull?: InputMaybe<Scalars['Boolean']>;
+  null?: InputMaybe<Scalars['Boolean']>;
+  or?: InputMaybe<Array<InputMaybe<Scalars['Date']>>>;
+  startsWith?: InputMaybe<Scalars['Date']>;
+};
+
+export type DateTimeFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<Scalars['DateTime']>>>;
+  between?: InputMaybe<Array<InputMaybe<Scalars['DateTime']>>>;
+  contains?: InputMaybe<Scalars['DateTime']>;
+  containsi?: InputMaybe<Scalars['DateTime']>;
+  endsWith?: InputMaybe<Scalars['DateTime']>;
+  eq?: InputMaybe<Scalars['DateTime']>;
+  eqi?: InputMaybe<Scalars['DateTime']>;
+  gt?: InputMaybe<Scalars['DateTime']>;
+  gte?: InputMaybe<Scalars['DateTime']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['DateTime']>>>;
+  lt?: InputMaybe<Scalars['DateTime']>;
+  lte?: InputMaybe<Scalars['DateTime']>;
+  ne?: InputMaybe<Scalars['DateTime']>;
+  not?: InputMaybe<DateTimeFilterInput>;
+  notContains?: InputMaybe<Scalars['DateTime']>;
+  notContainsi?: InputMaybe<Scalars['DateTime']>;
+  notIn?: InputMaybe<Array<InputMaybe<Scalars['DateTime']>>>;
+  notNull?: InputMaybe<Scalars['Boolean']>;
+  null?: InputMaybe<Scalars['Boolean']>;
+  or?: InputMaybe<Array<InputMaybe<Scalars['DateTime']>>>;
+  startsWith?: InputMaybe<Scalars['DateTime']>;
+};
+
+export type FloatFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
+  between?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
+  contains?: InputMaybe<Scalars['Float']>;
+  containsi?: InputMaybe<Scalars['Float']>;
+  endsWith?: InputMaybe<Scalars['Float']>;
+  eq?: InputMaybe<Scalars['Float']>;
+  eqi?: InputMaybe<Scalars['Float']>;
+  gt?: InputMaybe<Scalars['Float']>;
+  gte?: InputMaybe<Scalars['Float']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
+  lt?: InputMaybe<Scalars['Float']>;
+  lte?: InputMaybe<Scalars['Float']>;
+  ne?: InputMaybe<Scalars['Float']>;
+  not?: InputMaybe<FloatFilterInput>;
+  notContains?: InputMaybe<Scalars['Float']>;
+  notContainsi?: InputMaybe<Scalars['Float']>;
+  notIn?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
+  notNull?: InputMaybe<Scalars['Boolean']>;
+  null?: InputMaybe<Scalars['Boolean']>;
+  or?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
+  startsWith?: InputMaybe<Scalars['Float']>;
+};
+
+export type GenericMorph = ArtistEditorialPage | ComponentArtistEditorialPageExhibitions | ComponentArtistEditorialPageFeaturedWork | ComponentArtistEditorialPagePress | ComponentArtistEditorialPageProjectsCreated | ComponentArtistEditorialPageSpectrumArticles | ComponentGalleryGridItemGalleryGridItem | ComponentImageWithCaptionImageWithCaption | ComponentPressItemPressItem | ComponentProjectMetadataProjectMetadata | ComponentProjectSaleInfoRowProjectSaleInfoRow | ComponentSpectrumArticleSpectrumArticle | ProjectPage;
+
+export type IdFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
+  between?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
+  contains?: InputMaybe<Scalars['ID']>;
+  containsi?: InputMaybe<Scalars['ID']>;
+  endsWith?: InputMaybe<Scalars['ID']>;
+  eq?: InputMaybe<Scalars['ID']>;
+  eqi?: InputMaybe<Scalars['ID']>;
+  gt?: InputMaybe<Scalars['ID']>;
+  gte?: InputMaybe<Scalars['ID']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
+  lt?: InputMaybe<Scalars['ID']>;
+  lte?: InputMaybe<Scalars['ID']>;
+  ne?: InputMaybe<Scalars['ID']>;
+  not?: InputMaybe<IdFilterInput>;
+  notContains?: InputMaybe<Scalars['ID']>;
+  notContainsi?: InputMaybe<Scalars['ID']>;
+  notIn?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
+  notNull?: InputMaybe<Scalars['Boolean']>;
+  null?: InputMaybe<Scalars['Boolean']>;
+  or?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
+  startsWith?: InputMaybe<Scalars['ID']>;
+};
+
+export type IntFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
+  between?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
+  contains?: InputMaybe<Scalars['Int']>;
+  containsi?: InputMaybe<Scalars['Int']>;
+  endsWith?: InputMaybe<Scalars['Int']>;
+  eq?: InputMaybe<Scalars['Int']>;
+  eqi?: InputMaybe<Scalars['Int']>;
+  gt?: InputMaybe<Scalars['Int']>;
+  gte?: InputMaybe<Scalars['Int']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
+  lt?: InputMaybe<Scalars['Int']>;
+  lte?: InputMaybe<Scalars['Int']>;
+  ne?: InputMaybe<Scalars['Int']>;
+  not?: InputMaybe<IntFilterInput>;
+  notContains?: InputMaybe<Scalars['Int']>;
+  notContainsi?: InputMaybe<Scalars['Int']>;
+  notIn?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
+  notNull?: InputMaybe<Scalars['Boolean']>;
+  null?: InputMaybe<Scalars['Boolean']>;
+  or?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
+  startsWith?: InputMaybe<Scalars['Int']>;
+};
+
 /** Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'. */
 export type Int_Comparison_Exp = {
   _eq?: InputMaybe<Scalars['Int']>;
@@ -70,6 +503,125 @@ export type OpenseaCollectionData = {
   __typename?: 'OpenseaCollectionData';
   projectId: Scalars['String'];
   url: Scalars['String'];
+};
+
+export type Pagination = {
+  __typename?: 'Pagination';
+  page: Scalars['Int'];
+  pageCount: Scalars['Int'];
+  pageSize: Scalars['Int'];
+  total: Scalars['Int'];
+};
+
+export type PaginationArg = {
+  limit?: InputMaybe<Scalars['Int']>;
+  page?: InputMaybe<Scalars['Int']>;
+  pageSize?: InputMaybe<Scalars['Int']>;
+  start?: InputMaybe<Scalars['Int']>;
+};
+
+export type ProjectPage = {
+  __typename?: 'ProjectPage';
+  AuctionInfoRow?: Maybe<Array<Maybe<ComponentProjectSaleInfoRowProjectSaleInfoRow>>>;
+  Quote?: Maybe<Scalars['String']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  project: ComponentProjectMetadataProjectMetadata;
+  publishedAt?: Maybe<Scalars['DateTime']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+};
+
+
+export type ProjectPageAuctionInfoRowArgs = {
+  filters?: InputMaybe<ComponentProjectSaleInfoRowProjectSaleInfoRowFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+};
+
+export type ProjectPageEntity = {
+  __typename?: 'ProjectPageEntity';
+  attributes?: Maybe<ProjectPage>;
+  id?: Maybe<Scalars['ID']>;
+};
+
+export type ProjectPageEntityResponse = {
+  __typename?: 'ProjectPageEntityResponse';
+  data?: Maybe<ProjectPageEntity>;
+};
+
+export type ProjectPageEntityResponseCollection = {
+  __typename?: 'ProjectPageEntityResponseCollection';
+  data: Array<ProjectPageEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type ProjectPageFiltersInput = {
+  AuctionInfoRow?: InputMaybe<ComponentProjectSaleInfoRowProjectSaleInfoRowFiltersInput>;
+  Quote?: InputMaybe<StringFilterInput>;
+  and?: InputMaybe<Array<InputMaybe<ProjectPageFiltersInput>>>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  not?: InputMaybe<ProjectPageFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ProjectPageFiltersInput>>>;
+  project?: InputMaybe<ComponentProjectMetadataProjectMetadataFiltersInput>;
+  publishedAt?: InputMaybe<DateTimeFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export enum PublicationState {
+  Live = 'LIVE',
+  Preview = 'PREVIEW'
+}
+
+export type ResponseCollectionMeta = {
+  __typename?: 'ResponseCollectionMeta';
+  pagination: Pagination;
+};
+
+export type StringFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  between?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  contains?: InputMaybe<Scalars['String']>;
+  containsi?: InputMaybe<Scalars['String']>;
+  endsWith?: InputMaybe<Scalars['String']>;
+  eq?: InputMaybe<Scalars['String']>;
+  eqi?: InputMaybe<Scalars['String']>;
+  gt?: InputMaybe<Scalars['String']>;
+  gte?: InputMaybe<Scalars['String']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  lt?: InputMaybe<Scalars['String']>;
+  lte?: InputMaybe<Scalars['String']>;
+  ne?: InputMaybe<Scalars['String']>;
+  not?: InputMaybe<StringFilterInput>;
+  notContains?: InputMaybe<Scalars['String']>;
+  notContainsi?: InputMaybe<Scalars['String']>;
+  notIn?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  notNull?: InputMaybe<Scalars['Boolean']>;
+  null?: InputMaybe<Scalars['Boolean']>;
+  or?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  startsWith?: InputMaybe<Scalars['String']>;
+};
+
+export type StringFilterInput_Remote_Rel_Projects_MetadataartistPage = {
+  and?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  between?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  contains?: InputMaybe<Scalars['String']>;
+  containsi?: InputMaybe<Scalars['String']>;
+  endsWith?: InputMaybe<Scalars['String']>;
+  eqi?: InputMaybe<Scalars['String']>;
+  gt?: InputMaybe<Scalars['String']>;
+  gte?: InputMaybe<Scalars['String']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  lt?: InputMaybe<Scalars['String']>;
+  lte?: InputMaybe<Scalars['String']>;
+  ne?: InputMaybe<Scalars['String']>;
+  not?: InputMaybe<StringFilterInput>;
+  notContains?: InputMaybe<Scalars['String']>;
+  notContainsi?: InputMaybe<Scalars['String']>;
+  notIn?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  notNull?: InputMaybe<Scalars['Boolean']>;
+  null?: InputMaybe<Scalars['Boolean']>;
+  or?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  startsWith?: InputMaybe<Scalars['String']>;
 };
 
 /** Boolean expression to compare columns of type "String". All fields are combined with logical 'AND'. */
@@ -103,6 +655,38 @@ export type String_Comparison_Exp = {
   _regex?: InputMaybe<Scalars['String']>;
   /** does the column match the given SQL regular expression */
   _similar?: InputMaybe<Scalars['String']>;
+};
+
+export type UploadFile = {
+  __typename?: 'UploadFile';
+  alternativeText?: Maybe<Scalars['String']>;
+  caption?: Maybe<Scalars['String']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  ext?: Maybe<Scalars['String']>;
+  formats?: Maybe<Scalars['JSON']>;
+  hash: Scalars['String'];
+  height?: Maybe<Scalars['Int']>;
+  mime: Scalars['String'];
+  name: Scalars['String'];
+  previewUrl?: Maybe<Scalars['String']>;
+  provider: Scalars['String'];
+  provider_metadata?: Maybe<Scalars['JSON']>;
+  related?: Maybe<Array<Maybe<GenericMorph>>>;
+  size: Scalars['Float'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  url: Scalars['String'];
+  width?: Maybe<Scalars['Int']>;
+};
+
+export type UploadFileEntity = {
+  __typename?: 'UploadFileEntity';
+  attributes?: Maybe<UploadFile>;
+  id?: Maybe<Scalars['ID']>;
+};
+
+export type UploadFileEntityResponse = {
+  __typename?: 'UploadFileEntityResponse';
+  data?: Maybe<UploadFileEntity>;
 };
 
 /** columns and relationships of "artists" */
@@ -2694,13 +3278,26 @@ export type Media_Stream_Cursor_Value_Input = {
 export type Minter_Filters_Metadata = {
   __typename?: 'minter_filters_metadata';
   address: Scalars['String'];
+  core_registry_address?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "select_minterfilter_allowed_minters" */
+  globally_allowed_minters?: Maybe<Array<Minters_Metadata>>;
   /** An array relationship */
-  allowed_minters: Array<Minters_Metadata>;
+  known_minters: Array<Minters_Metadata>;
 };
 
 
 /** Newly-deployed minters (ie. Set Price minter, Dutch Auction with Settlement minter, etc) must be approved by the Art Blocks minter-filter contract before they may be included for purchasing on an artist’s project. This table tracks a minter-filter’s approved contracts. */
-export type Minter_Filters_MetadataAllowed_MintersArgs = {
+export type Minter_Filters_MetadataGlobally_Allowed_MintersArgs = {
+  distinct_on?: InputMaybe<Array<Minters_Metadata_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Minters_Metadata_Order_By>>;
+  where?: InputMaybe<Minters_Metadata_Bool_Exp>;
+};
+
+
+/** Newly-deployed minters (ie. Set Price minter, Dutch Auction with Settlement minter, etc) must be approved by the Art Blocks minter-filter contract before they may be included for purchasing on an artist’s project. This table tracks a minter-filter’s approved contracts. */
+export type Minter_Filters_MetadataKnown_MintersArgs = {
   distinct_on?: InputMaybe<Array<Minters_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -2714,19 +3311,25 @@ export type Minter_Filters_Metadata_Bool_Exp = {
   _not?: InputMaybe<Minter_Filters_Metadata_Bool_Exp>;
   _or?: InputMaybe<Array<Minter_Filters_Metadata_Bool_Exp>>;
   address?: InputMaybe<String_Comparison_Exp>;
-  allowed_minters?: InputMaybe<Minters_Metadata_Bool_Exp>;
+  core_registry_address?: InputMaybe<String_Comparison_Exp>;
+  globally_allowed_minters?: InputMaybe<Minters_Metadata_Bool_Exp>;
+  known_minters?: InputMaybe<Minters_Metadata_Bool_Exp>;
 };
 
 /** Ordering options when selecting data from "minter_filters_metadata". */
 export type Minter_Filters_Metadata_Order_By = {
   address?: InputMaybe<Order_By>;
-  allowed_minters_aggregate?: InputMaybe<Minters_Metadata_Aggregate_Order_By>;
+  core_registry_address?: InputMaybe<Order_By>;
+  globally_allowed_minters_aggregate?: InputMaybe<Minters_Metadata_Aggregate_Order_By>;
+  known_minters_aggregate?: InputMaybe<Minters_Metadata_Aggregate_Order_By>;
 };
 
 /** select columns of table "minter_filters_metadata" */
 export enum Minter_Filters_Metadata_Select_Column {
   /** column name */
-  Address = 'address'
+  Address = 'address',
+  /** column name */
+  CoreRegistryAddress = 'core_registry_address'
 }
 
 /** Streaming cursor of the table "minter_filters_metadata" */
@@ -2740,6 +3343,7 @@ export type Minter_Filters_Metadata_Stream_Cursor_Input = {
 /** Initial value of the column from where the streaming should start */
 export type Minter_Filters_Metadata_Stream_Cursor_Value_Input = {
   address?: InputMaybe<Scalars['String']>;
+  core_registry_address?: InputMaybe<Scalars['String']>;
 };
 
 export enum Minter_Type_Names_Enum {
@@ -2844,13 +3448,8 @@ export type Minter_Types_Stream_Cursor_Value_Input = {
 export type Minters_Metadata = {
   __typename?: 'minters_metadata';
   address: Scalars['String'];
-  /** An object relationship */
-  core_contract?: Maybe<Contracts_Metadata>;
-  core_contract_address: Scalars['String'];
   extra_minter_details?: Maybe<Scalars['jsonb']>;
-  maximum_price_decay_half_life_in_seconds?: Maybe<Scalars['Int']>;
-  minimum_auction_length_in_seconds?: Maybe<Scalars['Int']>;
-  minimum_price_decay_half_life_in_seconds?: Maybe<Scalars['Int']>;
+  is_globally_allowlisted_on_minter_filter: Scalars['Boolean'];
   /** An object relationship */
   minter_filter?: Maybe<Minter_Filters_Metadata>;
   minter_filter_address: Scalars['String'];
@@ -2891,24 +3490,9 @@ export type Minters_MetadataReceipts_AggregateArgs = {
 
 /** order by aggregate values of table "minters_metadata" */
 export type Minters_Metadata_Aggregate_Order_By = {
-  avg?: InputMaybe<Minters_Metadata_Avg_Order_By>;
   count?: InputMaybe<Order_By>;
   max?: InputMaybe<Minters_Metadata_Max_Order_By>;
   min?: InputMaybe<Minters_Metadata_Min_Order_By>;
-  stddev?: InputMaybe<Minters_Metadata_Stddev_Order_By>;
-  stddev_pop?: InputMaybe<Minters_Metadata_Stddev_Pop_Order_By>;
-  stddev_samp?: InputMaybe<Minters_Metadata_Stddev_Samp_Order_By>;
-  sum?: InputMaybe<Minters_Metadata_Sum_Order_By>;
-  var_pop?: InputMaybe<Minters_Metadata_Var_Pop_Order_By>;
-  var_samp?: InputMaybe<Minters_Metadata_Var_Samp_Order_By>;
-  variance?: InputMaybe<Minters_Metadata_Variance_Order_By>;
-};
-
-/** order by avg() on columns of table "minters_metadata" */
-export type Minters_Metadata_Avg_Order_By = {
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-  minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
 };
 
 /** Boolean expression to filter rows from the table "minters_metadata". All fields are combined with a logical 'AND'. */
@@ -2917,12 +3501,8 @@ export type Minters_Metadata_Bool_Exp = {
   _not?: InputMaybe<Minters_Metadata_Bool_Exp>;
   _or?: InputMaybe<Array<Minters_Metadata_Bool_Exp>>;
   address?: InputMaybe<String_Comparison_Exp>;
-  core_contract?: InputMaybe<Contracts_Metadata_Bool_Exp>;
-  core_contract_address?: InputMaybe<String_Comparison_Exp>;
   extra_minter_details?: InputMaybe<Jsonb_Comparison_Exp>;
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Int_Comparison_Exp>;
-  minimum_auction_length_in_seconds?: InputMaybe<Int_Comparison_Exp>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Int_Comparison_Exp>;
+  is_globally_allowlisted_on_minter_filter?: InputMaybe<Boolean_Comparison_Exp>;
   minter_filter?: InputMaybe<Minter_Filters_Metadata_Bool_Exp>;
   minter_filter_address?: InputMaybe<String_Comparison_Exp>;
   minter_type?: InputMaybe<Minter_Type_Names_Enum_Comparison_Exp>;
@@ -2934,32 +3514,20 @@ export type Minters_Metadata_Bool_Exp = {
 /** order by max() on columns of table "minters_metadata" */
 export type Minters_Metadata_Max_Order_By = {
   address?: InputMaybe<Order_By>;
-  core_contract_address?: InputMaybe<Order_By>;
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-  minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
   minter_filter_address?: InputMaybe<Order_By>;
 };
 
 /** order by min() on columns of table "minters_metadata" */
 export type Minters_Metadata_Min_Order_By = {
   address?: InputMaybe<Order_By>;
-  core_contract_address?: InputMaybe<Order_By>;
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-  minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
   minter_filter_address?: InputMaybe<Order_By>;
 };
 
 /** Ordering options when selecting data from "minters_metadata". */
 export type Minters_Metadata_Order_By = {
   address?: InputMaybe<Order_By>;
-  core_contract?: InputMaybe<Contracts_Metadata_Order_By>;
-  core_contract_address?: InputMaybe<Order_By>;
   extra_minter_details?: InputMaybe<Order_By>;
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-  minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
+  is_globally_allowlisted_on_minter_filter?: InputMaybe<Order_By>;
   minter_filter?: InputMaybe<Minter_Filters_Metadata_Order_By>;
   minter_filter_address?: InputMaybe<Order_By>;
   minter_type?: InputMaybe<Order_By>;
@@ -2972,41 +3540,14 @@ export enum Minters_Metadata_Select_Column {
   /** column name */
   Address = 'address',
   /** column name */
-  CoreContractAddress = 'core_contract_address',
-  /** column name */
   ExtraMinterDetails = 'extra_minter_details',
   /** column name */
-  MaximumPriceDecayHalfLifeInSeconds = 'maximum_price_decay_half_life_in_seconds',
-  /** column name */
-  MinimumAuctionLengthInSeconds = 'minimum_auction_length_in_seconds',
-  /** column name */
-  MinimumPriceDecayHalfLifeInSeconds = 'minimum_price_decay_half_life_in_seconds',
+  IsGloballyAllowlistedOnMinterFilter = 'is_globally_allowlisted_on_minter_filter',
   /** column name */
   MinterFilterAddress = 'minter_filter_address',
   /** column name */
   MinterType = 'minter_type'
 }
-
-/** order by stddev() on columns of table "minters_metadata" */
-export type Minters_Metadata_Stddev_Order_By = {
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-  minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-};
-
-/** order by stddev_pop() on columns of table "minters_metadata" */
-export type Minters_Metadata_Stddev_Pop_Order_By = {
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-  minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-};
-
-/** order by stddev_samp() on columns of table "minters_metadata" */
-export type Minters_Metadata_Stddev_Samp_Order_By = {
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-  minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-};
 
 /** Streaming cursor of the table "minters_metadata" */
 export type Minters_Metadata_Stream_Cursor_Input = {
@@ -3019,41 +3560,10 @@ export type Minters_Metadata_Stream_Cursor_Input = {
 /** Initial value of the column from where the streaming should start */
 export type Minters_Metadata_Stream_Cursor_Value_Input = {
   address?: InputMaybe<Scalars['String']>;
-  core_contract_address?: InputMaybe<Scalars['String']>;
   extra_minter_details?: InputMaybe<Scalars['jsonb']>;
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Scalars['Int']>;
-  minimum_auction_length_in_seconds?: InputMaybe<Scalars['Int']>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Scalars['Int']>;
+  is_globally_allowlisted_on_minter_filter?: InputMaybe<Scalars['Boolean']>;
   minter_filter_address?: InputMaybe<Scalars['String']>;
   minter_type?: InputMaybe<Minter_Type_Names_Enum>;
-};
-
-/** order by sum() on columns of table "minters_metadata" */
-export type Minters_Metadata_Sum_Order_By = {
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-  minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-};
-
-/** order by var_pop() on columns of table "minters_metadata" */
-export type Minters_Metadata_Var_Pop_Order_By = {
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-  minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-};
-
-/** order by var_samp() on columns of table "minters_metadata" */
-export type Minters_Metadata_Var_Samp_Order_By = {
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-  minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-};
-
-/** order by variance() on columns of table "minters_metadata" */
-export type Minters_Metadata_Variance_Order_By = {
-  maximum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
-  minimum_auction_length_in_seconds?: InputMaybe<Order_By>;
-  minimum_price_decay_half_life_in_seconds?: InputMaybe<Order_By>;
 };
 
 /** mutation root */
@@ -3081,6 +3591,225 @@ export type Numeric_Comparison_Exp = {
   _nin?: InputMaybe<Array<Scalars['numeric']>>;
 };
 
+/** Table for out-of-bounds tokens created for previewing upcoming projects */
+export type Oob_Tokens_Metadata = {
+  __typename?: 'oob_tokens_metadata';
+  /** An object relationship */
+  contract: Contracts_Metadata;
+  contract_address: Scalars['String'];
+  /** An object relationship */
+  gif?: Maybe<Media>;
+  gif_id?: Maybe<Scalars['Int']>;
+  hash: Scalars['String'];
+  id: Scalars['String'];
+  /** An object relationship */
+  image?: Maybe<Media>;
+  image_id?: Maybe<Scalars['Int']>;
+  /** A computed field, executes function "oob_live_view_path" */
+  live_view_path?: Maybe<Scalars['String']>;
+  /** a computed field that returns the media proxy url for this OOB token's statically rendered image */
+  media_url?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "oob_preview_asset_url" */
+  preview_asset_url?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "oob_primary_asset_url" */
+  primary_asset_url?: Maybe<Scalars['String']>;
+  /** An object relationship */
+  project: Projects_Metadata;
+  project_id: Scalars['String'];
+  token_id: Scalars['Int'];
+  /** An object relationship */
+  video?: Maybe<Media>;
+  video_id?: Maybe<Scalars['Int']>;
+};
+
+/** order by aggregate values of table "oob_tokens_metadata" */
+export type Oob_Tokens_Metadata_Aggregate_Order_By = {
+  avg?: InputMaybe<Oob_Tokens_Metadata_Avg_Order_By>;
+  count?: InputMaybe<Order_By>;
+  max?: InputMaybe<Oob_Tokens_Metadata_Max_Order_By>;
+  min?: InputMaybe<Oob_Tokens_Metadata_Min_Order_By>;
+  stddev?: InputMaybe<Oob_Tokens_Metadata_Stddev_Order_By>;
+  stddev_pop?: InputMaybe<Oob_Tokens_Metadata_Stddev_Pop_Order_By>;
+  stddev_samp?: InputMaybe<Oob_Tokens_Metadata_Stddev_Samp_Order_By>;
+  sum?: InputMaybe<Oob_Tokens_Metadata_Sum_Order_By>;
+  var_pop?: InputMaybe<Oob_Tokens_Metadata_Var_Pop_Order_By>;
+  var_samp?: InputMaybe<Oob_Tokens_Metadata_Var_Samp_Order_By>;
+  variance?: InputMaybe<Oob_Tokens_Metadata_Variance_Order_By>;
+};
+
+/** order by avg() on columns of table "oob_tokens_metadata" */
+export type Oob_Tokens_Metadata_Avg_Order_By = {
+  gif_id?: InputMaybe<Order_By>;
+  image_id?: InputMaybe<Order_By>;
+  token_id?: InputMaybe<Order_By>;
+  video_id?: InputMaybe<Order_By>;
+};
+
+/** Boolean expression to filter rows from the table "oob_tokens_metadata". All fields are combined with a logical 'AND'. */
+export type Oob_Tokens_Metadata_Bool_Exp = {
+  _and?: InputMaybe<Array<Oob_Tokens_Metadata_Bool_Exp>>;
+  _not?: InputMaybe<Oob_Tokens_Metadata_Bool_Exp>;
+  _or?: InputMaybe<Array<Oob_Tokens_Metadata_Bool_Exp>>;
+  contract?: InputMaybe<Contracts_Metadata_Bool_Exp>;
+  contract_address?: InputMaybe<String_Comparison_Exp>;
+  gif?: InputMaybe<Media_Bool_Exp>;
+  gif_id?: InputMaybe<Int_Comparison_Exp>;
+  hash?: InputMaybe<String_Comparison_Exp>;
+  id?: InputMaybe<String_Comparison_Exp>;
+  image?: InputMaybe<Media_Bool_Exp>;
+  image_id?: InputMaybe<Int_Comparison_Exp>;
+  live_view_path?: InputMaybe<String_Comparison_Exp>;
+  media_url?: InputMaybe<String_Comparison_Exp>;
+  preview_asset_url?: InputMaybe<String_Comparison_Exp>;
+  primary_asset_url?: InputMaybe<String_Comparison_Exp>;
+  project?: InputMaybe<Projects_Metadata_Bool_Exp>;
+  project_id?: InputMaybe<String_Comparison_Exp>;
+  token_id?: InputMaybe<Int_Comparison_Exp>;
+  video?: InputMaybe<Media_Bool_Exp>;
+  video_id?: InputMaybe<Int_Comparison_Exp>;
+};
+
+/** order by max() on columns of table "oob_tokens_metadata" */
+export type Oob_Tokens_Metadata_Max_Order_By = {
+  contract_address?: InputMaybe<Order_By>;
+  gif_id?: InputMaybe<Order_By>;
+  hash?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  image_id?: InputMaybe<Order_By>;
+  project_id?: InputMaybe<Order_By>;
+  token_id?: InputMaybe<Order_By>;
+  video_id?: InputMaybe<Order_By>;
+};
+
+/** order by min() on columns of table "oob_tokens_metadata" */
+export type Oob_Tokens_Metadata_Min_Order_By = {
+  contract_address?: InputMaybe<Order_By>;
+  gif_id?: InputMaybe<Order_By>;
+  hash?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  image_id?: InputMaybe<Order_By>;
+  project_id?: InputMaybe<Order_By>;
+  token_id?: InputMaybe<Order_By>;
+  video_id?: InputMaybe<Order_By>;
+};
+
+/** Ordering options when selecting data from "oob_tokens_metadata". */
+export type Oob_Tokens_Metadata_Order_By = {
+  contract?: InputMaybe<Contracts_Metadata_Order_By>;
+  contract_address?: InputMaybe<Order_By>;
+  gif?: InputMaybe<Media_Order_By>;
+  gif_id?: InputMaybe<Order_By>;
+  hash?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  image?: InputMaybe<Media_Order_By>;
+  image_id?: InputMaybe<Order_By>;
+  live_view_path?: InputMaybe<Order_By>;
+  media_url?: InputMaybe<Order_By>;
+  preview_asset_url?: InputMaybe<Order_By>;
+  primary_asset_url?: InputMaybe<Order_By>;
+  project?: InputMaybe<Projects_Metadata_Order_By>;
+  project_id?: InputMaybe<Order_By>;
+  token_id?: InputMaybe<Order_By>;
+  video?: InputMaybe<Media_Order_By>;
+  video_id?: InputMaybe<Order_By>;
+};
+
+/** select columns of table "oob_tokens_metadata" */
+export enum Oob_Tokens_Metadata_Select_Column {
+  /** column name */
+  ContractAddress = 'contract_address',
+  /** column name */
+  GifId = 'gif_id',
+  /** column name */
+  Hash = 'hash',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  ImageId = 'image_id',
+  /** column name */
+  ProjectId = 'project_id',
+  /** column name */
+  TokenId = 'token_id',
+  /** column name */
+  VideoId = 'video_id'
+}
+
+/** order by stddev() on columns of table "oob_tokens_metadata" */
+export type Oob_Tokens_Metadata_Stddev_Order_By = {
+  gif_id?: InputMaybe<Order_By>;
+  image_id?: InputMaybe<Order_By>;
+  token_id?: InputMaybe<Order_By>;
+  video_id?: InputMaybe<Order_By>;
+};
+
+/** order by stddev_pop() on columns of table "oob_tokens_metadata" */
+export type Oob_Tokens_Metadata_Stddev_Pop_Order_By = {
+  gif_id?: InputMaybe<Order_By>;
+  image_id?: InputMaybe<Order_By>;
+  token_id?: InputMaybe<Order_By>;
+  video_id?: InputMaybe<Order_By>;
+};
+
+/** order by stddev_samp() on columns of table "oob_tokens_metadata" */
+export type Oob_Tokens_Metadata_Stddev_Samp_Order_By = {
+  gif_id?: InputMaybe<Order_By>;
+  image_id?: InputMaybe<Order_By>;
+  token_id?: InputMaybe<Order_By>;
+  video_id?: InputMaybe<Order_By>;
+};
+
+/** Streaming cursor of the table "oob_tokens_metadata" */
+export type Oob_Tokens_Metadata_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Oob_Tokens_Metadata_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Oob_Tokens_Metadata_Stream_Cursor_Value_Input = {
+  contract_address?: InputMaybe<Scalars['String']>;
+  gif_id?: InputMaybe<Scalars['Int']>;
+  hash?: InputMaybe<Scalars['String']>;
+  id?: InputMaybe<Scalars['String']>;
+  image_id?: InputMaybe<Scalars['Int']>;
+  project_id?: InputMaybe<Scalars['String']>;
+  token_id?: InputMaybe<Scalars['Int']>;
+  video_id?: InputMaybe<Scalars['Int']>;
+};
+
+/** order by sum() on columns of table "oob_tokens_metadata" */
+export type Oob_Tokens_Metadata_Sum_Order_By = {
+  gif_id?: InputMaybe<Order_By>;
+  image_id?: InputMaybe<Order_By>;
+  token_id?: InputMaybe<Order_By>;
+  video_id?: InputMaybe<Order_By>;
+};
+
+/** order by var_pop() on columns of table "oob_tokens_metadata" */
+export type Oob_Tokens_Metadata_Var_Pop_Order_By = {
+  gif_id?: InputMaybe<Order_By>;
+  image_id?: InputMaybe<Order_By>;
+  token_id?: InputMaybe<Order_By>;
+  video_id?: InputMaybe<Order_By>;
+};
+
+/** order by var_samp() on columns of table "oob_tokens_metadata" */
+export type Oob_Tokens_Metadata_Var_Samp_Order_By = {
+  gif_id?: InputMaybe<Order_By>;
+  image_id?: InputMaybe<Order_By>;
+  token_id?: InputMaybe<Order_By>;
+  video_id?: InputMaybe<Order_By>;
+};
+
+/** order by variance() on columns of table "oob_tokens_metadata" */
+export type Oob_Tokens_Metadata_Variance_Order_By = {
+  gif_id?: InputMaybe<Order_By>;
+  image_id?: InputMaybe<Order_By>;
+  token_id?: InputMaybe<Order_By>;
+  video_id?: InputMaybe<Order_By>;
+};
+
 /** column ordering options */
 export enum Order_By {
   /** in ascending order, nulls last */
@@ -3096,6 +3825,99 @@ export enum Order_By {
   /** in descending order, nulls last */
   DescNullsLast = 'desc_nulls_last'
 }
+
+/** This table tracks pending & completed "processing jobs" which are a batch of 40 tokens or less. Any given refresh request consists of one or many processing jobs. */
+export type Processing_Jobs = {
+  __typename?: 'processing_jobs';
+  asset_type?: Maybe<Refresh_Asset_Types_Enum>;
+  completed_at?: Maybe<Scalars['timestamptz']>;
+  id: Scalars['uuid'];
+  name: Scalars['String'];
+  refresh_request_id: Scalars['uuid'];
+  submitted_at?: Maybe<Scalars['timestamptz']>;
+};
+
+/** order by aggregate values of table "processing_jobs" */
+export type Processing_Jobs_Aggregate_Order_By = {
+  count?: InputMaybe<Order_By>;
+  max?: InputMaybe<Processing_Jobs_Max_Order_By>;
+  min?: InputMaybe<Processing_Jobs_Min_Order_By>;
+};
+
+/** Boolean expression to filter rows from the table "processing_jobs". All fields are combined with a logical 'AND'. */
+export type Processing_Jobs_Bool_Exp = {
+  _and?: InputMaybe<Array<Processing_Jobs_Bool_Exp>>;
+  _not?: InputMaybe<Processing_Jobs_Bool_Exp>;
+  _or?: InputMaybe<Array<Processing_Jobs_Bool_Exp>>;
+  asset_type?: InputMaybe<Refresh_Asset_Types_Enum_Comparison_Exp>;
+  completed_at?: InputMaybe<Timestamptz_Comparison_Exp>;
+  id?: InputMaybe<Uuid_Comparison_Exp>;
+  name?: InputMaybe<String_Comparison_Exp>;
+  refresh_request_id?: InputMaybe<Uuid_Comparison_Exp>;
+  submitted_at?: InputMaybe<Timestamptz_Comparison_Exp>;
+};
+
+/** order by max() on columns of table "processing_jobs" */
+export type Processing_Jobs_Max_Order_By = {
+  completed_at?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  name?: InputMaybe<Order_By>;
+  refresh_request_id?: InputMaybe<Order_By>;
+  submitted_at?: InputMaybe<Order_By>;
+};
+
+/** order by min() on columns of table "processing_jobs" */
+export type Processing_Jobs_Min_Order_By = {
+  completed_at?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  name?: InputMaybe<Order_By>;
+  refresh_request_id?: InputMaybe<Order_By>;
+  submitted_at?: InputMaybe<Order_By>;
+};
+
+/** Ordering options when selecting data from "processing_jobs". */
+export type Processing_Jobs_Order_By = {
+  asset_type?: InputMaybe<Order_By>;
+  completed_at?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  name?: InputMaybe<Order_By>;
+  refresh_request_id?: InputMaybe<Order_By>;
+  submitted_at?: InputMaybe<Order_By>;
+};
+
+/** select columns of table "processing_jobs" */
+export enum Processing_Jobs_Select_Column {
+  /** column name */
+  AssetType = 'asset_type',
+  /** column name */
+  CompletedAt = 'completed_at',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  Name = 'name',
+  /** column name */
+  RefreshRequestId = 'refresh_request_id',
+  /** column name */
+  SubmittedAt = 'submitted_at'
+}
+
+/** Streaming cursor of the table "processing_jobs" */
+export type Processing_Jobs_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Processing_Jobs_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Processing_Jobs_Stream_Cursor_Value_Input = {
+  asset_type?: InputMaybe<Refresh_Asset_Types_Enum>;
+  completed_at?: InputMaybe<Scalars['timestamptz']>;
+  id?: InputMaybe<Scalars['uuid']>;
+  name?: InputMaybe<Scalars['String']>;
+  refresh_request_id?: InputMaybe<Scalars['uuid']>;
+  submitted_at?: InputMaybe<Scalars['timestamptz']>;
+};
 
 /** columns and relationships of "project_external_asset_dependencies" */
 export type Project_External_Asset_Dependencies = {
@@ -3260,14 +4082,10 @@ export type Project_External_Asset_Dependency_Types_Enum_Comparison_Exp = {
 /** This table holds metadata related to a minter that’s been configured by an artist for their project. Rows are added when an artist selects & assigns a minter type to their project that they’ve not previously used for the project in question. */
 export type Project_Minter_Configurations = {
   __typename?: 'project_minter_configurations';
-  /** A computed field, executes function "approximate_exp_da_end_time" */
-  approximate_exp_da_end_time?: Maybe<Scalars['timestamptz']>;
   base_price?: Maybe<Scalars['String']>;
   currency_address: Scalars['String'];
   currency_symbol: Scalars['String'];
-  end_time?: Maybe<Scalars['timestamptz']>;
   extra_minter_details?: Maybe<Scalars['jsonb']>;
-  half_life_in_seconds?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   max_invocations?: Maybe<Scalars['Int']>;
   /** An object relationship */
@@ -3279,8 +4097,6 @@ export type Project_Minter_Configurations = {
   project?: Maybe<Projects_Metadata>;
   project_id: Scalars['String'];
   purchase_to_disabled: Scalars['Boolean'];
-  start_price?: Maybe<Scalars['String']>;
-  start_time?: Maybe<Scalars['timestamptz']>;
 };
 
 
@@ -3300,13 +4116,10 @@ export type Project_Minter_Configurations_Bool_Exp = {
   _and?: InputMaybe<Array<Project_Minter_Configurations_Bool_Exp>>;
   _not?: InputMaybe<Project_Minter_Configurations_Bool_Exp>;
   _or?: InputMaybe<Array<Project_Minter_Configurations_Bool_Exp>>;
-  approximate_exp_da_end_time?: InputMaybe<Timestamptz_Comparison_Exp>;
   base_price?: InputMaybe<String_Comparison_Exp>;
   currency_address?: InputMaybe<String_Comparison_Exp>;
   currency_symbol?: InputMaybe<String_Comparison_Exp>;
-  end_time?: InputMaybe<Timestamptz_Comparison_Exp>;
   extra_minter_details?: InputMaybe<Jsonb_Comparison_Exp>;
-  half_life_in_seconds?: InputMaybe<String_Comparison_Exp>;
   id?: InputMaybe<String_Comparison_Exp>;
   max_invocations?: InputMaybe<Int_Comparison_Exp>;
   minter?: InputMaybe<Minters_Metadata_Bool_Exp>;
@@ -3316,19 +4129,14 @@ export type Project_Minter_Configurations_Bool_Exp = {
   project?: InputMaybe<Projects_Metadata_Bool_Exp>;
   project_id?: InputMaybe<String_Comparison_Exp>;
   purchase_to_disabled?: InputMaybe<Boolean_Comparison_Exp>;
-  start_price?: InputMaybe<String_Comparison_Exp>;
-  start_time?: InputMaybe<Timestamptz_Comparison_Exp>;
 };
 
 /** Ordering options when selecting data from "project_minter_configurations". */
 export type Project_Minter_Configurations_Order_By = {
-  approximate_exp_da_end_time?: InputMaybe<Order_By>;
   base_price?: InputMaybe<Order_By>;
   currency_address?: InputMaybe<Order_By>;
   currency_symbol?: InputMaybe<Order_By>;
-  end_time?: InputMaybe<Order_By>;
   extra_minter_details?: InputMaybe<Order_By>;
-  half_life_in_seconds?: InputMaybe<Order_By>;
   id?: InputMaybe<Order_By>;
   max_invocations?: InputMaybe<Order_By>;
   minter?: InputMaybe<Minters_Metadata_Order_By>;
@@ -3338,8 +4146,6 @@ export type Project_Minter_Configurations_Order_By = {
   project?: InputMaybe<Projects_Metadata_Order_By>;
   project_id?: InputMaybe<Order_By>;
   purchase_to_disabled?: InputMaybe<Order_By>;
-  start_price?: InputMaybe<Order_By>;
-  start_time?: InputMaybe<Order_By>;
 };
 
 /** select columns of table "project_minter_configurations" */
@@ -3351,11 +4157,7 @@ export enum Project_Minter_Configurations_Select_Column {
   /** column name */
   CurrencySymbol = 'currency_symbol',
   /** column name */
-  EndTime = 'end_time',
-  /** column name */
   ExtraMinterDetails = 'extra_minter_details',
-  /** column name */
-  HalfLifeInSeconds = 'half_life_in_seconds',
   /** column name */
   Id = 'id',
   /** column name */
@@ -3369,11 +4171,7 @@ export enum Project_Minter_Configurations_Select_Column {
   /** column name */
   ProjectId = 'project_id',
   /** column name */
-  PurchaseToDisabled = 'purchase_to_disabled',
-  /** column name */
-  StartPrice = 'start_price',
-  /** column name */
-  StartTime = 'start_time'
+  PurchaseToDisabled = 'purchase_to_disabled'
 }
 
 /** Streaming cursor of the table "project_minter_configurations" */
@@ -3389,9 +4187,7 @@ export type Project_Minter_Configurations_Stream_Cursor_Value_Input = {
   base_price?: InputMaybe<Scalars['String']>;
   currency_address?: InputMaybe<Scalars['String']>;
   currency_symbol?: InputMaybe<Scalars['String']>;
-  end_time?: InputMaybe<Scalars['timestamptz']>;
   extra_minter_details?: InputMaybe<Scalars['jsonb']>;
-  half_life_in_seconds?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['String']>;
   max_invocations?: InputMaybe<Scalars['Int']>;
   minter_id?: InputMaybe<Scalars['String']>;
@@ -3399,8 +4195,6 @@ export type Project_Minter_Configurations_Stream_Cursor_Value_Input = {
   price_is_configured?: InputMaybe<Scalars['Boolean']>;
   project_id?: InputMaybe<Scalars['String']>;
   purchase_to_disabled?: InputMaybe<Scalars['Boolean']>;
-  start_price?: InputMaybe<Scalars['String']>;
-  start_time?: InputMaybe<Scalars['timestamptz']>;
 };
 
 /** This table holds the artist script files used for all projects (all scripts are primarily stored on-chain, and this table exists here for convenience purposes). Note that multiple scripts are combined when multiple indexes exist for a given projectID. This table is updated when an artist uploads, edits, or deletes a script in their project shell. */
@@ -3948,6 +4742,7 @@ export type Projects_Metadata = {
   additional_payee_secondary_sales_percentage?: Maybe<Scalars['Int']>;
   /** An object relationship */
   artist: Users;
+  artistPage?: Maybe<ArtistEditorialPageEntityResponseCollection>;
   artist_address: Scalars['String'];
   artist_display_notes?: Maybe<Scalars['String']>;
   artist_featured_token_id?: Maybe<Scalars['String']>;
@@ -3959,6 +4754,7 @@ export type Projects_Metadata = {
   /** A computed field, executes function "project_auction_start_time" */
   auction_start_time?: Maybe<Scalars['timestamptz']>;
   base_uri?: Maybe<Scalars['String']>;
+  canvas_mode?: Maybe<Scalars['Boolean']>;
   charitable_giving_details?: Maybe<Scalars['String']>;
   complete: Scalars['Boolean'];
   completed_at?: Maybe<Scalars['timestamptz']>;
@@ -4017,6 +4813,8 @@ export type Projects_Metadata = {
   minter_configuration?: Maybe<Project_Minter_Configurations>;
   minter_configuration_id?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
+  /** An array relationship */
+  oob_tokens: Array<Oob_Tokens_Metadata>;
   paused: Scalars['Boolean'];
   preview_render_type: Render_Types_Enum;
   price_per_token_in_wei?: Maybe<Scalars['String']>;
@@ -4069,6 +4867,15 @@ export type Projects_Metadata = {
 
 
 /** This table holds entries for every project and information on all project-related settings. */
+export type Projects_MetadataArtistPageArgs = {
+  filters?: InputMaybe<ArtistEditorialPageFiltersInput_Remote_Rel_Projects_MetadataartistPage>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+};
+
+
+/** This table holds entries for every project and information on all project-related settings. */
 export type Projects_MetadataExternal_Asset_DependenciesArgs = {
   distinct_on?: InputMaybe<Array<Project_External_Asset_Dependencies_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4100,12 +4907,22 @@ export type Projects_MetadataFavorites_AggregateArgs = {
 
 /** This table holds entries for every project and information on all project-related settings. */
 export type Projects_MetadataFeatured_TokenArgs = {
-  args: Featured_Token_Projects_Metadata_Args;
+  args?: InputMaybe<Featured_Token_Projects_Metadata_Args>;
   distinct_on?: InputMaybe<Array<Tokens_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
   order_by?: InputMaybe<Array<Tokens_Metadata_Order_By>>;
   where?: InputMaybe<Tokens_Metadata_Bool_Exp>;
+};
+
+
+/** This table holds entries for every project and information on all project-related settings. */
+export type Projects_MetadataOob_TokensArgs = {
+  distinct_on?: InputMaybe<Array<Oob_Tokens_Metadata_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Oob_Tokens_Metadata_Order_By>>;
+  where?: InputMaybe<Oob_Tokens_Metadata_Bool_Exp>;
 };
 
 
@@ -4253,10 +5070,18 @@ export type Projects_Metadata_Avg_Fields = {
   additional_payee_secondary_sales_percentage?: Maybe<Scalars['Float']>;
   aspect_ratio?: Maybe<Scalars['Float']>;
   currency_decimals?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_external_asset_dependency_count" */
+  external_asset_dependency_count?: Maybe<Scalars['bigint']>;
   index?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_invocations" */
+  invocations?: Maybe<Scalars['bigint']>;
+  /** A computed field, executes function "project_lowest_listing" */
+  lowest_listing?: Maybe<Scalars['float8']>;
   max_invocations?: Maybe<Scalars['Float']>;
   render_delay?: Maybe<Scalars['Float']>;
   royalty_percentage?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_script_count" */
+  script_count?: Maybe<Scalars['bigint']>;
   series_id?: Maybe<Scalars['Float']>;
   video_aspect_ratio?: Maybe<Scalars['Float']>;
   video_duration?: Maybe<Scalars['Float']>;
@@ -4302,6 +5127,7 @@ export type Projects_Metadata_Bool_Exp = {
   auction_end_time?: InputMaybe<Timestamptz_Comparison_Exp>;
   auction_start_time?: InputMaybe<Timestamptz_Comparison_Exp>;
   base_uri?: InputMaybe<String_Comparison_Exp>;
+  canvas_mode?: InputMaybe<Boolean_Comparison_Exp>;
   charitable_giving_details?: InputMaybe<String_Comparison_Exp>;
   complete?: InputMaybe<Boolean_Comparison_Exp>;
   completed_at?: InputMaybe<Timestamptz_Comparison_Exp>;
@@ -4342,6 +5168,7 @@ export type Projects_Metadata_Bool_Exp = {
   minter_configuration?: InputMaybe<Project_Minter_Configurations_Bool_Exp>;
   minter_configuration_id?: InputMaybe<String_Comparison_Exp>;
   name?: InputMaybe<String_Comparison_Exp>;
+  oob_tokens?: InputMaybe<Oob_Tokens_Metadata_Bool_Exp>;
   paused?: InputMaybe<Boolean_Comparison_Exp>;
   preview_render_type?: InputMaybe<Render_Types_Enum_Comparison_Exp>;
   price_per_token_in_wei?: InputMaybe<String_Comparison_Exp>;
@@ -4393,20 +5220,36 @@ export type Projects_Metadata_Max_Fields = {
   artist_interview?: Maybe<Scalars['String']>;
   artist_name?: Maybe<Scalars['String']>;
   aspect_ratio?: Maybe<Scalars['numeric']>;
+  /** A computed field, executes function "project_auction_end_time" */
+  auction_end_time?: Maybe<Scalars['timestamptz']>;
+  /** A computed field, executes function "project_auction_start_time" */
+  auction_start_time?: Maybe<Scalars['timestamptz']>;
   base_uri?: Maybe<Scalars['String']>;
   charitable_giving_details?: Maybe<Scalars['String']>;
   completed_at?: Maybe<Scalars['timestamptz']>;
   contract_address?: Maybe<Scalars['String']>;
   creative_credit?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "curation_status_display" */
+  curation_status_display?: Maybe<Scalars['String']>;
   currency_address?: Maybe<Scalars['String']>;
   currency_decimals?: Maybe<Scalars['Int']>;
   currency_symbol?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "project_external_asset_dependency_count" */
+  external_asset_dependency_count?: Maybe<Scalars['bigint']>;
+  /** A computed field, executes function "first_token_minted_at" */
+  first_token_minted_at?: Maybe<Scalars['timestamptz']>;
+  /** A computed field, executes function "project_heritage_status" */
+  heritage_curation_status?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
   index?: Maybe<Scalars['Int']>;
+  /** A computed field, executes function "project_invocations" */
+  invocations?: Maybe<Scalars['bigint']>;
   ipfs_hash?: Maybe<Scalars['String']>;
   license?: Maybe<Scalars['String']>;
   link_to_license?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "project_lowest_listing" */
+  lowest_listing?: Maybe<Scalars['float8']>;
   max_invocations?: Maybe<Scalars['Int']>;
   minter_configuration_id?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
@@ -4417,7 +5260,11 @@ export type Projects_Metadata_Max_Fields = {
   royalty_percentage?: Maybe<Scalars['Int']>;
   sales_notes?: Maybe<Scalars['String']>;
   script?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "project_script_count" */
+  script_count?: Maybe<Scalars['bigint']>;
   script_type_and_version?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "second_token_minted_at" */
+  second_token_minted_at?: Maybe<Scalars['timestamptz']>;
   series_id?: Maybe<Scalars['Int']>;
   start_datetime?: Maybe<Scalars['timestamptz']>;
   updated_at?: Maybe<Scalars['timestamp']>;
@@ -4492,20 +5339,36 @@ export type Projects_Metadata_Min_Fields = {
   artist_interview?: Maybe<Scalars['String']>;
   artist_name?: Maybe<Scalars['String']>;
   aspect_ratio?: Maybe<Scalars['numeric']>;
+  /** A computed field, executes function "project_auction_end_time" */
+  auction_end_time?: Maybe<Scalars['timestamptz']>;
+  /** A computed field, executes function "project_auction_start_time" */
+  auction_start_time?: Maybe<Scalars['timestamptz']>;
   base_uri?: Maybe<Scalars['String']>;
   charitable_giving_details?: Maybe<Scalars['String']>;
   completed_at?: Maybe<Scalars['timestamptz']>;
   contract_address?: Maybe<Scalars['String']>;
   creative_credit?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "curation_status_display" */
+  curation_status_display?: Maybe<Scalars['String']>;
   currency_address?: Maybe<Scalars['String']>;
   currency_decimals?: Maybe<Scalars['Int']>;
   currency_symbol?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "project_external_asset_dependency_count" */
+  external_asset_dependency_count?: Maybe<Scalars['bigint']>;
+  /** A computed field, executes function "first_token_minted_at" */
+  first_token_minted_at?: Maybe<Scalars['timestamptz']>;
+  /** A computed field, executes function "project_heritage_status" */
+  heritage_curation_status?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
   index?: Maybe<Scalars['Int']>;
+  /** A computed field, executes function "project_invocations" */
+  invocations?: Maybe<Scalars['bigint']>;
   ipfs_hash?: Maybe<Scalars['String']>;
   license?: Maybe<Scalars['String']>;
   link_to_license?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "project_lowest_listing" */
+  lowest_listing?: Maybe<Scalars['float8']>;
   max_invocations?: Maybe<Scalars['Int']>;
   minter_configuration_id?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
@@ -4516,7 +5379,11 @@ export type Projects_Metadata_Min_Fields = {
   royalty_percentage?: Maybe<Scalars['Int']>;
   sales_notes?: Maybe<Scalars['String']>;
   script?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "project_script_count" */
+  script_count?: Maybe<Scalars['bigint']>;
   script_type_and_version?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "second_token_minted_at" */
+  second_token_minted_at?: Maybe<Scalars['timestamptz']>;
   series_id?: Maybe<Scalars['Int']>;
   start_datetime?: Maybe<Scalars['timestamptz']>;
   updated_at?: Maybe<Scalars['timestamp']>;
@@ -4595,6 +5462,7 @@ export type Projects_Metadata_Order_By = {
   auction_end_time?: InputMaybe<Order_By>;
   auction_start_time?: InputMaybe<Order_By>;
   base_uri?: InputMaybe<Order_By>;
+  canvas_mode?: InputMaybe<Order_By>;
   charitable_giving_details?: InputMaybe<Order_By>;
   complete?: InputMaybe<Order_By>;
   completed_at?: InputMaybe<Order_By>;
@@ -4634,6 +5502,7 @@ export type Projects_Metadata_Order_By = {
   minter_configuration?: InputMaybe<Project_Minter_Configurations_Order_By>;
   minter_configuration_id?: InputMaybe<Order_By>;
   name?: InputMaybe<Order_By>;
+  oob_tokens_aggregate?: InputMaybe<Oob_Tokens_Metadata_Aggregate_Order_By>;
   paused?: InputMaybe<Order_By>;
   preview_render_type?: InputMaybe<Order_By>;
   price_per_token_in_wei?: InputMaybe<Order_By>;
@@ -4697,6 +5566,8 @@ export enum Projects_Metadata_Select_Column {
   AspectRatio = 'aspect_ratio',
   /** column name */
   BaseUri = 'base_uri',
+  /** column name */
+  CanvasMode = 'canvas_mode',
   /** column name */
   CharitableGivingDetails = 'charitable_giving_details',
   /** column name */
@@ -4796,6 +5667,8 @@ export enum Projects_Metadata_Select_Column_Projects_Metadata_Aggregate_Bool_Exp
   /** column name */
   Active = 'active',
   /** column name */
+  CanvasMode = 'canvas_mode',
+  /** column name */
   Complete = 'complete',
   /** column name */
   DisableAutoImageFormat = 'disable_auto_image_format',
@@ -4817,6 +5690,8 @@ export enum Projects_Metadata_Select_Column_Projects_Metadata_Aggregate_Bool_Exp
 export enum Projects_Metadata_Select_Column_Projects_Metadata_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns {
   /** column name */
   Active = 'active',
+  /** column name */
+  CanvasMode = 'canvas_mode',
   /** column name */
   Complete = 'complete',
   /** column name */
@@ -4842,10 +5717,18 @@ export type Projects_Metadata_Stddev_Fields = {
   additional_payee_secondary_sales_percentage?: Maybe<Scalars['Float']>;
   aspect_ratio?: Maybe<Scalars['Float']>;
   currency_decimals?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_external_asset_dependency_count" */
+  external_asset_dependency_count?: Maybe<Scalars['bigint']>;
   index?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_invocations" */
+  invocations?: Maybe<Scalars['bigint']>;
+  /** A computed field, executes function "project_lowest_listing" */
+  lowest_listing?: Maybe<Scalars['float8']>;
   max_invocations?: Maybe<Scalars['Float']>;
   render_delay?: Maybe<Scalars['Float']>;
   royalty_percentage?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_script_count" */
+  script_count?: Maybe<Scalars['bigint']>;
   series_id?: Maybe<Scalars['Float']>;
   video_aspect_ratio?: Maybe<Scalars['Float']>;
   video_duration?: Maybe<Scalars['Float']>;
@@ -4877,10 +5760,18 @@ export type Projects_Metadata_Stddev_Pop_Fields = {
   additional_payee_secondary_sales_percentage?: Maybe<Scalars['Float']>;
   aspect_ratio?: Maybe<Scalars['Float']>;
   currency_decimals?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_external_asset_dependency_count" */
+  external_asset_dependency_count?: Maybe<Scalars['bigint']>;
   index?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_invocations" */
+  invocations?: Maybe<Scalars['bigint']>;
+  /** A computed field, executes function "project_lowest_listing" */
+  lowest_listing?: Maybe<Scalars['float8']>;
   max_invocations?: Maybe<Scalars['Float']>;
   render_delay?: Maybe<Scalars['Float']>;
   royalty_percentage?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_script_count" */
+  script_count?: Maybe<Scalars['bigint']>;
   series_id?: Maybe<Scalars['Float']>;
   video_aspect_ratio?: Maybe<Scalars['Float']>;
   video_duration?: Maybe<Scalars['Float']>;
@@ -4912,10 +5803,18 @@ export type Projects_Metadata_Stddev_Samp_Fields = {
   additional_payee_secondary_sales_percentage?: Maybe<Scalars['Float']>;
   aspect_ratio?: Maybe<Scalars['Float']>;
   currency_decimals?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_external_asset_dependency_count" */
+  external_asset_dependency_count?: Maybe<Scalars['bigint']>;
   index?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_invocations" */
+  invocations?: Maybe<Scalars['bigint']>;
+  /** A computed field, executes function "project_lowest_listing" */
+  lowest_listing?: Maybe<Scalars['float8']>;
   max_invocations?: Maybe<Scalars['Float']>;
   render_delay?: Maybe<Scalars['Float']>;
   royalty_percentage?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_script_count" */
+  script_count?: Maybe<Scalars['bigint']>;
   series_id?: Maybe<Scalars['Float']>;
   video_aspect_ratio?: Maybe<Scalars['Float']>;
   video_duration?: Maybe<Scalars['Float']>;
@@ -4963,6 +5862,7 @@ export type Projects_Metadata_Stream_Cursor_Value_Input = {
   artist_name?: InputMaybe<Scalars['String']>;
   aspect_ratio?: InputMaybe<Scalars['numeric']>;
   base_uri?: InputMaybe<Scalars['String']>;
+  canvas_mode?: InputMaybe<Scalars['Boolean']>;
   charitable_giving_details?: InputMaybe<Scalars['String']>;
   complete?: InputMaybe<Scalars['Boolean']>;
   completed_at?: InputMaybe<Scalars['timestamptz']>;
@@ -5018,10 +5918,18 @@ export type Projects_Metadata_Sum_Fields = {
   additional_payee_secondary_sales_percentage?: Maybe<Scalars['Int']>;
   aspect_ratio?: Maybe<Scalars['numeric']>;
   currency_decimals?: Maybe<Scalars['Int']>;
+  /** A computed field, executes function "project_external_asset_dependency_count" */
+  external_asset_dependency_count?: Maybe<Scalars['bigint']>;
   index?: Maybe<Scalars['Int']>;
+  /** A computed field, executes function "project_invocations" */
+  invocations?: Maybe<Scalars['bigint']>;
+  /** A computed field, executes function "project_lowest_listing" */
+  lowest_listing?: Maybe<Scalars['float8']>;
   max_invocations?: Maybe<Scalars['Int']>;
   render_delay?: Maybe<Scalars['Int']>;
   royalty_percentage?: Maybe<Scalars['Int']>;
+  /** A computed field, executes function "project_script_count" */
+  script_count?: Maybe<Scalars['bigint']>;
   series_id?: Maybe<Scalars['Int']>;
   video_aspect_ratio?: Maybe<Scalars['numeric']>;
   video_duration?: Maybe<Scalars['Int']>;
@@ -5053,10 +5961,18 @@ export type Projects_Metadata_Var_Pop_Fields = {
   additional_payee_secondary_sales_percentage?: Maybe<Scalars['Float']>;
   aspect_ratio?: Maybe<Scalars['Float']>;
   currency_decimals?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_external_asset_dependency_count" */
+  external_asset_dependency_count?: Maybe<Scalars['bigint']>;
   index?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_invocations" */
+  invocations?: Maybe<Scalars['bigint']>;
+  /** A computed field, executes function "project_lowest_listing" */
+  lowest_listing?: Maybe<Scalars['float8']>;
   max_invocations?: Maybe<Scalars['Float']>;
   render_delay?: Maybe<Scalars['Float']>;
   royalty_percentage?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_script_count" */
+  script_count?: Maybe<Scalars['bigint']>;
   series_id?: Maybe<Scalars['Float']>;
   video_aspect_ratio?: Maybe<Scalars['Float']>;
   video_duration?: Maybe<Scalars['Float']>;
@@ -5088,10 +6004,18 @@ export type Projects_Metadata_Var_Samp_Fields = {
   additional_payee_secondary_sales_percentage?: Maybe<Scalars['Float']>;
   aspect_ratio?: Maybe<Scalars['Float']>;
   currency_decimals?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_external_asset_dependency_count" */
+  external_asset_dependency_count?: Maybe<Scalars['bigint']>;
   index?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_invocations" */
+  invocations?: Maybe<Scalars['bigint']>;
+  /** A computed field, executes function "project_lowest_listing" */
+  lowest_listing?: Maybe<Scalars['float8']>;
   max_invocations?: Maybe<Scalars['Float']>;
   render_delay?: Maybe<Scalars['Float']>;
   royalty_percentage?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_script_count" */
+  script_count?: Maybe<Scalars['bigint']>;
   series_id?: Maybe<Scalars['Float']>;
   video_aspect_ratio?: Maybe<Scalars['Float']>;
   video_duration?: Maybe<Scalars['Float']>;
@@ -5123,10 +6047,18 @@ export type Projects_Metadata_Variance_Fields = {
   additional_payee_secondary_sales_percentage?: Maybe<Scalars['Float']>;
   aspect_ratio?: Maybe<Scalars['Float']>;
   currency_decimals?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_external_asset_dependency_count" */
+  external_asset_dependency_count?: Maybe<Scalars['bigint']>;
   index?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_invocations" */
+  invocations?: Maybe<Scalars['bigint']>;
+  /** A computed field, executes function "project_lowest_listing" */
+  lowest_listing?: Maybe<Scalars['float8']>;
   max_invocations?: Maybe<Scalars['Float']>;
   render_delay?: Maybe<Scalars['Float']>;
   royalty_percentage?: Maybe<Scalars['Float']>;
+  /** A computed field, executes function "project_script_count" */
+  script_count?: Maybe<Scalars['bigint']>;
   series_id?: Maybe<Scalars['Float']>;
   video_aspect_ratio?: Maybe<Scalars['Float']>;
   video_duration?: Maybe<Scalars['Float']>;
@@ -5225,6 +6157,8 @@ export type Proposed_Artist_Addresses_And_Splits_Stream_Cursor_Value_Input = {
 
 export type Query_Root = {
   __typename?: 'query_root';
+  artistEditorialPage?: Maybe<ArtistEditorialPageEntityResponse>;
+  artistEditorialPages?: Maybe<ArtistEditorialPageEntityResponseCollection>;
   /** fetch data from the table: "artists" */
   artists: Array<Artists>;
   /** fetch aggregated fields from the table: "artists" */
@@ -5322,6 +6256,16 @@ export type Query_Root = {
   minters_metadata: Array<Minters_Metadata>;
   /** fetch data from the table: "minters_metadata" using primary key columns */
   minters_metadata_by_pk?: Maybe<Minters_Metadata>;
+  /** fetch data from the table: "oob_tokens_metadata" */
+  oob_tokens_metadata: Array<Oob_Tokens_Metadata>;
+  /** fetch data from the table: "oob_tokens_metadata" using primary key columns */
+  oob_tokens_metadata_by_pk?: Maybe<Oob_Tokens_Metadata>;
+  /** An array relationship */
+  processing_jobs: Array<Processing_Jobs>;
+  /** fetch data from the table: "processing_jobs" using primary key columns */
+  processing_jobs_by_pk?: Maybe<Processing_Jobs>;
+  projectPage?: Maybe<ProjectPageEntityResponse>;
+  projectPages?: Maybe<ProjectPageEntityResponseCollection>;
   /** fetch data from the table: "project_external_asset_dependencies" */
   project_external_asset_dependencies: Array<Project_External_Asset_Dependencies>;
   /** fetch data from the table: "project_external_asset_dependencies" using primary key columns */
@@ -5368,6 +6312,10 @@ export type Query_Root = {
   receipt_metadata_aggregate: Receipt_Metadata_Aggregate;
   /** fetch data from the table: "receipt_metadata" using primary key columns */
   receipt_metadata_by_pk?: Maybe<Receipt_Metadata>;
+  /** fetch data from the table: "refresh_requests" */
+  refresh_requests: Array<Refresh_Requests>;
+  /** fetch data from the table: "refresh_requests" using primary key columns */
+  refresh_requests_by_pk?: Maybe<Refresh_Requests>;
   /** fetch data from the table: "render_types" */
   render_types: Array<Render_Types>;
   /** fetch data from the table: "render_types" using primary key columns */
@@ -5428,6 +6376,19 @@ export type Query_Root = {
   webflow_spectrum_articles: Array<Webflow_Spectrum_Articles>;
   /** fetch data from the table: "webflow_spectrum_articles" using primary key columns */
   webflow_spectrum_articles_by_pk?: Maybe<Webflow_Spectrum_Articles>;
+};
+
+
+export type Query_RootArtistEditorialPageArgs = {
+  id?: InputMaybe<Scalars['ID']>;
+};
+
+
+export type Query_RootArtistEditorialPagesArgs = {
+  filters?: InputMaybe<ArtistEditorialPageFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
 };
 
 
@@ -5719,7 +6680,9 @@ export type Query_RootFilter_Tokens_Metadata_By_Features_AggregateArgs = {
 
 
 export type Query_RootGetAuthMessageArgs = {
+  domain: Scalars['String'];
   publicAddress: Scalars['String'];
+  uri: Scalars['String'];
 };
 
 
@@ -5736,7 +6699,7 @@ export type Query_RootIsTokenFlaggedArgs = {
 
 
 export type Query_RootList_Projects_Metadata_RandomArgs = {
-  args: List_Projects_Metadata_Random_Args;
+  args?: InputMaybe<List_Projects_Metadata_Random_Args>;
   distinct_on?: InputMaybe<Array<Projects_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -5746,7 +6709,7 @@ export type Query_RootList_Projects_Metadata_RandomArgs = {
 
 
 export type Query_RootList_Projects_Metadata_Random_AggregateArgs = {
-  args: List_Projects_Metadata_Random_Args;
+  args?: InputMaybe<List_Projects_Metadata_Random_Args>;
   distinct_on?: InputMaybe<Array<Projects_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -5808,6 +6771,47 @@ export type Query_RootMinters_MetadataArgs = {
 
 export type Query_RootMinters_Metadata_By_PkArgs = {
   address: Scalars['String'];
+};
+
+
+export type Query_RootOob_Tokens_MetadataArgs = {
+  distinct_on?: InputMaybe<Array<Oob_Tokens_Metadata_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Oob_Tokens_Metadata_Order_By>>;
+  where?: InputMaybe<Oob_Tokens_Metadata_Bool_Exp>;
+};
+
+
+export type Query_RootOob_Tokens_Metadata_By_PkArgs = {
+  id: Scalars['String'];
+};
+
+
+export type Query_RootProcessing_JobsArgs = {
+  distinct_on?: InputMaybe<Array<Processing_Jobs_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Processing_Jobs_Order_By>>;
+  where?: InputMaybe<Processing_Jobs_Bool_Exp>;
+};
+
+
+export type Query_RootProcessing_Jobs_By_PkArgs = {
+  id: Scalars['uuid'];
+};
+
+
+export type Query_RootProjectPageArgs = {
+  id?: InputMaybe<Scalars['ID']>;
+};
+
+
+export type Query_RootProjectPagesArgs = {
+  filters?: InputMaybe<ProjectPageFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
 };
 
 
@@ -5977,6 +6981,20 @@ export type Query_RootReceipt_Metadata_AggregateArgs = {
 
 export type Query_RootReceipt_Metadata_By_PkArgs = {
   id: Scalars['String'];
+};
+
+
+export type Query_RootRefresh_RequestsArgs = {
+  distinct_on?: InputMaybe<Array<Refresh_Requests_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Refresh_Requests_Order_By>>;
+  where?: InputMaybe<Refresh_Requests_Bool_Exp>;
+};
+
+
+export type Query_RootRefresh_Requests_By_PkArgs = {
+  id: Scalars['uuid'];
 };
 
 
@@ -6295,6 +7313,8 @@ export type Receipt_Metadata_Bool_Exp = {
 /** aggregate max on columns */
 export type Receipt_Metadata_Max_Fields = {
   __typename?: 'receipt_metadata_max_fields';
+  /** Computed field defining approximate excess settlement funds available to be reclaimed on a given receipt, given latest purchase price on minter. May have minor rounding errors after 15 decimals. */
+  excess_settlement_funds?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
   minter_id?: Maybe<Scalars['String']>;
   net_posted?: Maybe<Scalars['String']>;
@@ -6316,6 +7336,8 @@ export type Receipt_Metadata_Max_Order_By = {
 /** aggregate min on columns */
 export type Receipt_Metadata_Min_Fields = {
   __typename?: 'receipt_metadata_min_fields';
+  /** Computed field defining approximate excess settlement funds available to be reclaimed on a given receipt, given latest purchase price on minter. May have minor rounding errors after 15 decimals. */
+  excess_settlement_funds?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
   minter_id?: Maybe<Scalars['String']>;
   net_posted?: Maybe<Scalars['String']>;
@@ -6380,6 +7402,127 @@ export type Receipt_Metadata_Stream_Cursor_Value_Input = {
   num_purchased?: InputMaybe<Scalars['String']>;
   project_id?: InputMaybe<Scalars['String']>;
   user_address?: InputMaybe<Scalars['String']>;
+};
+
+export enum Refresh_Asset_Types_Enum {
+  Image = 'Image',
+  None = 'None',
+  Video = 'Video'
+}
+
+/** Boolean expression to compare columns of type "refresh_asset_types_enum". All fields are combined with logical 'AND'. */
+export type Refresh_Asset_Types_Enum_Comparison_Exp = {
+  _eq?: InputMaybe<Refresh_Asset_Types_Enum>;
+  _in?: InputMaybe<Array<Refresh_Asset_Types_Enum>>;
+  _is_null?: InputMaybe<Scalars['Boolean']>;
+  _neq?: InputMaybe<Refresh_Asset_Types_Enum>;
+  _nin?: InputMaybe<Array<Refresh_Asset_Types_Enum>>;
+};
+
+export enum Refresh_Request_Types_Enum {
+  Project = 'Project',
+  Token = 'Token'
+}
+
+/** Boolean expression to compare columns of type "refresh_request_types_enum". All fields are combined with logical 'AND'. */
+export type Refresh_Request_Types_Enum_Comparison_Exp = {
+  _eq?: InputMaybe<Refresh_Request_Types_Enum>;
+  _in?: InputMaybe<Array<Refresh_Request_Types_Enum>>;
+  _is_null?: InputMaybe<Scalars['Boolean']>;
+  _neq?: InputMaybe<Refresh_Request_Types_Enum>;
+  _nin?: InputMaybe<Array<Refresh_Request_Types_Enum>>;
+};
+
+/** This table tracks pending & completed requests to refresh the media assets for a project or token. Artists and staff may re-render the .png, .mp4 and .gif files for a collection of NFTs and this table maintains those requests. */
+export type Refresh_Requests = {
+  __typename?: 'refresh_requests';
+  completed_at?: Maybe<Scalars['timestamptz']>;
+  id: Scalars['uuid'];
+  /** An array relationship */
+  processing_jobs: Array<Processing_Jobs>;
+  project_id: Scalars['String'];
+  /** A computed field, executes function "refresh_requests_queue_weight" */
+  queue_weight?: Maybe<Scalars['bigint']>;
+  request_type: Refresh_Request_Types_Enum;
+  submitted_at: Scalars['timestamptz'];
+  token_ids?: Maybe<Scalars['jsonb']>;
+};
+
+
+/** This table tracks pending & completed requests to refresh the media assets for a project or token. Artists and staff may re-render the .png, .mp4 and .gif files for a collection of NFTs and this table maintains those requests. */
+export type Refresh_RequestsProcessing_JobsArgs = {
+  distinct_on?: InputMaybe<Array<Processing_Jobs_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Processing_Jobs_Order_By>>;
+  where?: InputMaybe<Processing_Jobs_Bool_Exp>;
+};
+
+
+/** This table tracks pending & completed requests to refresh the media assets for a project or token. Artists and staff may re-render the .png, .mp4 and .gif files for a collection of NFTs and this table maintains those requests. */
+export type Refresh_RequestsToken_IdsArgs = {
+  path?: InputMaybe<Scalars['String']>;
+};
+
+/** Boolean expression to filter rows from the table "refresh_requests". All fields are combined with a logical 'AND'. */
+export type Refresh_Requests_Bool_Exp = {
+  _and?: InputMaybe<Array<Refresh_Requests_Bool_Exp>>;
+  _not?: InputMaybe<Refresh_Requests_Bool_Exp>;
+  _or?: InputMaybe<Array<Refresh_Requests_Bool_Exp>>;
+  completed_at?: InputMaybe<Timestamptz_Comparison_Exp>;
+  id?: InputMaybe<Uuid_Comparison_Exp>;
+  processing_jobs?: InputMaybe<Processing_Jobs_Bool_Exp>;
+  project_id?: InputMaybe<String_Comparison_Exp>;
+  queue_weight?: InputMaybe<Bigint_Comparison_Exp>;
+  request_type?: InputMaybe<Refresh_Request_Types_Enum_Comparison_Exp>;
+  submitted_at?: InputMaybe<Timestamptz_Comparison_Exp>;
+  token_ids?: InputMaybe<Jsonb_Comparison_Exp>;
+};
+
+/** Ordering options when selecting data from "refresh_requests". */
+export type Refresh_Requests_Order_By = {
+  completed_at?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  processing_jobs_aggregate?: InputMaybe<Processing_Jobs_Aggregate_Order_By>;
+  project_id?: InputMaybe<Order_By>;
+  queue_weight?: InputMaybe<Order_By>;
+  request_type?: InputMaybe<Order_By>;
+  submitted_at?: InputMaybe<Order_By>;
+  token_ids?: InputMaybe<Order_By>;
+};
+
+/** select columns of table "refresh_requests" */
+export enum Refresh_Requests_Select_Column {
+  /** column name */
+  CompletedAt = 'completed_at',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  ProjectId = 'project_id',
+  /** column name */
+  RequestType = 'request_type',
+  /** column name */
+  SubmittedAt = 'submitted_at',
+  /** column name */
+  TokenIds = 'token_ids'
+}
+
+/** Streaming cursor of the table "refresh_requests" */
+export type Refresh_Requests_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Refresh_Requests_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Refresh_Requests_Stream_Cursor_Value_Input = {
+  completed_at?: InputMaybe<Scalars['timestamptz']>;
+  id?: InputMaybe<Scalars['uuid']>;
+  project_id?: InputMaybe<Scalars['String']>;
+  request_type?: InputMaybe<Refresh_Request_Types_Enum>;
+  submitted_at?: InputMaybe<Scalars['timestamptz']>;
+  token_ids?: InputMaybe<Scalars['jsonb']>;
 };
 
 /** columns and relationships of "render_types" */
@@ -6594,6 +7737,18 @@ export type Subscription_Root = {
   minters_metadata_by_pk?: Maybe<Minters_Metadata>;
   /** fetch data from the table in a streaming manner: "minters_metadata" */
   minters_metadata_stream: Array<Minters_Metadata>;
+  /** fetch data from the table: "oob_tokens_metadata" */
+  oob_tokens_metadata: Array<Oob_Tokens_Metadata>;
+  /** fetch data from the table: "oob_tokens_metadata" using primary key columns */
+  oob_tokens_metadata_by_pk?: Maybe<Oob_Tokens_Metadata>;
+  /** fetch data from the table in a streaming manner: "oob_tokens_metadata" */
+  oob_tokens_metadata_stream: Array<Oob_Tokens_Metadata>;
+  /** An array relationship */
+  processing_jobs: Array<Processing_Jobs>;
+  /** fetch data from the table: "processing_jobs" using primary key columns */
+  processing_jobs_by_pk?: Maybe<Processing_Jobs>;
+  /** fetch data from the table in a streaming manner: "processing_jobs" */
+  processing_jobs_stream: Array<Processing_Jobs>;
   /** fetch data from the table: "project_external_asset_dependencies" */
   project_external_asset_dependencies: Array<Project_External_Asset_Dependencies>;
   /** fetch data from the table: "project_external_asset_dependencies" using primary key columns */
@@ -6660,6 +7815,12 @@ export type Subscription_Root = {
   receipt_metadata_by_pk?: Maybe<Receipt_Metadata>;
   /** fetch data from the table in a streaming manner: "receipt_metadata" */
   receipt_metadata_stream: Array<Receipt_Metadata>;
+  /** fetch data from the table: "refresh_requests" */
+  refresh_requests: Array<Refresh_Requests>;
+  /** fetch data from the table: "refresh_requests" using primary key columns */
+  refresh_requests_by_pk?: Maybe<Refresh_Requests>;
+  /** fetch data from the table in a streaming manner: "refresh_requests" */
+  refresh_requests_stream: Array<Refresh_Requests>;
   /** fetch data from the table: "render_types" */
   render_types: Array<Render_Types>;
   /** fetch data from the table: "render_types" using primary key columns */
@@ -7129,7 +8290,7 @@ export type Subscription_RootFilter_Tokens_Metadata_By_Features_AggregateArgs = 
 
 
 export type Subscription_RootList_Projects_Metadata_RandomArgs = {
-  args: List_Projects_Metadata_Random_Args;
+  args?: InputMaybe<List_Projects_Metadata_Random_Args>;
   distinct_on?: InputMaybe<Array<Projects_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -7139,7 +8300,7 @@ export type Subscription_RootList_Projects_Metadata_RandomArgs = {
 
 
 export type Subscription_RootList_Projects_Metadata_Random_AggregateArgs = {
-  args: List_Projects_Metadata_Random_Args;
+  args?: InputMaybe<List_Projects_Metadata_Random_Args>;
   distinct_on?: InputMaybe<Array<Projects_Metadata_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -7229,6 +8390,48 @@ export type Subscription_RootMinters_Metadata_StreamArgs = {
   batch_size: Scalars['Int'];
   cursor: Array<InputMaybe<Minters_Metadata_Stream_Cursor_Input>>;
   where?: InputMaybe<Minters_Metadata_Bool_Exp>;
+};
+
+
+export type Subscription_RootOob_Tokens_MetadataArgs = {
+  distinct_on?: InputMaybe<Array<Oob_Tokens_Metadata_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Oob_Tokens_Metadata_Order_By>>;
+  where?: InputMaybe<Oob_Tokens_Metadata_Bool_Exp>;
+};
+
+
+export type Subscription_RootOob_Tokens_Metadata_By_PkArgs = {
+  id: Scalars['String'];
+};
+
+
+export type Subscription_RootOob_Tokens_Metadata_StreamArgs = {
+  batch_size: Scalars['Int'];
+  cursor: Array<InputMaybe<Oob_Tokens_Metadata_Stream_Cursor_Input>>;
+  where?: InputMaybe<Oob_Tokens_Metadata_Bool_Exp>;
+};
+
+
+export type Subscription_RootProcessing_JobsArgs = {
+  distinct_on?: InputMaybe<Array<Processing_Jobs_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Processing_Jobs_Order_By>>;
+  where?: InputMaybe<Processing_Jobs_Bool_Exp>;
+};
+
+
+export type Subscription_RootProcessing_Jobs_By_PkArgs = {
+  id: Scalars['uuid'];
+};
+
+
+export type Subscription_RootProcessing_Jobs_StreamArgs = {
+  batch_size: Scalars['Int'];
+  cursor: Array<InputMaybe<Processing_Jobs_Stream_Cursor_Input>>;
+  where?: InputMaybe<Processing_Jobs_Bool_Exp>;
 };
 
 
@@ -7468,6 +8671,27 @@ export type Subscription_RootReceipt_Metadata_StreamArgs = {
   batch_size: Scalars['Int'];
   cursor: Array<InputMaybe<Receipt_Metadata_Stream_Cursor_Input>>;
   where?: InputMaybe<Receipt_Metadata_Bool_Exp>;
+};
+
+
+export type Subscription_RootRefresh_RequestsArgs = {
+  distinct_on?: InputMaybe<Array<Refresh_Requests_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Refresh_Requests_Order_By>>;
+  where?: InputMaybe<Refresh_Requests_Bool_Exp>;
+};
+
+
+export type Subscription_RootRefresh_Requests_By_PkArgs = {
+  id: Scalars['uuid'];
+};
+
+
+export type Subscription_RootRefresh_Requests_StreamArgs = {
+  batch_size: Scalars['Int'];
+  cursor: Array<InputMaybe<Refresh_Requests_Stream_Cursor_Input>>;
+  where?: InputMaybe<Refresh_Requests_Bool_Exp>;
 };
 
 
@@ -7965,6 +9189,7 @@ export type Tokens_Metadata = {
   image_id?: Maybe<Scalars['Int']>;
   invocation: Scalars['Int'];
   isFlaggedAsSuspicious?: Maybe<Scalars['Boolean']>;
+  last_refreshed?: Maybe<Scalars['timestamptz']>;
   list_creation_date?: Maybe<Scalars['timestamptz']>;
   list_currency_address?: Maybe<Scalars['String']>;
   list_currency_symbol?: Maybe<Scalars['String']>;
@@ -8203,6 +9428,7 @@ export type Tokens_Metadata_Bool_Exp = {
   image?: InputMaybe<Media_Bool_Exp>;
   image_id?: InputMaybe<Int_Comparison_Exp>;
   invocation?: InputMaybe<Int_Comparison_Exp>;
+  last_refreshed?: InputMaybe<Timestamptz_Comparison_Exp>;
   list_creation_date?: InputMaybe<Timestamptz_Comparison_Exp>;
   list_currency_address?: InputMaybe<String_Comparison_Exp>;
   list_currency_symbol?: InputMaybe<String_Comparison_Exp>;
@@ -8241,6 +9467,7 @@ export type Tokens_Metadata_Max_Fields = {
   id?: Maybe<Scalars['String']>;
   image_id?: Maybe<Scalars['Int']>;
   invocation?: Maybe<Scalars['Int']>;
+  last_refreshed?: Maybe<Scalars['timestamptz']>;
   list_creation_date?: Maybe<Scalars['timestamptz']>;
   list_currency_address?: Maybe<Scalars['String']>;
   list_currency_symbol?: Maybe<Scalars['String']>;
@@ -8249,10 +9476,20 @@ export type Tokens_Metadata_Max_Fields = {
   list_platform?: Maybe<Scalars['String']>;
   list_price?: Maybe<Scalars['float8']>;
   list_url?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "live_view_path" */
+  live_view_path?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "live_view_url" */
+  live_view_url?: Maybe<Scalars['String']>;
   low_res_image_id?: Maybe<Scalars['Int']>;
+  /** a computed field that returns the media proxy url for this token's statically rendered image */
+  media_url?: Maybe<Scalars['String']>;
   mint_transaction_hash?: Maybe<Scalars['String']>;
   minted_at?: Maybe<Scalars['timestamptz']>;
   owner_address?: Maybe<Scalars['String']>;
+  /** returns the preview asset url based on preview_render_type and availability */
+  preview_asset_url?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "primary_asset_url" */
+  primary_asset_url?: Maybe<Scalars['String']>;
   project_id?: Maybe<Scalars['String']>;
   project_name?: Maybe<Scalars['String']>;
   token_id?: Maybe<Scalars['String']>;
@@ -8269,6 +9506,7 @@ export type Tokens_Metadata_Max_Order_By = {
   id?: InputMaybe<Order_By>;
   image_id?: InputMaybe<Order_By>;
   invocation?: InputMaybe<Order_By>;
+  last_refreshed?: InputMaybe<Order_By>;
   list_creation_date?: InputMaybe<Order_By>;
   list_currency_address?: InputMaybe<Order_By>;
   list_currency_symbol?: InputMaybe<Order_By>;
@@ -8298,6 +9536,7 @@ export type Tokens_Metadata_Min_Fields = {
   id?: Maybe<Scalars['String']>;
   image_id?: Maybe<Scalars['Int']>;
   invocation?: Maybe<Scalars['Int']>;
+  last_refreshed?: Maybe<Scalars['timestamptz']>;
   list_creation_date?: Maybe<Scalars['timestamptz']>;
   list_currency_address?: Maybe<Scalars['String']>;
   list_currency_symbol?: Maybe<Scalars['String']>;
@@ -8306,10 +9545,20 @@ export type Tokens_Metadata_Min_Fields = {
   list_platform?: Maybe<Scalars['String']>;
   list_price?: Maybe<Scalars['float8']>;
   list_url?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "live_view_path" */
+  live_view_path?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "live_view_url" */
+  live_view_url?: Maybe<Scalars['String']>;
   low_res_image_id?: Maybe<Scalars['Int']>;
+  /** a computed field that returns the media proxy url for this token's statically rendered image */
+  media_url?: Maybe<Scalars['String']>;
   mint_transaction_hash?: Maybe<Scalars['String']>;
   minted_at?: Maybe<Scalars['timestamptz']>;
   owner_address?: Maybe<Scalars['String']>;
+  /** returns the preview asset url based on preview_render_type and availability */
+  preview_asset_url?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "primary_asset_url" */
+  primary_asset_url?: Maybe<Scalars['String']>;
   project_id?: Maybe<Scalars['String']>;
   project_name?: Maybe<Scalars['String']>;
   token_id?: Maybe<Scalars['String']>;
@@ -8326,6 +9575,7 @@ export type Tokens_Metadata_Min_Order_By = {
   id?: InputMaybe<Order_By>;
   image_id?: InputMaybe<Order_By>;
   invocation?: InputMaybe<Order_By>;
+  last_refreshed?: InputMaybe<Order_By>;
   list_creation_date?: InputMaybe<Order_By>;
   list_currency_address?: InputMaybe<Order_By>;
   list_currency_symbol?: InputMaybe<Order_By>;
@@ -8361,6 +9611,7 @@ export type Tokens_Metadata_Order_By = {
   image?: InputMaybe<Media_Order_By>;
   image_id?: InputMaybe<Order_By>;
   invocation?: InputMaybe<Order_By>;
+  last_refreshed?: InputMaybe<Order_By>;
   list_creation_date?: InputMaybe<Order_By>;
   list_currency_address?: InputMaybe<Order_By>;
   list_currency_symbol?: InputMaybe<Order_By>;
@@ -8407,6 +9658,8 @@ export enum Tokens_Metadata_Select_Column {
   ImageId = 'image_id',
   /** column name */
   Invocation = 'invocation',
+  /** column name */
+  LastRefreshed = 'last_refreshed',
   /** column name */
   ListCreationDate = 'list_creation_date',
   /** column name */
@@ -8600,6 +9853,7 @@ export type Tokens_Metadata_Stream_Cursor_Value_Input = {
   id?: InputMaybe<Scalars['String']>;
   image_id?: InputMaybe<Scalars['Int']>;
   invocation?: InputMaybe<Scalars['Int']>;
+  last_refreshed?: InputMaybe<Scalars['timestamptz']>;
   list_creation_date?: InputMaybe<Scalars['timestamptz']>;
   list_currency_address?: InputMaybe<Scalars['String']>;
   list_currency_symbol?: InputMaybe<Scalars['String']>;
@@ -9104,6 +10358,10 @@ export type Users_Bool_Exp = {
 export type Users_Max_Fields = {
   __typename?: 'users_max_fields';
   created_at?: Maybe<Scalars['timestamptz']>;
+  /** A computed field, executes function "user_display_name" */
+  display_name?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "generate_nonce" */
+  nonce?: Maybe<Scalars['String']>;
   public_address?: Maybe<Scalars['String']>;
   tos_accepted_at?: Maybe<Scalars['timestamptz']>;
 };
@@ -9112,6 +10370,10 @@ export type Users_Max_Fields = {
 export type Users_Min_Fields = {
   __typename?: 'users_min_fields';
   created_at?: Maybe<Scalars['timestamptz']>;
+  /** A computed field, executes function "user_display_name" */
+  display_name?: Maybe<Scalars['String']>;
+  /** A computed field, executes function "generate_nonce" */
+  nonce?: Maybe<Scalars['String']>;
   public_address?: Maybe<Scalars['String']>;
   tos_accepted_at?: Maybe<Scalars['timestamptz']>;
 };
@@ -9171,6 +10433,19 @@ export type Users_Stream_Cursor_Value_Input = {
   public_address?: InputMaybe<Scalars['String']>;
   tos_accepted_at?: InputMaybe<Scalars['timestamptz']>;
   viewed_warning_banner?: InputMaybe<Scalars['Boolean']>;
+};
+
+/** Boolean expression to compare columns of type "uuid". All fields are combined with logical 'AND'. */
+export type Uuid_Comparison_Exp = {
+  _eq?: InputMaybe<Scalars['uuid']>;
+  _gt?: InputMaybe<Scalars['uuid']>;
+  _gte?: InputMaybe<Scalars['uuid']>;
+  _in?: InputMaybe<Array<Scalars['uuid']>>;
+  _is_null?: InputMaybe<Scalars['Boolean']>;
+  _lt?: InputMaybe<Scalars['uuid']>;
+  _lte?: InputMaybe<Scalars['uuid']>;
+  _neq?: InputMaybe<Scalars['uuid']>;
+  _nin?: InputMaybe<Array<Scalars['uuid']>>;
 };
 
 /** vertical enums */
@@ -9644,17 +10919,71 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
+  ArtistEditorialPage: ResolverTypeWrapper<ArtistEditorialPage>;
+  ArtistEditorialPageEntity: ResolverTypeWrapper<ArtistEditorialPageEntity>;
+  ArtistEditorialPageEntityResponse: ResolverTypeWrapper<ArtistEditorialPageEntityResponse>;
+  ArtistEditorialPageEntityResponseCollection: ResolverTypeWrapper<ArtistEditorialPageEntityResponseCollection>;
+  ArtistEditorialPageFiltersInput: ArtistEditorialPageFiltersInput;
+  ArtistEditorialPageFiltersInput_remote_rel_projects_metadataartistPage: ArtistEditorialPageFiltersInput_Remote_Rel_Projects_MetadataartistPage;
   AuthMessageOutput: ResolverTypeWrapper<AuthMessageOutput>;
   AuthenticateInput: AuthenticateInput;
   AuthenticateOutput: ResolverTypeWrapper<AuthenticateOutput>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Boolean_comparison_exp: Boolean_Comparison_Exp;
+  ComponentArtistEditorialPageExhibitions: ResolverTypeWrapper<ComponentArtistEditorialPageExhibitions>;
+  ComponentArtistEditorialPageExhibitionsFiltersInput: ComponentArtistEditorialPageExhibitionsFiltersInput;
+  ComponentArtistEditorialPageFeaturedWork: ResolverTypeWrapper<ComponentArtistEditorialPageFeaturedWork>;
+  ComponentArtistEditorialPageFeaturedWorkFiltersInput: ComponentArtistEditorialPageFeaturedWorkFiltersInput;
+  ComponentArtistEditorialPagePress: ResolverTypeWrapper<ComponentArtistEditorialPagePress>;
+  ComponentArtistEditorialPagePressFiltersInput: ComponentArtistEditorialPagePressFiltersInput;
+  ComponentArtistEditorialPageProjectsCreated: ResolverTypeWrapper<ComponentArtistEditorialPageProjectsCreated>;
+  ComponentArtistEditorialPageProjectsCreatedFiltersInput: ComponentArtistEditorialPageProjectsCreatedFiltersInput;
+  ComponentArtistEditorialPageProjectsCreatedFiltersInput_remote_rel_projects_metadataartistPage: ComponentArtistEditorialPageProjectsCreatedFiltersInput_Remote_Rel_Projects_MetadataartistPage;
+  ComponentArtistEditorialPageSpectrumArticles: ResolverTypeWrapper<ComponentArtistEditorialPageSpectrumArticles>;
+  ComponentArtistEditorialPageSpectrumArticlesFiltersInput: ComponentArtistEditorialPageSpectrumArticlesFiltersInput;
+  ComponentGalleryGridItemGalleryGridItem: ResolverTypeWrapper<ComponentGalleryGridItemGalleryGridItem>;
+  ComponentGalleryGridItemGalleryGridItemFiltersInput: ComponentGalleryGridItemGalleryGridItemFiltersInput;
+  ComponentImageWithCaptionImageWithCaption: ResolverTypeWrapper<ComponentImageWithCaptionImageWithCaption>;
+  ComponentImageWithCaptionImageWithCaptionFiltersInput: ComponentImageWithCaptionImageWithCaptionFiltersInput;
+  ComponentPressItemPressItem: ResolverTypeWrapper<ComponentPressItemPressItem>;
+  ComponentPressItemPressItemFiltersInput: ComponentPressItemPressItemFiltersInput;
+  ComponentProjectMetadataProjectMetadata: ResolverTypeWrapper<ComponentProjectMetadataProjectMetadata>;
+  ComponentProjectMetadataProjectMetadataFiltersInput: ComponentProjectMetadataProjectMetadataFiltersInput;
+  ComponentProjectMetadataProjectMetadataFiltersInput_remote_rel_projects_metadataartistPage: ComponentProjectMetadataProjectMetadataFiltersInput_Remote_Rel_Projects_MetadataartistPage;
+  ComponentProjectSaleInfoRowProjectSaleInfoRow: ResolverTypeWrapper<ComponentProjectSaleInfoRowProjectSaleInfoRow>;
+  ComponentProjectSaleInfoRowProjectSaleInfoRowFiltersInput: ComponentProjectSaleInfoRowProjectSaleInfoRowFiltersInput;
+  ComponentSpectrumArticleSpectrumArticle: ResolverTypeWrapper<ComponentSpectrumArticleSpectrumArticle>;
+  ComponentSpectrumArticleSpectrumArticleFiltersInput: ComponentSpectrumArticleSpectrumArticleFiltersInput;
+  Date: ResolverTypeWrapper<Scalars['Date']>;
+  DateFilterInput: DateFilterInput;
+  DateTime: ResolverTypeWrapper<Scalars['DateTime']>;
+  DateTimeFilterInput: DateTimeFilterInput;
   Float: ResolverTypeWrapper<Scalars['Float']>;
+  FloatFilterInput: FloatFilterInput;
+  GenericMorph: ResolversTypes['ArtistEditorialPage'] | ResolversTypes['ComponentArtistEditorialPageExhibitions'] | ResolversTypes['ComponentArtistEditorialPageFeaturedWork'] | ResolversTypes['ComponentArtistEditorialPagePress'] | ResolversTypes['ComponentArtistEditorialPageProjectsCreated'] | ResolversTypes['ComponentArtistEditorialPageSpectrumArticles'] | ResolversTypes['ComponentGalleryGridItemGalleryGridItem'] | ResolversTypes['ComponentImageWithCaptionImageWithCaption'] | ResolversTypes['ComponentPressItemPressItem'] | ResolversTypes['ComponentProjectMetadataProjectMetadata'] | ResolversTypes['ComponentProjectSaleInfoRowProjectSaleInfoRow'] | ResolversTypes['ComponentSpectrumArticleSpectrumArticle'] | ResolversTypes['ProjectPage'];
+  ID: ResolverTypeWrapper<Scalars['ID']>;
+  IDFilterInput: IdFilterInput;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  IntFilterInput: IntFilterInput;
   Int_comparison_exp: Int_Comparison_Exp;
+  JSON: ResolverTypeWrapper<Scalars['JSON']>;
   OpenseaCollectionData: ResolverTypeWrapper<OpenseaCollectionData>;
+  Pagination: ResolverTypeWrapper<Pagination>;
+  PaginationArg: PaginationArg;
+  ProjectPage: ResolverTypeWrapper<ProjectPage>;
+  ProjectPageEntity: ResolverTypeWrapper<ProjectPageEntity>;
+  ProjectPageEntityResponse: ResolverTypeWrapper<ProjectPageEntityResponse>;
+  ProjectPageEntityResponseCollection: ResolverTypeWrapper<ProjectPageEntityResponseCollection>;
+  ProjectPageFiltersInput: ProjectPageFiltersInput;
+  PublicationState: PublicationState;
+  ResponseCollectionMeta: ResolverTypeWrapper<ResponseCollectionMeta>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  StringFilterInput: StringFilterInput;
+  StringFilterInput_remote_rel_projects_metadataartistPage: StringFilterInput_Remote_Rel_Projects_MetadataartistPage;
   String_comparison_exp: String_Comparison_Exp;
+  UploadFile: ResolverTypeWrapper<Omit<UploadFile, 'related'> & { related?: Maybe<Array<Maybe<ResolversTypes['GenericMorph']>>> }>;
+  UploadFileEntity: ResolverTypeWrapper<UploadFileEntity>;
+  UploadFileEntityResponse: ResolverTypeWrapper<UploadFileEntityResponse>;
   artists: ResolverTypeWrapper<Artists>;
   artists_aggregate: ResolverTypeWrapper<Artists_Aggregate>;
   artists_aggregate_fields: ResolverTypeWrapper<Artists_Aggregate_Fields>;
@@ -9939,25 +11268,43 @@ export type ResolversTypes = {
   minter_types_stream_cursor_value_input: Minter_Types_Stream_Cursor_Value_Input;
   minters_metadata: ResolverTypeWrapper<Minters_Metadata>;
   minters_metadata_aggregate_order_by: Minters_Metadata_Aggregate_Order_By;
-  minters_metadata_avg_order_by: Minters_Metadata_Avg_Order_By;
   minters_metadata_bool_exp: Minters_Metadata_Bool_Exp;
   minters_metadata_max_order_by: Minters_Metadata_Max_Order_By;
   minters_metadata_min_order_by: Minters_Metadata_Min_Order_By;
   minters_metadata_order_by: Minters_Metadata_Order_By;
   minters_metadata_select_column: Minters_Metadata_Select_Column;
-  minters_metadata_stddev_order_by: Minters_Metadata_Stddev_Order_By;
-  minters_metadata_stddev_pop_order_by: Minters_Metadata_Stddev_Pop_Order_By;
-  minters_metadata_stddev_samp_order_by: Minters_Metadata_Stddev_Samp_Order_By;
   minters_metadata_stream_cursor_input: Minters_Metadata_Stream_Cursor_Input;
   minters_metadata_stream_cursor_value_input: Minters_Metadata_Stream_Cursor_Value_Input;
-  minters_metadata_sum_order_by: Minters_Metadata_Sum_Order_By;
-  minters_metadata_var_pop_order_by: Minters_Metadata_Var_Pop_Order_By;
-  minters_metadata_var_samp_order_by: Minters_Metadata_Var_Samp_Order_By;
-  minters_metadata_variance_order_by: Minters_Metadata_Variance_Order_By;
   mutation_root: ResolverTypeWrapper<{}>;
   numeric: ResolverTypeWrapper<Scalars['numeric']>;
   numeric_comparison_exp: Numeric_Comparison_Exp;
+  oob_tokens_metadata: ResolverTypeWrapper<Oob_Tokens_Metadata>;
+  oob_tokens_metadata_aggregate_order_by: Oob_Tokens_Metadata_Aggregate_Order_By;
+  oob_tokens_metadata_avg_order_by: Oob_Tokens_Metadata_Avg_Order_By;
+  oob_tokens_metadata_bool_exp: Oob_Tokens_Metadata_Bool_Exp;
+  oob_tokens_metadata_max_order_by: Oob_Tokens_Metadata_Max_Order_By;
+  oob_tokens_metadata_min_order_by: Oob_Tokens_Metadata_Min_Order_By;
+  oob_tokens_metadata_order_by: Oob_Tokens_Metadata_Order_By;
+  oob_tokens_metadata_select_column: Oob_Tokens_Metadata_Select_Column;
+  oob_tokens_metadata_stddev_order_by: Oob_Tokens_Metadata_Stddev_Order_By;
+  oob_tokens_metadata_stddev_pop_order_by: Oob_Tokens_Metadata_Stddev_Pop_Order_By;
+  oob_tokens_metadata_stddev_samp_order_by: Oob_Tokens_Metadata_Stddev_Samp_Order_By;
+  oob_tokens_metadata_stream_cursor_input: Oob_Tokens_Metadata_Stream_Cursor_Input;
+  oob_tokens_metadata_stream_cursor_value_input: Oob_Tokens_Metadata_Stream_Cursor_Value_Input;
+  oob_tokens_metadata_sum_order_by: Oob_Tokens_Metadata_Sum_Order_By;
+  oob_tokens_metadata_var_pop_order_by: Oob_Tokens_Metadata_Var_Pop_Order_By;
+  oob_tokens_metadata_var_samp_order_by: Oob_Tokens_Metadata_Var_Samp_Order_By;
+  oob_tokens_metadata_variance_order_by: Oob_Tokens_Metadata_Variance_Order_By;
   order_by: Order_By;
+  processing_jobs: ResolverTypeWrapper<Processing_Jobs>;
+  processing_jobs_aggregate_order_by: Processing_Jobs_Aggregate_Order_By;
+  processing_jobs_bool_exp: Processing_Jobs_Bool_Exp;
+  processing_jobs_max_order_by: Processing_Jobs_Max_Order_By;
+  processing_jobs_min_order_by: Processing_Jobs_Min_Order_By;
+  processing_jobs_order_by: Processing_Jobs_Order_By;
+  processing_jobs_select_column: Processing_Jobs_Select_Column;
+  processing_jobs_stream_cursor_input: Processing_Jobs_Stream_Cursor_Input;
+  processing_jobs_stream_cursor_value_input: Processing_Jobs_Stream_Cursor_Value_Input;
   project_external_asset_dependencies: ResolverTypeWrapper<Project_External_Asset_Dependencies>;
   project_external_asset_dependencies_aggregate_order_by: Project_External_Asset_Dependencies_Aggregate_Order_By;
   project_external_asset_dependencies_avg_order_by: Project_External_Asset_Dependencies_Avg_Order_By;
@@ -10096,6 +11443,16 @@ export type ResolversTypes = {
   receipt_metadata_select_column: Receipt_Metadata_Select_Column;
   receipt_metadata_stream_cursor_input: Receipt_Metadata_Stream_Cursor_Input;
   receipt_metadata_stream_cursor_value_input: Receipt_Metadata_Stream_Cursor_Value_Input;
+  refresh_asset_types_enum: Refresh_Asset_Types_Enum;
+  refresh_asset_types_enum_comparison_exp: Refresh_Asset_Types_Enum_Comparison_Exp;
+  refresh_request_types_enum: Refresh_Request_Types_Enum;
+  refresh_request_types_enum_comparison_exp: Refresh_Request_Types_Enum_Comparison_Exp;
+  refresh_requests: ResolverTypeWrapper<Refresh_Requests>;
+  refresh_requests_bool_exp: Refresh_Requests_Bool_Exp;
+  refresh_requests_order_by: Refresh_Requests_Order_By;
+  refresh_requests_select_column: Refresh_Requests_Select_Column;
+  refresh_requests_stream_cursor_input: Refresh_Requests_Stream_Cursor_Input;
+  refresh_requests_stream_cursor_value_input: Refresh_Requests_Stream_Cursor_Value_Input;
   render_types: ResolverTypeWrapper<Render_Types>;
   render_types_bool_exp: Render_Types_Bool_Exp;
   render_types_enum: Render_Types_Enum;
@@ -10203,6 +11560,8 @@ export type ResolversTypes = {
   users_select_column: Users_Select_Column;
   users_stream_cursor_input: Users_Stream_Cursor_Input;
   users_stream_cursor_value_input: Users_Stream_Cursor_Value_Input;
+  uuid: ResolverTypeWrapper<Scalars['uuid']>;
+  uuid_comparison_exp: Uuid_Comparison_Exp;
   verticals: ResolverTypeWrapper<Verticals>;
   verticals_bool_exp: Verticals_Bool_Exp;
   verticals_enum: Verticals_Enum;
@@ -10239,17 +11598,70 @@ export type ResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
+  ArtistEditorialPage: ArtistEditorialPage;
+  ArtistEditorialPageEntity: ArtistEditorialPageEntity;
+  ArtistEditorialPageEntityResponse: ArtistEditorialPageEntityResponse;
+  ArtistEditorialPageEntityResponseCollection: ArtistEditorialPageEntityResponseCollection;
+  ArtistEditorialPageFiltersInput: ArtistEditorialPageFiltersInput;
+  ArtistEditorialPageFiltersInput_remote_rel_projects_metadataartistPage: ArtistEditorialPageFiltersInput_Remote_Rel_Projects_MetadataartistPage;
   AuthMessageOutput: AuthMessageOutput;
   AuthenticateInput: AuthenticateInput;
   AuthenticateOutput: AuthenticateOutput;
   Boolean: Scalars['Boolean'];
   Boolean_comparison_exp: Boolean_Comparison_Exp;
+  ComponentArtistEditorialPageExhibitions: ComponentArtistEditorialPageExhibitions;
+  ComponentArtistEditorialPageExhibitionsFiltersInput: ComponentArtistEditorialPageExhibitionsFiltersInput;
+  ComponentArtistEditorialPageFeaturedWork: ComponentArtistEditorialPageFeaturedWork;
+  ComponentArtistEditorialPageFeaturedWorkFiltersInput: ComponentArtistEditorialPageFeaturedWorkFiltersInput;
+  ComponentArtistEditorialPagePress: ComponentArtistEditorialPagePress;
+  ComponentArtistEditorialPagePressFiltersInput: ComponentArtistEditorialPagePressFiltersInput;
+  ComponentArtistEditorialPageProjectsCreated: ComponentArtistEditorialPageProjectsCreated;
+  ComponentArtistEditorialPageProjectsCreatedFiltersInput: ComponentArtistEditorialPageProjectsCreatedFiltersInput;
+  ComponentArtistEditorialPageProjectsCreatedFiltersInput_remote_rel_projects_metadataartistPage: ComponentArtistEditorialPageProjectsCreatedFiltersInput_Remote_Rel_Projects_MetadataartistPage;
+  ComponentArtistEditorialPageSpectrumArticles: ComponentArtistEditorialPageSpectrumArticles;
+  ComponentArtistEditorialPageSpectrumArticlesFiltersInput: ComponentArtistEditorialPageSpectrumArticlesFiltersInput;
+  ComponentGalleryGridItemGalleryGridItem: ComponentGalleryGridItemGalleryGridItem;
+  ComponentGalleryGridItemGalleryGridItemFiltersInput: ComponentGalleryGridItemGalleryGridItemFiltersInput;
+  ComponentImageWithCaptionImageWithCaption: ComponentImageWithCaptionImageWithCaption;
+  ComponentImageWithCaptionImageWithCaptionFiltersInput: ComponentImageWithCaptionImageWithCaptionFiltersInput;
+  ComponentPressItemPressItem: ComponentPressItemPressItem;
+  ComponentPressItemPressItemFiltersInput: ComponentPressItemPressItemFiltersInput;
+  ComponentProjectMetadataProjectMetadata: ComponentProjectMetadataProjectMetadata;
+  ComponentProjectMetadataProjectMetadataFiltersInput: ComponentProjectMetadataProjectMetadataFiltersInput;
+  ComponentProjectMetadataProjectMetadataFiltersInput_remote_rel_projects_metadataartistPage: ComponentProjectMetadataProjectMetadataFiltersInput_Remote_Rel_Projects_MetadataartistPage;
+  ComponentProjectSaleInfoRowProjectSaleInfoRow: ComponentProjectSaleInfoRowProjectSaleInfoRow;
+  ComponentProjectSaleInfoRowProjectSaleInfoRowFiltersInput: ComponentProjectSaleInfoRowProjectSaleInfoRowFiltersInput;
+  ComponentSpectrumArticleSpectrumArticle: ComponentSpectrumArticleSpectrumArticle;
+  ComponentSpectrumArticleSpectrumArticleFiltersInput: ComponentSpectrumArticleSpectrumArticleFiltersInput;
+  Date: Scalars['Date'];
+  DateFilterInput: DateFilterInput;
+  DateTime: Scalars['DateTime'];
+  DateTimeFilterInput: DateTimeFilterInput;
   Float: Scalars['Float'];
+  FloatFilterInput: FloatFilterInput;
+  GenericMorph: ResolversParentTypes['ArtistEditorialPage'] | ResolversParentTypes['ComponentArtistEditorialPageExhibitions'] | ResolversParentTypes['ComponentArtistEditorialPageFeaturedWork'] | ResolversParentTypes['ComponentArtistEditorialPagePress'] | ResolversParentTypes['ComponentArtistEditorialPageProjectsCreated'] | ResolversParentTypes['ComponentArtistEditorialPageSpectrumArticles'] | ResolversParentTypes['ComponentGalleryGridItemGalleryGridItem'] | ResolversParentTypes['ComponentImageWithCaptionImageWithCaption'] | ResolversParentTypes['ComponentPressItemPressItem'] | ResolversParentTypes['ComponentProjectMetadataProjectMetadata'] | ResolversParentTypes['ComponentProjectSaleInfoRowProjectSaleInfoRow'] | ResolversParentTypes['ComponentSpectrumArticleSpectrumArticle'] | ResolversParentTypes['ProjectPage'];
+  ID: Scalars['ID'];
+  IDFilterInput: IdFilterInput;
   Int: Scalars['Int'];
+  IntFilterInput: IntFilterInput;
   Int_comparison_exp: Int_Comparison_Exp;
+  JSON: Scalars['JSON'];
   OpenseaCollectionData: OpenseaCollectionData;
+  Pagination: Pagination;
+  PaginationArg: PaginationArg;
+  ProjectPage: ProjectPage;
+  ProjectPageEntity: ProjectPageEntity;
+  ProjectPageEntityResponse: ProjectPageEntityResponse;
+  ProjectPageEntityResponseCollection: ProjectPageEntityResponseCollection;
+  ProjectPageFiltersInput: ProjectPageFiltersInput;
+  ResponseCollectionMeta: ResponseCollectionMeta;
   String: Scalars['String'];
+  StringFilterInput: StringFilterInput;
+  StringFilterInput_remote_rel_projects_metadataartistPage: StringFilterInput_Remote_Rel_Projects_MetadataartistPage;
   String_comparison_exp: String_Comparison_Exp;
+  UploadFile: Omit<UploadFile, 'related'> & { related?: Maybe<Array<Maybe<ResolversParentTypes['GenericMorph']>>> };
+  UploadFileEntity: UploadFileEntity;
+  UploadFileEntityResponse: UploadFileEntityResponse;
   artists: Artists;
   artists_aggregate: Artists_Aggregate;
   artists_aggregate_fields: Artists_Aggregate_Fields;
@@ -10510,23 +11922,39 @@ export type ResolversParentTypes = {
   minter_types_stream_cursor_value_input: Minter_Types_Stream_Cursor_Value_Input;
   minters_metadata: Minters_Metadata;
   minters_metadata_aggregate_order_by: Minters_Metadata_Aggregate_Order_By;
-  minters_metadata_avg_order_by: Minters_Metadata_Avg_Order_By;
   minters_metadata_bool_exp: Minters_Metadata_Bool_Exp;
   minters_metadata_max_order_by: Minters_Metadata_Max_Order_By;
   minters_metadata_min_order_by: Minters_Metadata_Min_Order_By;
   minters_metadata_order_by: Minters_Metadata_Order_By;
-  minters_metadata_stddev_order_by: Minters_Metadata_Stddev_Order_By;
-  minters_metadata_stddev_pop_order_by: Minters_Metadata_Stddev_Pop_Order_By;
-  minters_metadata_stddev_samp_order_by: Minters_Metadata_Stddev_Samp_Order_By;
   minters_metadata_stream_cursor_input: Minters_Metadata_Stream_Cursor_Input;
   minters_metadata_stream_cursor_value_input: Minters_Metadata_Stream_Cursor_Value_Input;
-  minters_metadata_sum_order_by: Minters_Metadata_Sum_Order_By;
-  minters_metadata_var_pop_order_by: Minters_Metadata_Var_Pop_Order_By;
-  minters_metadata_var_samp_order_by: Minters_Metadata_Var_Samp_Order_By;
-  minters_metadata_variance_order_by: Minters_Metadata_Variance_Order_By;
   mutation_root: {};
   numeric: Scalars['numeric'];
   numeric_comparison_exp: Numeric_Comparison_Exp;
+  oob_tokens_metadata: Oob_Tokens_Metadata;
+  oob_tokens_metadata_aggregate_order_by: Oob_Tokens_Metadata_Aggregate_Order_By;
+  oob_tokens_metadata_avg_order_by: Oob_Tokens_Metadata_Avg_Order_By;
+  oob_tokens_metadata_bool_exp: Oob_Tokens_Metadata_Bool_Exp;
+  oob_tokens_metadata_max_order_by: Oob_Tokens_Metadata_Max_Order_By;
+  oob_tokens_metadata_min_order_by: Oob_Tokens_Metadata_Min_Order_By;
+  oob_tokens_metadata_order_by: Oob_Tokens_Metadata_Order_By;
+  oob_tokens_metadata_stddev_order_by: Oob_Tokens_Metadata_Stddev_Order_By;
+  oob_tokens_metadata_stddev_pop_order_by: Oob_Tokens_Metadata_Stddev_Pop_Order_By;
+  oob_tokens_metadata_stddev_samp_order_by: Oob_Tokens_Metadata_Stddev_Samp_Order_By;
+  oob_tokens_metadata_stream_cursor_input: Oob_Tokens_Metadata_Stream_Cursor_Input;
+  oob_tokens_metadata_stream_cursor_value_input: Oob_Tokens_Metadata_Stream_Cursor_Value_Input;
+  oob_tokens_metadata_sum_order_by: Oob_Tokens_Metadata_Sum_Order_By;
+  oob_tokens_metadata_var_pop_order_by: Oob_Tokens_Metadata_Var_Pop_Order_By;
+  oob_tokens_metadata_var_samp_order_by: Oob_Tokens_Metadata_Var_Samp_Order_By;
+  oob_tokens_metadata_variance_order_by: Oob_Tokens_Metadata_Variance_Order_By;
+  processing_jobs: Processing_Jobs;
+  processing_jobs_aggregate_order_by: Processing_Jobs_Aggregate_Order_By;
+  processing_jobs_bool_exp: Processing_Jobs_Bool_Exp;
+  processing_jobs_max_order_by: Processing_Jobs_Max_Order_By;
+  processing_jobs_min_order_by: Processing_Jobs_Min_Order_By;
+  processing_jobs_order_by: Processing_Jobs_Order_By;
+  processing_jobs_stream_cursor_input: Processing_Jobs_Stream_Cursor_Input;
+  processing_jobs_stream_cursor_value_input: Processing_Jobs_Stream_Cursor_Value_Input;
   project_external_asset_dependencies: Project_External_Asset_Dependencies;
   project_external_asset_dependencies_aggregate_order_by: Project_External_Asset_Dependencies_Aggregate_Order_By;
   project_external_asset_dependencies_avg_order_by: Project_External_Asset_Dependencies_Avg_Order_By;
@@ -10652,6 +12080,13 @@ export type ResolversParentTypes = {
   receipt_metadata_order_by: Receipt_Metadata_Order_By;
   receipt_metadata_stream_cursor_input: Receipt_Metadata_Stream_Cursor_Input;
   receipt_metadata_stream_cursor_value_input: Receipt_Metadata_Stream_Cursor_Value_Input;
+  refresh_asset_types_enum_comparison_exp: Refresh_Asset_Types_Enum_Comparison_Exp;
+  refresh_request_types_enum_comparison_exp: Refresh_Request_Types_Enum_Comparison_Exp;
+  refresh_requests: Refresh_Requests;
+  refresh_requests_bool_exp: Refresh_Requests_Bool_Exp;
+  refresh_requests_order_by: Refresh_Requests_Order_By;
+  refresh_requests_stream_cursor_input: Refresh_Requests_Stream_Cursor_Input;
+  refresh_requests_stream_cursor_value_input: Refresh_Requests_Stream_Cursor_Value_Input;
   render_types: Render_Types;
   render_types_bool_exp: Render_Types_Bool_Exp;
   render_types_enum_comparison_exp: Render_Types_Enum_Comparison_Exp;
@@ -10742,6 +12177,8 @@ export type ResolversParentTypes = {
   users_order_by: Users_Order_By;
   users_stream_cursor_input: Users_Stream_Cursor_Input;
   users_stream_cursor_value_input: Users_Stream_Cursor_Value_Input;
+  uuid: Scalars['uuid'];
+  uuid_comparison_exp: Uuid_Comparison_Exp;
   verticals: Verticals;
   verticals_bool_exp: Verticals_Bool_Exp;
   verticals_enum_comparison_exp: Verticals_Enum_Comparison_Exp;
@@ -10777,6 +12214,45 @@ export type CachedDirectiveArgs = {
 
 export type CachedDirectiveResolver<Result, Parent, ContextType = any, Args = CachedDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
+export type ArtistEditorialPageResolvers<ContextType = any, ParentType extends ResolversParentTypes['ArtistEditorialPage'] = ResolversParentTypes['ArtistEditorialPage']> = {
+  ExhibitionsSection?: Resolver<Maybe<ResolversTypes['ComponentArtistEditorialPageExhibitions']>, ParentType, ContextType>;
+  FeaturedWorkSection?: Resolver<Maybe<ResolversTypes['ComponentArtistEditorialPageFeaturedWork']>, ParentType, ContextType>;
+  PressSection?: Resolver<Maybe<ResolversTypes['ComponentArtistEditorialPagePress']>, ParentType, ContextType>;
+  ReleasesSection?: Resolver<Maybe<ResolversTypes['ComponentArtistEditorialPageProjectsCreated']>, ParentType, ContextType>;
+  SpectrumArticlesSection?: Resolver<Maybe<ResolversTypes['ComponentArtistEditorialPageSpectrumArticles']>, ParentType, ContextType>;
+  artistName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  avatar?: Resolver<Maybe<ResolversTypes['UploadFileEntityResponse']>, ParentType, ContextType>;
+  bio?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  headerImage?: Resolver<Maybe<ResolversTypes['UploadFileEntityResponse']>, ParentType, ContextType>;
+  instagram?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  publishedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  seoMetaDescription?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  twitter?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  userProfileAddress?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  website?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ArtistEditorialPageEntityResolvers<ContextType = any, ParentType extends ResolversParentTypes['ArtistEditorialPageEntity'] = ResolversParentTypes['ArtistEditorialPageEntity']> = {
+  attributes?: Resolver<Maybe<ResolversTypes['ArtistEditorialPage']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ArtistEditorialPageEntityResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ArtistEditorialPageEntityResponse'] = ResolversParentTypes['ArtistEditorialPageEntityResponse']> = {
+  data?: Resolver<Maybe<ResolversTypes['ArtistEditorialPageEntity']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ArtistEditorialPageEntityResponseCollectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['ArtistEditorialPageEntityResponseCollection'] = ResolversParentTypes['ArtistEditorialPageEntityResponseCollection']> = {
+  data?: Resolver<Array<ResolversTypes['ArtistEditorialPageEntity']>, ParentType, ContextType>;
+  meta?: Resolver<ResolversTypes['ResponseCollectionMeta'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type AuthMessageOutputResolvers<ContextType = any, ParentType extends ResolversParentTypes['AuthMessageOutput'] = ResolversParentTypes['AuthMessageOutput']> = {
   authMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -10788,9 +12264,179 @@ export type AuthenticateOutputResolvers<ContextType = any, ParentType extends Re
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type ComponentArtistEditorialPageExhibitionsResolvers<ContextType = any, ParentType extends ResolversParentTypes['ComponentArtistEditorialPageExhibitions'] = ResolversParentTypes['ComponentArtistEditorialPageExhibitions']> = {
+  exhibitionItem?: Resolver<Maybe<Array<Maybe<ResolversTypes['ComponentGalleryGridItemGalleryGridItem']>>>, ParentType, ContextType, RequireFields<ComponentArtistEditorialPageExhibitionsExhibitionItemArgs, 'pagination' | 'sort'>>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ComponentArtistEditorialPageFeaturedWorkResolvers<ContextType = any, ParentType extends ResolversParentTypes['ComponentArtistEditorialPageFeaturedWork'] = ResolversParentTypes['ComponentArtistEditorialPageFeaturedWork']> = {
+  FeaturedWorkItem?: Resolver<Maybe<Array<Maybe<ResolversTypes['ComponentImageWithCaptionImageWithCaption']>>>, ParentType, ContextType, RequireFields<ComponentArtistEditorialPageFeaturedWorkFeaturedWorkItemArgs, 'pagination' | 'sort'>>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ComponentArtistEditorialPagePressResolvers<ContextType = any, ParentType extends ResolversParentTypes['ComponentArtistEditorialPagePress'] = ResolversParentTypes['ComponentArtistEditorialPagePress']> = {
+  PressItem?: Resolver<Maybe<Array<Maybe<ResolversTypes['ComponentPressItemPressItem']>>>, ParentType, ContextType, RequireFields<ComponentArtistEditorialPagePressPressItemArgs, 'pagination' | 'sort'>>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ComponentArtistEditorialPageProjectsCreatedResolvers<ContextType = any, ParentType extends ResolversParentTypes['ComponentArtistEditorialPageProjectsCreated'] = ResolversParentTypes['ComponentArtistEditorialPageProjectsCreated']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  projectMetadata?: Resolver<Maybe<Array<Maybe<ResolversTypes['ComponentProjectMetadataProjectMetadata']>>>, ParentType, ContextType, RequireFields<ComponentArtistEditorialPageProjectsCreatedProjectMetadataArgs, 'pagination' | 'sort'>>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ComponentArtistEditorialPageSpectrumArticlesResolvers<ContextType = any, ParentType extends ResolversParentTypes['ComponentArtistEditorialPageSpectrumArticles'] = ResolversParentTypes['ComponentArtistEditorialPageSpectrumArticles']> = {
+  SpectrumArticle?: Resolver<Maybe<Array<Maybe<ResolversTypes['ComponentSpectrumArticleSpectrumArticle']>>>, ParentType, ContextType, RequireFields<ComponentArtistEditorialPageSpectrumArticlesSpectrumArticleArgs, 'pagination' | 'sort'>>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ComponentGalleryGridItemGalleryGridItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['ComponentGalleryGridItemGalleryGridItem'] = ResolversParentTypes['ComponentGalleryGridItemGalleryGridItem']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  image?: Resolver<Maybe<ResolversTypes['UploadFileEntityResponse']>, ParentType, ContextType>;
+  subtitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ComponentImageWithCaptionImageWithCaptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['ComponentImageWithCaptionImageWithCaption'] = ResolversParentTypes['ComponentImageWithCaptionImageWithCaption']> = {
+  caption?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  image?: Resolver<Maybe<ResolversTypes['UploadFileEntityResponse']>, ParentType, ContextType>;
+  url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ComponentPressItemPressItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['ComponentPressItemPressItem'] = ResolversParentTypes['ComponentPressItemPressItem']> = {
+  date?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  publication?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ComponentProjectMetadataProjectMetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['ComponentProjectMetadataProjectMetadata'] = ResolversParentTypes['ComponentProjectMetadataProjectMetadata']> = {
+  Project?: Resolver<Maybe<ResolversTypes['projects_metadata']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  projectId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ComponentProjectSaleInfoRowProjectSaleInfoRowResolvers<ContextType = any, ParentType extends ResolversParentTypes['ComponentProjectSaleInfoRowProjectSaleInfoRow'] = ResolversParentTypes['ComponentProjectSaleInfoRowProjectSaleInfoRow']> = {
+  AuctionEndPrice?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  AuctionEndTime?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  AuctionStartPrice?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  AuctionStartTime?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  AuctionType?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  MinterMaxInvocations?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ComponentSpectrumArticleSpectrumArticleResolvers<ContextType = any, ParentType extends ResolversParentTypes['ComponentSpectrumArticleSpectrumArticle'] = ResolversParentTypes['ComponentSpectrumArticleSpectrumArticle']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  previewImage?: Resolver<Maybe<ResolversTypes['UploadFileEntityResponse']>, ParentType, ContextType>;
+  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
+  name: 'Date';
+}
+
+export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
+  name: 'DateTime';
+}
+
+export type GenericMorphResolvers<ContextType = any, ParentType extends ResolversParentTypes['GenericMorph'] = ResolversParentTypes['GenericMorph']> = {
+  __resolveType: TypeResolveFn<'ArtistEditorialPage' | 'ComponentArtistEditorialPageExhibitions' | 'ComponentArtistEditorialPageFeaturedWork' | 'ComponentArtistEditorialPagePress' | 'ComponentArtistEditorialPageProjectsCreated' | 'ComponentArtistEditorialPageSpectrumArticles' | 'ComponentGalleryGridItemGalleryGridItem' | 'ComponentImageWithCaptionImageWithCaption' | 'ComponentPressItemPressItem' | 'ComponentProjectMetadataProjectMetadata' | 'ComponentProjectSaleInfoRowProjectSaleInfoRow' | 'ComponentSpectrumArticleSpectrumArticle' | 'ProjectPage', ParentType, ContextType>;
+};
+
+export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['JSON'], any> {
+  name: 'JSON';
+}
+
 export type OpenseaCollectionDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['OpenseaCollectionData'] = ResolversParentTypes['OpenseaCollectionData']> = {
   projectId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PaginationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Pagination'] = ResolversParentTypes['Pagination']> = {
+  page?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  pageCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  pageSize?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ProjectPageResolvers<ContextType = any, ParentType extends ResolversParentTypes['ProjectPage'] = ResolversParentTypes['ProjectPage']> = {
+  AuctionInfoRow?: Resolver<Maybe<Array<Maybe<ResolversTypes['ComponentProjectSaleInfoRowProjectSaleInfoRow']>>>, ParentType, ContextType, RequireFields<ProjectPageAuctionInfoRowArgs, 'pagination' | 'sort'>>;
+  Quote?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  project?: Resolver<ResolversTypes['ComponentProjectMetadataProjectMetadata'], ParentType, ContextType>;
+  publishedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ProjectPageEntityResolvers<ContextType = any, ParentType extends ResolversParentTypes['ProjectPageEntity'] = ResolversParentTypes['ProjectPageEntity']> = {
+  attributes?: Resolver<Maybe<ResolversTypes['ProjectPage']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ProjectPageEntityResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ProjectPageEntityResponse'] = ResolversParentTypes['ProjectPageEntityResponse']> = {
+  data?: Resolver<Maybe<ResolversTypes['ProjectPageEntity']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ProjectPageEntityResponseCollectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['ProjectPageEntityResponseCollection'] = ResolversParentTypes['ProjectPageEntityResponseCollection']> = {
+  data?: Resolver<Array<ResolversTypes['ProjectPageEntity']>, ParentType, ContextType>;
+  meta?: Resolver<ResolversTypes['ResponseCollectionMeta'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ResponseCollectionMetaResolvers<ContextType = any, ParentType extends ResolversParentTypes['ResponseCollectionMeta'] = ResolversParentTypes['ResponseCollectionMeta']> = {
+  pagination?: Resolver<ResolversTypes['Pagination'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type UploadFileResolvers<ContextType = any, ParentType extends ResolversParentTypes['UploadFile'] = ResolversParentTypes['UploadFile']> = {
+  alternativeText?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  caption?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  ext?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  formats?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
+  hash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  height?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  mime?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  previewUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  provider?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  provider_metadata?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
+  related?: Resolver<Maybe<Array<Maybe<ResolversTypes['GenericMorph']>>>, ParentType, ContextType>;
+  size?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  width?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type UploadFileEntityResolvers<ContextType = any, ParentType extends ResolversParentTypes['UploadFileEntity'] = ResolversParentTypes['UploadFileEntity']> = {
+  attributes?: Resolver<Maybe<ResolversTypes['UploadFile']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type UploadFileEntityResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['UploadFileEntityResponse'] = ResolversParentTypes['UploadFileEntityResponse']> = {
+  data?: Resolver<Maybe<ResolversTypes['UploadFileEntity']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -11493,7 +13139,9 @@ export type MediaResolvers<ContextType = any, ParentType extends ResolversParent
 
 export type Minter_Filters_MetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['minter_filters_metadata'] = ResolversParentTypes['minter_filters_metadata']> = {
   address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  allowed_minters?: Resolver<Array<ResolversTypes['minters_metadata']>, ParentType, ContextType, Partial<Minter_Filters_MetadataAllowed_MintersArgs>>;
+  core_registry_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  globally_allowed_minters?: Resolver<Maybe<Array<ResolversTypes['minters_metadata']>>, ParentType, ContextType, Partial<Minter_Filters_MetadataGlobally_Allowed_MintersArgs>>;
+  known_minters?: Resolver<Array<ResolversTypes['minters_metadata']>, ParentType, ContextType, Partial<Minter_Filters_MetadataKnown_MintersArgs>>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -11508,12 +13156,8 @@ export type Minter_TypesResolvers<ContextType = any, ParentType extends Resolver
 
 export type Minters_MetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['minters_metadata'] = ResolversParentTypes['minters_metadata']> = {
   address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  core_contract?: Resolver<Maybe<ResolversTypes['contracts_metadata']>, ParentType, ContextType>;
-  core_contract_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   extra_minter_details?: Resolver<Maybe<ResolversTypes['jsonb']>, ParentType, ContextType, Partial<Minters_MetadataExtra_Minter_DetailsArgs>>;
-  maximum_price_decay_half_life_in_seconds?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  minimum_auction_length_in_seconds?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  minimum_price_decay_half_life_in_seconds?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  is_globally_allowlisted_on_minter_filter?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   minter_filter?: Resolver<Maybe<ResolversTypes['minter_filters_metadata']>, ParentType, ContextType>;
   minter_filter_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   minter_type?: Resolver<ResolversTypes['minter_type_names_enum'], ParentType, ContextType>;
@@ -11531,6 +13175,37 @@ export interface NumericScalarConfig extends GraphQLScalarTypeConfig<ResolversTy
   name: 'numeric';
 }
 
+export type Oob_Tokens_MetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['oob_tokens_metadata'] = ResolversParentTypes['oob_tokens_metadata']> = {
+  contract?: Resolver<ResolversTypes['contracts_metadata'], ParentType, ContextType>;
+  contract_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  gif?: Resolver<Maybe<ResolversTypes['media']>, ParentType, ContextType>;
+  gif_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  hash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  image?: Resolver<Maybe<ResolversTypes['media']>, ParentType, ContextType>;
+  image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  live_view_path?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  media_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  preview_asset_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  primary_asset_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  project?: Resolver<ResolversTypes['projects_metadata'], ParentType, ContextType>;
+  project_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  token_id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  video?: Resolver<Maybe<ResolversTypes['media']>, ParentType, ContextType>;
+  video_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Processing_JobsResolvers<ContextType = any, ParentType extends ResolversParentTypes['processing_jobs'] = ResolversParentTypes['processing_jobs']> = {
+  asset_type?: Resolver<Maybe<ResolversTypes['refresh_asset_types_enum']>, ParentType, ContextType>;
+  completed_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['uuid'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  refresh_request_id?: Resolver<ResolversTypes['uuid'], ParentType, ContextType>;
+  submitted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type Project_External_Asset_DependenciesResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_external_asset_dependencies'] = ResolversParentTypes['project_external_asset_dependencies']> = {
   bytecode_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   cid?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -11543,13 +13218,10 @@ export type Project_External_Asset_DependenciesResolvers<ContextType = any, Pare
 };
 
 export type Project_Minter_ConfigurationsResolvers<ContextType = any, ParentType extends ResolversParentTypes['project_minter_configurations'] = ResolversParentTypes['project_minter_configurations']> = {
-  approximate_exp_da_end_time?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   base_price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   currency_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   currency_symbol?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  end_time?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   extra_minter_details?: Resolver<Maybe<ResolversTypes['jsonb']>, ParentType, ContextType, Partial<Project_Minter_ConfigurationsExtra_Minter_DetailsArgs>>;
-  half_life_in_seconds?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   max_invocations?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   minter?: Resolver<Maybe<ResolversTypes['minters_metadata']>, ParentType, ContextType>;
@@ -11559,8 +13231,6 @@ export type Project_Minter_ConfigurationsResolvers<ContextType = any, ParentType
   project?: Resolver<Maybe<ResolversTypes['projects_metadata']>, ParentType, ContextType>;
   project_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   purchase_to_disabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  start_price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  start_time?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -11689,6 +13359,7 @@ export type Projects_MetadataResolvers<ContextType = any, ParentType extends Res
   additional_payee_secondary_sales_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   artist?: Resolver<ResolversTypes['users'], ParentType, ContextType>;
+  artistPage?: Resolver<Maybe<ResolversTypes['ArtistEditorialPageEntityResponseCollection']>, ParentType, ContextType, RequireFields<Projects_MetadataArtistPageArgs, 'pagination' | 'publicationState' | 'sort'>>;
   artist_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   artist_display_notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   artist_featured_token_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -11698,6 +13369,7 @@ export type Projects_MetadataResolvers<ContextType = any, ParentType extends Res
   auction_end_time?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   auction_start_time?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   base_uri?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  canvas_mode?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   charitable_giving_details?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   complete?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   completed_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
@@ -11721,7 +13393,7 @@ export type Projects_MetadataResolvers<ContextType = any, ParentType extends Res
   favorited_by_user?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   favorites?: Resolver<Array<ResolversTypes['favorites']>, ParentType, ContextType, Partial<Projects_MetadataFavoritesArgs>>;
   favorites_aggregate?: Resolver<ResolversTypes['favorites_aggregate'], ParentType, ContextType, Partial<Projects_MetadataFavorites_AggregateArgs>>;
-  featured_token?: Resolver<Maybe<Array<ResolversTypes['tokens_metadata']>>, ParentType, ContextType, RequireFields<Projects_MetadataFeatured_TokenArgs, 'args'>>;
+  featured_token?: Resolver<Maybe<Array<ResolversTypes['tokens_metadata']>>, ParentType, ContextType, Partial<Projects_MetadataFeatured_TokenArgs>>;
   features?: Resolver<Maybe<ResolversTypes['projects_features']>, ParentType, ContextType>;
   first_token_minted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   generate_video_assets?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -11739,6 +13411,7 @@ export type Projects_MetadataResolvers<ContextType = any, ParentType extends Res
   minter_configuration?: Resolver<Maybe<ResolversTypes['project_minter_configurations']>, ParentType, ContextType>;
   minter_configuration_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  oob_tokens?: Resolver<Array<ResolversTypes['oob_tokens_metadata']>, ParentType, ContextType, Partial<Projects_MetadataOob_TokensArgs>>;
   paused?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   preview_render_type?: Resolver<ResolversTypes['render_types_enum'], ParentType, ContextType>;
   price_per_token_in_wei?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -11803,10 +13476,14 @@ export type Projects_Metadata_Avg_FieldsResolvers<ContextType = any, ParentType 
   additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   currency_decimals?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  external_asset_dependency_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   index?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  invocations?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
+  lowest_listing?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
   max_invocations?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   render_delay?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   royalty_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  script_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   series_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   video_aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   video_duration?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -11827,20 +13504,28 @@ export type Projects_Metadata_Max_FieldsResolvers<ContextType = any, ParentType 
   artist_interview?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   artist_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   aspect_ratio?: Resolver<Maybe<ResolversTypes['numeric']>, ParentType, ContextType>;
+  auction_end_time?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  auction_start_time?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   base_uri?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   charitable_giving_details?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   completed_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   contract_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   creative_credit?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  curation_status_display?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   currency_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   currency_decimals?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   currency_symbol?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  external_asset_dependency_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
+  first_token_minted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  heritage_curation_status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   index?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  invocations?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   ipfs_hash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   license?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   link_to_license?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  lowest_listing?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
   max_invocations?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   minter_configuration_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -11851,7 +13536,9 @@ export type Projects_Metadata_Max_FieldsResolvers<ContextType = any, ParentType 
   royalty_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   sales_notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   script?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  script_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   script_type_and_version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  second_token_minted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   series_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   start_datetime?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   updated_at?: Resolver<Maybe<ResolversTypes['timestamp']>, ParentType, ContextType>;
@@ -11876,20 +13563,28 @@ export type Projects_Metadata_Min_FieldsResolvers<ContextType = any, ParentType 
   artist_interview?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   artist_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   aspect_ratio?: Resolver<Maybe<ResolversTypes['numeric']>, ParentType, ContextType>;
+  auction_end_time?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  auction_start_time?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   base_uri?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   charitable_giving_details?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   completed_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   contract_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   creative_credit?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  curation_status_display?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   currency_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   currency_decimals?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   currency_symbol?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  external_asset_dependency_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
+  first_token_minted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  heritage_curation_status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   index?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  invocations?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   ipfs_hash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   license?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   link_to_license?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  lowest_listing?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
   max_invocations?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   minter_configuration_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -11900,7 +13595,9 @@ export type Projects_Metadata_Min_FieldsResolvers<ContextType = any, ParentType 
   royalty_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   sales_notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   script?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  script_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   script_type_and_version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  second_token_minted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   series_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   start_datetime?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   updated_at?: Resolver<Maybe<ResolversTypes['timestamp']>, ParentType, ContextType>;
@@ -11918,10 +13615,14 @@ export type Projects_Metadata_Stddev_FieldsResolvers<ContextType = any, ParentTy
   additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   currency_decimals?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  external_asset_dependency_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   index?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  invocations?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
+  lowest_listing?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
   max_invocations?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   render_delay?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   royalty_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  script_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   series_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   video_aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   video_duration?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -11935,10 +13636,14 @@ export type Projects_Metadata_Stddev_Pop_FieldsResolvers<ContextType = any, Pare
   additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   currency_decimals?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  external_asset_dependency_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   index?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  invocations?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
+  lowest_listing?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
   max_invocations?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   render_delay?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   royalty_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  script_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   series_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   video_aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   video_duration?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -11952,10 +13657,14 @@ export type Projects_Metadata_Stddev_Samp_FieldsResolvers<ContextType = any, Par
   additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   currency_decimals?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  external_asset_dependency_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   index?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  invocations?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
+  lowest_listing?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
   max_invocations?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   render_delay?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   royalty_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  script_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   series_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   video_aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   video_duration?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -11969,10 +13678,14 @@ export type Projects_Metadata_Sum_FieldsResolvers<ContextType = any, ParentType 
   additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   aspect_ratio?: Resolver<Maybe<ResolversTypes['numeric']>, ParentType, ContextType>;
   currency_decimals?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  external_asset_dependency_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   index?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  invocations?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
+  lowest_listing?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
   max_invocations?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   render_delay?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   royalty_percentage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  script_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   series_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   video_aspect_ratio?: Resolver<Maybe<ResolversTypes['numeric']>, ParentType, ContextType>;
   video_duration?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -11986,10 +13699,14 @@ export type Projects_Metadata_Var_Pop_FieldsResolvers<ContextType = any, ParentT
   additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   currency_decimals?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  external_asset_dependency_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   index?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  invocations?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
+  lowest_listing?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
   max_invocations?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   render_delay?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   royalty_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  script_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   series_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   video_aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   video_duration?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -12003,10 +13720,14 @@ export type Projects_Metadata_Var_Samp_FieldsResolvers<ContextType = any, Parent
   additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   currency_decimals?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  external_asset_dependency_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   index?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  invocations?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
+  lowest_listing?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
   max_invocations?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   render_delay?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   royalty_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  script_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   series_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   video_aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   video_duration?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -12020,10 +13741,14 @@ export type Projects_Metadata_Variance_FieldsResolvers<ContextType = any, Parent
   additional_payee_secondary_sales_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   currency_decimals?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  external_asset_dependency_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   index?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  invocations?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
+  lowest_listing?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
   max_invocations?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   render_delay?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   royalty_percentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  script_count?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
   series_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   video_aspect_ratio?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   video_duration?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -12044,6 +13769,8 @@ export type Proposed_Artist_Addresses_And_SplitsResolvers<ContextType = any, Par
 };
 
 export type Query_RootResolvers<ContextType = any, ParentType extends ResolversParentTypes['query_root'] = ResolversParentTypes['query_root']> = {
+  artistEditorialPage?: Resolver<Maybe<ResolversTypes['ArtistEditorialPageEntityResponse']>, ParentType, ContextType, Partial<Query_RootArtistEditorialPageArgs>>;
+  artistEditorialPages?: Resolver<Maybe<ResolversTypes['ArtistEditorialPageEntityResponseCollection']>, ParentType, ContextType, RequireFields<Query_RootArtistEditorialPagesArgs, 'pagination' | 'publicationState' | 'sort'>>;
   artists?: Resolver<Array<ResolversTypes['artists']>, ParentType, ContextType, Partial<Query_RootArtistsArgs>>;
   artists_aggregate?: Resolver<ResolversTypes['artists_aggregate'], ParentType, ContextType, Partial<Query_RootArtists_AggregateArgs>>;
   categories?: Resolver<Array<ResolversTypes['categories']>, ParentType, ContextType, Partial<Query_RootCategoriesArgs>>;
@@ -12081,11 +13808,11 @@ export type Query_RootResolvers<ContextType = any, ParentType extends ResolversP
   feature_flags_by_pk?: Resolver<Maybe<ResolversTypes['feature_flags']>, ParentType, ContextType, RequireFields<Query_RootFeature_Flags_By_PkArgs, 'flag_name'>>;
   filter_tokens_metadata_by_features?: Resolver<Array<ResolversTypes['tokens_metadata']>, ParentType, ContextType, RequireFields<Query_RootFilter_Tokens_Metadata_By_FeaturesArgs, 'args'>>;
   filter_tokens_metadata_by_features_aggregate?: Resolver<ResolversTypes['tokens_metadata_aggregate'], ParentType, ContextType, RequireFields<Query_RootFilter_Tokens_Metadata_By_Features_AggregateArgs, 'args'>>;
-  getAuthMessage?: Resolver<Maybe<ResolversTypes['AuthMessageOutput']>, ParentType, ContextType, RequireFields<Query_RootGetAuthMessageArgs, 'publicAddress'>>;
+  getAuthMessage?: Resolver<Maybe<ResolversTypes['AuthMessageOutput']>, ParentType, ContextType, RequireFields<Query_RootGetAuthMessageArgs, 'domain' | 'publicAddress' | 'uri'>>;
   getOpenseaCollectionURL?: Resolver<Maybe<ResolversTypes['OpenseaCollectionData']>, ParentType, ContextType, RequireFields<Query_RootGetOpenseaCollectionUrlArgs, 'contractAddress' | 'projectId'>>;
   isTokenFlagged?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<Query_RootIsTokenFlaggedArgs, 'contractAddress' | 'tokenId'>>;
-  list_projects_metadata_random?: Resolver<Array<ResolversTypes['projects_metadata']>, ParentType, ContextType, RequireFields<Query_RootList_Projects_Metadata_RandomArgs, 'args'>>;
-  list_projects_metadata_random_aggregate?: Resolver<ResolversTypes['projects_metadata_aggregate'], ParentType, ContextType, RequireFields<Query_RootList_Projects_Metadata_Random_AggregateArgs, 'args'>>;
+  list_projects_metadata_random?: Resolver<Array<ResolversTypes['projects_metadata']>, ParentType, ContextType, Partial<Query_RootList_Projects_Metadata_RandomArgs>>;
+  list_projects_metadata_random_aggregate?: Resolver<ResolversTypes['projects_metadata_aggregate'], ParentType, ContextType, Partial<Query_RootList_Projects_Metadata_Random_AggregateArgs>>;
   media?: Resolver<Array<ResolversTypes['media']>, ParentType, ContextType, Partial<Query_RootMediaArgs>>;
   media_by_pk?: Resolver<Maybe<ResolversTypes['media']>, ParentType, ContextType, RequireFields<Query_RootMedia_By_PkArgs, 'id'>>;
   minter_filters_metadata?: Resolver<Array<ResolversTypes['minter_filters_metadata']>, ParentType, ContextType, Partial<Query_RootMinter_Filters_MetadataArgs>>;
@@ -12094,6 +13821,12 @@ export type Query_RootResolvers<ContextType = any, ParentType extends ResolversP
   minter_types_by_pk?: Resolver<Maybe<ResolversTypes['minter_types']>, ParentType, ContextType, RequireFields<Query_RootMinter_Types_By_PkArgs, 'type'>>;
   minters_metadata?: Resolver<Array<ResolversTypes['minters_metadata']>, ParentType, ContextType, Partial<Query_RootMinters_MetadataArgs>>;
   minters_metadata_by_pk?: Resolver<Maybe<ResolversTypes['minters_metadata']>, ParentType, ContextType, RequireFields<Query_RootMinters_Metadata_By_PkArgs, 'address'>>;
+  oob_tokens_metadata?: Resolver<Array<ResolversTypes['oob_tokens_metadata']>, ParentType, ContextType, Partial<Query_RootOob_Tokens_MetadataArgs>>;
+  oob_tokens_metadata_by_pk?: Resolver<Maybe<ResolversTypes['oob_tokens_metadata']>, ParentType, ContextType, RequireFields<Query_RootOob_Tokens_Metadata_By_PkArgs, 'id'>>;
+  processing_jobs?: Resolver<Array<ResolversTypes['processing_jobs']>, ParentType, ContextType, Partial<Query_RootProcessing_JobsArgs>>;
+  processing_jobs_by_pk?: Resolver<Maybe<ResolversTypes['processing_jobs']>, ParentType, ContextType, RequireFields<Query_RootProcessing_Jobs_By_PkArgs, 'id'>>;
+  projectPage?: Resolver<Maybe<ResolversTypes['ProjectPageEntityResponse']>, ParentType, ContextType, Partial<Query_RootProjectPageArgs>>;
+  projectPages?: Resolver<Maybe<ResolversTypes['ProjectPageEntityResponseCollection']>, ParentType, ContextType, RequireFields<Query_RootProjectPagesArgs, 'pagination' | 'publicationState' | 'sort'>>;
   project_external_asset_dependencies?: Resolver<Array<ResolversTypes['project_external_asset_dependencies']>, ParentType, ContextType, Partial<Query_RootProject_External_Asset_DependenciesArgs>>;
   project_external_asset_dependencies_by_pk?: Resolver<Maybe<ResolversTypes['project_external_asset_dependencies']>, ParentType, ContextType, RequireFields<Query_RootProject_External_Asset_Dependencies_By_PkArgs, 'index' | 'project_id'>>;
   project_minter_configurations?: Resolver<Array<ResolversTypes['project_minter_configurations']>, ParentType, ContextType, Partial<Query_RootProject_Minter_ConfigurationsArgs>>;
@@ -12117,6 +13850,8 @@ export type Query_RootResolvers<ContextType = any, ParentType extends ResolversP
   receipt_metadata?: Resolver<Array<ResolversTypes['receipt_metadata']>, ParentType, ContextType, Partial<Query_RootReceipt_MetadataArgs>>;
   receipt_metadata_aggregate?: Resolver<ResolversTypes['receipt_metadata_aggregate'], ParentType, ContextType, Partial<Query_RootReceipt_Metadata_AggregateArgs>>;
   receipt_metadata_by_pk?: Resolver<Maybe<ResolversTypes['receipt_metadata']>, ParentType, ContextType, RequireFields<Query_RootReceipt_Metadata_By_PkArgs, 'id'>>;
+  refresh_requests?: Resolver<Array<ResolversTypes['refresh_requests']>, ParentType, ContextType, Partial<Query_RootRefresh_RequestsArgs>>;
+  refresh_requests_by_pk?: Resolver<Maybe<ResolversTypes['refresh_requests']>, ParentType, ContextType, RequireFields<Query_RootRefresh_Requests_By_PkArgs, 'id'>>;
   render_types?: Resolver<Array<ResolversTypes['render_types']>, ParentType, ContextType, Partial<Query_RootRender_TypesArgs>>;
   render_types_by_pk?: Resolver<Maybe<ResolversTypes['render_types']>, ParentType, ContextType, RequireFields<Query_RootRender_Types_By_PkArgs, 'value'>>;
   search_projects?: Resolver<Array<ResolversTypes['projects_metadata']>, ParentType, ContextType, RequireFields<Query_RootSearch_ProjectsArgs, 'args'>>;
@@ -12177,6 +13912,7 @@ export type Receipt_Metadata_Aggregate_FieldsResolvers<ContextType = any, Parent
 };
 
 export type Receipt_Metadata_Max_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['receipt_metadata_max_fields'] = ResolversParentTypes['receipt_metadata_max_fields']> = {
+  excess_settlement_funds?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   minter_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   net_posted?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -12187,12 +13923,25 @@ export type Receipt_Metadata_Max_FieldsResolvers<ContextType = any, ParentType e
 };
 
 export type Receipt_Metadata_Min_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['receipt_metadata_min_fields'] = ResolversParentTypes['receipt_metadata_min_fields']> = {
+  excess_settlement_funds?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   minter_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   net_posted?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   num_purchased?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   project_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   user_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Refresh_RequestsResolvers<ContextType = any, ParentType extends ResolversParentTypes['refresh_requests'] = ResolversParentTypes['refresh_requests']> = {
+  completed_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['uuid'], ParentType, ContextType>;
+  processing_jobs?: Resolver<Array<ResolversTypes['processing_jobs']>, ParentType, ContextType, Partial<Refresh_RequestsProcessing_JobsArgs>>;
+  project_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  queue_weight?: Resolver<Maybe<ResolversTypes['bigint']>, ParentType, ContextType>;
+  request_type?: Resolver<ResolversTypes['refresh_request_types_enum'], ParentType, ContextType>;
+  submitted_at?: Resolver<ResolversTypes['timestamptz'], ParentType, ContextType>;
+  token_ids?: Resolver<Maybe<ResolversTypes['jsonb']>, ParentType, ContextType, Partial<Refresh_RequestsToken_IdsArgs>>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -12258,8 +14007,8 @@ export type Subscription_RootResolvers<ContextType = any, ParentType extends Res
   feature_flags_stream?: SubscriptionResolver<Array<ResolversTypes['feature_flags']>, "feature_flags_stream", ParentType, ContextType, RequireFields<Subscription_RootFeature_Flags_StreamArgs, 'batch_size' | 'cursor'>>;
   filter_tokens_metadata_by_features?: SubscriptionResolver<Array<ResolversTypes['tokens_metadata']>, "filter_tokens_metadata_by_features", ParentType, ContextType, RequireFields<Subscription_RootFilter_Tokens_Metadata_By_FeaturesArgs, 'args'>>;
   filter_tokens_metadata_by_features_aggregate?: SubscriptionResolver<ResolversTypes['tokens_metadata_aggregate'], "filter_tokens_metadata_by_features_aggregate", ParentType, ContextType, RequireFields<Subscription_RootFilter_Tokens_Metadata_By_Features_AggregateArgs, 'args'>>;
-  list_projects_metadata_random?: SubscriptionResolver<Array<ResolversTypes['projects_metadata']>, "list_projects_metadata_random", ParentType, ContextType, RequireFields<Subscription_RootList_Projects_Metadata_RandomArgs, 'args'>>;
-  list_projects_metadata_random_aggregate?: SubscriptionResolver<ResolversTypes['projects_metadata_aggregate'], "list_projects_metadata_random_aggregate", ParentType, ContextType, RequireFields<Subscription_RootList_Projects_Metadata_Random_AggregateArgs, 'args'>>;
+  list_projects_metadata_random?: SubscriptionResolver<Array<ResolversTypes['projects_metadata']>, "list_projects_metadata_random", ParentType, ContextType, Partial<Subscription_RootList_Projects_Metadata_RandomArgs>>;
+  list_projects_metadata_random_aggregate?: SubscriptionResolver<ResolversTypes['projects_metadata_aggregate'], "list_projects_metadata_random_aggregate", ParentType, ContextType, Partial<Subscription_RootList_Projects_Metadata_Random_AggregateArgs>>;
   media?: SubscriptionResolver<Array<ResolversTypes['media']>, "media", ParentType, ContextType, Partial<Subscription_RootMediaArgs>>;
   media_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['media']>, "media_by_pk", ParentType, ContextType, RequireFields<Subscription_RootMedia_By_PkArgs, 'id'>>;
   media_stream?: SubscriptionResolver<Array<ResolversTypes['media']>, "media_stream", ParentType, ContextType, RequireFields<Subscription_RootMedia_StreamArgs, 'batch_size' | 'cursor'>>;
@@ -12272,6 +14021,12 @@ export type Subscription_RootResolvers<ContextType = any, ParentType extends Res
   minters_metadata?: SubscriptionResolver<Array<ResolversTypes['minters_metadata']>, "minters_metadata", ParentType, ContextType, Partial<Subscription_RootMinters_MetadataArgs>>;
   minters_metadata_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['minters_metadata']>, "minters_metadata_by_pk", ParentType, ContextType, RequireFields<Subscription_RootMinters_Metadata_By_PkArgs, 'address'>>;
   minters_metadata_stream?: SubscriptionResolver<Array<ResolversTypes['minters_metadata']>, "minters_metadata_stream", ParentType, ContextType, RequireFields<Subscription_RootMinters_Metadata_StreamArgs, 'batch_size' | 'cursor'>>;
+  oob_tokens_metadata?: SubscriptionResolver<Array<ResolversTypes['oob_tokens_metadata']>, "oob_tokens_metadata", ParentType, ContextType, Partial<Subscription_RootOob_Tokens_MetadataArgs>>;
+  oob_tokens_metadata_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['oob_tokens_metadata']>, "oob_tokens_metadata_by_pk", ParentType, ContextType, RequireFields<Subscription_RootOob_Tokens_Metadata_By_PkArgs, 'id'>>;
+  oob_tokens_metadata_stream?: SubscriptionResolver<Array<ResolversTypes['oob_tokens_metadata']>, "oob_tokens_metadata_stream", ParentType, ContextType, RequireFields<Subscription_RootOob_Tokens_Metadata_StreamArgs, 'batch_size' | 'cursor'>>;
+  processing_jobs?: SubscriptionResolver<Array<ResolversTypes['processing_jobs']>, "processing_jobs", ParentType, ContextType, Partial<Subscription_RootProcessing_JobsArgs>>;
+  processing_jobs_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['processing_jobs']>, "processing_jobs_by_pk", ParentType, ContextType, RequireFields<Subscription_RootProcessing_Jobs_By_PkArgs, 'id'>>;
+  processing_jobs_stream?: SubscriptionResolver<Array<ResolversTypes['processing_jobs']>, "processing_jobs_stream", ParentType, ContextType, RequireFields<Subscription_RootProcessing_Jobs_StreamArgs, 'batch_size' | 'cursor'>>;
   project_external_asset_dependencies?: SubscriptionResolver<Array<ResolversTypes['project_external_asset_dependencies']>, "project_external_asset_dependencies", ParentType, ContextType, Partial<Subscription_RootProject_External_Asset_DependenciesArgs>>;
   project_external_asset_dependencies_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['project_external_asset_dependencies']>, "project_external_asset_dependencies_by_pk", ParentType, ContextType, RequireFields<Subscription_RootProject_External_Asset_Dependencies_By_PkArgs, 'index' | 'project_id'>>;
   project_external_asset_dependencies_stream?: SubscriptionResolver<Array<ResolversTypes['project_external_asset_dependencies']>, "project_external_asset_dependencies_stream", ParentType, ContextType, RequireFields<Subscription_RootProject_External_Asset_Dependencies_StreamArgs, 'batch_size' | 'cursor'>>;
@@ -12305,6 +14060,9 @@ export type Subscription_RootResolvers<ContextType = any, ParentType extends Res
   receipt_metadata_aggregate?: SubscriptionResolver<ResolversTypes['receipt_metadata_aggregate'], "receipt_metadata_aggregate", ParentType, ContextType, Partial<Subscription_RootReceipt_Metadata_AggregateArgs>>;
   receipt_metadata_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['receipt_metadata']>, "receipt_metadata_by_pk", ParentType, ContextType, RequireFields<Subscription_RootReceipt_Metadata_By_PkArgs, 'id'>>;
   receipt_metadata_stream?: SubscriptionResolver<Array<ResolversTypes['receipt_metadata']>, "receipt_metadata_stream", ParentType, ContextType, RequireFields<Subscription_RootReceipt_Metadata_StreamArgs, 'batch_size' | 'cursor'>>;
+  refresh_requests?: SubscriptionResolver<Array<ResolversTypes['refresh_requests']>, "refresh_requests", ParentType, ContextType, Partial<Subscription_RootRefresh_RequestsArgs>>;
+  refresh_requests_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['refresh_requests']>, "refresh_requests_by_pk", ParentType, ContextType, RequireFields<Subscription_RootRefresh_Requests_By_PkArgs, 'id'>>;
+  refresh_requests_stream?: SubscriptionResolver<Array<ResolversTypes['refresh_requests']>, "refresh_requests_stream", ParentType, ContextType, RequireFields<Subscription_RootRefresh_Requests_StreamArgs, 'batch_size' | 'cursor'>>;
   render_types?: SubscriptionResolver<Array<ResolversTypes['render_types']>, "render_types", ParentType, ContextType, Partial<Subscription_RootRender_TypesArgs>>;
   render_types_by_pk?: SubscriptionResolver<Maybe<ResolversTypes['render_types']>, "render_types_by_pk", ParentType, ContextType, RequireFields<Subscription_RootRender_Types_By_PkArgs, 'value'>>;
   render_types_stream?: SubscriptionResolver<Array<ResolversTypes['render_types']>, "render_types_stream", ParentType, ContextType, RequireFields<Subscription_RootRender_Types_StreamArgs, 'batch_size' | 'cursor'>>;
@@ -12384,6 +14142,7 @@ export type Tokens_MetadataResolvers<ContextType = any, ParentType extends Resol
   image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   invocation?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   isFlaggedAsSuspicious?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  last_refreshed?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   list_creation_date?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   list_currency_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   list_currency_symbol?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -12454,6 +14213,7 @@ export type Tokens_Metadata_Max_FieldsResolvers<ContextType = any, ParentType ex
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   invocation?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  last_refreshed?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   list_creation_date?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   list_currency_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   list_currency_symbol?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -12462,10 +14222,15 @@ export type Tokens_Metadata_Max_FieldsResolvers<ContextType = any, ParentType ex
   list_platform?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   list_price?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
   list_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  live_view_path?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  live_view_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   low_res_image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  media_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   mint_transaction_hash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   minted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   owner_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  preview_asset_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  primary_asset_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   project_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   project_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   token_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -12482,6 +14247,7 @@ export type Tokens_Metadata_Min_FieldsResolvers<ContextType = any, ParentType ex
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   invocation?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  last_refreshed?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   list_creation_date?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   list_currency_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   list_currency_symbol?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -12490,10 +14256,15 @@ export type Tokens_Metadata_Min_FieldsResolvers<ContextType = any, ParentType ex
   list_platform?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   list_price?: Resolver<Maybe<ResolversTypes['float8']>, ParentType, ContextType>;
   list_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  live_view_path?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  live_view_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   low_res_image_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  media_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   mint_transaction_hash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   minted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   owner_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  preview_asset_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  primary_asset_url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   project_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   project_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   token_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -12728,6 +14499,8 @@ export type Users_Aggregate_FieldsResolvers<ContextType = any, ParentType extend
 
 export type Users_Max_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['users_max_fields'] = ResolversParentTypes['users_max_fields']> = {
   created_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  display_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  nonce?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   public_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   tos_accepted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -12735,10 +14508,16 @@ export type Users_Max_FieldsResolvers<ContextType = any, ParentType extends Reso
 
 export type Users_Min_FieldsResolvers<ContextType = any, ParentType extends ResolversParentTypes['users_min_fields'] = ResolversParentTypes['users_min_fields']> = {
   created_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
+  display_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  nonce?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   public_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   tos_accepted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
+
+export interface UuidScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['uuid'], any> {
+  name: 'uuid';
+}
 
 export type VerticalsResolvers<ContextType = any, ParentType extends ResolversParentTypes['verticals'] = ResolversParentTypes['verticals']> = {
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -12784,9 +14563,37 @@ export type Webflow_Spectrum_ArticlesResolvers<ContextType = any, ParentType ext
 };
 
 export type Resolvers<ContextType = any> = {
+  ArtistEditorialPage?: ArtistEditorialPageResolvers<ContextType>;
+  ArtistEditorialPageEntity?: ArtistEditorialPageEntityResolvers<ContextType>;
+  ArtistEditorialPageEntityResponse?: ArtistEditorialPageEntityResponseResolvers<ContextType>;
+  ArtistEditorialPageEntityResponseCollection?: ArtistEditorialPageEntityResponseCollectionResolvers<ContextType>;
   AuthMessageOutput?: AuthMessageOutputResolvers<ContextType>;
   AuthenticateOutput?: AuthenticateOutputResolvers<ContextType>;
+  ComponentArtistEditorialPageExhibitions?: ComponentArtistEditorialPageExhibitionsResolvers<ContextType>;
+  ComponentArtistEditorialPageFeaturedWork?: ComponentArtistEditorialPageFeaturedWorkResolvers<ContextType>;
+  ComponentArtistEditorialPagePress?: ComponentArtistEditorialPagePressResolvers<ContextType>;
+  ComponentArtistEditorialPageProjectsCreated?: ComponentArtistEditorialPageProjectsCreatedResolvers<ContextType>;
+  ComponentArtistEditorialPageSpectrumArticles?: ComponentArtistEditorialPageSpectrumArticlesResolvers<ContextType>;
+  ComponentGalleryGridItemGalleryGridItem?: ComponentGalleryGridItemGalleryGridItemResolvers<ContextType>;
+  ComponentImageWithCaptionImageWithCaption?: ComponentImageWithCaptionImageWithCaptionResolvers<ContextType>;
+  ComponentPressItemPressItem?: ComponentPressItemPressItemResolvers<ContextType>;
+  ComponentProjectMetadataProjectMetadata?: ComponentProjectMetadataProjectMetadataResolvers<ContextType>;
+  ComponentProjectSaleInfoRowProjectSaleInfoRow?: ComponentProjectSaleInfoRowProjectSaleInfoRowResolvers<ContextType>;
+  ComponentSpectrumArticleSpectrumArticle?: ComponentSpectrumArticleSpectrumArticleResolvers<ContextType>;
+  Date?: GraphQLScalarType;
+  DateTime?: GraphQLScalarType;
+  GenericMorph?: GenericMorphResolvers<ContextType>;
+  JSON?: GraphQLScalarType;
   OpenseaCollectionData?: OpenseaCollectionDataResolvers<ContextType>;
+  Pagination?: PaginationResolvers<ContextType>;
+  ProjectPage?: ProjectPageResolvers<ContextType>;
+  ProjectPageEntity?: ProjectPageEntityResolvers<ContextType>;
+  ProjectPageEntityResponse?: ProjectPageEntityResponseResolvers<ContextType>;
+  ProjectPageEntityResponseCollection?: ProjectPageEntityResponseCollectionResolvers<ContextType>;
+  ResponseCollectionMeta?: ResponseCollectionMetaResolvers<ContextType>;
+  UploadFile?: UploadFileResolvers<ContextType>;
+  UploadFileEntity?: UploadFileEntityResolvers<ContextType>;
+  UploadFileEntityResponse?: UploadFileEntityResponseResolvers<ContextType>;
   artists?: ArtistsResolvers<ContextType>;
   artists_aggregate?: Artists_AggregateResolvers<ContextType>;
   artists_aggregate_fields?: Artists_Aggregate_FieldsResolvers<ContextType>;
@@ -12883,6 +14690,8 @@ export type Resolvers<ContextType = any> = {
   minters_metadata?: Minters_MetadataResolvers<ContextType>;
   mutation_root?: Mutation_RootResolvers<ContextType>;
   numeric?: GraphQLScalarType;
+  oob_tokens_metadata?: Oob_Tokens_MetadataResolvers<ContextType>;
+  processing_jobs?: Processing_JobsResolvers<ContextType>;
   project_external_asset_dependencies?: Project_External_Asset_DependenciesResolvers<ContextType>;
   project_minter_configurations?: Project_Minter_ConfigurationsResolvers<ContextType>;
   project_scripts?: Project_ScriptsResolvers<ContextType>;
@@ -12922,6 +14731,7 @@ export type Resolvers<ContextType = any> = {
   receipt_metadata_aggregate_fields?: Receipt_Metadata_Aggregate_FieldsResolvers<ContextType>;
   receipt_metadata_max_fields?: Receipt_Metadata_Max_FieldsResolvers<ContextType>;
   receipt_metadata_min_fields?: Receipt_Metadata_Min_FieldsResolvers<ContextType>;
+  refresh_requests?: Refresh_RequestsResolvers<ContextType>;
   render_types?: Render_TypesResolvers<ContextType>;
   seed_float?: GraphQLScalarType;
   subscription_root?: Subscription_RootResolvers<ContextType>;
@@ -12959,6 +14769,7 @@ export type Resolvers<ContextType = any> = {
   users_aggregate_fields?: Users_Aggregate_FieldsResolvers<ContextType>;
   users_max_fields?: Users_Max_FieldsResolvers<ContextType>;
   users_min_fields?: Users_Min_FieldsResolvers<ContextType>;
+  uuid?: GraphQLScalarType;
   verticals?: VerticalsResolvers<ContextType>;
   video_aspect_ratios?: Video_Aspect_RatiosResolvers<ContextType>;
   video_frame_rates?: Video_Frame_RatesResolvers<ContextType>;

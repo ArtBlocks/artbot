@@ -232,7 +232,7 @@ const initReservoirBots = async () => {
     )
 
     new ReservoirSaleBot(
-      `https://api.reservoir.tools/sales/v4?${saleParams}&limit=${reservoirSaleLimit}`,
+      `https://api.reservoir.tools/sales/v5?${saleParams}&limit=${reservoirSaleLimit}`,
       pollTimeMs,
       bot,
       {
