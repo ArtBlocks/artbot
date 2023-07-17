@@ -3,6 +3,7 @@ import { ENGINE_CONTRACTS, mintBot } from '../index'
 import axios, { AxiosError } from 'axios'
 import {
   MINT_UTM,
+  getCollectionType,
   getTokenApiUrl,
   getTokenUrl,
   replaceVideoWithGIF,
@@ -33,17 +34,34 @@ export enum CollectionType {
 // Handles all logic and posting of new project mints!
 export class MintBot {
   bot: Client
-  twitterBot?: TwitterBot
+  abTwitterBot?: TwitterBot
   newMints: { [id: string]: Mint } = {}
   mintsToPost: { [id: string]: Mint } = {}
   contractToChannel: { [id: string]: string[] } = {}
+  contractToTwitterBot: { [id: string]: TwitterBot } = {}
   constructor(bot: Client) {
     this.bot = bot
     this.buildContractToChannel()
     this.startRoutine()
 
-    if (process.env.PRODUCTION_MODE && process.env.AB_TWITTER_API_KEY) {
-      this.twitterBot = new TwitterBot()
+    if (process.env.PRODUCTION_MODE) {
+      if (process.env.AB_TWITTER_API_KEY) {
+        this.abTwitterBot = new TwitterBot({
+          appKey: process.env.AB_TWITTER_API_KEY ?? '',
+          appSecret: process.env.AB_TWITTER_API_SECRET ?? '',
+          accessToken: process.env.AB_TWITTER_OAUTH_TOKEN ?? '',
+          accessSecret: process.env.AB_TWITTER_OAUTH_SECRET ?? '',
+        })
+      }
+      if (process.env.HODLERS_TWITTER_API_KEY) {
+        this.contractToTwitterBot[PARTNER_CONTRACTS['HODLERS']] =
+          new TwitterBot({
+            appKey: process.env.HODLERS_TWITTER_API_KEY ?? '',
+            appSecret: process.env.HODLERS_TWITTER_API_SECRET ?? '',
+            accessToken: process.env.HODLERS_TWITTER_OAUTH_TOKEN ?? '',
+            accessSecret: process.env.HODLERS_TWITTER_OAUTH_SECRET ?? '',
+          })
+      }
     }
   }
 
@@ -131,7 +149,7 @@ export class MintBot {
                 mint.tokenId
               )
               mint.postToDiscord()
-              this.twitterBot?.sendToTwitter(mint)
+              this.postToTwitter(mint)
             }
           }
         } catch (e) {
@@ -169,6 +187,19 @@ export class MintBot {
       }
       await this.checkAndPostMints()
     }, parseInt(MINT_REFRESH_TIME_SECONDS) * 1000)
+  }
+
+  async postToTwitter(mint: Mint) {
+    const collectionType = await getCollectionType(mint.contractAddress)
+    if (
+      collectionType !== CollectionType.ENGINE &&
+      collectionType !== CollectionType.STAGING
+    ) {
+      this.abTwitterBot?.sendToTwitter(mint)
+    }
+    if (this.contractToTwitterBot[mint.contractAddress]) {
+      this.contractToTwitterBot[mint.contractAddress].sendToTwitter(mint)
+    }
   }
 }
 
