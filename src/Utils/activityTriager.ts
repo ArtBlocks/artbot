@@ -1,9 +1,8 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js'
 import * as dotenv from 'dotenv'
 import { CollectionType } from '../Classes/MintBot'
+import { projectConfig } from '..'
 dotenv.config()
-
-const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 
 // Trade activity Discord channel IDs.
 const CHANNEL_SALES_CHAT = projectConfig.chIdByName['block-talk']

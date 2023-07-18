@@ -3,12 +3,13 @@ dotenv.config()
 import { Client, Events, GatewayIntentBits } from 'discord.js'
 const express = require('express')
 const bodyParser = require('body-parser')
+import { ProjectConfig } from './ProjectConfig/projectConfig'
+export let ENGINE_CONTRACTS: string[] = []
+export let ARBITRUM_CONTRACTS: string[] = []
+export const projectConfig = new ProjectConfig()
 
 import { ArtIndexerBot } from './Classes/ArtIndexerBot'
-
 import { MintBot } from './Classes/MintBot'
-const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
-
 import { ReservoirListBot } from './Classes/APIBots/ReservoirListBot'
 import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
 import {
@@ -34,8 +35,6 @@ export const EXPLORATIONS_CONTRACTS: {
 export const COLLAB_CONTRACTS: {
   [id: string]: string
 } = require('./ProjectConfig/collaborationContracts.json')
-export let ENGINE_CONTRACTS: string[] = []
-export let ARBITRUM_CONTRACTS: string[] = []
 getEngineContracts().then((contracts) => {
   ENGINE_CONTRACTS = contracts ?? []
 })
