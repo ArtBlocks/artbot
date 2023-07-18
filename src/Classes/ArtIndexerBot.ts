@@ -31,7 +31,7 @@ RANDOM_ART_TIME.setMinutes(0)
 RANDOM_ART_TIME.setSeconds(0)
 RANDOM_ART_TIME.setMilliseconds(0)
 
-// Time for birthday check (UTC) - 10am EST
+// Time for birthday check (UTC) - 10am EST (also + and - 8 hours)
 const BIRTHDAY_CHECK_TIME = new Date()
 BIRTHDAY_CHECK_TIME.setHours(14)
 BIRTHDAY_CHECK_TIME.setMinutes(0)
@@ -223,7 +223,9 @@ export class ArtIndexerBot {
       const now = new Date()
       // Only send message if hour and minute match up with specified time
       if (
-        now.getHours() !== BIRTHDAY_CHECK_TIME.getHours() ||
+        (now.getHours() !== BIRTHDAY_CHECK_TIME.getHours() &&
+          now.getHours() !== BIRTHDAY_CHECK_TIME.getHours() + 8 &&
+          now.getHours() !== BIRTHDAY_CHECK_TIME.getHours() - 8) ||
         now.getMinutes() !== BIRTHDAY_CHECK_TIME.getMinutes()
       ) {
         return
