@@ -1,6 +1,10 @@
 import * as dotenv from 'dotenv'
 
-import { COLLAB_CONTRACTS, ENGINE_CONTRACTS } from '../../index'
+import {
+  ARBITRUM_CONTRACTS,
+  COLLAB_CONTRACTS,
+  ENGINE_CONTRACTS,
+} from '../../index'
 import { CollectionType } from '../MintBot'
 import { AxiosError } from 'axios'
 import { ProjectDetailFragment } from '../../Data/generated/graphql'
@@ -153,6 +157,8 @@ export function getTokenApiUrl(
     return `https://token.artblocks.io/${tokenId}`
   } else if (Object.values(STAGING_CONTRACTS).includes(contractAddress)) {
     return `https://token.staging.artblocks.io/${contractAddress}/${tokenId}`
+  } else if (isArbitrumContract(contractAddress)) {
+    return `https://token.arbitrum.artblocks.io/${contractAddress}/${tokenId}`
   } else {
     return `https://token.artblocks.io/${contractAddress}/${tokenId}`
   }
@@ -185,12 +191,12 @@ export function buildCollectionMapping(
   return [collectionMapping, heritageStatuses]
 }
 
-export async function isEngineContract(
-  contractAddress: string
-): Promise<boolean> {
-  return ((await ENGINE_CONTRACTS) ?? []).includes(
-    contractAddress.toLowerCase()
-  )
+export function isEngineContract(contractAddress: string): boolean {
+  return ENGINE_CONTRACTS.includes(contractAddress.toLowerCase())
+}
+
+export function isArbitrumContract(contractAddress: string): boolean {
+  return ARBITRUM_CONTRACTS.includes(contractAddress.toLowerCase())
 }
 
 export function isCoreContract(contractAddress: string): boolean {
@@ -210,7 +216,7 @@ export async function getCollectionType(
     Object.values(COLLAB_CONTRACTS).includes(contractAddress.toLowerCase())
   ) {
     return CollectionType.COLLAB
-  } else if (await isEngineContract(contractAddress)) {
+  } else if (isEngineContract(contractAddress)) {
     return CollectionType.ENGINE
   }
 

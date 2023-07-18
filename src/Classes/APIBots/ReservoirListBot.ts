@@ -159,7 +159,7 @@ export class ReservoirListBot extends APIPollBot {
       curationStatus = 'AB x Bright Moments'
     } else if (isExplorationsContract(listing.contract)) {
       curationStatus = 'Explorations'
-    } else if (await isEngineContract(listing.contract)) {
+    } else if (isEngineContract(listing.contract)) {
       curationStatus = 'Engine'
       if (artBlocksData?.platform) {
         title = `${artBlocksData.platform} - ${title}`

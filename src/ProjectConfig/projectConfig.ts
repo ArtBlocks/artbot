@@ -122,7 +122,7 @@ class Channel {
  *  - interface to lookup channelIDs by name
  *  - interface to route incoming messages from identified project channels.
  */
-class ProjectConfig {
+export class ProjectConfig {
   channels: { [key: string]: Channel }
   projectBots: { [key: string]: ProjectBot }
   chIdByName: { [key: string]: string }
@@ -282,6 +282,3 @@ class ProjectConfig {
     this.projectBots[botName].handleNumberMessage(msg)
   }
 }
-
-const projectConfig = new ProjectConfig()
-module.exports.projectConfig = projectConfig

@@ -1,8 +1,8 @@
 import { EmbedBuilder, ColorResolvable } from 'discord.js'
 import * as dotenv from 'dotenv'
+import { projectConfig } from '..'
 dotenv.config()
 const fetch = require('node-fetch')
-const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 
 // Discord channel IDs.
 const CHANNEL_HELP: string = projectConfig.chIdByName['help']

@@ -1,5 +1,5 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js'
-import { ENGINE_CONTRACTS, mintBot } from '../index'
+import { ENGINE_CONTRACTS, mintBot, projectConfig } from '../index'
 import axios, { AxiosError } from 'axios'
 import {
   MINT_UTM,
@@ -11,7 +11,6 @@ import {
 import { ensOrAddress } from './APIBots/utils'
 import { TwitterBot } from './TwitterBot'
 
-const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 const MINT_CONFIG: {
   [id: string]: string[]
 } = require('../ProjectConfig/mintBotConfig.json')
