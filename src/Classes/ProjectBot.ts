@@ -1,6 +1,11 @@
 import { AxiosError } from 'axios'
 import { Message } from 'discord.js'
-import { PROJECTBOT_UTM, getTokenUrl, isCoreContract } from './APIBots/utils'
+import {
+  PROJECTBOT_UTM,
+  getTokenApiUrl,
+  getTokenUrl,
+  isCoreContract,
+} from './APIBots/utils'
 
 import { ensOrAddress, replaceVideoWithGIF } from './APIBots/utils'
 import {
@@ -164,7 +169,7 @@ export class ProjectBot {
     detailsRequested: boolean
   ) {
     const artBlocksResponse = await axios.get(
-      `https://token.artblocks.io/${this.coreContract}/${tokenID}`
+      getTokenApiUrl(this.coreContract, `${tokenID}`)
     )
     const artBlocksData = artBlocksResponse.data
 
@@ -315,9 +320,7 @@ export class ProjectBot {
       console.log('sending birthday message(s) for:', this.projectName)
 
       const artBlocksResponse = await axios.get(
-        `https://token.artblocks.io/${this.coreContract}/${
-          this.projectNumber * ONE_MILLION
-        }`
+        getTokenApiUrl(this.coreContract, `${this.projectNumber * ONE_MILLION}`)
       )
       const artBlocksData = await artBlocksResponse.data
       let assetUrl = artBlocksData?.preview_asset_url

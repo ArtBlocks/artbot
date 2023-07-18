@@ -12,6 +12,7 @@ const projectConfig = require('./ProjectConfig/projectConfig').projectConfig
 import { ReservoirListBot } from './Classes/APIBots/ReservoirListBot'
 import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
 import {
+  getArbitrumContracts,
   getArtBlocksXBMProjects,
   getArtBlocksXPaceProjects,
   getEngineContracts,
@@ -33,7 +34,14 @@ export const EXPLORATIONS_CONTRACTS: {
 export const COLLAB_CONTRACTS: {
   [id: string]: string
 } = require('./ProjectConfig/collaborationContracts.json')
-export const ENGINE_CONTRACTS = getEngineContracts()
+export let ENGINE_CONTRACTS: string[] = []
+export let ARBITRUM_CONTRACTS: string[] = []
+getEngineContracts().then((contracts) => {
+  ENGINE_CONTRACTS = contracts ?? []
+})
+getArbitrumContracts().then((contracts) => {
+  ARBITRUM_CONTRACTS = contracts ?? []
+})
 
 // Factory Channel
 const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects']

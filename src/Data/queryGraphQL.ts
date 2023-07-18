@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv'
-import { createClient } from 'urql/core'
+import { Client, createClient } from 'urql/core'
 import {
   ProjectDetailFragment,
   GetAllProjectsDocument,
@@ -12,11 +12,15 @@ import {
   GetProjectInvocationsDocument,
   GetProjectInContractsDocument,
 } from './generated/graphql'
+import { isArbitrumContract } from '../Classes/APIBots/utils'
+import { ARBITRUM_CONTRACTS, ENGINE_CONTRACTS } from '..'
 
 dotenv.config()
 const fetch = require('node-fetch')
 
 export const PUBLIC_HASURA_ENDPOINT = 'https://data.artblocks.io/v1/graphql'
+export const PUBLIC_ARB_HASURA_ENDPOINT =
+  'https://ab-prod-arbitrum.hasura.app/v1/graphql'
 const CORE_CONTRACTS: {
   [id: string]: string
 } = require('../ProjectConfig/coreContracts.json')
@@ -44,14 +48,29 @@ const client = createClient({
   requestPolicy: 'network-only',
 })
 
+const arbitrumClient = createClient({
+  url: PUBLIC_ARB_HASURA_ENDPOINT,
+  fetch: fetch,
+  requestPolicy: 'network-only',
+})
+
+const getClientForContract = (contract: string) => {
+  if (isArbitrumContract(contract)) {
+    return arbitrumClient
+  }
+  return client
+}
+
 const maxProjectsPerQuery = 1000
 
-export async function getAllProjects(): Promise<ProjectDetailFragment[]> {
+export async function getAllProjectsForClient(
+  hasuraClient: Client
+): Promise<ProjectDetailFragment[]> {
   try {
     const allProjects: any[] = []
     let loop = true
     while (loop) {
-      const { data } = await client
+      const { data } = await hasuraClient
         .query(GetAllProjectsDocument, {
           first: maxProjectsPerQuery,
           skip: allProjects.length,
@@ -72,6 +91,40 @@ export async function getAllProjects(): Promise<ProjectDetailFragment[]> {
   }
 }
 
+export async function getAllProjects(): Promise<ProjectDetailFragment[]> {
+  try {
+    const mainnet = await getAllProjectsForClient(client)
+    const arb = await getAllProjectsForClient(arbitrumClient)
+    return mainnet.concat(arb)
+  } catch (err) {
+    console.error(err)
+    return []
+  }
+}
+
+export async function getArbitrumContracts() {
+  const nonPBABContracts: string[] = Object.values(CORE_CONTRACTS)
+    .concat(Object.values(COLLAB_CONTRACTS))
+    .concat(Object.values(EXPLORATION_CONTRACTS))
+    .concat(Object.values(BLOCKED_ENGINE_CONTRACTS))
+  try {
+    const { data: arbData } = await arbitrumClient
+      .query(GetEngineContractsDocument, {
+        ids: nonPBABContracts,
+      })
+      .toPromise()
+
+    if (!arbData) {
+      throw Error('No data returned from getEngineContracts arbitrum query')
+    }
+
+    return arbData.contracts_metadata.map(({ address }) => address)
+  } catch (err) {
+    console.error(err)
+    return undefined
+  }
+}
+
 export async function getEngineContracts() {
   const nonPBABContracts: string[] = Object.values(CORE_CONTRACTS)
     .concat(Object.values(COLLAB_CONTRACTS))
@@ -88,27 +141,33 @@ export async function getEngineContracts() {
       throw Error('No data returned from getEngineContracts subgraph query')
     }
 
-    return data.contracts_metadata.map(({ address }) => address)
+    const arbContracts = await getArbitrumContracts()
+
+    const allContracts = data.contracts_metadata
+      .map(({ address }) => address)
+      .concat(arbContracts ?? [])
+
+    return allContracts
   } catch (err) {
     console.error(err)
     return undefined
   }
 }
 
-export async function getAllTokensInWallet(walletAddress: string) {
-  const engineContracts = await getEngineContracts()
+async function getAllWalletTokensClient(
+  hasuraClient: Client,
+  wallet: string,
+  contracts: string[]
+) {
   const maxTokensPerQuery = 1000
   try {
     const allTokens: any[] = []
     let loop = true
     while (loop) {
-      const { data } = await client
+      const { data } = await hasuraClient
         .query(GetWalletTokensDocument, {
-          wallet: walletAddress,
-          contracts: Object.values(CORE_CONTRACTS)
-            .concat(Object.values(COLLAB_CONTRACTS))
-            .concat(Object.values(EXPLORATION_CONTRACTS))
-            .concat(Object.values(engineContracts ?? [])),
+          wallet,
+          contracts,
           first: maxTokensPerQuery,
           skip: allTokens.length,
         })
@@ -124,8 +183,31 @@ export async function getAllTokensInWallet(walletAddress: string) {
     return allTokens
   } catch (err) {
     console.error(err)
-    return undefined
+    return []
   }
+}
+
+export async function getAllTokensInWallet(walletAddress: string) {
+  const engineContracts = ENGINE_CONTRACTS
+  const arbContracts = ARBITRUM_CONTRACTS
+  const addresses = Object.values(CORE_CONTRACTS)
+    .concat(Object.values(COLLAB_CONTRACTS))
+    .concat(Object.values(EXPLORATION_CONTRACTS))
+    .concat(Object.values(engineContracts))
+    .concat(Object.values(arbContracts))
+
+  const mainnetTokens = await getAllWalletTokensClient(
+    client,
+    walletAddress,
+    addresses
+  )
+  const arbTokens = await getAllWalletTokensClient(
+    arbitrumClient,
+    walletAddress,
+    addresses
+  )
+
+  return mainnetTokens.concat(arbTokens)
 }
 
 export async function getArtblocksOpenProjects(): Promise<
@@ -186,7 +268,8 @@ export async function getContractProject(
   projectId: number,
   contractAddress: string
 ): Promise<ProjectDetailFragment> {
-  const { data } = await client
+  const hasuraClient = getClientForContract(contractAddress)
+  const { data } = await hasuraClient
     .query(GetProjectDocument, {
       id: `${contractAddress}-${projectId}`,
     })
@@ -238,12 +321,12 @@ export async function getProject(
 async function getContractProjects(
   contractAddress: string
 ): Promise<ProjectDetailFragment[]> {
+  const hasuraClient = getClientForContract(contractAddress)
   const maxTokensPerQuery = 1000
-
   const allProjects: ProjectDetailFragment[] = []
   let loop = true
   while (loop) {
-    const { data } = await client
+    const { data } = await hasuraClient
       .query(GetContractProjectsDocument, {
         contract: contractAddress,
         first: maxTokensPerQuery,
@@ -277,8 +360,9 @@ async function getContractsProjects(
 }
 
 export async function getTokenOwnerAddress(tokenId: string) {
+  const hasuraClient = getClientForContract(tokenId.split('-')[0])
   try {
-    const { data, error } = await client
+    const { data, error } = await hasuraClient
       .query(GetTokenOwnerDocument, {
         id: tokenId,
       })
@@ -302,8 +386,9 @@ export async function getTokenOwnerAddress(tokenId: string) {
 }
 
 export async function getProjectInvocations(projectId: string) {
+  const hasuraClient = getClientForContract(projectId.split('-')[0])
   try {
-    const { data } = await client
+    const { data } = await hasuraClient
       .query(GetProjectInvocationsDocument, {
         id: projectId,
       })
