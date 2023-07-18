@@ -1,20 +1,30 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
 import { TwitterApi } from 'twitter-api-v2'
-import { Mint, CollectionType } from './MintBot'
-import { ensOrAddress, getCollectionType, timeout } from './APIBots/utils'
+import { Mint } from './MintBot'
+import { ensOrAddress, timeout } from './APIBots/utils'
 import axios from 'axios'
 
 const TWITTER_TIMEOUT_MS = 14 * 1000
 
 export class TwitterBot {
-  abTwitterClient: TwitterApi
-  constructor() {
-    this.abTwitterClient = new TwitterApi({
-      appKey: process.env.AB_TWITTER_API_KEY ?? '',
-      appSecret: process.env.AB_TWITTER_API_SECRET ?? '',
-      accessToken: process.env.AB_TWITTER_OAUTH_TOKEN ?? '',
-      accessSecret: process.env.AB_TWITTER_OAUTH_SECRET ?? '',
+  twitterClient: TwitterApi
+  constructor({
+    appKey,
+    appSecret,
+    accessToken,
+    accessSecret,
+  }: {
+    appKey: string
+    appSecret: string
+    accessToken: string
+    accessSecret: string
+  }) {
+    this.twitterClient = new TwitterApi({
+      appKey,
+      appSecret,
+      accessToken,
+      accessSecret,
     })
   }
 
@@ -23,7 +33,7 @@ export class TwitterBot {
       // use race function to timeout because twitter library doesn't timeout
       const uploadRes = await Promise.race([
         timeout(TWITTER_TIMEOUT_MS, 'Twitter post timed out'),
-        this.abTwitterClient.v1.uploadMedia(imgBinary, { mimeType: 'png' }),
+        this.twitterClient.v1.uploadMedia(imgBinary, { mimeType: 'png' }),
       ])
       return uploadRes
     } catch (e) {
@@ -64,32 +74,21 @@ export class TwitterBot {
     }. \n\n${artBlock.artblocksUrl}`
     console.log(`Tweeting ${tweetText}`)
 
-    const tweetRes = await this.abTwitterClient.v2.tweet(tweetText, {
+    const tweetRes = await this.twitterClient.v2.tweet(tweetText, {
       text: tweetText,
       media: { media_ids: [mediaId] },
     })
 
     return {
       tweetRes,
-      tweetUrl: `https://twitter.com/artblockmints/status/${tweetRes.data.id}`,
     }
   }
 
   async sendToTwitter(mint: Mint) {
-    const collectionType = await getCollectionType(mint.contractAddress)
-    if (
-      collectionType === CollectionType.ENGINE ||
-      collectionType === CollectionType.STAGING
-    ) {
-      // Do not tweet from AB mint account if PBAB or staging mint event
-      // TODO: handle Engine mints
-      return
-    }
-
     try {
       await this.tweetArtblock(mint)
     } catch (e) {
-      console.error('[ERROR]: ', e)
+      console.error('Error posting to Twitter: ', e)
     }
   }
 }

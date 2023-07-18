@@ -1,8 +1,8 @@
 import { EmbedBuilder, ColorResolvable } from 'discord.js'
 import * as dotenv from 'dotenv'
+import { projectConfig } from '..'
 dotenv.config()
 const fetch = require('node-fetch')
-const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 
 // Discord channel IDs.
 const CHANNEL_HELP: string = projectConfig.chIdByName['help']
@@ -319,6 +319,9 @@ export async function smartBotResponse(
       msgContentLowercase.includes('efcharistó') || // greek
       msgContentLowercase.includes('dyakuyu tobi') || // ukrainian
       msgContentLowercase.includes('blagodaryu vas') || // russian
+      msgContentLowercase.includes('谢谢') || // simplified chinese
+      msgContentLowercase.includes('謝謝') || // traditional chinese
+      msgContentLowercase.includes('xie xie') || // pinyin chinese
       msgContentLowercase.includes('danke')) && // german
     (msgContentLowercase.includes('grant') ||
       msgContentLowercase.includes('grant-san'))

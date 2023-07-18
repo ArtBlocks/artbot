@@ -1,9 +1,8 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js'
 import * as dotenv from 'dotenv'
 import { CollectionType } from '../Classes/MintBot'
+import { projectConfig } from '..'
 dotenv.config()
-
-const projectConfig = require('../ProjectConfig/projectConfig').projectConfig
 
 // Trade activity Discord channel IDs.
 const CHANNEL_SALES_CHAT = projectConfig.chIdByName['block-talk']
@@ -17,18 +16,19 @@ const EXPLORATIONS_LISTINGS = projectConfig.chIdByName['explorations-listings']
 const CHANNEL_SQUIGGLE_SALES = projectConfig.chIdByName['squiggle_square']
 const CHANNEL_SQUIGGLE_LISTINGS = projectConfig.chIdByName['squiggle-listings']
 
+// Artist Servers
 const STEVIE_P_SALES = projectConfig.chIdByName['stevie-p-sales']
 const STEVIE_P_LISTINGS = projectConfig.chIdByName['stevie-p-listings']
-
 const IXNAYOKAY_SALES = projectConfig.chIdByName['ixnayokay-sales']
-
 const OWMO_SALES = projectConfig.chIdByName['owmo-sales']
 
+// Engine Partner Servers
 const PLOTTABLES_SALES = projectConfig.chIdByName['plottables-sales']
 const PLOTTABLES_LISTINGS = projectConfig.chIdByName['plottables-listings']
-
 const FLUTTER_SALES = projectConfig.chIdByName['flutter-sales']
 const TENDER_SALES = projectConfig.chIdByName['tender-sales']
+const HODLERS_SALES = projectConfig.chIdByName['hodlers-sales']
+const HODLERS_LISTINGS = projectConfig.chIdByName['hodlers-listings']
 
 // Addresses which should be omitted entirely from event feeds.
 export const BAN_ADDRESSES = new Set([
@@ -170,6 +170,9 @@ export function sendEmbedToSaleChannels(
     if (artBlocksData.platform.includes('Flutter')) {
       sendEmbedToChannel(bot, embed, FLUTTER_SALES)
     }
+    if (artBlocksData.platform.includes('Hodlers')) {
+      sendEmbedToChannel(bot, embed, HODLERS_SALES)
+    }
 
     if (
       artBlocksData.platform.includes('Tender') ||
@@ -219,6 +222,9 @@ export function sendEmbedToListChannels(
     }
     if (artBlocksData.platform.includes('Plottables')) {
       sendEmbedToChannel(bot, embed, PLOTTABLES_LISTINGS)
+    }
+    if (artBlocksData.platform.includes('Hodlers')) {
+      sendEmbedToChannel(bot, embed, HODLERS_LISTINGS)
     }
   } catch (e) {
     console.warn(e)
