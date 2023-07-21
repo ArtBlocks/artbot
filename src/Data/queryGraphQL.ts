@@ -11,6 +11,7 @@ import {
   GetTokenOwnerDocument,
   GetProjectInvocationsDocument,
   GetProjectInContractsDocument,
+  GetProjectFloorDocument,
 } from './generated/graphql'
 import { isArbitrumContract } from '../Classes/APIBots/utils'
 import { ARBITRUM_CONTRACTS, ENGINE_CONTRACTS } from '..'
@@ -399,6 +400,27 @@ export async function getProjectInvocations(projectId: string) {
     }
     return data.projects_metadata.length > 0
       ? data.projects_metadata[0].invocations
+      : null
+  } catch (err) {
+    console.error(err)
+    return undefined
+  }
+}
+
+export async function getProjectFloor(projectId: string) {
+  const hasuraClient = getClientForContract(projectId.split('-')[0])
+  try {
+    const { data } = await hasuraClient
+      .query(GetProjectFloorDocument, {
+        id: projectId,
+      })
+      .toPromise()
+
+    if (!data) {
+      throw Error('No data returned from getProjectFloor subgraph query')
+    }
+    return data.projects_metadata.length > 0
+      ? data.projects_metadata[0].tokens?.[0]
       : null
   } catch (err) {
     console.error(err)

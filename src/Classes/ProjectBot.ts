@@ -9,6 +9,7 @@ import {
 
 import { ensOrAddress, replaceVideoWithGIF } from './APIBots/utils'
 import {
+  getProjectFloor,
   getProjectInvocations,
   getTokenOwnerAddress,
 } from '../Data/queryGraphQL'
@@ -107,6 +108,19 @@ export class ProjectBot {
         )
       }
       return
+    }
+
+    if (content.toLowerCase().includes('#floor')) {
+      const floorToken = await getProjectFloor(this.id)
+      console.log(floorToken)
+      if (floorToken && floorToken.list_eth_price) {
+        content = `#${floorToken.invocation}`
+      } else {
+        msg.channel.send(
+          `Sorry, looks like no ${this.projectName} tokens are for sale!`
+        )
+        return
+      }
     }
 
     // decode any mappings
