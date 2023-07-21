@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
-import { TwitterApi } from 'twitter-api-v2'
+import { ETwitterStreamEvent, TwitterApi } from 'twitter-api-v2'
 import { Mint } from './MintBot'
 import { ensOrAddress, timeout } from './APIBots/utils'
 import axios from 'axios'
@@ -14,17 +14,51 @@ export class TwitterBot {
     appSecret,
     accessToken,
     accessSecret,
+    listener,
   }: {
     appKey: string
     appSecret: string
     accessToken: string
     accessSecret: string
+    listener?: boolean
   }) {
     this.twitterClient = new TwitterApi({
       appKey,
       appSecret,
       accessToken,
       accessSecret,
+    })
+    // if (listener) {
+    //   this.initListener()
+    // }
+  }
+
+  async initListener() {
+    console.log('Initializing Twitter listener...')
+    const streamRules = await this.twitterClient.v2.streamRules()
+    console.log(streamRules)
+    if (!streamRules.data) {
+      this.twitterClient.v2.updateStreamRules({
+        add: [
+          { value: '@artbot-testing -is:retweet', tag: 'artbot mentioned' },
+        ],
+      })
+    }
+    const stream = await this.twitterClient.v2.searchStream({
+      'tweet.fields': ['referenced_tweets', 'author_id'],
+      expansions: ['referenced_tweets.id'],
+    })
+    // Enable auto reconnect
+    stream.autoReconnect = true
+
+    stream.on(ETwitterStreamEvent.Data, async (tweet) => {
+      console.log('TWEET!!!')
+      console.log(tweet)
+      // Reply to tweet
+      await this.twitterClient.v1.reply(
+        'Hi!! I am here and I am working!',
+        tweet.data.id
+      )
     })
   }
 
