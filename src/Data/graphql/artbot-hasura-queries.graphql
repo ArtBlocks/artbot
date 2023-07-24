@@ -107,6 +107,15 @@ query getProjectInvocations($id: String!) {
   }
 }
 
+query getProjectFloor($id: String!) {
+  projects_metadata(where: { id: { _eq: $id } }) {
+    tokens(limit: 1, order_by: { list_eth_price: asc }) {
+      invocation
+      list_eth_price
+    }
+  }
+}
+
 query getTokenOwner($id: String!) {
   tokens_metadata(where: { id: { _eq: $id } }) {
     owner {
