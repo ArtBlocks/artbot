@@ -217,7 +217,14 @@ bot.on(Events.MessageCreate, async (msg) => {
   )
 })
 
+const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
 const initReservoirBots = async () => {
+  while (ENGINE_CONTRACTS.length === 0) {
+    console.log('Waiting for engine contracts to load...')
+    await delay(5000)
+  }
+  console.log('Engine contracts loaded')
+
   const buildContractsString = (contracts: string[]): string => {
     const ans = 'contracts=' + contracts.join('&contracts=')
     return ans
@@ -252,7 +259,7 @@ const initReservoirBots = async () => {
   const allContracts = Object.values(CORE_CONTRACTS)
     .concat(Object.values(COLLAB_CONTRACTS))
     .concat(Object.values(EXPLORATIONS_CONTRACTS))
-    .concat((await ENGINE_CONTRACTS) ?? [])
+    .concat(ENGINE_CONTRACTS ?? [])
 
   const RESERVOIR_CONTRACT_LIMIT = 20
   const numBotInstances = Math.ceil(

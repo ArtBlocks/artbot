@@ -7,7 +7,10 @@ import {
   getArtblocksOpenProjects,
   getAllTokensInWallet,
 } from '../Data/queryGraphQL'
-import { ProjectDetailFragment } from '../Data/generated/graphql'
+import {
+  Categories_Enum,
+  ProjectDetailFragment,
+} from '../Data/generated/graphql'
 import {
   getVerticalName,
   isVerticalName,
@@ -83,7 +86,8 @@ export class ArtIndexerBot {
         let bday = project.start_datetime
         // Only AB projects use vertical names. Other projects (Engine, Collabs, etc) should use the category name
         const collection = this.toProjectKey(
-          project.vertical?.category_name?.toLowerCase() !== 'collections'
+          project.vertical?.category_name?.toLowerCase() !==
+            Categories_Enum.Collections
             ? project.vertical?.category_name
             : project.vertical_name
         )

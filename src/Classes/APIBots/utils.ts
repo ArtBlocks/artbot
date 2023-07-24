@@ -121,15 +121,16 @@ export function isWallet(msg: string): boolean {
   return msg.startsWith('0x') || msg.endsWith('eth')
 }
 
+const acceptedVerticals = [
+  'curated',
+  'collabs',
+  'collaborations',
+  'explorations',
+  'engine',
+  'presents',
+]
 export function isVerticalName(msg: string): boolean {
-  return (
-    msg === 'curated' ||
-    msg === 'presents' ||
-    msg === 'collaborations' ||
-    msg === 'collabs' ||
-    msg === 'explorations' ||
-    msg === 'engine'
-  )
+  return acceptedVerticals.includes(msg)
 }
 export function getVerticalName(msg: string): string {
   switch (msg) {
