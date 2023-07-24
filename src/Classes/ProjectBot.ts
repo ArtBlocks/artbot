@@ -40,7 +40,7 @@ export class ProjectBot {
   namedMappings: any
   artistName: string
   collection?: string
-  heritageStatus?: string
+  tags?: string[]
   startTime?: Date
 
   constructor(
@@ -54,7 +54,7 @@ export class ProjectBot {
     namedMappings: any,
     artistName = '',
     collection?: string,
-    heritageStatus?: string,
+    tags?: string[],
     startTime?: Date
   ) {
     this.id = id
@@ -69,7 +69,7 @@ export class ProjectBot {
       : undefined
     this.artistName = artistName
     this.collection = collection
-    this.heritageStatus = heritageStatus
+    this.tags = tags
     this.startTime = startTime
   }
 

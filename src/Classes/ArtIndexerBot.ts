@@ -2,20 +2,23 @@ import { Channel, Collection, Message } from 'discord.js'
 import * as dotenv from 'dotenv'
 
 import { ProjectBot } from './ProjectBot'
-import { buildCollectionMapping } from './APIBots/utils'
 import {
   getAllProjects,
   getArtblocksOpenProjects,
   getAllTokensInWallet,
 } from '../Data/queryGraphQL'
-import { ProjectDetailFragment } from '../Data/generated/graphql'
+import {
+  Categories_Enum,
+  ProjectDetailFragment,
+} from '../Data/generated/graphql'
+import {
+  getVerticalName,
+  isVerticalName,
+  resolveEnsName,
+} from './APIBots/utils'
 dotenv.config()
 
 const deburr = require('lodash.deburr')
-
-const resolveEnsName = require('./APIBots/utils').resolveEnsName
-const isVerticalName = require('./APIBots/utils').isVerticalName
-const getVerticalName = require('./APIBots/utils').getVerticalName
 
 const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
 const { isWallet } = require('./APIBots/utils')
@@ -43,7 +46,8 @@ export class ArtIndexerBot {
   projects: { [id: string]: ProjectBot }
   artists: { [id: string]: ProjectBot[] }
   birthdays: { [id: string]: ProjectBot[] }
-  collectionMapping: { [id: string]: ProjectBot[] }
+  collections: { [id: string]: ProjectBot[] }
+  tags: { [id: string]: ProjectBot[] }
   sentBirthdays: { [id: string]: boolean }
   walletTokens: { [id: string]: string[] }
 
@@ -52,7 +56,8 @@ export class ArtIndexerBot {
     this.projects = {}
     this.artists = {}
     this.birthdays = {}
-    this.collectionMapping = {}
+    this.collections = {}
+    this.tags = {}
     this.sentBirthdays = {}
     this.walletTokens = {}
     this.init()
@@ -72,9 +77,6 @@ export class ArtIndexerBot {
   async buildProjectBots() {
     try {
       const projects = await this.projectFetch()
-      const collectionInfo = buildCollectionMapping(projects)
-      const collections = collectionInfo[0]
-      const heritageStatuses = collectionInfo[1]
       console.log(
         `ArtIndexerBot: Building ${projects.length} ProjectBots using: ${this.projectFetch.name}`
       )
@@ -82,11 +84,15 @@ export class ArtIndexerBot {
         const project = projects[i]
         if (project.invocations === '0') continue
         let bday = project.start_datetime
+        // Only AB projects use vertical names. Other projects (Engine, Collabs, etc) should use the category name
         const collection = this.toProjectKey(
-          collections[`${project.contract_address}-${project.project_id}`]
+          project.vertical?.category_name?.toLowerCase() !==
+            Categories_Enum.Collections
+            ? project.vertical?.category_name
+            : project.vertical_name
         )
-        const heritageStatus = this.toProjectKey(
-          heritageStatuses[`${project.contract_address}-${project.project_id}`]
+        const tags: string[] = project.tags.map((tag) =>
+          this.toProjectKey(tag.tag_name)
         )
         const newBot = new ProjectBot(
           project.id,
@@ -98,8 +104,8 @@ export class ArtIndexerBot {
           project.active,
           undefined,
           project.artist_name ?? 'unknown artist',
-          collection ?? undefined,
-          heritageStatus ?? undefined,
+          collection,
+          tags,
           bday ? new Date(bday) : undefined
         )
 
@@ -118,19 +124,12 @@ export class ArtIndexerBot {
         this.artists[artistName] = this.artists[artistName] ?? []
         this.artists[artistName].push(newBot)
 
-        this.collectionMapping[collection] =
-          this.collectionMapping[collection] ?? []
-        this.collectionMapping[collection].push(newBot)
-        if (heritageStatus) {
-          // Umbrella 'heritage' status
-          this.collectionMapping['heritage'] =
-            this.collectionMapping['heritage'] ?? []
-          this.collectionMapping['heritage'].push(newBot)
-
-          // Individual heritage status (e.g. 'factory')
-          this.collectionMapping[heritageStatus] =
-            this.collectionMapping[heritageStatus] ?? []
-          this.collectionMapping[heritageStatus].push(newBot)
+        this.collections[collection] = this.collections[collection] ?? []
+        this.collections[collection].push(newBot)
+        for (let j = 0; j < tags.length; j++) {
+          const tag = tags[j]
+          this.tags[tag] = this.tags[tag] ?? []
+          this.tags[tag].push(newBot)
         }
       }
     } catch (err) {
@@ -166,6 +165,8 @@ export class ArtIndexerBot {
     } else if (isVerticalName(projectKey)) {
       projectKey = getVerticalName(projectKey)
       return this.sendCurationStatusRandomTokenMessage(msg, projectKey)
+    } else if (this.tags[projectKey]) {
+      return this.sendTagRandomTokenMessage(msg, projectKey)
     } else if (this.artists[projectKey]) {
       return this.sendArtistRandomTokenMessage(msg, projectKey)
     } else if (
@@ -183,7 +184,8 @@ export class ArtIndexerBot {
         projectKey &&
         !this.projects[projectKey] &&
         !this.artists[projectKey] &&
-        !isVerticalName(projectKey)
+        !isVerticalName(projectKey) &&
+        !this.tags[projectKey]
       ) {
         msg.channel.send(
           `Sorry, I wasn't able to find that project: ${afterTheHash}`
@@ -288,18 +290,32 @@ export class ArtIndexerBot {
   ) {
     let attempts = 0
     if (
-      !this.collectionMapping[collectionType] ||
-      this.collectionMapping[collectionType].length === 0
+      !this.collections[collectionType] ||
+      this.collections[collectionType].length === 0
     ) {
       return
     }
     while (attempts < 10) {
       const projBot =
-        this.collectionMapping[collectionType][
-          Math.floor(
-            Math.random() * this.collectionMapping[collectionType].length
-          )
+        this.collections[collectionType][
+          Math.floor(Math.random() * this.collections[collectionType].length)
         ]
+
+      if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
+        return projBot.handleNumberMessage(msg)
+      }
+      attempts++
+    }
+  }
+
+  async sendTagRandomTokenMessage(msg: Message, tag: string) {
+    let attempts = 0
+    if (!this.tags[tag] || this.tags[tag].length === 0) {
+      return
+    }
+    while (attempts < 10) {
+      const projBot =
+        this.tags[tag][Math.floor(Math.random() * this.tags[tag].length)]
 
       if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
         return projBot.handleNumberMessage(msg)
@@ -403,11 +419,7 @@ export class ArtIndexerBot {
           for (let index = 0; index < tokens.length; index++) {
             const token = tokens[index]
             const projBot = this.projects[this.toProjectKey(token.project.name)]
-            if (
-              projBot.collection?.toLowerCase() === projectKey ||
-              projBot.heritageStatus?.toLowerCase() === projectKey ||
-              (projectKey === 'heritage' && projBot.heritageStatus)
-            ) {
+            if (projBot.collection?.toLowerCase() === projectKey) {
               tokensInVertical.push(token)
             }
           }
@@ -421,6 +433,26 @@ export class ArtIndexerBot {
             tokensInVertical[
               Math.floor(Math.random() * tokensInVertical.length)
             ]
+          const projBot = this.projects[this.toProjectKey(_token.project.name)]
+          msg.content = `#${_token.invocation}`
+          return projBot.handleNumberMessage(msg)
+        } else if (this.tags[projectKey]) {
+          const tokensInTag = []
+          for (let index = 0; index < tokens.length; index++) {
+            const token = tokens[index]
+            const projBot = this.projects[this.toProjectKey(token.project.name)]
+            if (projBot.tags?.includes(projectKey)) {
+              tokensInTag.push(token)
+            }
+          }
+          if (tokensInTag.length === 0) {
+            msg.channel.send(
+              `Sorry, I wasn't able to find any ${projectKey} tokens in that wallet: ${wallet}`
+            )
+            return
+          }
+          const _token =
+            tokensInTag[Math.floor(Math.random() * tokensInTag.length)]
           const projBot = this.projects[this.toProjectKey(_token.project.name)]
           msg.content = `#${_token.invocation}`
           return projBot.handleNumberMessage(msg)

@@ -11,9 +11,11 @@ fragment ProjectDetail on projects_metadata {
   contract_address
   start_datetime
   vertical_name
-  heritage_curation_status
   vertical {
     category_name
+  }
+  tags {
+    tag_name
   }
 }
 
