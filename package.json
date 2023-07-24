@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
+    "dev": "yarn start",
     "test": "jest",
     "format": "prettier --write .",
     "lint": "eslint . --ext ts --ext tsx --ext js",
