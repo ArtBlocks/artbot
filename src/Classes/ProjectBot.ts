@@ -112,7 +112,6 @@ export class ProjectBot {
 
     if (content.toLowerCase().includes('#floor')) {
       const floorToken = await getProjectFloor(this.id)
-      console.log(floorToken)
       if (floorToken && floorToken.list_eth_price) {
         content = `#${floorToken.invocation}`
       } else {

@@ -78,7 +78,7 @@ export async function getAllProjectsForClient(
         })
         .toPromise()
       if (!data) {
-        throw Error('No data returned from getAllProjects subgraph query')
+        throw Error('No data returned from getAllProjects Hasura query')
       }
       allProjects.push(...data.projects_metadata)
       if (data.projects_metadata.length !== maxProjectsPerQuery) {
@@ -139,7 +139,7 @@ export async function getEngineContracts() {
       .toPromise()
 
     if (!data) {
-      throw Error('No data returned from getEngineContracts subgraph query')
+      throw Error('No data returned from getEngineContracts Hasura query')
     }
 
     const arbContracts = await getArbitrumContracts()
@@ -174,7 +174,7 @@ async function getAllWalletTokensClient(
         })
         .toPromise()
       if (!data) {
-        throw Error('No data returned from getAllTokensInWallet subgraph query')
+        throw Error('No data returned from getAllTokensInWallet Hasura query')
       }
       allTokens.push(...data.tokens_metadata)
       if (data.tokens_metadata.length !== maxTokensPerQuery) {
@@ -228,7 +228,7 @@ export async function getArtblocksOpenProjects(): Promise<
         .toPromise()
       if (!data || !data.projects_metadata) {
         throw Error(
-          'No data returned from getArtblocksOpenProjects subgraph query'
+          'No data returned from getArtblocksOpenProjects Hasura query'
         )
       }
 
@@ -277,7 +277,7 @@ export async function getContractProject(
     .toPromise()
 
   if (!data || !data.projects_metadata || !data.projects_metadata[0]) {
-    throw Error('No data returned from getProject subgraph query')
+    throw Error('No data returned from getProject Hasura query')
   }
 
   return data.projects_metadata[0]
@@ -295,7 +295,7 @@ export async function getProjectInContracts(
     .toPromise()
 
   if (!data || !data.projects_metadata.length) {
-    throw Error('No data returned from getProject subgraph query')
+    throw Error('No data returned from getProject Hasura query')
   }
 
   return data.projects_metadata[0]
@@ -336,7 +336,7 @@ async function getContractProjects(
       .toPromise()
 
     if (!data || !data.projects_metadata) {
-      throw Error('No data returned from getContractProjects subgraph query')
+      throw Error('No data returned from getContractProjects Hasura query')
     }
 
     allProjects.push(...data.projects_metadata)
@@ -376,7 +376,7 @@ export async function getTokenOwnerAddress(tokenId: string) {
     ) {
       console.log(error)
       console.log(data, tokenId)
-      throw Error('No data returned from get token owner subgraph query')
+      throw Error('No data returned from get token owner Hasura query')
     }
 
     return data.tokens_metadata[0]?.owner?.public_address
@@ -396,7 +396,7 @@ export async function getProjectInvocations(projectId: string) {
       .toPromise()
 
     if (!data) {
-      throw Error('No data returned from getProjectInvocations subgraph query')
+      throw Error('No data returned from getProjectInvocations Hasura query')
     }
     return data.projects_metadata.length > 0
       ? data.projects_metadata[0].invocations
@@ -417,7 +417,7 @@ export async function getProjectFloor(projectId: string) {
       .toPromise()
 
     if (!data) {
-      throw Error('No data returned from getProjectFloor subgraph query')
+      throw Error('No data returned from getProjectFloor Hasura query')
     }
     return data.projects_metadata.length > 0
       ? data.projects_metadata[0].tokens?.[0]
