@@ -11,25 +11,27 @@ import { getTokenApiUrl, replaceVideoWithGIF } from './APIBots/utils'
 const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 export class TriviaBot {
   bot: Client
-  model: OpenAIChat
+  model?: OpenAIChat
   channel: TextChannel
 
   currentTriviaAnswer: string
   constructor(bot: Client) {
     this.bot = bot
-    this.model = new OpenAIChat({
-      modelName: 'gpt-3.5-turbo', // With valid API keys can also use 'gpt-4'
-      temperature: 0,
-      prefixMessages: [
-        {
-          role: 'system',
-          content: `
+    this.model = process.env.OPENAI_API_KEY
+      ? new OpenAIChat({
+          modelName: 'gpt-3.5-turbo', // With valid API keys can also use 'gpt-4'
+          temperature: 0,
+          prefixMessages: [
+            {
+              role: 'system',
+              content: `
           You are a bot that thinks of trivia questions with art projects as the answers. I will provide the title of the project and the project description.
          DO NOT include the answer in your response.
           `,
-        },
-      ],
-    })
+            },
+          ],
+        })
+      : undefined
 
     this.currentTriviaAnswer = ''
     this.channel = this.bot.channels?.cache?.get(
@@ -69,6 +71,10 @@ export class TriviaBot {
   }
 
   async askChatGPTQuestion(project: ProjectBot): Promise<EmbedBuilder> {
+    if (!this.model) {
+      console.log("Can't ask trivia question - no OpenAI API key")
+      throw new Error("Can't ask trivia question - no OpenAI API key") // TODO: catch this
+    }
     const question = await this.model.call(
       `Generate a short, cryptic, poetic, vague, difficult riddle that has the answer: "${project.projectName}". It is VERY important that you DO NOT include the answer in your response. The project description is: "${project.description}"`
     )
