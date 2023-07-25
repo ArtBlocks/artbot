@@ -12,9 +12,11 @@ fragment ProjectDetail on projects_metadata {
   contract_address
   start_datetime
   vertical_name
-  heritage_curation_status
   vertical {
     category_name
+  }
+  tags {
+    tag_name
   }
 }
 
@@ -103,6 +105,15 @@ query getEngineContracts($ids: [String!]) {
 query getProjectInvocations($id: String!) {
   projects_metadata(where: { id: { _eq: $id } }) {
     invocations
+  }
+}
+
+query getProjectFloor($id: String!) {
+  projects_metadata(where: { id: { _eq: $id } }) {
+    tokens(limit: 1, order_by: { list_eth_price: asc }) {
+      invocation
+      list_eth_price
+    }
   }
 }
 

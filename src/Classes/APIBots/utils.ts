@@ -7,7 +7,6 @@ import {
 } from '../../index'
 import { CollectionType } from '../MintBot'
 import { AxiosError } from 'axios'
-import { ProjectDetailFragment } from '../../Data/generated/graphql'
 dotenv.config()
 
 const axios = require('axios')
@@ -58,7 +57,7 @@ async function getENSName(address: string): Promise<string> {
   return name
 }
 
-async function resolveEnsName(ensName: string): Promise<string> {
+export async function resolveEnsName(ensName: string): Promise<string> {
   let wallet = ''
   if (ensResolvedMap[ensName]) {
     wallet = ensResolvedMap[ensName]
@@ -86,7 +85,7 @@ export async function ensOrAddress(address: string): Promise<string> {
   return ens !== '' ? ens : address
 }
 
-async function getOSName(address: string): Promise<string> {
+export async function getOSName(address: string): Promise<string> {
   let name = ''
   if (osAddressMap[address]) {
     console.log('Cached!')
@@ -118,25 +117,22 @@ async function getOSName(address: string): Promise<string> {
   return name
 }
 
-function isWallet(msg: string): boolean {
+export function isWallet(msg: string): boolean {
   return msg.startsWith('0x') || msg.endsWith('eth')
 }
 
-function isVerticalName(msg: string): boolean {
-  return (
-    msg === 'curated' ||
-    msg === 'presents' ||
-    msg === 'collaborations' ||
-    msg === 'collabs' ||
-    msg === 'heritage' ||
-    msg === 'factory' ||
-    msg === 'playground' ||
-    msg === 'explorations' ||
-    msg === 'engine' ||
-    msg.startsWith('curatedseries')
-  )
+const acceptedVerticals = [
+  'curated',
+  'collabs',
+  'collaborations',
+  'explorations',
+  'engine',
+  'presents',
+]
+export function isVerticalName(msg: string): boolean {
+  return acceptedVerticals.includes(msg)
 }
-function getVerticalName(msg: string): string {
+export function getVerticalName(msg: string): string {
   switch (msg) {
     case 'collabs':
       return 'collaborations'
@@ -168,27 +164,6 @@ export function isExplorationsContract(contractAddress: string): boolean {
   return Object.values(EXPLORATIONS_CONTRACTS).includes(
     contractAddress.toLowerCase()
   )
-}
-
-// Collection mapping maps project ID to curated/presents/collaboration/engine
-// Heritage statuses maps project ID to factory/playground/curated series x
-export function buildCollectionMapping(
-  projects: ProjectDetailFragment[]
-): { [id: string]: string }[] {
-  const collectionMapping: { [id: string]: string } = {}
-  const heritageStatuses: { [id: string]: string } = {}
-  projects.forEach((proj) => {
-    let collectionName = proj.vertical_name.toLowerCase()
-    if (proj.vertical?.category_name?.toLowerCase() !== 'collections') {
-      collectionName = proj.vertical?.category_name?.toLowerCase()
-    }
-    if (proj.heritage_curation_status) {
-      heritageStatuses[proj.id] = proj.heritage_curation_status
-    }
-    collectionMapping[proj.id] = collectionName
-  })
-
-  return [collectionMapping, heritageStatuses]
 }
 
 export function isEngineContract(contractAddress: string): boolean {
@@ -283,10 +258,3 @@ export async function replaceVideoWithGIF(url: string) {
 
   return url
 }
-
-module.exports.ensOrAddress = ensOrAddress
-module.exports.getOSName = getOSName
-module.exports.resolveEnsName = resolveEnsName
-module.exports.isWallet = isWallet
-module.exports.isVerticalName = isVerticalName
-module.exports.getVerticalName = getVerticalName

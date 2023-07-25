@@ -9,6 +9,7 @@ import {
 
 import { ensOrAddress, replaceVideoWithGIF } from './APIBots/utils'
 import {
+  getProjectFloor,
   getProjectInvocations,
   getTokenOwnerAddress,
 } from '../Data/queryGraphQL'
@@ -41,7 +42,7 @@ export class ProjectBot {
   namedMappings: any
   artistName: string
   collection?: string
-  heritageStatus?: string
+  tags?: string[]
   startTime?: Date
   description?: string
 
@@ -56,7 +57,7 @@ export class ProjectBot {
     namedMappings,
     artistName,
     collection,
-    heritageStatus,
+    tags,
     startTime,
     description,
   }: {
@@ -70,7 +71,7 @@ export class ProjectBot {
     namedMappings: any
     artistName: string
     collection?: string
-    heritageStatus?: string
+    tags?: string[]
     startTime?: Date
     description?: string
   }) {
@@ -86,7 +87,7 @@ export class ProjectBot {
       : undefined
     this.artistName = artistName
     this.collection = collection
-    this.heritageStatus = heritageStatus
+    this.tags = tags
     this.startTime = startTime
     this.description = description
   }
@@ -128,6 +129,18 @@ export class ProjectBot {
         )
       }
       return
+    }
+
+    if (content.toLowerCase().includes('#floor')) {
+      const floorToken = await getProjectFloor(this.id)
+      if (floorToken && floorToken.list_eth_price) {
+        content = `#${floorToken.invocation}`
+      } else {
+        msg.channel.send(
+          `Sorry, looks like no ${this.projectName} tokens are for sale!`
+        )
+        return
+      }
     }
 
     // decode any mappings
