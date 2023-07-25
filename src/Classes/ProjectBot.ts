@@ -42,21 +42,38 @@ export class ProjectBot {
   collection?: string
   heritageStatus?: string
   startTime?: Date
+  description?: string
+  activeTriviaQuestion: boolean
 
-  constructor(
-    id: string,
-    projectNumber: number,
-    coreContract: string,
-    editionSize: number,
-    maxEditionSize: number,
-    projectName: string,
-    projectActive: boolean,
-    namedMappings: any,
-    artistName = '',
-    collection?: string,
-    heritageStatus?: string,
+  constructor({
+    id,
+    projectNumber,
+    coreContract,
+    editionSize,
+    maxEditionSize,
+    projectName,
+    projectActive,
+    namedMappings,
+    artistName,
+    collection,
+    heritageStatus,
+    startTime,
+    description,
+  }: {
+    id: string
+    projectNumber: number
+    coreContract: string
+    editionSize: number
+    maxEditionSize: number
+    projectName: string
+    projectActive: boolean
+    namedMappings: any
+    artistName: string
+    collection?: string
+    heritageStatus?: string
     startTime?: Date
-  ) {
+    description?: string
+  }) {
     this.id = id
     this.projectNumber = projectNumber
     this.coreContract = coreContract
@@ -71,6 +88,8 @@ export class ProjectBot {
     this.collection = collection
     this.heritageStatus = heritageStatus
     this.startTime = startTime
+    this.description = description
+    this.activeTriviaQuestion = false
   }
 
   static getProjectHandlerHelper({ singles, sets }: any) {
@@ -86,6 +105,10 @@ export class ProjectBot {
         `Invalid format, enter # followed by the piece number of interest.`
       )
       return
+    }
+    if (this.activeTriviaQuestion) {
+      this.activeTriviaQuestion = false
+      msg.reply(`Congrats @${msg.author.username}! You got it!`)
     }
 
     if (content.toLowerCase().includes('named')) {

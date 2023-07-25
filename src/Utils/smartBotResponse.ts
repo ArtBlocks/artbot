@@ -20,7 +20,7 @@ const ARTBOT_GREEN = 0x00ff00
 const ARTBOT_WARNING = 0xffff00
 
 // Returns a random color
-function randomColor(): ColorResolvable {
+export function randomColor(): ColorResolvable {
   return `#${Math.floor(Math.random() * 16777215).toString(16)}`
 }
 

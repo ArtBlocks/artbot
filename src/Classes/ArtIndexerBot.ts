@@ -9,6 +9,7 @@ import {
   getAllTokensInWallet,
 } from '../Data/queryGraphQL'
 import { ProjectDetailFragment } from '../Data/generated/graphql'
+import { triviaBot } from '..'
 dotenv.config()
 
 const deburr = require('lodash.deburr')
@@ -88,20 +89,21 @@ export class ArtIndexerBot {
         const heritageStatus = this.toProjectKey(
           heritageStatuses[`${project.contract_address}-${project.project_id}`]
         )
-        const newBot = new ProjectBot(
-          project.id,
-          parseInt(project.project_id),
-          project.contract_address,
-          project.invocations,
-          project.max_invocations,
-          project.name ?? 'unknown',
-          project.active,
-          undefined,
-          project.artist_name ?? 'unknown artist',
-          collection ?? undefined,
-          heritageStatus ?? undefined,
-          bday ? new Date(bday) : undefined
-        )
+        const newBot = new ProjectBot({
+          id: project.id,
+          projectNumber: parseInt(project.project_id),
+          coreContract: project.contract_address,
+          editionSize: project.invocations,
+          maxEditionSize: project.max_invocations,
+          projectName: project.name ?? 'unknown',
+          description: project.description ?? '',
+          projectActive: project.active,
+          namedMappings: undefined,
+          artistName: project.artist_name ?? 'unknown artist',
+          collection,
+          heritageStatus,
+          startTime: bday ? new Date(bday) : undefined,
+        })
 
         const projectKey = this.toProjectKey(project.name ?? 'unknown project')
         this.projects[projectKey] = newBot
@@ -246,6 +248,22 @@ export class ArtIndexerBot {
     }, 1 * 60000)
   }
 
+  async startTriviaRoutine() {
+    setInterval(() => {
+      console.log("It's trivia time!")
+      let attempts = 0
+      while (attempts < 10) {
+        const keys = Object.keys(this.projects)
+        const projectKey = keys[Math.floor(Math.random() * keys.length)]
+        const projBot = this.projects[projectKey]
+        if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
+          triviaBot.askTriviaQuestion(projBot)
+          return
+        }
+        attempts++
+      }
+    }, 1 * 60000)
+  }
   // This function takes a channel and sends a message containing a random
   // token from a random project
   async sendRandomProjectRandomTokenMessage(msg: Message, numMessages: number) {
