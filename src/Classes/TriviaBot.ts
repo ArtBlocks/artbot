@@ -2,15 +2,19 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 import { OpenAIChat } from 'langchain/llms/openai'
 import { ProjectBot } from './ProjectBot'
-import { Client, EmbedBuilder, TextChannel } from 'discord.js'
+import { Client, EmbedBuilder, Message, TextChannel } from 'discord.js'
 import { projectConfig } from '..'
 import { randomColor } from '../Utils/smartBotResponse'
+import axios from 'axios'
+import { getTokenApiUrl, replaceVideoWithGIF } from './APIBots/utils'
 
 const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 export class TriviaBot {
   bot: Client
   model: OpenAIChat
   channel: TextChannel
+
+  currentTriviaAnswer: string
   constructor(bot: Client) {
     this.bot = bot
     this.model = new OpenAIChat({
@@ -27,20 +31,29 @@ export class TriviaBot {
       ],
     })
 
+    this.currentTriviaAnswer = ''
     this.channel = this.bot.channels?.cache?.get(
       CHANNEL_BLOCK_TALK
     ) as TextChannel
+  }
 
-    // Continue with this documentation! https://github.com/transitive-bullshit/chatgpt-api
-    // Prefix: You are a bot that thinks of trivia questions. DO NOT include the answer in your response.
-    //       Generate a short, cryptic, poetic, vague, difficult riddle that has the answer:
+  isActiveTriviaAnswer(projectBot: ProjectBot): boolean {
+    return (
+      projectBot.projectName === this.currentTriviaAnswer ||
+      projectBot.artistName === this.currentTriviaAnswer
+    )
+  }
+
+  tally(msg: Message) {
+    msg.reply(`Congrats @${msg.author.username}! You got it!`)
+    // TODO in next PR: add persistent storage for trivia scores
   }
 
   async askTriviaQuestion(project: ProjectBot) {
     // TODO: Add more question types: Name this collection? Name this artist?
     console.log(`Asking trivia question for ${project.projectName}`)
 
-    project.activeTriviaQuestion = true
+    this.currentTriviaAnswer = project.projectName
     const embed = await this.askChatGPTQuestion(project)
 
     this.channel
@@ -54,6 +67,7 @@ export class TriviaBot {
         )
       })
   }
+
   async askChatGPTQuestion(project: ProjectBot): Promise<EmbedBuilder> {
     const question = await this.model.call(
       `Generate a short, cryptic, poetic, vague, difficult riddle that has the answer: "${project.projectName}". It is VERY important that you DO NOT include the answer in your response. The project description is: "${project.description}"`
@@ -68,12 +82,20 @@ export class TriviaBot {
 
     return embed
   }
+
   async askNameProjectQuestion(project: ProjectBot): Promise<EmbedBuilder> {
     const question = 'Name this project!'
-    // TODO: Get project image and add to embed
+    const tokenNumber = Math.floor(Math.random() * project.editionSize)
+
+    const artBlocksResponse = await axios.get(
+      getTokenApiUrl(project.coreContract, `${tokenNumber}`)
+    )
+    const artBlocksData = artBlocksResponse.data
+    const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url)
     const embed = new EmbedBuilder()
       .setTitle('Artbot Trivia Hour')
       .setDescription(question)
+      .setImage(assetUrl)
       .setColor(randomColor())
       .setFooter({
         text: 'Answer by using the #? command',

@@ -12,6 +12,7 @@ import {
   getProjectInvocations,
   getTokenOwnerAddress,
 } from '../Data/queryGraphQL'
+import { triviaBot } from '..'
 
 const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
@@ -43,7 +44,6 @@ export class ProjectBot {
   heritageStatus?: string
   startTime?: Date
   description?: string
-  activeTriviaQuestion: boolean
 
   constructor({
     id,
@@ -89,7 +89,6 @@ export class ProjectBot {
     this.heritageStatus = heritageStatus
     this.startTime = startTime
     this.description = description
-    this.activeTriviaQuestion = false
   }
 
   static getProjectHandlerHelper({ singles, sets }: any) {
@@ -106,9 +105,8 @@ export class ProjectBot {
       )
       return
     }
-    if (this.activeTriviaQuestion) {
-      this.activeTriviaQuestion = false
-      msg.reply(`Congrats @${msg.author.username}! You got it!`)
+    if (triviaBot.isActiveTriviaAnswer(this)) {
+      triviaBot.tally(msg)
     }
 
     if (content.toLowerCase().includes('named')) {
