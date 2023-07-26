@@ -213,18 +213,20 @@ export class ProjectConfig {
         name,
         active,
         contract_address,
+        artist_name,
       } = await getProject(projectNumber, configContract)
 
-      projectBots[botId] = new ProjectBot(
+      projectBots[botId] = new ProjectBot({
         id,
         projectNumber,
-        contract_address,
-        invocations,
-        max_invocations,
-        name ?? 'Unknown',
-        active,
-        namedMappings
-      )
+        coreContract: contract_address,
+        editionSize: invocations,
+        maxEditionSize: max_invocations,
+        projectName: name ?? 'Unknown',
+        artistName: artist_name ?? 'Unknown',
+        projectActive: active,
+        namedMappings,
+      })
     })
 
     await Promise.all(promises)

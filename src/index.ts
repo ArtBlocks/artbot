@@ -19,6 +19,7 @@ import {
   getEngineContracts,
   getEngineProjects,
 } from './Data/queryGraphQL'
+import { TriviaBot } from './Classes/TriviaBot'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
@@ -147,10 +148,13 @@ const bot = new Client({
 if (PRODUCTION_MODE) {
   bot.login(DISCORD_TOKEN)
 }
-
+export const triviaBot = new TriviaBot(bot)
 bot.on('ready', () => {
   console.info(`Logged in as ${bot.user?.tag}!`)
   artIndexerBot.startBirthdayRoutine(bot.channels.cache, projectConfig)
+
+  // TODO: Uncomment when trivia game is ready (also probs want to tweak the timing)
+  // artIndexerBot.startTriviaRoutine()
 })
 
 const artIndexerBot = new ArtIndexerBot()

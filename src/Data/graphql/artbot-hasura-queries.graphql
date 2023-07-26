@@ -2,6 +2,7 @@ fragment ProjectDetail on projects_metadata {
   id
   project_id
   name
+  description
   invocations
   max_invocations
   active
