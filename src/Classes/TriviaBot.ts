@@ -36,10 +36,10 @@ export class TriviaBot {
       : undefined
 
     this.currentTriviaAnswer = ''
-    this.supabaseClient = createClient(
-      process.env.SUPABASE_URL ?? '',
-      process.env.SUPABASE_API_KEY ?? ''
-    )
+    this.supabaseClient =
+      process.env.SUPABASE_URL && process.env.SUPABASE_API_KEY
+        ? createClient(process.env.SUPABASE_URL, process.env.SUPABASE_API_KEY)
+        : undefined
   }
 
   isActiveTriviaAnswer(projectBot: ProjectBot): boolean {
