@@ -208,17 +208,22 @@ bot.on(Events.MessageCreate, async (msg) => {
 
   // Handle special info questions that ArtBot knows how to answer.
   const artBotID = bot.user?.id
-  smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
-    (smartResponse: string) => {
-      if (smartResponse !== null && smartResponse !== undefined) {
-        if (typeof smartResponse === 'string') {
-          msg.reply(smartResponse)
-        } else {
-          msg.reply({ embeds: [smartResponse] })
-        }
+  // TODO: refactor smartbotresponse to be less irritating / have fewer args
+  smartBotResponse(
+    msgContentLowercase,
+    msgAuthor,
+    artBotID,
+    channelID,
+    msg
+  ).then((smartResponse: string) => {
+    if (smartResponse !== null && smartResponse !== undefined) {
+      if (typeof smartResponse === 'string') {
+        msg.reply(smartResponse)
+      } else {
+        msg.reply({ embeds: [smartResponse] })
       }
     }
-  )
+  })
 })
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
