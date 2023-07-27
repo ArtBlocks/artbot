@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
-import { ETwitterStreamEvent, TwitterApi } from 'twitter-api-v2'
+import { EUploadMimeType, TwitterApi } from 'twitter-api-v2'
 import { Mint } from './MintBot'
-import { ensOrAddress, timeout } from './APIBots/utils'
+import { ensOrAddress, getTokenApiUrl, timeout } from './APIBots/utils'
 import axios from 'axios'
 
 const TWITTER_TIMEOUT_MS = 14 * 1000
@@ -28,37 +28,44 @@ export class TwitterBot {
       accessToken,
       accessSecret,
     })
-    // if (listener) {
-    //   this.initListener()
-    // }
+
+    if (listener) {
+      this.initListener()
+    }
   }
 
   async initListener() {
     console.log('Initializing Twitter listener...')
-    const streamRules = await this.twitterClient.v2.streamRules()
-    console.log(streamRules)
-    if (!streamRules.data) {
-      this.twitterClient.v2.updateStreamRules({
-        add: [
-          { value: '@artbot-testing -is:retweet', tag: 'artbot mentioned' },
-        ],
-      })
-    }
-    const stream = await this.twitterClient.v2.searchStream({
-      'tweet.fields': ['referenced_tweets', 'author_id'],
-      expansions: ['referenced_tweets.id'],
+    const jsTweets = await this.twitterClient.v2.search('@artbot_ab', {
+      since_id: '1684583508541689857',
     })
-    // Enable auto reconnect
-    stream.autoReconnect = true
-
-    stream.on(ETwitterStreamEvent.Data, async (tweet) => {
-      console.log('TWEET!!!')
+    for await (const tweet of jsTweets) {
       console.log(tweet)
-      // Reply to tweet
-      await this.twitterClient.v1.reply(
-        'Hi!! I am here and I am working!',
-        tweet.data.id
-      )
+      if (tweet.text.includes('#123 fidenza')) {
+        this.replyToTweet(tweet.id)
+      }
+    }
+  }
+
+  async replyToTweet(tweetId: string) {
+    const artBlocksResponse = await axios.get(
+      getTokenApiUrl('0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270', `78000123`)
+    )
+    const artBlocksData = artBlocksResponse.data
+    const downStream = await axios({
+      method: 'GET',
+      responseType: 'arraybuffer',
+      url: artBlocksData.preview_asset_url,
+    })
+    console.log('Uploading media...', artBlocksData.preview_asset_url)
+    const media_id = await this.twitterClient.v1.uploadMedia(downStream.data, {
+      mimeType: EUploadMimeType.Png,
+    })
+    console.log('Media', media_id)
+    await this.twitterClient.v2.reply(artBlocksData.name, tweetId, {
+      media: {
+        media_ids: [media_id],
+      },
     })
   }
 
