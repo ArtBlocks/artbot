@@ -9,9 +9,11 @@ import {
 
 import { ensOrAddress, replaceVideoWithGIF } from './APIBots/utils'
 import {
+  getProjectFloor,
   getProjectInvocations,
   getTokenOwnerAddress,
 } from '../Data/queryGraphQL'
+import { triviaBot } from '..'
 
 const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
@@ -40,23 +42,39 @@ export class ProjectBot {
   namedMappings: any
   artistName: string
   collection?: string
-  heritageStatus?: string
+  tags?: string[]
   startTime?: Date
+  description?: string
 
-  constructor(
-    id: string,
-    projectNumber: number,
-    coreContract: string,
-    editionSize: number,
-    maxEditionSize: number,
-    projectName: string,
-    projectActive: boolean,
-    namedMappings: any,
-    artistName = '',
-    collection?: string,
-    heritageStatus?: string,
+  constructor({
+    id,
+    projectNumber,
+    coreContract,
+    editionSize,
+    maxEditionSize,
+    projectName,
+    projectActive,
+    namedMappings,
+    artistName,
+    collection,
+    tags,
+    startTime,
+    description,
+  }: {
+    id: string
+    projectNumber: number
+    coreContract: string
+    editionSize: number
+    maxEditionSize: number
+    projectName: string
+    projectActive: boolean
+    namedMappings: any
+    artistName: string
+    collection?: string
+    tags?: string[]
     startTime?: Date
-  ) {
+    description?: string
+  }) {
     this.id = id
     this.projectNumber = projectNumber
     this.coreContract = coreContract
@@ -69,8 +87,9 @@ export class ProjectBot {
       : undefined
     this.artistName = artistName
     this.collection = collection
-    this.heritageStatus = heritageStatus
+    this.tags = tags
     this.startTime = startTime
+    this.description = description
   }
 
   static getProjectHandlerHelper({ singles, sets }: any) {
@@ -86,6 +105,9 @@ export class ProjectBot {
         `Invalid format, enter # followed by the piece number of interest.`
       )
       return
+    }
+    if (triviaBot.isActiveTriviaAnswer(this)) {
+      triviaBot.tally(msg)
     }
 
     if (content.toLowerCase().includes('named')) {
@@ -107,6 +129,18 @@ export class ProjectBot {
         )
       }
       return
+    }
+
+    if (content.toLowerCase().includes('#floor')) {
+      const floorToken = await getProjectFloor(this.id)
+      if (floorToken && floorToken.list_eth_price) {
+        content = `#${floorToken.invocation}`
+      } else {
+        msg.channel.send(
+          `Sorry, looks like no ${this.projectName} tokens are for sale!`
+        )
+        return
+      }
     }
 
     // decode any mappings

@@ -1,6 +1,6 @@
-import { EmbedBuilder, ColorResolvable } from 'discord.js'
+import { EmbedBuilder, ColorResolvable, Message } from 'discord.js'
 import * as dotenv from 'dotenv'
-import { projectConfig } from '..'
+import { projectConfig, triviaBot } from '..'
 dotenv.config()
 const fetch = require('node-fetch')
 
@@ -20,7 +20,7 @@ const ARTBOT_GREEN = 0x00ff00
 const ARTBOT_WARNING = 0xffff00
 
 // Returns a random color
-function randomColor(): ColorResolvable {
+export function randomColor(): ColorResolvable {
   return `#${Math.floor(Math.random() * 16777215).toString(16)}`
 }
 
@@ -259,7 +259,8 @@ export async function smartBotResponse(
   msgContentLowercase: string,
   msgAuthor: string,
   artBotID: string,
-  channelID: string
+  channelID: string,
+  msg: Message
 ): Promise<string | EmbedBuilder | null> {
   /*
    * NOTE: It is important to check if the message author is the ArtBot
@@ -479,6 +480,8 @@ export async function smartBotResponse(
     }
     return GAS_MESSAGE
   }
-
+  if (msgContentLowercase.includes('leaderboard')) {
+    triviaBot.leaderboard(msg)
+  }
   return null
 }

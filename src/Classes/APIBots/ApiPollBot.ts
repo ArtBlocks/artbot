@@ -1,7 +1,11 @@
 import { Client, ColorResolvable } from 'discord.js'
-import { buildOpenseaURL, buildLooksRareURL, buildX2Y2URL } from './utils'
+import {
+  buildOpenseaURL,
+  buildLooksRareURL,
+  buildX2Y2URL,
+  getOSName,
+} from './utils'
 
-const { getOSName } = require('./utils')
 const axios = require('axios')
 /** Abstract parent class for all API Poll Bots */
 export class APIPollBot {

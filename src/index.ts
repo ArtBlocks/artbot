@@ -19,6 +19,7 @@ import {
   getEngineContracts,
   getEngineProjects,
 } from './Data/queryGraphQL'
+import { TriviaBot } from './Classes/TriviaBot'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
@@ -147,10 +148,13 @@ const bot = new Client({
 if (PRODUCTION_MODE) {
   bot.login(DISCORD_TOKEN)
 }
-
+export const triviaBot = new TriviaBot(bot)
 bot.on('ready', () => {
   console.info(`Logged in as ${bot.user?.tag}!`)
   artIndexerBot.startBirthdayRoutine(bot.channels.cache, projectConfig)
+
+  // TODO: Uncomment when trivia game is ready (also probs want to tweak the timing)
+  // artIndexerBot.startTriviaRoutine()
 })
 
 const artIndexerBot = new ArtIndexerBot()
@@ -204,20 +208,32 @@ bot.on(Events.MessageCreate, async (msg) => {
 
   // Handle special info questions that ArtBot knows how to answer.
   const artBotID = bot.user?.id
-  smartBotResponse(msgContentLowercase, msgAuthor, artBotID, channelID).then(
-    (smartResponse: string) => {
-      if (smartResponse !== null && smartResponse !== undefined) {
-        if (typeof smartResponse === 'string') {
-          msg.reply(smartResponse)
-        } else {
-          msg.reply({ embeds: [smartResponse] })
-        }
+  // TODO: refactor smartbotresponse to be less irritating / have fewer args
+  smartBotResponse(
+    msgContentLowercase,
+    msgAuthor,
+    artBotID,
+    channelID,
+    msg
+  ).then((smartResponse: string) => {
+    if (smartResponse !== null && smartResponse !== undefined) {
+      if (typeof smartResponse === 'string') {
+        msg.reply(smartResponse)
+      } else {
+        msg.reply({ embeds: [smartResponse] })
       }
     }
-  )
+  })
 })
 
+const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
 const initReservoirBots = async () => {
+  while (ENGINE_CONTRACTS.length === 0) {
+    console.log('Waiting for engine contracts to load...')
+    await delay(5000)
+  }
+  console.log('Engine contracts loaded')
+
   const buildContractsString = (contracts: string[]): string => {
     const ans = 'contracts=' + contracts.join('&contracts=')
     return ans
@@ -252,7 +268,7 @@ const initReservoirBots = async () => {
   const allContracts = Object.values(CORE_CONTRACTS)
     .concat(Object.values(COLLAB_CONTRACTS))
     .concat(Object.values(EXPLORATIONS_CONTRACTS))
-    .concat((await ENGINE_CONTRACTS) ?? [])
+    .concat(ENGINE_CONTRACTS ?? [])
 
   const RESERVOIR_CONTRACT_LIMIT = 20
   const numBotInstances = Math.ceil(
