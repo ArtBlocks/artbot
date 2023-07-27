@@ -51,14 +51,16 @@ export class TriviaBot {
 
   async askTriviaQuestion(project: ProjectBot) {
     // List of ideas:
-    // TODO: Add more question types: Name this collection? Name this artist?
-    // TODO: Price is right style trivia
+    // TODO: Add more question types: Name this artist?
+    // TODO: Price is right style trivia - would need to change the way the answers come in
     // TODO: Different triggers? Not just time based - number of sales, LJ cursing, thank grant, etc.
     // TODO: Trait data type questions? (e.g. "Name a project that has a trait of 'blue'"), Which of these is not a Meridian trait?
-    // TODO: Artist name is the answer
-    console.log(`Asking trivia question for ${project.projectName}`)
 
-    this.currentTriviaAnswer = project.projectName
+    enum QuestionType {
+      CHAT_GPT = 0,
+      PICTURE_ID = 1,
+      ARTIST_NAME = 2,
+    }
 
     let embed = new EmbedBuilder()
       .setTitle('Artbot Trivia Hour')
@@ -66,8 +68,22 @@ export class TriviaBot {
       .setFooter({
         text: 'Answer by using the #? command',
       })
+    const questionType = Math.floor(Math.random() * 2)
+    console.log(`Asking trivia question for ${project.projectName}`)
 
-    embed = await this.askChatGPTQuestion(project, embed)
+    switch (questionType) {
+      case QuestionType.CHAT_GPT:
+        embed = await this.askChatGPTQuestion(project, embed)
+        this.currentTriviaAnswer = project.projectName
+        break
+      case QuestionType.PICTURE_ID:
+        embed = await this.askNameProjectQuestion(project, embed)
+        this.currentTriviaAnswer = project.projectName
+        break
+      case QuestionType.ARTIST_NAME:
+        break
+    }
+
     this.channel = this.bot.channels?.cache?.get(
       CHANNEL_BLOCK_TALK
     ) as TextChannel
@@ -104,7 +120,9 @@ export class TriviaBot {
     embed: EmbedBuilder
   ): Promise<EmbedBuilder> {
     const question = 'Name this project!'
-    const tokenNumber = Math.floor(Math.random() * project.editionSize)
+    const tokenNumber =
+      Math.floor(Math.random() * project.editionSize) +
+      project.projectNumber * 1e6
 
     const artBlocksResponse = await axios.get(
       getTokenApiUrl(project.coreContract, `${tokenNumber}`)
@@ -149,8 +167,30 @@ export class TriviaBot {
         console.log('ERROR upserting', error)
       }
 
+      const congratsOptions = [
+        `Correct. You may have won this round ${msg.author}, but the game is far from over. You now have \`${score}\` total points`,
+        `Ingenious ${msg.author}! You've outwitted my little puzzle with grace and cunning. Your score totals \`${score}\` magic points`,
+        `Behold, the hallmarks of your struggles - your petty victories. The game shall continue, and I shall relish in the torment of your confusion. Brace yourselves, for the storm of mind-bending riddles is nigh! (Thy score is now \`${score}\` points)`,
+        `Your minds are but pawns in my grand design, dancing to the tune of my malevolent whims. Relish in the satisfaction of a correct answer ${msg.author}, for it may be fleeting as you delve deeper into my labyrinthine schemes. You now have a measly \`${score}\` points`,
+        `You're, like, slaying this trivia game ${msg.author}! queen emoji Yas, correct answer! You're, like, a boss babe at trivia! 💅 you have like \`${score}\` points now!`,
+        `Well, slap my knee! *laughs* You're a regular sharpshooter ${msg.author}, hittin' the target dead on! Good goin'! You've roped in \`${score}\` pointeroonies!`,
+        `01000011 01101111 01110010 01110010 01100101 01100011 01110100 00101110 00100000 01000111 01110010 01100101 01100001 01110100 00100000 01110111 01101111 01110010 01101011 ${msg.author} 00101110 00100000 01011001 01101111 01110101 00100000 01101110 01101111 01110111 00100000 01101000 01100001 01110110 01100101 00100000 \`${score}\` 01110000 01101111 01101001 01101110 01110100 01110011 00101110`,
+        `Oh, man, that's rad ${msg.author}! *admires retro camera* Correct answer, you're so vintage and cool! I knew that one before it was popular though. *sips artisanal coffee* You have \`${score}\` cool points now!`,
+        `.................................correct ${msg.author}................you have \`${score}\` points...................`,
+        `WAGMI ${msg.author} fam!! The hodler of knowledge :person_bowing:. Your score is literally **mooning** :rocket: :rocket: - its up to \`${score}\`. Up only!`,
+        `Wen $${msg.author} token? Sick gains bro. You're up to \`${score}\` lambos!`,
+        `Intriguing, like a surreal juxtaposition of colors! *strokes beard* Correct answer ${msg.author}, you've painted your way to \`${score}\` points!`,
+        `Hot dang, you're mining them right answers like a seasoned prospector ${msg.author}! *chomps on tobacco* Correct, you're a nugget of knowledge! You've struck gold \`${score}\` times! *does a little jig*`,
+        `Thou hast danced nimbly upon the stage of knowledge, and the audience doth applaud thy triumph! Well played, indeed ${msg.author}! Thou hast \`${score}\` points!`,
+        `Cowabunga! Correct answer, you're riding high on the wave of brilliance! *makes surfing gestures* You've got \`${score}\` points now brah!`,
+        `Quite the triumph, old chap! Correct, your knowledge bespeaks of an esteemed intellectual prowess! *adjusts monocle* I daresay you've accumulated an inspiring \`${score}\` points!`,
+        `Thou may take pride in this insignificant accomplishment ${msg.author}, but I, the embodiment of malevolence, doth see through thy paltry facade. *gleaming eyes* I shall revel in thy naive celebration, for in the grand tapestry of time, thou art a mere stitch. Thou hast a measly \`${score}\` points.`,
+        `Well, well, well, looks like *someone* spends a lot of time in block-talk, eh ${msg.author}? You've got \`${score}\` points now!`,
+        `"Thanks ${msg.author}" - Grant. You've got \`${score}\` points!`,
+      ]
+
       msg.reply(
-        `Congrats @<${msg.author.username}>! You've figured out my devious question! You now have ${score} total points!`
+        congratsOptions[Math.floor(Math.random() * congratsOptions.length)]
       )
     } catch (err) {
       console.log('ERROR tallying', err)
@@ -179,10 +219,26 @@ export class TriviaBot {
     }
 
     let leaderboardString = ''
+
+    const getEmoji = (i: number) => {
+      switch (i) {
+        case 0:
+          return ':first_place:'
+        case 1:
+          return ':second_place:'
+        case 2:
+          return ':third_place:'
+        default:
+          return ''
+      }
+    }
+
     for (let i = 0; i < data?.length; i++) {
       const user = data[i].user
       const score = data[i].score
-      leaderboardString += `${i + 1}. ${user} - ${score} points\n`
+      leaderboardString += `${i + 1}. ${getEmoji(
+        i
+      )} \`${user}\`  - **\`${score}\`** points \n`
     }
 
     msg.reply({
