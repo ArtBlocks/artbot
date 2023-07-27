@@ -138,20 +138,20 @@ export class TriviaBot {
         score = parseInt(data[0].score) + 1
       }
 
-      msg.reply(
-        `Congrats @<${msg.author.username}>! You've figured out my devious question! You now have ${score} total points!`
-      )
-
       const { error } = await this.supabaseClient
         .from(process.env.TRIVIA_TABLE ?? '')
         .upsert({ user: `${msg.author.username}`, score: score })
 
       if (error) {
         msg.reply(
-          `Uh-oh, looks there was an error saving your score. Pester Grant until he fixes it`
+          `Uh-oh, you got it right but looks there was an error saving your score. Pester Grant until he fixes it`
         )
         console.log('ERROR upserting', error)
       }
+
+      msg.reply(
+        `Congrats @<${msg.author.username}>! You've figured out my devious question! You now have ${score} total points!`
+      )
     } catch (err) {
       console.log('ERROR tallying', err)
       msg.reply('Oh no, looks like there was an unexpected error!')
@@ -171,6 +171,7 @@ export class TriviaBot {
       .from(process.env.TRIVIA_TABLE ?? '')
       .select(`user, score`)
       .order('score', { ascending: false })
+      .limit(10)
 
     if (!data?.length) {
       msg.reply(`Uh-oh, looks like there are no scores yet!`)
