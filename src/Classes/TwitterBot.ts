@@ -1,14 +1,16 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
-import { EUploadMimeType, TwitterApi } from 'twitter-api-v2'
+import { EUploadMimeType, TweetV2, TwitterApi } from 'twitter-api-v2'
 import { Mint } from './MintBot'
 import { ensOrAddress, getTokenApiUrl, timeout } from './APIBots/utils'
 import axios from 'axios'
+import { artIndexerBot } from '..'
 
 const TWITTER_TIMEOUT_MS = 14 * 1000
 
 export class TwitterBot {
   twitterClient: TwitterApi
+  lastTweetId: string
   constructor({
     appKey,
     appSecret,
@@ -29,27 +31,59 @@ export class TwitterBot {
       accessSecret,
     })
 
+    this.lastTweetId = '1684599404534124544'
     if (listener) {
-      this.initListener()
+      this.startSearchAndReplyRoutine()
     }
   }
 
-  async initListener() {
-    console.log('Initializing Twitter listener...')
-    const jsTweets = await this.twitterClient.v2.search('@artbot_ab', {
-      since_id: '1684583508541689857',
+  async startSearchAndReplyRoutine() {
+    setInterval(() => {
+      this.search()
+    }, 1 * 20000)
+  }
+
+  async search() {
+    console.log(`Searching Twitter... (last tweet id: ${this.lastTweetId})`)
+    const artbotTweets = await this.twitterClient.v2.search('@artbot_ab', {
+      since_id: this.lastTweetId,
     })
-    for await (const tweet of jsTweets) {
+
+    console.log(`Rate limit status: ${artbotTweets.rateLimit}`)
+    if (artbotTweets.meta.result_count === 0) {
+      console.log('No new tweets found')
+      return
+    }
+
+    for await (const tweet of artbotTweets) {
       console.log(tweet)
-      if (tweet.text.includes('#123 fidenza')) {
-        this.replyToTweet(tweet.id)
+      if (tweet.text.includes('#')) {
+        this.replyToTweet(tweet)
       }
     }
+    this.lastTweetId = artbotTweets.meta.newest_id
   }
+  async replyToTweet(tweet: TweetV2) {
+    const afterTheHash = tweet.text.replace('@artbot_ab', '')
 
-  async replyToTweet(tweetId: string) {
+    const projectKey = artIndexerBot.toProjectKey(
+      afterTheHash.replace(/#(\?|\d+)/, '')
+    )
+    if (!artIndexerBot.projects[projectKey]) {
+      console.error(`No project found for ${projectKey}`)
+      return
+    }
+
+    const projectBot = artIndexerBot.projects[projectKey]
+    const fullTokenId = await projectBot.handleTweet(afterTheHash)
+
+    if (!fullTokenId) {
+      console.error(`No token found for ${projectKey}`)
+      return
+    }
+    console.log('Full token id', fullTokenId)
     const artBlocksResponse = await axios.get(
-      getTokenApiUrl('0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270', `78000123`)
+      getTokenApiUrl(fullTokenId.split('-')[0], fullTokenId.split('-')[1])
     )
     const artBlocksData = artBlocksResponse.data
     const downStream = await axios({
@@ -62,7 +96,7 @@ export class TwitterBot {
       mimeType: EUploadMimeType.Png,
     })
     console.log('Media', media_id)
-    await this.twitterClient.v2.reply(artBlocksData.name, tweetId, {
+    await this.twitterClient.v2.reply(artBlocksData.name, tweet.id, {
       media: {
         media_ids: [media_id],
       },
