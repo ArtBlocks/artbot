@@ -100,6 +100,8 @@ export const BAN_ADDRESSES = new Set([
   '0x872ea485576a569b06861a94946f04c08c510358',
   '0x592a6119e24013e4e7d02259e1c9b7148fec7677',
   '0x9b397d50f662d5d39e88e4b886571581ccf48188',
+  '0x664e3a3a6a6fa524d06f4d612fe8440b923574bd',
+  '0x43fcf64fd6dde18272b62a5b365dd8e70bdde38d',
 ])
 
 function sendEmbedToChannel(
