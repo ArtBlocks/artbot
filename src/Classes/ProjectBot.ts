@@ -14,7 +14,6 @@ import {
   getTokenOwnerAddress,
 } from '../Data/queryGraphQL'
 import { triviaBot } from '..'
-
 const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
 const Web3 = require('web3')

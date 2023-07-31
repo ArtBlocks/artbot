@@ -5,9 +5,10 @@ import { Mint } from './MintBot'
 import { ensOrAddress, getTokenApiUrl, timeout } from './APIBots/utils'
 import axios from 'axios'
 import { artIndexerBot } from '..'
+import sharp from 'sharp'
 
 const TWITTER_TIMEOUT_MS = 14 * 1000
-
+const TWITTER_MEDIA_BYTE_LIMIT = 5242880
 export class TwitterBot {
   twitterClient: TwitterApi
   lastTweetId: string
@@ -31,7 +32,7 @@ export class TwitterBot {
       accessSecret,
     })
 
-    this.lastTweetId = '1684599404534124544'
+    this.lastTweetId = '1684951589616754690'
     if (listener) {
       this.startSearchAndReplyRoutine()
     }
@@ -49,7 +50,13 @@ export class TwitterBot {
       since_id: this.lastTweetId,
     })
 
-    console.log(`Rate limit status: ${artbotTweets.rateLimit}`)
+    console.log(
+      `Rate limit status: \nLimit: ${
+        artbotTweets.rateLimit.limit
+      } \nRemaining: ${artbotTweets.rateLimit.remaining} \nReset: ${new Date(
+        artbotTweets.rateLimit.reset
+      ).toISOString()}\n`
+    )
     if (artbotTweets.meta.result_count === 0) {
       console.log('No new tweets found')
       return
@@ -91,8 +98,23 @@ export class TwitterBot {
       responseType: 'arraybuffer',
       url: artBlocksData.preview_asset_url,
     })
+
+    let imageBuff: Buffer = downStream.data as Buffer
+
+    if (imageBuff.length > TWITTER_MEDIA_BYTE_LIMIT) {
+      console.log('Resizing image...')
+      const ratio = TWITTER_MEDIA_BYTE_LIMIT / imageBuff.length
+      const metadata = await sharp(imageBuff).metadata()
+      console.log('Original', metadata)
+      imageBuff = await sharp(imageBuff)
+        .resize({ width: Math.floor((metadata.width ?? 0) * ratio) })
+        .toBuffer()
+      const metadata2 = await sharp(imageBuff).metadata()
+      console.log('Resized', metadata2)
+    }
+
     console.log('Uploading media...', artBlocksData.preview_asset_url)
-    const media_id = await this.twitterClient.v1.uploadMedia(downStream.data, {
+    const media_id = await this.twitterClient.v1.uploadMedia(imageBuff, {
       mimeType: EUploadMimeType.Png,
     })
     console.log('Media', media_id)
