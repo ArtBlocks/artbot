@@ -1,5 +1,5 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js'
-import { ENGINE_CONTRACTS, mintBot, projectConfig } from '../index'
+import { mintBot, projectConfig } from '../index'
 import axios, { AxiosError } from 'axios'
 import {
   MINT_UTM,
@@ -7,6 +7,7 @@ import {
   getTokenApiUrl,
   getTokenUrl,
   replaceVideoWithGIF,
+  waitForEngineContracts,
 } from './APIBots/utils'
 import { ensOrAddress } from './APIBots/utils'
 import { TwitterBot } from './TwitterBot'
@@ -67,7 +68,7 @@ export class MintBot {
 
   async buildContractToChannel() {
     const contractToChannel: { [id: string]: string[] } = {}
-    const engineContracts = await ENGINE_CONTRACTS
+    const engineContracts = await waitForEngineContracts()
     Object.entries(MINT_CONFIG).forEach(([mintType, channels]) => {
       let contracts: string[] = []
       switch (mintType) {
