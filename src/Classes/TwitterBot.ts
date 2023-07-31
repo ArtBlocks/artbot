@@ -14,6 +14,7 @@ import sharp from 'sharp'
 
 const TWITTER_TIMEOUT_MS = 14 * 1000
 const TWITTER_MEDIA_BYTE_LIMIT = 5242880
+const SEARCH_INTERVAL_MS = 20000
 export class TwitterBot {
   twitterClient: TwitterApi
   lastTweetId: string
@@ -48,7 +49,7 @@ export class TwitterBot {
   async startSearchAndReplyRoutine() {
     setInterval(() => {
       this.search()
-    }, 1 * 20000)
+    }, SEARCH_INTERVAL_MS)
   }
 
   async search() {
