@@ -2,17 +2,11 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 import { EUploadMimeType, TweetV2, TwitterApi } from 'twitter-api-v2'
 import { Mint } from './MintBot'
-import {
-  ensOrAddress,
-  getTokenApiUrl,
-  getTokenUrl,
-  timeout,
-} from './APIBots/utils'
+import { ensOrAddress, getTokenApiUrl, getTokenUrl } from './APIBots/utils'
 import axios from 'axios'
 import { artIndexerBot } from '..'
 import sharp from 'sharp'
 
-const TWITTER_TIMEOUT_MS = 14 * 1000
 const TWITTER_MEDIA_BYTE_LIMIT = 5242880
 const SEARCH_INTERVAL_MS = 20000
 export class TwitterBot {
@@ -42,7 +36,7 @@ export class TwitterBot {
     if (listener) {
       console.log('Starting Twitter listener')
       // TODO: Uncomment this when we're ready to start listening!
-      //this.startSearchAndReplyRoutine()
+      // this.startSearchAndReplyRoutine()
     }
   }
 
@@ -74,9 +68,12 @@ export class TwitterBot {
     }
 
     for await (const tweet of artbotTweets) {
-      console.log(tweet)
       if (tweet.text.includes('#')) {
-        this.replyToTweet(tweet)
+        try {
+          this.replyToTweet(tweet)
+        } catch (e) {
+          console.error(`Error responding to ${tweet.text}:`, e)
+        }
       }
     }
     this.lastTweetId = artbotTweets.meta.newest_id
@@ -87,6 +84,7 @@ export class TwitterBot {
     const projectKey = artIndexerBot.toProjectKey(
       afterTheHash.replace(/#(\?|\d+)/, '')
     )
+
     if (!artIndexerBot.projects[projectKey]) {
       console.error(`No project found for ${projectKey}`)
       return
@@ -155,19 +153,6 @@ export class TwitterBot {
     })
   }
 
-  async uploadTwitterImage(imgBinary: Buffer): Promise<string | undefined> {
-    try {
-      // use race function to timeout because twitter library doesn't timeout
-      const uploadRes = await Promise.race([
-        timeout(TWITTER_TIMEOUT_MS, 'Twitter post timed out'),
-        this.twitterClient.v1.uploadMedia(imgBinary, { mimeType: 'png' }),
-      ])
-      return uploadRes
-    } catch (e) {
-      console.error(e)
-      return undefined
-    }
-  }
   async tweetArtblock(artBlock: Mint) {
     const imageUrl = artBlock.image
     if (!artBlock.image) {
