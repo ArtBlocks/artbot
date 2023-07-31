@@ -12,6 +12,7 @@ import {
   GetProjectInvocationsDocument,
   GetProjectInContractsDocument,
   GetProjectFloorDocument,
+  TokenDetailFragment,
 } from './generated/graphql'
 import { isArbitrumContract } from '../Classes/APIBots/utils'
 import { ARBITRUM_CONTRACTS, ENGINE_CONTRACTS } from '..'
@@ -162,7 +163,7 @@ async function getAllWalletTokensClient(
 ) {
   const maxTokensPerQuery = 1000
   try {
-    const allTokens: any[] = []
+    const allTokens: TokenDetailFragment[] = []
     let loop = true
     while (loop) {
       const { data } = await hasuraClient
