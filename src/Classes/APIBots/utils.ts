@@ -258,3 +258,13 @@ export async function replaceVideoWithGIF(url: string) {
 
   return url
 }
+
+const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
+export const waitForEngineContracts = async (): Promise<string[]> => {
+  while (ENGINE_CONTRACTS.length === 0) {
+    console.log('Waiting for engine contracts to load...')
+    await delay(5000)
+  }
+  console.log('Engine contracts loaded')
+  return ENGINE_CONTRACTS
+}
