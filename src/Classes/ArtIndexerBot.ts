@@ -44,6 +44,8 @@ BIRTHDAY_CHECK_TIME.setMinutes(0)
 BIRTHDAY_CHECK_TIME.setSeconds(0)
 BIRTHDAY_CHECK_TIME.setMilliseconds(0)
 
+const ONE_MINUTE_IN_MS = 60000
+
 export enum MessageTypes {
   RANDOM = 'random',
   ARTIST = 'artist',
@@ -85,7 +87,7 @@ export class ArtIndexerBot {
 
     setInterval(async () => {
       await this.buildProjectBots()
-    }, parseInt(METADATA_REFRESH_INTERVAL_MINUTES) * 60000)
+    }, parseInt(METADATA_REFRESH_INTERVAL_MINUTES) * ONE_MINUTE_IN_MS)
   }
 
   async buildProjectBots() {
@@ -462,7 +464,7 @@ export class ArtIndexerBot {
           }
         })
       }
-    }, 60000)
+    }, ONE_MINUTE_IN_MS)
   }
 
   async startTriviaRoutine() {
@@ -479,6 +481,6 @@ export class ArtIndexerBot {
         }
         attempts++
       }
-    }, 60000)
+    }, ONE_MINUTE_IN_MS)
   }
 }
