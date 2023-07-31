@@ -173,6 +173,32 @@ export class ArtIndexerBot {
     return MessageTypes.UNKNOWN
   }
 
+  async projectBotForMessage(
+    key: string,
+    afterTheHash: string
+  ): Promise<ProjectBot | undefined> {
+    const messageType = this.getMessageType(key, afterTheHash)
+    switch (messageType) {
+      case MessageTypes.RANDOM:
+        return this.getRandomizedProjectBot(Object.values(this.projects))
+      case MessageTypes.OPEN:
+        return await this.getRandomOpenProjectBot()
+      case MessageTypes.COLLECTION:
+        return this.getRandomizedProjectBot(
+          this.collections[getVerticalName(key)]
+        )
+      case MessageTypes.TAG:
+        return this.getRandomizedProjectBot(this.tags[key])
+      case MessageTypes.ARTIST:
+        return this.getRandomizedProjectBot(this.artists[key])
+      case MessageTypes.PROJECT:
+        return this.projects[key]
+      case MessageTypes.WALLET:
+      case MessageTypes.UNKNOWN:
+        return undefined
+    }
+  }
+
   async handleNumberMessage(msg: Message) {
     const content = msg.content
     if (content.length <= 1) {
@@ -189,39 +215,50 @@ export class ArtIndexerBot {
     let projectKey = this.toProjectKey(afterTheHash)
 
     const messageType = this.getMessageType(projectKey, afterTheHash)
-    let wallet = ''
-    switch (messageType) {
-      case MessageTypes.RANDOM:
-        return this.sendRandomProjectRandomTokenMessage(msg)
-      case MessageTypes.OPEN:
-        return this.sendRandomOpenProjectRandomTokenMessage(msg)
-      case MessageTypes.COLLECTION:
-        projectKey = getVerticalName(projectKey)
-        return this.sendCurationStatusRandomTokenMessage(msg, projectKey)
-      case MessageTypes.TAG:
-        return this.sendTagRandomTokenMessage(msg, projectKey)
-      case MessageTypes.ARTIST:
-        return this.sendArtistRandomTokenMessage(msg, projectKey)
-      case MessageTypes.WALLET:
-        wallet = afterTheHash.split(' ')[0]
-        afterTheHash = afterTheHash.replace(wallet, '')
-        projectKey = this.toProjectKey(afterTheHash)
-        projectKey = projectKey === '' ? '#?' : projectKey
-        if (
-          this.getMessageType(projectKey, afterTheHash) === MessageTypes.UNKNOWN
-        ) {
-          msg.channel.send(
-            `Sorry, I wasn't able to understand that: ${afterTheHash}`
-          )
-          return
-        }
-        return this.sendRandomWalletTokenMessage(msg, wallet, projectKey)
-      case MessageTypes.PROJECT:
-        return this.projects[projectKey].handleNumberMessage(msg)
-      case MessageTypes.UNKNOWN:
-        console.log("Wasn't able to parse message", content)
+
+    // Wallet has to be handled separately as it is dealing with specific tokens not whole projects
+    if (messageType === MessageTypes.WALLET) {
+      const wallet = afterTheHash.split(' ')[0]
+      afterTheHash = afterTheHash.replace(wallet, '')
+      projectKey = this.toProjectKey(afterTheHash)
+      projectKey = projectKey === '' ? '#?' : projectKey
+      if (
+        this.getMessageType(projectKey, afterTheHash) === MessageTypes.UNKNOWN
+      ) {
+        msg.channel.send(
+          `Sorry, I wasn't able to understand that: ${afterTheHash}`
+        )
         return
+      }
+      return this.sendRandomWalletTokenMessage(msg, wallet, projectKey)
     }
+
+    const projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
+
+    if (!projectBot) {
+      console.log("Wasn't able to parse message", content)
+      return
+    }
+    projectBot.handleNumberMessage(msg)
+  }
+
+  async handleNumberTweet(tweet: string): Promise<ProjectBot | undefined> {
+    const content = tweet
+
+    const afterTheHash = content.replace(/#(\?|\d+)/, '')
+    const projectKey = this.toProjectKey(afterTheHash)
+
+    const messageType = this.getMessageType(projectKey, afterTheHash)
+    if (messageType === MessageTypes.WALLET) {
+      // TODO: support wallet tweets
+    }
+    const projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
+
+    if (!projectBot) {
+      console.log("Wasn't able to parse tweet", content)
+      return
+    }
+    return projectBot
   }
 
   toProjectKey(projectName: string) {
@@ -254,15 +291,8 @@ export class ArtIndexerBot {
   }
 
   // This function takes a channel and sends a message containing a random
-  // token from a random project
-  async sendRandomProjectRandomTokenMessage(msg: Message) {
-    const projBot = this.getRandomizedProjectBot(Object.values(this.projects))
-    projBot?.handleNumberMessage(msg)
-  }
-
-  // This function takes a channel and sends a message containing a random
   // token from a random open project
-  async sendRandomOpenProjectRandomTokenMessage(msg: Message) {
+  async getRandomOpenProjectBot(): Promise<ProjectBot> {
     // NOTE: this fxn can't use the clean logic of the others bc it is dealing with Hasura query
     let attempts = 0
     while (attempts < 10) {
@@ -273,46 +303,14 @@ export class ArtIndexerBot {
 
       const projBot = this.projects[this.toProjectKey(project.name ?? '')]
       if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
-        return projBot.handleNumberMessage(msg)
+        return projBot
       }
       attempts++
     }
-  }
-
-  async sendCurationStatusRandomTokenMessage(
-    msg: Message,
-    collectionType: string
-  ) {
-    if (!this.collections[collectionType]) {
-      return
-    }
-
-    const projBot = this.getRandomizedProjectBot(
-      this.collections[collectionType]
-    )
-    projBot?.handleNumberMessage(msg)
-  }
-
-  async sendTagRandomTokenMessage(msg: Message, tag: string) {
-    if (!this.tags[tag]) {
-      return
-    }
-    const projBot = this.getRandomizedProjectBot(this.tags[tag])
-    projBot?.handleNumberMessage(msg)
-  }
-
-  async sendArtistRandomTokenMessage(msg: Message, artistName: string) {
-    console.log('Looking for artist ' + artistName)
-    if (!this.artists[artistName]) {
-      return
-    }
-
-    const projBot = this.getRandomizedProjectBot(this.artists[artistName])
-    projBot?.handleNumberMessage(msg)
+    throw new Error("Couldn't find an open project")
   }
 
   getRandomizedWalletProjectBot(
-    key: string,
     tokens: TokenDetailFragment[],
     conditional: (projectBot: ProjectBot) => boolean
   ): TokenDetailFragment | undefined {
@@ -376,7 +374,6 @@ export class ArtIndexerBot {
       switch (messageType) {
         case MessageTypes.ARTIST:
           chosenToken = this.getRandomizedWalletProjectBot(
-            projectKey,
             tokens,
             (projectBot) => {
               return this.toProjectKey(projectBot.artistName) === projectKey
@@ -385,7 +382,6 @@ export class ArtIndexerBot {
           break
         case MessageTypes.COLLECTION:
           chosenToken = this.getRandomizedWalletProjectBot(
-            projectKey,
             tokens,
             (projectBot) => {
               return projectBot.collection?.toLowerCase() === projectKey
@@ -394,7 +390,6 @@ export class ArtIndexerBot {
           break
         case MessageTypes.TAG:
           chosenToken = this.getRandomizedWalletProjectBot(
-            projectKey,
             tokens,
             (projectBot) => {
               return projectBot.tags?.includes(projectKey) ?? false
@@ -403,7 +398,6 @@ export class ArtIndexerBot {
           break
         case MessageTypes.PROJECT:
           chosenToken = this.getRandomizedWalletProjectBot(
-            projectKey,
             tokens,
             (projectBot) => {
               return this.toProjectKey(projectBot.projectName) === projectKey
