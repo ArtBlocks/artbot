@@ -158,7 +158,7 @@ bot.on('ready', () => {
   // artIndexerBot.startTriviaRoutine()
 })
 
-const artIndexerBot = new ArtIndexerBot()
+export const artIndexerBot = new ArtIndexerBot()
 const pbabIndexerBot = new ArtIndexerBot(getEngineProjects)
 const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
 const abXbmIndexerBot = new ArtIndexerBot(getArtBlocksXBMProjects)

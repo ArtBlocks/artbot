@@ -51,6 +51,7 @@ export class MintBot {
           appSecret: process.env.AB_TWITTER_API_SECRET ?? '',
           accessToken: process.env.AB_TWITTER_OAUTH_TOKEN ?? '',
           accessSecret: process.env.AB_TWITTER_OAUTH_SECRET ?? '',
+          listener: true,
         })
       }
       if (process.env.HODLERS_TWITTER_API_KEY) {
