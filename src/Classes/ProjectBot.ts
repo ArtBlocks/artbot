@@ -228,7 +228,7 @@ export class ProjectBot {
 
     const tokenID = pieceNumber + this.projectNumber * 1e6
 
-    return `${this.coreContract}-${tokenID.toString()}`
+    return tokenID.toString()
   }
 
   /**

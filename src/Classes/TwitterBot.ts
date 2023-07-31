@@ -2,7 +2,12 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 import { EUploadMimeType, TweetV2, TwitterApi } from 'twitter-api-v2'
 import { Mint } from './MintBot'
-import { ensOrAddress, getTokenApiUrl, timeout } from './APIBots/utils'
+import {
+  ensOrAddress,
+  getTokenApiUrl,
+  getTokenUrl,
+  timeout,
+} from './APIBots/utils'
 import axios from 'axios'
 import { artIndexerBot } from '..'
 import sharp from 'sharp'
@@ -32,9 +37,11 @@ export class TwitterBot {
       accessSecret,
     })
 
-    this.lastTweetId = '1684951589616754690'
+    this.lastTweetId = '1684979000714592256'
     if (listener) {
-      this.startSearchAndReplyRoutine()
+      console.log('Starting Twitter listener')
+      // TODO: Uncomment this when we're ready to start listening!
+      //this.startSearchAndReplyRoutine()
     }
   }
 
@@ -50,12 +57,15 @@ export class TwitterBot {
       since_id: this.lastTweetId,
     })
 
+    const rateLimitReset = new Date(artbotTweets.rateLimit.reset * 1000)
+    const now = new Date()
+    const diffSeconds = (rateLimitReset.getTime() - now.getTime()) / 1000
     console.log(
-      `Rate limit status: \nLimit: ${
+      `Search rate limit status: \nLimit: ${
         artbotTweets.rateLimit.limit
       } \nRemaining: ${artbotTweets.rateLimit.remaining} \nReset: ${new Date(
-        artbotTweets.rateLimit.reset
-      ).toISOString()}\n`
+        artbotTweets.rateLimit.reset * 1000
+      ).toISOString()} (${diffSeconds / 60} mins from now)\n`
     )
     if (artbotTweets.meta.result_count === 0) {
       console.log('No new tweets found')
@@ -82,21 +92,49 @@ export class TwitterBot {
     }
 
     const projectBot = artIndexerBot.projects[projectKey]
-    const fullTokenId = await projectBot.handleTweet(afterTheHash)
+    const tokenId = await projectBot.handleTweet(afterTheHash)
 
-    if (!fullTokenId) {
+    if (!tokenId) {
       console.error(`No token found for ${projectKey}`)
       return
     }
-    console.log('Full token id', fullTokenId)
-    const artBlocksResponse = await axios.get(
-      getTokenApiUrl(fullTokenId.split('-')[0], fullTokenId.split('-')[1])
+
+    const { data: artBlocksData } = await axios.get(
+      getTokenApiUrl(projectBot.coreContract, tokenId)
     )
-    const artBlocksData = artBlocksResponse.data
+
+    // TODO: support gifs
+    const imageUrl = artBlocksData.image
+      .replace('gif', 'png')
+      .replace('mp4', 'png')
+    const media_id = await this.uploadMedia(imageUrl)
+
+    if (!media_id) {
+      console.error(`no media id returned for ${imageUrl} - not tweeting`)
+      return
+    }
+
+    const tokenUrl = getTokenUrl(
+      artBlocksData.external_url,
+      projectBot.coreContract,
+      tokenId
+    )
+
+    const tweetMessage = `${artBlocksData.name} by ${artBlocksData.artist} \n\n${tokenUrl}`
+
+    console.log(`Replying to ${tweet.id} with ${artBlocksData.name}`)
+    await this.twitterClient.v2.reply(tweetMessage, tweet.id, {
+      media: {
+        media_ids: [media_id],
+      },
+    })
+  }
+
+  async uploadMedia(imageUrl: string): Promise<string | undefined> {
     const downStream = await axios({
       method: 'GET',
       responseType: 'arraybuffer',
-      url: artBlocksData.preview_asset_url,
+      url: imageUrl,
     })
 
     let imageBuff: Buffer = downStream.data as Buffer
@@ -105,23 +143,14 @@ export class TwitterBot {
       console.log('Resizing image...')
       const ratio = TWITTER_MEDIA_BYTE_LIMIT / imageBuff.length
       const metadata = await sharp(imageBuff).metadata()
-      console.log('Original', metadata)
       imageBuff = await sharp(imageBuff)
         .resize({ width: Math.floor((metadata.width ?? 0) * ratio) })
         .toBuffer()
-      const metadata2 = await sharp(imageBuff).metadata()
-      console.log('Resized', metadata2)
     }
 
-    console.log('Uploading media...', artBlocksData.preview_asset_url)
-    const media_id = await this.twitterClient.v1.uploadMedia(imageBuff, {
+    console.log('Uploading media...', imageUrl)
+    return await this.twitterClient.v1.uploadMedia(imageBuff, {
       mimeType: EUploadMimeType.Png,
-    })
-    console.log('Media', media_id)
-    await this.twitterClient.v2.reply(artBlocksData.name, tweet.id, {
-      media: {
-        media_ids: [media_id],
-      },
     })
   }
 
@@ -148,16 +177,7 @@ export class TwitterBot {
     // TODO: mint tweets aren't posting right now. Need to fix this and handle .gif extensions in uploadTwitterImage()
     // artBlocksData.image = replaceVideoWithGIF(artBlock.image)
 
-    const imgResp = await axios.get(imageUrl, {
-      responseType: 'arraybuffer',
-    })
-
-    if (!imgResp || !imgResp.data) {
-      console.error('No image binary returned', JSON.stringify(artBlock))
-      return
-    }
-    const imgBinary = Buffer.from(imgResp.data, 'binary')
-    const mediaId = await this.uploadTwitterImage(imgBinary)
+    const mediaId = await this.uploadMedia(imageUrl)
 
     if (!mediaId) {
       console.error('no media id returned, not tweeting')
