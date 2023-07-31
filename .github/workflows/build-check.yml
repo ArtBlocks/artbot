@@ -19,6 +19,6 @@ jobs:
           echo "HASURA_GRAPHQL_ADMIN_SECRET=${{ secrets.HASURA_GRAPHQL_ADMIN_SECRET }}" >> $GITHUB_ENV
           echo "DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}" >> $GITHUB_ENV
       - name: Install modules
-        run: yarn install --ignore-scripts
+        run: yarn install
       - name: Run program
         run: timeout 1m yarn start || ( [[ $? -eq 124 ]] && echo "WARNING Timeout reached, but that's OK" )

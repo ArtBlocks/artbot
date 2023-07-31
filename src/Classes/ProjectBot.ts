@@ -190,6 +190,7 @@ export class ProjectBot {
   }
 
   async handleTweet(tweetText: string) {
+    // TODO: Consolidate logic with handleNumberMessage
     const content = tweetText
     if (content.length <= 1) {
       console.log(

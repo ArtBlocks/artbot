@@ -149,12 +149,10 @@ export class ArtIndexerBot {
       return
     }
 
-    console.log(content)
     let afterTheHash = content
       .substr(content.indexOf(' ') + 1)
       .replace('?details', '')
 
-    console.log(afterTheHash)
     let projectKey = this.toProjectKey(afterTheHash)
 
     if (PROJECT_ALIASES[projectKey]) {
