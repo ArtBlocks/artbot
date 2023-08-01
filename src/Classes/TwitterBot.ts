@@ -55,6 +55,7 @@ export class TwitterBot {
     const rateLimitReset = new Date(artbotTweets.rateLimit.reset * 1000)
     const now = new Date()
     const diffSeconds = (rateLimitReset.getTime() - now.getTime()) / 1000
+    // TODO: IDEA: if we're close to the rate limit, slow down the search interval - https://app.asana.com/0/1201568815538912/1205173752010563/f
     console.log(
       `Search rate limit status: \nLimit: ${
         artbotTweets.rateLimit.limit
@@ -70,6 +71,7 @@ export class TwitterBot {
     for await (const tweet of artbotTweets) {
       if (tweet.text.includes('#')) {
         try {
+          // TODO: figure out retries - https://app.asana.com/0/1201568815538912/1205173752010561/f
           this.replyToTweet(tweet)
         } catch (e) {
           console.error(`Error responding to ${tweet.text}:`, e)
@@ -79,22 +81,18 @@ export class TwitterBot {
     this.lastTweetId = artbotTweets.meta.newest_id
   }
   async replyToTweet(tweet: TweetV2) {
-    const afterTheHash = tweet.text.replace('@artbot_ab', '')
+    const cleanedTweet = tweet.text.replace('@artbot_ab', '')
+    const projectBot = await artIndexerBot.handleNumberTweet(cleanedTweet)
 
-    const projectKey = artIndexerBot.toProjectKey(
-      afterTheHash.replace(/#(\?|\d+)/, '')
-    )
-
-    if (!artIndexerBot.projects[projectKey]) {
-      console.error(`No project found for ${projectKey}`)
+    if (!projectBot) {
+      console.error(`No project found for ${tweet.text}`)
       return
     }
 
-    const projectBot = artIndexerBot.projects[projectKey]
-    const tokenId = await projectBot.handleTweet(afterTheHash)
+    const tokenId = await projectBot.handleTweet(cleanedTweet)
 
     if (!tokenId) {
-      console.error(`No token found for ${projectKey}`)
+      console.error(`No token found for ${projectBot.projectName}`)
       return
     }
 
@@ -122,11 +120,16 @@ export class TwitterBot {
     const tweetMessage = `${artBlocksData.name} by ${artBlocksData.artist} \n\n${tokenUrl}`
 
     console.log(`Replying to ${tweet.id} with ${artBlocksData.name}`)
-    await this.twitterClient.v2.reply(tweetMessage, tweet.id, {
-      media: {
-        media_ids: [media_id],
-      },
-    })
+    this.twitterClient.v2
+      .reply(tweetMessage, tweet.id, {
+        media: {
+          media_ids: [media_id],
+        },
+      })
+      .catch((e) => {
+        console.error(`Error replying to ${tweet.id}:`, e)
+        //TODO: retry https://app.asana.com/0/1201568815538912/1205173752010561/f
+      })
   }
 
   async uploadMedia(imageUrl: string): Promise<string | undefined> {

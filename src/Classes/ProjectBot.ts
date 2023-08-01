@@ -97,6 +97,17 @@ export class ProjectBot {
     return new ProjectHandlerHelper(singlesMap, setsMap)
   }
 
+  // If project is still minting, refresh edition size to see if piece is in bounds
+  async checkEditionSize(pieceNumber: number) {
+    if (pieceNumber >= this.editionSize && pieceNumber < this.maxEditionSize) {
+      const invocations: number | null = await getProjectInvocations(this.id)
+
+      if (invocations) {
+        this.editionSize = invocations
+      }
+    }
+  }
+
   async handleNumberMessage(msg: Message) {
     let content = msg.content
     if (content.length <= 1) {
@@ -156,14 +167,7 @@ export class ProjectBot {
       pieceNumber = parseInt(afterTheHash)
     }
 
-    // If project is still minting, refresh edition size to see if piece is in bounds
-    if (pieceNumber >= this.editionSize && pieceNumber < this.maxEditionSize) {
-      const invocations: number | null = await getProjectInvocations(this.id)
-
-      if (invocations) {
-        this.editionSize = invocations
-      }
-    }
+    await this.checkEditionSize(pieceNumber)
 
     if (pieceNumber >= this.editionSize || pieceNumber < 0) {
       msg.channel.send(
@@ -190,7 +194,6 @@ export class ProjectBot {
   }
 
   async handleTweet(tweetText: string) {
-    // TODO: Consolidate logic with handleNumberMessage
     const content = tweetText
     if (content.length <= 1) {
       console.log(
@@ -211,15 +214,7 @@ export class ProjectBot {
       pieceNumber = parseInt(afterTheHash)
     }
 
-    // If project is still minting, refresh edition size to see if piece is in bounds
-    if (pieceNumber >= this.editionSize && pieceNumber < this.maxEditionSize) {
-      const invocations: number | null = await getProjectInvocations(this.id)
-
-      if (invocations) {
-        this.editionSize = invocations
-      }
-    }
-
+    await this.checkEditionSize(pieceNumber)
     if (pieceNumber >= this.editionSize || pieceNumber < 0) {
       console.log(
         `Invalid #, only ${this.editionSize} pieces minted for ${this.projectName}.`
