@@ -250,7 +250,7 @@ export class ArtIndexerBot {
 
     const messageType = this.getMessageType(projectKey, afterTheHash)
     if (messageType === MessageTypes.WALLET) {
-      // TODO: support wallet tweets
+      // TODO: support wallet tweets https://app.asana.com/0/1201568815538912/1205173752010557/f
     }
     const projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
 
