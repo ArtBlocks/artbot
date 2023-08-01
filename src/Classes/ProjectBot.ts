@@ -273,7 +273,7 @@ export class ProjectBot {
     const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url)
 
     const ownerProfileLink = ownerAddress
-      ? 'https://www.artblocks.io/user/' + ownerAddress
+      ? 'https://www.artblocks.io/user/' + ownerAddress + PROJECTBOT_UTM
       : ''
     // If user did *not* request full details, return just a large image,
     // along with a link to the OpenSea page and ArtBlocks live script.
@@ -295,7 +295,7 @@ export class ProjectBot {
       }
       embedContent.addFields({
         name: 'Live Script',
-        value: `[Generator](${artBlocksData.generator_url})`,
+        value: `[Generator](${artBlocksData.generator_url + PROJECTBOT_UTM})`,
         inline: true,
       })
       msg.channel.send({ embeds: [embedContent] })

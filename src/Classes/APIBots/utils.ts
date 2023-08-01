@@ -28,11 +28,16 @@ const osAddressMap: { [id: string]: string } = {}
 const MAX_ENS_RETRIES = 3
 
 // UTM for links so we can track traffic that comes through Artbot
-const ARTBOT_UTM = '?utm_source=artbot&utm_medium=discord'
-export const LISTING_UTM = ARTBOT_UTM + '&utm_campaign=listing'
-export const SALE_UTM = ARTBOT_UTM + '&utm_campaign=sale'
-export const MINT_UTM = ARTBOT_UTM + '&utm_campaign=mint'
-export const PROJECTBOT_UTM = ARTBOT_UTM + '&utm_campaign=projectbot'
+const ARTBOT_UTM = '?utm_source=artbot'
+const DISCORD_UTM = '&utm_medium=discord'
+const TWITTER_UTM = '&utm_medium=twitter'
+export const LISTING_UTM = ARTBOT_UTM + DISCORD_UTM + '&utm_campaign=listing'
+export const SALE_UTM = ARTBOT_UTM + DISCORD_UTM + '&utm_campaign=sale'
+export const MINT_UTM = ARTBOT_UTM + DISCORD_UTM + '&utm_campaign=mint'
+export const PROJECTBOT_UTM =
+  ARTBOT_UTM + DISCORD_UTM + '&utm_campaign=projectbot'
+export const TWITTER_PROJECTBOT_UTM =
+  ARTBOT_UTM + TWITTER_UTM + '&utm_campaign=projectbot'
 
 async function getENSName(address: string): Promise<string> {
   let name = ''

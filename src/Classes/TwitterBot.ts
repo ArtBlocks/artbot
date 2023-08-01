@@ -2,15 +2,21 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 import { EUploadMimeType, TweetV2, TwitterApi } from 'twitter-api-v2'
 import { Mint } from './MintBot'
-import { ensOrAddress, getTokenApiUrl, getTokenUrl } from './APIBots/utils'
+import {
+  TWITTER_PROJECTBOT_UTM,
+  ensOrAddress,
+  getTokenApiUrl,
+  getTokenUrl,
+} from './APIBots/utils'
 import axios from 'axios'
 import { artIndexerBot } from '..'
 import sharp from 'sharp'
 import { getLastTweetId, updateLastTweetId } from '../Data/supabase'
 
 const TWITTER_MEDIA_BYTE_LIMIT = 5242880
-const SEARCH_INTERVAL_MS = 30000
-
+// Search rate limit is 60 queries per 15 minutes - shortest interval is 15 secs (though we should keep it a bit longer)
+const SEARCH_INTERVAL_MS = 20000
+const NUM_RETRIES = 3
 const prod = process.env.ARTBOT_IS_PROD
   ? process.env.ARTBOT_IS_PROD.toLowerCase() === 'true'
   : false
@@ -59,30 +65,16 @@ export class TwitterBot {
       since_id: this.lastTweetId,
     })
 
-    const rateLimitReset = new Date(artbotTweets.rateLimit.reset * 1000)
-    const now = new Date()
-    const diffSeconds = (rateLimitReset.getTime() - now.getTime()) / 1000
-    // TODO: IDEA: if we're close to the rate limit, slow down the search interval - https://app.asana.com/0/1201568815538912/1205173752010563/f
-    console.log(
-      `Search rate limit status: \nLimit: ${
-        artbotTweets.rateLimit.limit
-      } \nRemaining: ${artbotTweets.rateLimit.remaining} \nReset: ${new Date(
-        artbotTweets.rateLimit.reset * 1000
-      ).toISOString()} (${diffSeconds / 60} mins from now)\n`
-    )
     if (artbotTweets.meta.result_count === 0) {
       console.log('No new tweets found')
       return
     }
 
     for await (const tweet of artbotTweets) {
-      if (tweet.text.includes('#')) {
-        try {
-          // TODO: figure out retries - https://app.asana.com/0/1201568815538912/1205173752010561/f
-          this.replyToTweet(tweet)
-        } catch (e) {
-          console.error(`Error responding to ${tweet.text}:`, e)
-        }
+      try {
+        this.replyToTweet(tweet)
+      } catch (e) {
+        console.error(`Error responding to ${tweet.text}:`, e)
       }
     }
     this.updateLastTweetId(artbotTweets.meta.newest_id)
@@ -95,7 +87,12 @@ export class TwitterBot {
     await updateLastTweetId(tweetId, prod)
   }
   async replyToTweet(tweet: TweetV2) {
-    const cleanedTweet = tweet.text.replace('@artbot_ab', '')
+    const cleanedTweet = tweet.text.replaceAll(/@\w+/g, '') // Regex to remove all mentions
+    if (!tweet.text.includes('#')) {
+      console.warn(`Tweet '${tweet.text}' is not a supported action`)
+      return
+    }
+
     const projectBot = await artIndexerBot.handleNumberTweet(cleanedTweet)
 
     if (!projectBot) {
@@ -114,14 +111,11 @@ export class TwitterBot {
       getTokenApiUrl(projectBot.coreContract, tokenId)
     )
 
-    // TODO: support gifs
-    const imageUrl = artBlocksData.image
-      .replace('gif', 'png')
-      .replace('mp4', 'png')
-    const media_id = await this.uploadMedia(imageUrl)
+    const assetUrl = artBlocksData.preview_asset_url
+    const media_id = await this.uploadMedia(assetUrl)
 
     if (!media_id) {
-      console.error(`no media id returned for ${imageUrl} - not tweeting`)
+      console.error(`no media id returned for ${assetUrl} - not tweeting`)
       return
     }
 
@@ -134,29 +128,31 @@ export class TwitterBot {
     const tweetMessage = `${artBlocksData.name} by ${artBlocksData.artist} \n\n${tokenUrl}`
 
     console.log(`Replying to ${tweet.id} with ${artBlocksData.name}`)
-    this.twitterClient.v2
-      .reply(tweetMessage, tweet.id, {
-        media: {
-          media_ids: [media_id],
-        },
-      })
-      .catch((e) => {
-        console.error(`Error replying to ${tweet.id}:`, e)
-        //TODO: retry https://app.asana.com/0/1201568815538912/1205173752010561/f
-      })
+    for (let i = 0; i < NUM_RETRIES; i++) {
+      try {
+        await this.twitterClient.v2.reply(tweetMessage, tweet.id, {
+          media: {
+            media_ids: [media_id],
+          },
+        })
+        return
+      } catch (err) {
+        console.log(`Error replying to ${tweet.id}:`, err)
+        console.log(`Retrying (attempt ${i} of ${NUM_RETRIES})...`)
+      }
+    }
   }
 
-  async uploadMedia(imageUrl: string): Promise<string | undefined> {
+  async uploadMedia(assetUrl: string): Promise<string | undefined> {
     const downStream = await axios({
       method: 'GET',
       responseType: 'arraybuffer',
-      url: imageUrl,
+      url: assetUrl,
     })
 
     let imageBuff: Buffer = downStream.data as Buffer
-
     if (imageBuff.length > TWITTER_MEDIA_BYTE_LIMIT) {
-      console.log('Resizing image...')
+      console.log('Resizing...')
       const ratio = TWITTER_MEDIA_BYTE_LIMIT / imageBuff.length
       const metadata = await sharp(imageBuff).metadata()
       imageBuff = await sharp(imageBuff)
@@ -164,23 +160,30 @@ export class TwitterBot {
         .toBuffer()
     }
 
-    console.log('Uploading media...', imageUrl)
+    console.log('Uploading media...', assetUrl)
     return await this.twitterClient.v1.uploadMedia(imageBuff, {
-      mimeType: EUploadMimeType.Png,
+      mimeType: this.getMimeType(assetUrl),
     })
   }
 
+  getMimeType(assetUrl: string): EUploadMimeType {
+    if (assetUrl.includes('.gif')) {
+      return EUploadMimeType.Gif
+    } else if (assetUrl.includes('.mp4')) {
+      return EUploadMimeType.Mp4
+    } else {
+      return EUploadMimeType.Png
+    }
+  }
+
   async tweetArtblock(artBlock: Mint) {
-    const imageUrl = artBlock.image
+    const assetUrl = artBlock.image
     if (!artBlock.image) {
       console.error('No artblock image defined', JSON.stringify(artBlock))
       return
     }
-    // now that we support animated projects with GIF/MP4 outputs this logic's needed to make sure we only post GIF to Discord/Twitter
-    // TODO: mint tweets aren't posting right now. Need to fix this and handle .gif extensions in uploadTwitterImage()
-    // artBlocksData.image = replaceVideoWithGIF(artBlock.image)
 
-    const mediaId = await this.uploadMedia(imageUrl)
+    const mediaId = await this.uploadMedia(assetUrl)
 
     if (!mediaId) {
       console.error('no media id returned, not tweeting')
@@ -191,7 +194,7 @@ export class TwitterBot {
 
     const tweetText = `${artBlock.tokenName} minted${
       ownerText ? ` by ${ownerText}` : ''
-    }. \n\n${artBlock.artblocksUrl}`
+    }. \n\n${artBlock.artblocksUrl + TWITTER_PROJECTBOT_UTM}`
     console.log(`Tweeting ${tweetText}`)
 
     const tweetRes = await this.twitterClient.v2.tweet(tweetText, {

@@ -245,14 +245,15 @@ export class ArtIndexerBot {
   async handleNumberTweet(tweet: string): Promise<ProjectBot | undefined> {
     const content = tweet
 
-    const afterTheHash = content.replace(/#(\?|\d+)/, '')
-    const projectKey = this.toProjectKey(afterTheHash)
+    const afterTheHash = content.replace(/#(\?|\d+)/g, '')
+    let key = this.toProjectKey(afterTheHash)
+    key = content.trim() === '#?' ? '#?' : key
 
-    const messageType = this.getMessageType(projectKey, afterTheHash)
+    const messageType = this.getMessageType(key, afterTheHash)
     if (messageType === MessageTypes.WALLET) {
       // TODO: support wallet tweets https://app.asana.com/0/1201568815538912/1205173752010557/f
     }
-    const projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
+    const projectBot = await this.projectBotForMessage(key, afterTheHash)
 
     if (!projectBot) {
       console.log("Wasn't able to parse tweet", content)
