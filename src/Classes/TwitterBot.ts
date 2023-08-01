@@ -55,7 +55,7 @@ export class TwitterBot {
     const rateLimitReset = new Date(artbotTweets.rateLimit.reset * 1000)
     const now = new Date()
     const diffSeconds = (rateLimitReset.getTime() - now.getTime()) / 1000
-    // TODO: IDEA: if we're close to the rate limit, slow down the search interval
+    // TODO: IDEA: if we're close to the rate limit, slow down the search interval - https://app.asana.com/0/1201568815538912/1205173752010563/f
     console.log(
       `Search rate limit status: \nLimit: ${
         artbotTweets.rateLimit.limit
@@ -71,7 +71,7 @@ export class TwitterBot {
     for await (const tweet of artbotTweets) {
       if (tweet.text.includes('#')) {
         try {
-          // TODO: figure out retries
+          // TODO: figure out retries - https://app.asana.com/0/1201568815538912/1205173752010561/f
           this.replyToTweet(tweet)
         } catch (e) {
           console.error(`Error responding to ${tweet.text}:`, e)
@@ -128,7 +128,7 @@ export class TwitterBot {
       })
       .catch((e) => {
         console.error(`Error replying to ${tweet.id}:`, e)
-        //TODO: retry?
+        //TODO: retry https://app.asana.com/0/1201568815538912/1205173752010561/f
       })
   }
 
