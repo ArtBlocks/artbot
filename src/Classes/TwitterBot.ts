@@ -36,7 +36,7 @@ export class TwitterBot {
     if (listener) {
       console.log('Starting Twitter listener')
       // TODO: Uncomment this when we're ready to start listening!
-      this.startSearchAndReplyRoutine()
+      // this.startSearchAndReplyRoutine()
     }
   }
 
