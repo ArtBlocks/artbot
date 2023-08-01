@@ -6,9 +6,15 @@ import { ensOrAddress, getTokenApiUrl, getTokenUrl } from './APIBots/utils'
 import axios from 'axios'
 import { artIndexerBot } from '..'
 import sharp from 'sharp'
+import { getLastTweetId, updateLastTweetId } from '../Data/supabase'
 
 const TWITTER_MEDIA_BYTE_LIMIT = 5242880
-const SEARCH_INTERVAL_MS = 20000
+const SEARCH_INTERVAL_MS = 30000
+
+const prod = process.env.ARTBOT_IS_PROD
+  ? process.env.ARTBOT_IS_PROD.toLowerCase() === 'true'
+  : false
+
 export class TwitterBot {
   twitterClient: TwitterApi
   lastTweetId: string
@@ -32,7 +38,7 @@ export class TwitterBot {
       accessSecret,
     })
 
-    this.lastTweetId = '1684979000714592256'
+    this.lastTweetId = ''
     if (listener) {
       console.log('Starting Twitter listener')
       // TODO: Uncomment this when we're ready to start listening!
@@ -41,6 +47,7 @@ export class TwitterBot {
   }
 
   async startSearchAndReplyRoutine() {
+    this.lastTweetId = await getLastTweetId(prod)
     setInterval(() => {
       this.search()
     }, SEARCH_INTERVAL_MS)
@@ -78,7 +85,14 @@ export class TwitterBot {
         }
       }
     }
-    this.lastTweetId = artbotTweets.meta.newest_id
+    this.updateLastTweetId(artbotTweets.meta.newest_id)
+  }
+  async updateLastTweetId(tweetId: string) {
+    if (tweetId === this.lastTweetId) {
+      return
+    }
+    this.lastTweetId = tweetId
+    await updateLastTweetId(tweetId, prod)
   }
   async replyToTweet(tweet: TweetV2) {
     const cleanedTweet = tweet.text.replace('@artbot_ab', '')
