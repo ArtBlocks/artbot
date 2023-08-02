@@ -127,11 +127,12 @@ export class TwitterBot {
       return
     }
 
-    const tokenUrl = getTokenUrl(
-      artBlocksData.external_url,
-      projectBot.coreContract,
-      tokenId
-    )
+    const tokenUrl =
+      getTokenUrl(
+        artBlocksData.external_url,
+        projectBot.coreContract,
+        tokenId
+      ) + TWITTER_PROJECTBOT_UTM
 
     let platform = ''
     // If Engine project, add Engine platform name
@@ -144,7 +145,7 @@ export class TwitterBot {
         artBlocksData.platform = 'Bright Moments'
       }
 
-      platform = `on ${artBlocksData.platform} `
+      platform = `on ${artBlocksData.platform} (Art Blocks Engine)`
     }
 
     const tweetMessage = `${artBlocksData.name} by ${artBlocksData.artist} ${platform}\n\n${tokenUrl}`
