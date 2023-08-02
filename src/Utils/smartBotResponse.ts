@@ -211,6 +211,27 @@ const SAFETY_MESSAGE = new EmbedBuilder()
         `
   )
 
+const HASHTAG_MESSAGE = new EmbedBuilder()
+  // Set the title of the field
+  .setTitle('All `#?` functionalities')
+  // Set the color of the embed
+  .setColor(ARTBOT_GREEN)
+  // Set the main content of the embed
+  .setDescription(
+    `\`#?\` = Random project, random token
+    \`#? [project name]\` = Random token from project
+    \`#[token number] [project name]\` = Specific token from project
+    \`#? [artist name]\` = Random token from artist
+    \`#? [vertical]\` = Random token from vertical (e.g. Curated, Explorations, Presents, Engine, Collaborations, etc)
+    \`#? [tag]\` = Random token from tag (e.g. Audio, Interactive, Animated, etc)
+    \`#? [wallet or ENS]\` = Random token from wallet
+    \`#? [wallet or ENS] [project name / artist / vertical / tag]\` = Random token from wallet with criteria described above
+    \`#? open\` = Random token from an open (still minting) collection
+
+    Ask me about \`aliases\` to see a list of project name shortcuts you can use in #? commands!
+    `
+  )
+
 const OTC_MESSAGE = new EmbedBuilder()
   // Set the title of the field
   .setTitle('Warning: OTC trades can be dangerous')
@@ -479,6 +500,10 @@ export async function smartBotResponse(
       return generateGasPriceMessage()
     }
     return GAS_MESSAGE
+  }
+
+  if (containsQuestion && msgContentLowercase.includes('hashtag')) {
+    return HASHTAG_MESSAGE
   }
   if (msgContentLowercase.includes('leaderboard')) {
     triviaBot.leaderboard(msg)
