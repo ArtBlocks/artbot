@@ -154,6 +154,7 @@ export class ArtIndexerBot {
     }
   }
 
+  // Please update HASHTAG_MESSAGE in smartBotResponse.ts if you add more options here
   getMessageType(key: string, afterTheHash: string): MessageTypes {
     if (key === '#?') {
       return MessageTypes.RANDOM
