@@ -4,6 +4,7 @@ import { EUploadMimeType, TweetV2, TwitterApi } from 'twitter-api-v2'
 import { Mint } from './MintBot'
 import {
   TWITTER_PROJECTBOT_UTM,
+  delay,
   ensOrAddress,
   getTokenApiUrl,
   getTokenUrl,
@@ -17,9 +18,12 @@ const TWITTER_MEDIA_BYTE_LIMIT = 5242880
 // Search rate limit is 60 queries per 15 minutes - shortest interval is 15 secs (though we should keep it a bit longer)
 const SEARCH_INTERVAL_MS = 20000
 const NUM_RETRIES = 3
+const RETRY_DELAY_MS = 1000
 const prod = process.env.ARTBOT_IS_PROD
   ? process.env.ARTBOT_IS_PROD.toLowerCase() === 'true'
   : false
+
+const ARTBOT_TWITTER_HANDLE = '@artbotartbot'
 
 export class TwitterBot {
   twitterClient: TwitterApi
@@ -45,10 +49,9 @@ export class TwitterBot {
     })
 
     this.lastTweetId = ''
-    if (listener) {
+    if (listener && process.env.TWITTER_ENABLED === 'true') {
       console.log('Starting Twitter listener')
-      // TODO: Uncomment this when we're ready to start listening!
-      // this.startSearchAndReplyRoutine()
+      this.startSearchAndReplyRoutine()
     }
   }
 
@@ -61,9 +64,12 @@ export class TwitterBot {
 
   async search() {
     console.log(`Searching Twitter... (last tweet id: ${this.lastTweetId})`)
-    const artbotTweets = await this.twitterClient.v2.search('@artbot_ab', {
-      since_id: this.lastTweetId,
-    })
+    const artbotTweets = await this.twitterClient.v2.search(
+      ARTBOT_TWITTER_HANDLE,
+      {
+        since_id: this.lastTweetId,
+      }
+    )
 
     if (artbotTweets.meta.result_count === 0) {
       console.log('No new tweets found')
@@ -92,6 +98,7 @@ export class TwitterBot {
       console.warn(`Tweet '${tweet.text}' is not a supported action`)
       return
     }
+    console.log(`Handling tweet ${tweet.id}: ${cleanedTweet}`)
 
     let projectBot
     let tokenId
@@ -111,10 +118,12 @@ export class TwitterBot {
     )
 
     const assetUrl = artBlocksData.preview_asset_url
-    const media_id = await this.uploadMedia(assetUrl)
 
-    if (!media_id) {
-      console.error(`no media id returned for ${assetUrl} - not tweeting`)
+    let media_id: string
+    try {
+      media_id = await this.uploadMedia(assetUrl)
+    } catch (error) {
+      console.error(`Error uploading media for ${assetUrl}:`, error)
       return
     }
 
@@ -138,11 +147,12 @@ export class TwitterBot {
       } catch (err) {
         console.log(`Error replying to ${tweet.id}:`, err)
         console.log(`Retrying (attempt ${i} of ${NUM_RETRIES})...`)
+        await delay(RETRY_DELAY_MS)
       }
     }
   }
 
-  async uploadMedia(assetUrl: string): Promise<string | undefined> {
+  async uploadMedia(assetUrl: string): Promise<string> {
     const downStream = await axios({
       method: 'GET',
       responseType: 'arraybuffer',
@@ -150,7 +160,8 @@ export class TwitterBot {
     })
 
     let imageBuff: Buffer = downStream.data as Buffer
-    if (imageBuff.length > TWITTER_MEDIA_BYTE_LIMIT) {
+
+    while (imageBuff.length > TWITTER_MEDIA_BYTE_LIMIT) {
       console.log('Resizing...')
       const ratio = TWITTER_MEDIA_BYTE_LIMIT / imageBuff.length
       const metadata = await sharp(imageBuff).metadata()
@@ -159,10 +170,20 @@ export class TwitterBot {
         .toBuffer()
     }
 
-    console.log('Uploading media...', assetUrl)
-    return await this.twitterClient.v1.uploadMedia(imageBuff, {
-      mimeType: this.getMimeType(assetUrl),
-    })
+    console.log('Uploading media to twitter...', assetUrl)
+    for (let i = 0; i < NUM_RETRIES; i++) {
+      try {
+        const mediaId = await this.twitterClient.v1.uploadMedia(imageBuff, {
+          mimeType: this.getMimeType(assetUrl),
+        })
+        return mediaId
+      } catch (err) {
+        console.log(`Error uploading ${assetUrl}:`, err)
+        console.log(`Retrying (attempt ${i} of ${NUM_RETRIES})...`)
+        await delay(RETRY_DELAY_MS)
+      }
+    }
+    throw new Error("Couldn't upload media - dropping tweet")
   }
 
   getMimeType(assetUrl: string): EUploadMimeType {

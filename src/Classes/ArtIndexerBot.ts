@@ -257,11 +257,11 @@ export class ArtIndexerBot {
   }
 
   async handleNumberTweet(tweet: string): Promise<ProjectBotAndToken> {
-    let content = tweet
+    let content = tweet.trim()
 
-    let afterTheHash = content.replace(/#(\?|\d+)/g, '')
+    let afterTheHash = content.replace(/#(\?|\d+)/g, '').trim()
     let key = this.toProjectKey(afterTheHash)
-    key = content.trim() === '#?' ? '#?' : key
+    key = content === '#?' ? '#?' : key
 
     const messageType = this.getMessageType(key, afterTheHash)
     let projectBot
