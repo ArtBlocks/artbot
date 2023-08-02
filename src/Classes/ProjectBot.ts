@@ -193,18 +193,16 @@ export class ProjectBot {
     )
   }
 
-  async handleTweet(tweetText: string) {
+  async handleTweet(tweetText: string): Promise<string> {
     const content = tweetText
     if (content.length <= 1) {
-      console.log(
+      throw new Error(
         `Invalid format, enter # followed by the piece number of interest.`
       )
-      return
     }
     const num = content.match(/#(\?|\d+)/) ?? ''
     if (!num) {
-      console.log(`Regex not matched :(`)
-      return
+      throw new Error(`Regex not matched :(`)
     }
     const afterTheHash = num[0].substring(1)
     let pieceNumber
@@ -216,10 +214,9 @@ export class ProjectBot {
 
     await this.checkEditionSize(pieceNumber)
     if (pieceNumber >= this.editionSize || pieceNumber < 0) {
-      console.log(
+      throw new Error(
         `Invalid #, only ${this.editionSize} pieces minted for ${this.projectName}.`
       )
-      return
     }
 
     const tokenID = pieceNumber + this.projectNumber * 1e6
@@ -273,7 +270,7 @@ export class ProjectBot {
     const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url)
 
     const ownerProfileLink = ownerAddress
-      ? 'https://www.artblocks.io/user/' + ownerAddress
+      ? 'https://www.artblocks.io/user/' + ownerAddress + PROJECTBOT_UTM
       : ''
     // If user did *not* request full details, return just a large image,
     // along with a link to the OpenSea page and ArtBlocks live script.
@@ -295,7 +292,7 @@ export class ProjectBot {
       }
       embedContent.addFields({
         name: 'Live Script',
-        value: `[Generator](${artBlocksData.generator_url})`,
+        value: `[Generator](${artBlocksData.generator_url + PROJECTBOT_UTM})`,
         inline: true,
       })
       msg.channel.send({ embeds: [embedContent] })
