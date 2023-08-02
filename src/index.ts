@@ -20,6 +20,7 @@ import {
   getEngineProjects,
 } from './Data/queryGraphQL'
 import { TriviaBot } from './Classes/TriviaBot'
+import { waitForEngineContracts } from './Classes/APIBots/utils'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
@@ -157,12 +158,10 @@ bot.on('ready', () => {
   // artIndexerBot.startTriviaRoutine()
 })
 
-const artIndexerBot = new ArtIndexerBot()
+export const artIndexerBot = new ArtIndexerBot()
 const pbabIndexerBot = new ArtIndexerBot(getEngineProjects)
 const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
 const abXbmIndexerBot = new ArtIndexerBot(getArtBlocksXBMProjects)
-
-export const mintBot = new MintBot(bot)
 
 bot.on(Events.MessageCreate, async (msg) => {
   const msgAuthor = msg.author.username
@@ -226,13 +225,8 @@ bot.on(Events.MessageCreate, async (msg) => {
   })
 })
 
-const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
 const initReservoirBots = async () => {
-  while (ENGINE_CONTRACTS.length === 0) {
-    console.log('Waiting for engine contracts to load...')
-    await delay(5000)
-  }
-  console.log('Engine contracts loaded')
+  const engineContracts = await waitForEngineContracts()
 
   const buildContractsString = (contracts: string[]): string => {
     const ans = 'contracts=' + contracts.join('&contracts=')
@@ -268,7 +262,7 @@ const initReservoirBots = async () => {
   const allContracts = Object.values(CORE_CONTRACTS)
     .concat(Object.values(COLLAB_CONTRACTS))
     .concat(Object.values(EXPLORATIONS_CONTRACTS))
-    .concat(ENGINE_CONTRACTS ?? [])
+    .concat(engineContracts ?? [])
 
   const RESERVOIR_CONTRACT_LIMIT = 20
   const numBotInstances = Math.ceil(
@@ -283,6 +277,8 @@ const initReservoirBots = async () => {
     createReservoirBots(listParams, saleParams, API_POLL_TIME_MS + i * 3000)
   }
 }
+
+export const mintBot = new MintBot(bot)
 
 // Instantiate API Pollers (if not in test mode)
 if (PRODUCTION_MODE) {

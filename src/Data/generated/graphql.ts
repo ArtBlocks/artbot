@@ -377,22 +377,22 @@ export type ComponentProjectMetadataProjectMetadataFiltersInput_Remote_Rel_Proje
 
 export type ComponentProjectSaleInfoRowProjectSaleInfoRow = {
   __typename?: 'ComponentProjectSaleInfoRowProjectSaleInfoRow';
-  AuctionEndPrice?: Maybe<Scalars['Float']>;
   AuctionEndTime?: Maybe<Scalars['DateTime']>;
-  AuctionStartPrice: Scalars['Float'];
   AuctionStartTime: Scalars['DateTime'];
   AuctionType: Scalars['String'];
+  EndPrice?: Maybe<Scalars['String']>;
   MinterMaxInvocations?: Maybe<Scalars['Int']>;
+  StartPrice?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
 };
 
 export type ComponentProjectSaleInfoRowProjectSaleInfoRowFiltersInput = {
-  AuctionEndPrice?: InputMaybe<FloatFilterInput>;
   AuctionEndTime?: InputMaybe<DateTimeFilterInput>;
-  AuctionStartPrice?: InputMaybe<FloatFilterInput>;
   AuctionStartTime?: InputMaybe<DateTimeFilterInput>;
   AuctionType?: InputMaybe<StringFilterInput>;
+  EndPrice?: InputMaybe<StringFilterInput>;
   MinterMaxInvocations?: InputMaybe<IntFilterInput>;
+  StartPrice?: InputMaybe<StringFilterInput>;
   and?: InputMaybe<Array<InputMaybe<ComponentProjectSaleInfoRowProjectSaleInfoRowFiltersInput>>>;
   not?: InputMaybe<ComponentProjectSaleInfoRowProjectSaleInfoRowFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<ComponentProjectSaleInfoRowProjectSaleInfoRowFiltersInput>>>;
@@ -469,30 +469,6 @@ export enum Enum_Article_Category {
   Podcast = 'PODCAST',
   Video = 'VIDEO'
 }
-
-export type FloatFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
-  between?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
-  contains?: InputMaybe<Scalars['Float']>;
-  containsi?: InputMaybe<Scalars['Float']>;
-  endsWith?: InputMaybe<Scalars['Float']>;
-  eq?: InputMaybe<Scalars['Float']>;
-  eqi?: InputMaybe<Scalars['Float']>;
-  gt?: InputMaybe<Scalars['Float']>;
-  gte?: InputMaybe<Scalars['Float']>;
-  in?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
-  lt?: InputMaybe<Scalars['Float']>;
-  lte?: InputMaybe<Scalars['Float']>;
-  ne?: InputMaybe<Scalars['Float']>;
-  not?: InputMaybe<FloatFilterInput>;
-  notContains?: InputMaybe<Scalars['Float']>;
-  notContainsi?: InputMaybe<Scalars['Float']>;
-  notIn?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
-  notNull?: InputMaybe<Scalars['Boolean']>;
-  null?: InputMaybe<Scalars['Boolean']>;
-  or?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
-  startsWith?: InputMaybe<Scalars['Float']>;
-};
 
 export type GenericMorph = Article | ArtistEditorialPage | ComponentArtistEditorialPageExhibitions | ComponentArtistEditorialPageFeaturedWork | ComponentArtistEditorialPagePress | ComponentArtistEditorialPageProjectsCreated | ComponentArtistEditorialPageSpectrumArticles | ComponentGalleryGridItemGalleryGridItem | ComponentImageWithCaptionImageWithCaption | ComponentPressItemPressItem | ComponentProjectMetadataProjectMetadata | ComponentProjectSaleInfoRowProjectSaleInfoRow | ComponentSpectrumArticleSpectrumArticle | ProjectPage;
 
@@ -3892,6 +3868,7 @@ export type Processing_Jobs = {
   id: Scalars['uuid'];
   name: Scalars['String'];
   refresh_request_id: Scalars['uuid'];
+  status: Processing_Jobs_Status_Types_Enum;
   submitted_at?: Maybe<Scalars['timestamptz']>;
 };
 
@@ -3912,6 +3889,7 @@ export type Processing_Jobs_Bool_Exp = {
   id?: InputMaybe<Uuid_Comparison_Exp>;
   name?: InputMaybe<String_Comparison_Exp>;
   refresh_request_id?: InputMaybe<Uuid_Comparison_Exp>;
+  status?: InputMaybe<Processing_Jobs_Status_Types_Enum_Comparison_Exp>;
   submitted_at?: InputMaybe<Timestamptz_Comparison_Exp>;
 };
 
@@ -3940,6 +3918,7 @@ export type Processing_Jobs_Order_By = {
   id?: InputMaybe<Order_By>;
   name?: InputMaybe<Order_By>;
   refresh_request_id?: InputMaybe<Order_By>;
+  status?: InputMaybe<Order_By>;
   submitted_at?: InputMaybe<Order_By>;
 };
 
@@ -3956,8 +3935,25 @@ export enum Processing_Jobs_Select_Column {
   /** column name */
   RefreshRequestId = 'refresh_request_id',
   /** column name */
+  Status = 'status',
+  /** column name */
   SubmittedAt = 'submitted_at'
 }
+
+export enum Processing_Jobs_Status_Types_Enum {
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+  Success = 'SUCCESS'
+}
+
+/** Boolean expression to compare columns of type "processing_jobs_status_types_enum". All fields are combined with logical 'AND'. */
+export type Processing_Jobs_Status_Types_Enum_Comparison_Exp = {
+  _eq?: InputMaybe<Processing_Jobs_Status_Types_Enum>;
+  _in?: InputMaybe<Array<Processing_Jobs_Status_Types_Enum>>;
+  _is_null?: InputMaybe<Scalars['Boolean']>;
+  _neq?: InputMaybe<Processing_Jobs_Status_Types_Enum>;
+  _nin?: InputMaybe<Array<Processing_Jobs_Status_Types_Enum>>;
+};
 
 /** Streaming cursor of the table "processing_jobs" */
 export type Processing_Jobs_Stream_Cursor_Input = {
@@ -3974,6 +3970,7 @@ export type Processing_Jobs_Stream_Cursor_Value_Input = {
   id?: InputMaybe<Scalars['uuid']>;
   name?: InputMaybe<Scalars['String']>;
   refresh_request_id?: InputMaybe<Scalars['uuid']>;
+  status?: InputMaybe<Processing_Jobs_Status_Types_Enum>;
   submitted_at?: InputMaybe<Scalars['timestamptz']>;
 };
 
@@ -4878,6 +4875,7 @@ export type Projects_Metadata = {
   price_per_token_in_wei?: Maybe<Scalars['String']>;
   primary_render_type: Render_Types_Enum;
   project_id: Scalars['String'];
+  properties_updated_at: Scalars['jsonb'];
   /** An object relationship */
   proposed_artist_addresses_and_split?: Maybe<Proposed_Artist_Addresses_And_Splits>;
   proposed_artists_and_splits_id?: Maybe<Scalars['String']>;
@@ -4981,6 +4979,12 @@ export type Projects_MetadataOob_TokensArgs = {
   offset?: InputMaybe<Scalars['Int']>;
   order_by?: InputMaybe<Array<Oob_Tokens_Metadata_Order_By>>;
   where?: InputMaybe<Oob_Tokens_Metadata_Bool_Exp>;
+};
+
+
+/** This table holds entries for every project and information on all project-related settings. */
+export type Projects_MetadataProperties_Updated_AtArgs = {
+  path?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -5232,6 +5236,7 @@ export type Projects_Metadata_Bool_Exp = {
   price_per_token_in_wei?: InputMaybe<String_Comparison_Exp>;
   primary_render_type?: InputMaybe<Render_Types_Enum_Comparison_Exp>;
   project_id?: InputMaybe<String_Comparison_Exp>;
+  properties_updated_at?: InputMaybe<Jsonb_Comparison_Exp>;
   proposed_artist_addresses_and_split?: InputMaybe<Proposed_Artist_Addresses_And_Splits_Bool_Exp>;
   proposed_artists_and_splits_id?: InputMaybe<String_Comparison_Exp>;
   receipts?: InputMaybe<Receipt_Metadata_Bool_Exp>;
@@ -5566,6 +5571,7 @@ export type Projects_Metadata_Order_By = {
   price_per_token_in_wei?: InputMaybe<Order_By>;
   primary_render_type?: InputMaybe<Order_By>;
   project_id?: InputMaybe<Order_By>;
+  properties_updated_at?: InputMaybe<Order_By>;
   proposed_artist_addresses_and_split?: InputMaybe<Proposed_Artist_Addresses_And_Splits_Order_By>;
   proposed_artists_and_splits_id?: InputMaybe<Order_By>;
   receipts_aggregate?: InputMaybe<Receipt_Metadata_Aggregate_Order_By>;
@@ -5684,6 +5690,8 @@ export enum Projects_Metadata_Select_Column {
   PrimaryRenderType = 'primary_render_type',
   /** column name */
   ProjectId = 'project_id',
+  /** column name */
+  PropertiesUpdatedAt = 'properties_updated_at',
   /** column name */
   ProposedArtistsAndSplitsId = 'proposed_artists_and_splits_id',
   /** column name */
@@ -5950,6 +5958,7 @@ export type Projects_Metadata_Stream_Cursor_Value_Input = {
   price_per_token_in_wei?: InputMaybe<Scalars['String']>;
   primary_render_type?: InputMaybe<Render_Types_Enum>;
   project_id?: InputMaybe<Scalars['String']>;
+  properties_updated_at?: InputMaybe<Scalars['jsonb']>;
   proposed_artists_and_splits_id?: InputMaybe<Scalars['String']>;
   render_delay?: InputMaybe<Scalars['Int']>;
   render_with_gpu?: InputMaybe<Scalars['Boolean']>;
@@ -10851,6 +10860,8 @@ export type Webflow_Spectrum_Articles_Stream_Cursor_Value_Input = {
 
 export type ProjectDetailFragment = { __typename?: 'projects_metadata', id: string, project_id: string, name?: string | null, description?: string | null, invocations?: any | null, max_invocations: number, active: boolean, paused: boolean, complete: boolean, artist_name?: string | null, contract_address: string, start_datetime?: any | null, vertical_name: string, vertical: { __typename?: 'project_verticals', category_name: string }, tags: Array<{ __typename?: 'entity_tags', tag_name: string }> };
 
+export type TokenDetailFragment = { __typename?: 'tokens_metadata', invocation: number, project: { __typename?: 'projects_metadata', name?: string | null } };
+
 export type GetAllProjectsQueryVariables = Exact<{
   first: Scalars['Int'];
   skip?: InputMaybe<Scalars['Int']>;
@@ -11045,7 +11056,6 @@ export type ResolversTypes = {
   DateTimeFilterInput: DateTimeFilterInput;
   ENUM_ARTICLE_CATEGORY: Enum_Article_Category;
   Float: ResolverTypeWrapper<Scalars['Float']>;
-  FloatFilterInput: FloatFilterInput;
   GenericMorph: ResolversTypes['Article'] | ResolversTypes['ArtistEditorialPage'] | ResolversTypes['ComponentArtistEditorialPageExhibitions'] | ResolversTypes['ComponentArtistEditorialPageFeaturedWork'] | ResolversTypes['ComponentArtistEditorialPagePress'] | ResolversTypes['ComponentArtistEditorialPageProjectsCreated'] | ResolversTypes['ComponentArtistEditorialPageSpectrumArticles'] | ResolversTypes['ComponentGalleryGridItemGalleryGridItem'] | ResolversTypes['ComponentImageWithCaptionImageWithCaption'] | ResolversTypes['ComponentPressItemPressItem'] | ResolversTypes['ComponentProjectMetadataProjectMetadata'] | ResolversTypes['ComponentProjectSaleInfoRowProjectSaleInfoRow'] | ResolversTypes['ComponentSpectrumArticleSpectrumArticle'] | ResolversTypes['ProjectPage'];
   ID: ResolverTypeWrapper<Scalars['ID']>;
   IDFilterInput: IdFilterInput;
@@ -11389,6 +11399,8 @@ export type ResolversTypes = {
   processing_jobs_min_order_by: Processing_Jobs_Min_Order_By;
   processing_jobs_order_by: Processing_Jobs_Order_By;
   processing_jobs_select_column: Processing_Jobs_Select_Column;
+  processing_jobs_status_types_enum: Processing_Jobs_Status_Types_Enum;
+  processing_jobs_status_types_enum_comparison_exp: Processing_Jobs_Status_Types_Enum_Comparison_Exp;
   processing_jobs_stream_cursor_input: Processing_Jobs_Stream_Cursor_Input;
   processing_jobs_stream_cursor_value_input: Processing_Jobs_Stream_Cursor_Value_Input;
   project_external_asset_dependencies: ResolverTypeWrapper<Project_External_Asset_Dependencies>;
@@ -11729,7 +11741,6 @@ export type ResolversParentTypes = {
   DateTime: Scalars['DateTime'];
   DateTimeFilterInput: DateTimeFilterInput;
   Float: Scalars['Float'];
-  FloatFilterInput: FloatFilterInput;
   GenericMorph: ResolversParentTypes['Article'] | ResolversParentTypes['ArtistEditorialPage'] | ResolversParentTypes['ComponentArtistEditorialPageExhibitions'] | ResolversParentTypes['ComponentArtistEditorialPageFeaturedWork'] | ResolversParentTypes['ComponentArtistEditorialPagePress'] | ResolversParentTypes['ComponentArtistEditorialPageProjectsCreated'] | ResolversParentTypes['ComponentArtistEditorialPageSpectrumArticles'] | ResolversParentTypes['ComponentGalleryGridItemGalleryGridItem'] | ResolversParentTypes['ComponentImageWithCaptionImageWithCaption'] | ResolversParentTypes['ComponentPressItemPressItem'] | ResolversParentTypes['ComponentProjectMetadataProjectMetadata'] | ResolversParentTypes['ComponentProjectSaleInfoRowProjectSaleInfoRow'] | ResolversParentTypes['ComponentSpectrumArticleSpectrumArticle'] | ResolversParentTypes['ProjectPage'];
   ID: Scalars['ID'];
   IDFilterInput: IdFilterInput;
@@ -12044,6 +12055,7 @@ export type ResolversParentTypes = {
   processing_jobs_max_order_by: Processing_Jobs_Max_Order_By;
   processing_jobs_min_order_by: Processing_Jobs_Min_Order_By;
   processing_jobs_order_by: Processing_Jobs_Order_By;
+  processing_jobs_status_types_enum_comparison_exp: Processing_Jobs_Status_Types_Enum_Comparison_Exp;
   processing_jobs_stream_cursor_input: Processing_Jobs_Stream_Cursor_Input;
   processing_jobs_stream_cursor_value_input: Processing_Jobs_Stream_Cursor_Value_Input;
   project_external_asset_dependencies: Project_External_Asset_Dependencies;
@@ -12452,12 +12464,12 @@ export type ComponentProjectMetadataProjectMetadataResolvers<ContextType = any, 
 };
 
 export type ComponentProjectSaleInfoRowProjectSaleInfoRowResolvers<ContextType = any, ParentType extends ResolversParentTypes['ComponentProjectSaleInfoRowProjectSaleInfoRow'] = ResolversParentTypes['ComponentProjectSaleInfoRowProjectSaleInfoRow']> = {
-  AuctionEndPrice?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   AuctionEndTime?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  AuctionStartPrice?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   AuctionStartTime?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   AuctionType?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  EndPrice?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   MinterMaxInvocations?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  StartPrice?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -13326,6 +13338,7 @@ export type Processing_JobsResolvers<ContextType = any, ParentType extends Resol
   id?: Resolver<ResolversTypes['uuid'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   refresh_request_id?: Resolver<ResolversTypes['uuid'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['processing_jobs_status_types_enum'], ParentType, ContextType>;
   submitted_at?: Resolver<Maybe<ResolversTypes['timestamptz']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -13541,6 +13554,7 @@ export type Projects_MetadataResolvers<ContextType = any, ParentType extends Res
   price_per_token_in_wei?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   primary_render_type?: Resolver<ResolversTypes['render_types_enum'], ParentType, ContextType>;
   project_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  properties_updated_at?: Resolver<ResolversTypes['jsonb'], ParentType, ContextType, Partial<Projects_MetadataProperties_Updated_AtArgs>>;
   proposed_artist_addresses_and_split?: Resolver<Maybe<ResolversTypes['proposed_artist_addresses_and_splits']>, ParentType, ContextType>;
   proposed_artists_and_splits_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   receipts?: Resolver<Array<ResolversTypes['receipt_metadata']>, ParentType, ContextType, Partial<Projects_MetadataReceiptsArgs>>;
@@ -14912,9 +14926,10 @@ export type DirectiveResolvers<ContextType = any> = {
 };
 
 export const ProjectDetailFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProjectDetail"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"projects_metadata"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"project_id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"invocations"}},{"kind":"Field","name":{"kind":"Name","value":"max_invocations"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"paused"}},{"kind":"Field","name":{"kind":"Name","value":"complete"}},{"kind":"Field","name":{"kind":"Name","value":"artist_name"}},{"kind":"Field","name":{"kind":"Name","value":"contract_address"}},{"kind":"Field","name":{"kind":"Name","value":"start_datetime"}},{"kind":"Field","name":{"kind":"Name","value":"vertical_name"}},{"kind":"Field","name":{"kind":"Name","value":"vertical"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"category_name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"tags"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tag_name"}}]}}]}}]} as unknown as DocumentNode<ProjectDetailFragment, unknown>;
+export const TokenDetailFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"TokenDetail"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"tokens_metadata"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"invocation"}},{"kind":"Field","name":{"kind":"Name","value":"project"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<TokenDetailFragment, unknown>;
 export const GetAllProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getAllProjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"project_id"},"value":{"kind":"EnumValue","value":"asc"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetAllProjectsQuery, GetAllProjectsQueryVariables>;
 export const GetProjectInContractsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getProjectInContracts"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"projectId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"project_id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"projectId"}}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"contract_address"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_in"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"1"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetProjectInContractsQuery, GetProjectInContractsQueryVariables>;
-export const GetWalletTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getWalletTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"wallet"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokens_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"owner_address"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"wallet"}}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"contract_address"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_in"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"invocation"}},{"kind":"Field","name":{"kind":"Name","value":"project"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetWalletTokensQuery, GetWalletTokensQueryVariables>;
+export const GetWalletTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getWalletTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"wallet"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokens_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"owner_address"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"wallet"}}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"contract_address"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_in"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"TokenDetail"}}]}}]}},...TokenDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetWalletTokensQuery, GetWalletTokensQueryVariables>;
 export const GetContractProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getContractProjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contract"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"project_id"},"value":{"kind":"EnumValue","value":"asc"}}]}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"contract_address"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contract"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetContractProjectsQuery, GetContractProjectsQueryVariables>;
 export const GetOpenProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getOpenProjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"order_by"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"project_id"},"value":{"kind":"EnumValue","value":"asc"}}]}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"paused"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"BooleanValue","value":false}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"active"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"BooleanValue","value":true}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"complete"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"BooleanValue","value":false}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"contract_address"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_in"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contracts"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetOpenProjectsQuery, GetOpenProjectsQueryVariables>;
 export const GetProjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getProject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects_metadata"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetail"}}]}}]}},...ProjectDetailFragmentDoc.definitions]} as unknown as DocumentNode<GetProjectQuery, GetProjectQueryVariables>;

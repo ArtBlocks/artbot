@@ -20,6 +20,13 @@ fragment ProjectDetail on projects_metadata {
   }
 }
 
+fragment TokenDetail on tokens_metadata {
+  invocation
+  project {
+    name
+  }
+}
+
 query getAllProjects($first: Int!, $skip: Int) {
   projects_metadata(
     limit: $first
@@ -56,10 +63,7 @@ query getWalletTokens(
       contract_address: { _in: $contracts }
     }
   ) {
-    invocation
-    project {
-      name
-    }
+    ...TokenDetail
   }
 }
 

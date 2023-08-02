@@ -7,14 +7,13 @@ import { projectConfig } from '..'
 import { randomColor } from '../Utils/smartBotResponse'
 import axios from 'axios'
 import { getTokenApiUrl, replaceVideoWithGIF } from './APIBots/utils'
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { getTriviaLeaderboard, updateTriviaScore } from '../Data/supabase'
 
 const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 export class TriviaBot {
   bot: Client
   model?: OpenAIChat
   channel?: TextChannel
-  supabaseClient?: SupabaseClient
 
   currentTriviaAnswer: string
   constructor(bot: Client) {
@@ -36,10 +35,6 @@ export class TriviaBot {
       : undefined
 
     this.currentTriviaAnswer = ''
-    this.supabaseClient =
-      process.env.SUPABASE_URL && process.env.SUPABASE_API_KEY
-        ? createClient(process.env.SUPABASE_URL, process.env.SUPABASE_API_KEY)
-        : undefined
   }
 
   isActiveTriviaAnswer(projectBot: ProjectBot): boolean {
@@ -139,32 +134,15 @@ export class TriviaBot {
   async tally(msg: Message) {
     try {
       this.currentTriviaAnswer = ''
-      if (!this.supabaseClient) {
-        console.log("Can't tally trivia score - no Supabase API key")
+      let score = -1
+      try {
+        score = await updateTriviaScore(msg.author.username)
+      } catch (err) {
+        console.log('ERROR updating score', err)
         msg.reply(
-          `Uh-oh, looks like I can't tally your score. Pester Grant until he fixes it`
+          `Hmmm, you got it right but it seems there was an error updating your score. Pester Grant until he fixes it`
         )
         return
-      }
-      const { data } = await this.supabaseClient
-        .from(process.env.TRIVIA_TABLE ?? '')
-        .select(`score`)
-        .eq('user', `${msg.author.username}`)
-
-      let score = 1
-      if (data?.length) {
-        score = parseInt(data[0].score) + 1
-      }
-
-      const { error } = await this.supabaseClient
-        .from(process.env.TRIVIA_TABLE ?? '')
-        .upsert({ user: `${msg.author.username}`, score: score })
-
-      if (error) {
-        msg.reply(
-          `Uh-oh, you got it right but looks there was an error saving your score. Pester Grant until he fixes it`
-        )
-        console.log('ERROR upserting', error)
       }
 
       const congratsOptions = [
@@ -199,21 +177,18 @@ export class TriviaBot {
   }
 
   async leaderboard(msg: Message) {
-    if (!this.supabaseClient) {
-      console.log("Can't get leaderboard - no Supabase API key")
+    let leaderboardData
+    try {
+      leaderboardData = await getTriviaLeaderboard()
+    } catch (err) {
+      console.log('ERROR getting leaderboard', err)
       msg.reply(
-        `Uh-oh, looks like I can't query for the leaderboard. Pester Grant until he fixes it`
+        'Alas, looks like there was an unexpected error fetching the leaderboard!'
       )
       return
     }
 
-    const { data } = await this.supabaseClient
-      .from(process.env.TRIVIA_TABLE ?? '')
-      .select(`user, score`)
-      .order('score', { ascending: false })
-      .limit(10)
-
-    if (!data?.length) {
+    if (!leaderboardData?.length) {
       msg.reply(`Uh-oh, looks like there are no scores yet!`)
       return
     }
@@ -233,9 +208,9 @@ export class TriviaBot {
       }
     }
 
-    for (let i = 0; i < data?.length; i++) {
-      const user = data[i].user
-      const score = data[i].score
+    for (let i = 0; i < leaderboardData?.length; i++) {
+      const user = leaderboardData[i].user
+      const score = leaderboardData[i].score
       leaderboardString += `${i + 1}. ${getEmoji(
         i
       )} \`${user}\`  - **\`${score}\`** points \n`

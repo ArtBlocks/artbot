@@ -14,7 +14,6 @@ import {
   getTokenOwnerAddress,
 } from '../Data/queryGraphQL'
 import { triviaBot } from '..'
-
 const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
 const Web3 = require('web3')
@@ -98,6 +97,17 @@ export class ProjectBot {
     return new ProjectHandlerHelper(singlesMap, setsMap)
   }
 
+  // If project is still minting, refresh edition size to see if piece is in bounds
+  async checkEditionSize(pieceNumber: number) {
+    if (pieceNumber >= this.editionSize && pieceNumber < this.maxEditionSize) {
+      const invocations: number | null = await getProjectInvocations(this.id)
+
+      if (invocations) {
+        this.editionSize = invocations
+      }
+    }
+  }
+
   async handleNumberMessage(msg: Message) {
     let content = msg.content
     if (content.length <= 1) {
@@ -157,14 +167,7 @@ export class ProjectBot {
       pieceNumber = parseInt(afterTheHash)
     }
 
-    // If project is still minting, refresh edition size to see if piece is in bounds
-    if (pieceNumber >= this.editionSize && pieceNumber < this.maxEditionSize) {
-      const invocations: number | null = await getProjectInvocations(this.id)
-
-      if (invocations) {
-        this.editionSize = invocations
-      }
-    }
+    await this.checkEditionSize(pieceNumber)
 
     if (pieceNumber >= this.editionSize || pieceNumber < 0) {
       msg.channel.send(
@@ -190,9 +193,42 @@ export class ProjectBot {
     )
   }
 
+  async handleTweet(tweetText: string) {
+    const content = tweetText
+    if (content.length <= 1) {
+      console.log(
+        `Invalid format, enter # followed by the piece number of interest.`
+      )
+      return
+    }
+    const num = content.match(/#(\?|\d+)/) ?? ''
+    if (!num) {
+      console.log(`Regex not matched :(`)
+      return
+    }
+    const afterTheHash = num[0].substring(1)
+    let pieceNumber
+    if (afterTheHash[0] == '?') {
+      pieceNumber = Math.floor(Math.random() * this.editionSize)
+    } else {
+      pieceNumber = parseInt(afterTheHash)
+    }
+
+    await this.checkEditionSize(pieceNumber)
+    if (pieceNumber >= this.editionSize || pieceNumber < 0) {
+      console.log(
+        `Invalid #, only ${this.editionSize} pieces minted for ${this.projectName}.`
+      )
+      return
+    }
+
+    const tokenID = pieceNumber + this.projectNumber * 1e6
+
+    return tokenID.toString()
+  }
+
   /**
    * Constructs and sends discord message
-   * @param {*} openSeaData
    * @param {*} msg
    * @param {*} tokenID
    * @param {*} detailsRequested
