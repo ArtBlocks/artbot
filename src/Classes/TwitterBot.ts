@@ -93,7 +93,7 @@ export class TwitterBot {
     await updateLastTweetId(tweetId, prod)
   }
   async replyToTweet(tweet: TweetV2) {
-    const cleanedTweet = tweet.text.replaceAll(/@\w+/g, '') // Regex to remove all mentions
+    const cleanedTweet = tweet.text.replaceAll(/@\w+/g, '').trim() // Regex to remove all mentions
     if (!tweet.text.includes('#')) {
       console.warn(`Tweet '${tweet.text}' is not a supported action`)
       return
@@ -133,7 +133,21 @@ export class TwitterBot {
       tokenId
     )
 
-    const tweetMessage = `${artBlocksData.name} by ${artBlocksData.artist} \n\n${tokenUrl}`
+    let platform = ''
+    // If Engine project, add Engine platform name
+    if (
+      artBlocksData.platform &&
+      artBlocksData.platform !== '' &&
+      !artBlocksData.platform.includes('Art Blocks')
+    ) {
+      if (artBlocksData.platform === 'MOMENT') {
+        artBlocksData.platform = 'Bright Moments'
+      }
+
+      platform = `on ${artBlocksData.platform} `
+    }
+
+    const tweetMessage = `${artBlocksData.name} by ${artBlocksData.artist} ${platform}\n\n${tokenUrl}`
 
     console.log(`Replying to ${tweet.id} with ${artBlocksData.name}`)
     for (let i = 0; i < NUM_RETRIES; i++) {
