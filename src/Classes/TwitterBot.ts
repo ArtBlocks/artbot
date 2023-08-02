@@ -65,7 +65,7 @@ export class TwitterBot {
   async search() {
     console.log(`Searching Twitter... (last tweet id: ${this.lastTweetId})`)
     const artbotTweets = await this.twitterClient.v2.search(
-      ARTBOT_TWITTER_HANDLE,
+      `${ARTBOT_TWITTER_HANDLE} -has:links`,
       {
         since_id: this.lastTweetId,
       }
