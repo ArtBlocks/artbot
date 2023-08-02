@@ -93,17 +93,16 @@ export class TwitterBot {
       return
     }
 
-    const projectBot = await artIndexerBot.handleNumberTweet(cleanedTweet)
+    let projectBot
+    let tokenId
+    try {
+      const { projectBot: p, tokenId: t } =
+        await artIndexerBot.handleNumberTweet(cleanedTweet)
 
-    if (!projectBot) {
-      console.error(`No project found for ${tweet.text}`)
-      return
-    }
-
-    const tokenId = await projectBot.handleTweet(cleanedTweet)
-
-    if (!tokenId) {
-      console.error(`No token found for ${projectBot.projectName}`)
+      projectBot = p
+      tokenId = t
+    } catch (e) {
+      console.error(e)
       return
     }
 

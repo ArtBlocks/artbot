@@ -193,18 +193,16 @@ export class ProjectBot {
     )
   }
 
-  async handleTweet(tweetText: string) {
+  async handleTweet(tweetText: string): Promise<string> {
     const content = tweetText
     if (content.length <= 1) {
-      console.log(
+      throw new Error(
         `Invalid format, enter # followed by the piece number of interest.`
       )
-      return
     }
     const num = content.match(/#(\?|\d+)/) ?? ''
     if (!num) {
-      console.log(`Regex not matched :(`)
-      return
+      throw new Error(`Regex not matched :(`)
     }
     const afterTheHash = num[0].substring(1)
     let pieceNumber
@@ -216,10 +214,9 @@ export class ProjectBot {
 
     await this.checkEditionSize(pieceNumber)
     if (pieceNumber >= this.editionSize || pieceNumber < 0) {
-      console.log(
+      throw new Error(
         `Invalid #, only ${this.editionSize} pieces minted for ${this.projectName}.`
       )
-      return
     }
 
     const tokenID = pieceNumber + this.projectNumber * 1e6

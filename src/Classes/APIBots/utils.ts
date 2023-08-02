@@ -123,7 +123,7 @@ export async function getOSName(address: string): Promise<string> {
 }
 
 export function isWallet(msg: string): boolean {
-  return msg.startsWith('0x') || msg.endsWith('eth')
+  return !!msg.match(/(0x[a-fA-F0-9]{40})|([a-zA-Z0-9.-]+\.eth)/g)
 }
 
 const acceptedVerticals = [
