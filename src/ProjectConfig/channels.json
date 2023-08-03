@@ -70,7 +70,8 @@
       "default": "89",
       "stringTriggers": {
         "119": ["ecumenopolis"],
-        "256": ["spotlight"]
+        "256": ["spotlight"],
+        "456": ["spaghetti bones", "spaghetti", "bones", "sb"]
       }
     }
   },
