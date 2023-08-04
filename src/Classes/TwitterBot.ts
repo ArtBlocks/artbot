@@ -23,7 +23,6 @@ import {
   updateLastTweetId,
   updateStatusRefreshToken,
 } from '../Data/supabase'
-import { start } from '../Utils/twitterUtils'
 
 const TWITTER_MEDIA_BYTE_LIMIT = 5242880
 // Search rate limit is 60 queries per 15 minutes - shortest interval is 15 secs (though we should keep it a bit longer)
@@ -40,10 +39,8 @@ const STATUS_TWITTER_HANDLE = 'ArtbotStatus'
 export class TwitterBot {
   twitterClient: TwitterApi
   twitterStatusAccount?: TwitterApi
-
   lastTweetId: string
-  codeVerifier?: any
-  state?: any
+
   constructor({
     appKey,
     appSecret,
@@ -61,22 +58,13 @@ export class TwitterBot {
     if (listener && process.env.TWITTER_ENABLED === 'true') {
       console.log('Starting Twitter listener')
       this.startSearchAndReplyRoutine()
-      start()
-
-      this.twitterClient = new TwitterApi({
-        appKey,
-        appSecret,
-        accessToken,
-        accessSecret,
-      })
-    } else {
-      this.twitterClient = new TwitterApi({
-        appKey,
-        appSecret,
-        accessToken,
-        accessSecret,
-      })
     }
+    this.twitterClient = new TwitterApi({
+      appKey,
+      appSecret,
+      accessToken,
+      accessSecret,
+    })
   }
 
   async startSearchAndReplyRoutine() {
@@ -106,16 +94,12 @@ export class TwitterBot {
         error.rateLimit
       ) {
         console.log(
-          `You just hit the rate limit! Limit for this endpoint is ${error.rateLimit.limit} requests!`
+          `Search rate limit hit! Limit will reset at timestamp ${error.rateLimit.reset}`
         )
-        console.log(
-          `Request counter will reset at timestamp ${error.rateLimit.reset}.`
-        )
-        return
       } else {
         console.error('Error searching Twitter:', error)
-        throw error
       }
+      return
     }
 
     console.log('artbotTweets', artbotTweets?.meta?.result_count)
@@ -124,7 +108,6 @@ export class TwitterBot {
       console.log('No new tweets found')
       return
     }
-    const latestId = artbotTweets.meta.newest_id
 
     for await (const tweet of artbotTweets) {
       try {
@@ -133,7 +116,7 @@ export class TwitterBot {
         console.error(`Error responding to ${tweet.text}:`, e)
       }
     }
-    this.updateLastTweetId(latestId)
+    this.updateLastTweetId(artbotTweets.meta.newest_id)
   }
   async updateLastTweetId(tweetId: string) {
     if (tweetId === this.lastTweetId) {
@@ -203,23 +186,11 @@ export class TwitterBot {
     console.log(`Replying to ${tweet.id} with ${artBlocksData.name}`)
     for (let i = 0; i < NUM_RETRIES; i++) {
       try {
-        // Get a single tweet
-        // throw new ApiResponseError('test', {
-        //   code: 403,
-        //   data: {},
-        //   headers: {},
-        //   rateLimit: {
-        //     limit: 1,
-        //     remaining: 1,
-        //     reset: 1691174855,
-        //   },
-        // })
         await this.twitterClient.v2.reply(tweetMessage, tweet.id, {
           media: {
             media_ids: [media_id],
           },
         })
-
         return
       } catch (error) {
         if (error instanceof ApiResponseError && error.rateLimit) {
@@ -235,11 +206,10 @@ export class TwitterBot {
               `@${ARTBOT_TWITTER_HANDLE} has been rate limited by Twitter :( Please try again in ${diffMinutes} minutes`,
               tweet.id
             )
-            return
           } catch (e) {
             console.error('Error sending status message:', e)
-            return
           }
+          return
         } else {
           console.log(`Error replying to ${tweet.id}:`, error)
           console.log(`Retrying (attempt ${i} of ${NUM_RETRIES})...`)
@@ -337,6 +307,8 @@ export class TwitterBot {
     }
   }
 
+  // Have to log in with OAuth2 to access status account
+  // Refresh token is stored in supabase
   async signIntoStatusAccount() {
     console.log('Signing in to status account')
     const token = await getStatusRefreshToken()
@@ -344,13 +316,12 @@ export class TwitterBot {
       clientId: process.env.AB_TWITTER_CLIENT_ID ?? '',
       clientSecret: process.env.AB_TWITTER_CLIENT_SECRET ?? '',
     })
-    console.log('connecting with', token)
+    console.log('Connecting with', token)
     const { client: refreshedClient, refreshToken: newRefreshToken } =
       await API.refreshOAuth2Token(token)
-
-    console.log('Connected! new token', newRefreshToken)
+    console.log('Connected to status account! New token:', newRefreshToken)
     await updateStatusRefreshToken(newRefreshToken ?? '')
-    console.log('Saved new refresh token', newRefreshToken)
+    console.log('Saved new refresh token')
     this.twitterStatusAccount = refreshedClient
   }
 
