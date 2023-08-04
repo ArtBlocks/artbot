@@ -21,6 +21,7 @@ import {
 } from './Data/queryGraphQL'
 import { TriviaBot } from './Classes/TriviaBot'
 import { waitForEngineContracts } from './Classes/APIBots/utils'
+import { verifyTwitter } from './Utils/twitterUtils'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
@@ -139,10 +140,8 @@ app.listen(PORT, function () {
 })
 
 app.get('/callback', (req: any, res: any) => {
-  console.log('here!!!!!!!!!!!!!!!!!!!!!')
-  // Extract state and code from query string
-
-  mintBot.abTwitterBot?.verify(res, req)
+  // Used for Twitter OAuth
+  verifyTwitter(res, req)
 })
 
 // Bot setup.
