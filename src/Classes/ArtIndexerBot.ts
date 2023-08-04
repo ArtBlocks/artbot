@@ -19,6 +19,7 @@ import {
   isVerticalName,
   resolveEnsName,
 } from './APIBots/utils'
+import { ProjectConfig } from '../ProjectConfig/projectConfig'
 dotenv.config()
 
 const deburr = require('lodash.deburr')
@@ -29,21 +30,6 @@ const { isWallet } = require('./APIBots/utils')
 // Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES =
   process.env.METADATA_REFRESH_INTERVAL_MINUTES ?? '60'
-
-// Time for random art (UTC) - 8am EST
-const RANDOM_ART_TIME = new Date()
-RANDOM_ART_TIME.setHours(12)
-RANDOM_ART_TIME.setMinutes(0)
-RANDOM_ART_TIME.setSeconds(0)
-RANDOM_ART_TIME.setMilliseconds(0)
-
-// Time for birthday check (UTC) - 10am EST (also + and - 8 hours)
-const BIRTHDAY_CHECK_TIME = new Date()
-BIRTHDAY_CHECK_TIME.setHours(14)
-BIRTHDAY_CHECK_TIME.setMinutes(0)
-BIRTHDAY_CHECK_TIME.setSeconds(0)
-BIRTHDAY_CHECK_TIME.setMilliseconds(0)
-
 const ONE_MINUTE_IN_MS = 60000
 
 export enum MessageTypes {
@@ -450,51 +436,37 @@ export class ArtIndexerBot {
     return chosenToken
   }
 
-  async startBirthdayRoutine(
+  async checkBirthdays(
     channels: Collection<string, Channel>,
-    projectConfig: any
+    projectConfig: ProjectConfig
   ) {
-    setInterval(() => {
-      const now = new Date()
-      // Only send message if hour and minute match up with specified time
-      if (
-        (now.getHours() !== BIRTHDAY_CHECK_TIME.getHours() &&
-          now.getHours() !== BIRTHDAY_CHECK_TIME.getHours() + 8 &&
-          now.getHours() !== BIRTHDAY_CHECK_TIME.getHours() - 8) ||
-        now.getMinutes() !== BIRTHDAY_CHECK_TIME.getMinutes()
-      ) {
-        return
-      }
-      const [year, month, day] = now.toISOString().split('T')[0].split('-')
-      if (this.birthdays[`${month}-${day}`]) {
-        this.birthdays[`${month}-${day}`].forEach((projBot) => {
-          if (
-            projBot.startTime &&
-            projBot.startTime.getFullYear().toString() !== year &&
-            !this.sentBirthdays[projBot.projectNumber]
-          ) {
-            projBot.sendBirthdayMessage(channels, projectConfig)
-            this.sentBirthdays[projBot.projectNumber] = true
-          }
-        })
-      }
-    }, ONE_MINUTE_IN_MS)
+    const now = new Date()
+    const [year, month, day] = now.toISOString().split('T')[0].split('-')
+    if (this.birthdays[`${month}-${day}`]) {
+      this.birthdays[`${month}-${day}`].forEach((projBot) => {
+        if (
+          projBot.startTime &&
+          projBot.startTime.getFullYear().toString() !== year &&
+          !this.sentBirthdays[projBot.projectNumber]
+        ) {
+          projBot.sendBirthdayMessage(channels, projectConfig)
+          this.sentBirthdays[projBot.projectNumber] = true
+        }
+      })
+    }
   }
 
-  async startTriviaRoutine() {
-    setInterval(() => {
-      console.log("It's trivia time!")
-      let attempts = 0
-      while (attempts < 10) {
-        const keys = Object.keys(this.projects)
-        const projectKey = keys[Math.floor(Math.random() * keys.length)]
-        const projBot = this.projects[projectKey]
-        if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
-          triviaBot.askTriviaQuestion(projBot)
-          return
-        }
-        attempts++
+  async handleTrivia() {
+    let attempts = 0
+    while (attempts < 10) {
+      const keys = Object.keys(this.projects)
+      const projectKey = keys[Math.floor(Math.random() * keys.length)]
+      const projBot = this.projects[projectKey]
+      if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
+        triviaBot.askTriviaQuestion(projBot)
+        return
       }
-    }, ONE_MINUTE_IN_MS)
+      attempts++
+    }
   }
 }
