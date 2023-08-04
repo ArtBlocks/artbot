@@ -28,11 +28,14 @@ const osAddressMap: { [id: string]: string } = {}
 const MAX_ENS_RETRIES = 3
 
 // UTM for links so we can track traffic that comes through Artbot
-const ARTBOT_UTM = '?utm_source=artbot&utm_medium=discord'
-export const LISTING_UTM = ARTBOT_UTM + '&utm_campaign=listing'
-export const SALE_UTM = ARTBOT_UTM + '&utm_campaign=sale'
-export const MINT_UTM = ARTBOT_UTM + '&utm_campaign=mint'
-export const PROJECTBOT_UTM = ARTBOT_UTM + '&utm_campaign=projectbot'
+const ARTBOT_UTM = '?utm_source=artbot'
+const DISCORD_UTM = `${ARTBOT_UTM}&utm_medium=discord`
+const TWITTER_UTM = `${ARTBOT_UTM}&utm_medium=twitter`
+export const LISTING_UTM = `${DISCORD_UTM}&utm_campaign=listing`
+export const SALE_UTM = `${DISCORD_UTM}&utm_campaign=sale`
+export const MINT_UTM = `${DISCORD_UTM}&utm_campaign=mint`
+export const PROJECTBOT_UTM = `${DISCORD_UTM}&utm_campaign=projectbot`
+export const TWITTER_PROJECTBOT_UTM = `${TWITTER_UTM}&utm_campaign=projectbot`
 
 async function getENSName(address: string): Promise<string> {
   let name = ''
@@ -118,7 +121,7 @@ export async function getOSName(address: string): Promise<string> {
 }
 
 export function isWallet(msg: string): boolean {
-  return msg.startsWith('0x') || msg.endsWith('eth')
+  return !!msg.match(/(0x[a-fA-F0-9]{40})|([a-zA-Z0-9.-]+\.eth)/g)
 }
 
 const acceptedVerticals = [
@@ -259,7 +262,7 @@ export async function replaceVideoWithGIF(url: string) {
   return url
 }
 
-const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
+export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
 export const waitForEngineContracts = async (): Promise<string[]> => {
   while (ENGINE_CONTRACTS.length === 0) {
     console.log('Waiting for engine contracts to load...')

@@ -57,6 +57,11 @@ export enum MessageTypes {
   UNKNOWN = 'unknown',
 }
 
+type ProjectBotAndToken = {
+  projectBot: ProjectBot
+  tokenId: string
+}
+
 export class ArtIndexerBot {
   projectFetch: () => Promise<ProjectDetailFragment[]>
   projects: { [id: string]: ProjectBot }
@@ -166,7 +171,7 @@ export class ArtIndexerBot {
       return MessageTypes.TAG
     } else if (this.artists[key]) {
       return MessageTypes.ARTIST
-    } else if (!this.projects[key] && isWallet(afterTheHash?.split(' ')[0])) {
+    } else if (isWallet(afterTheHash?.split(' ')[0])) {
       return MessageTypes.WALLET
     } else if (this.projects[key]) {
       return MessageTypes.PROJECT
@@ -217,6 +222,7 @@ export class ArtIndexerBot {
 
     const messageType = this.getMessageType(projectKey, afterTheHash)
 
+    let projectBot
     // Wallet has to be handled separately as it is dealing with specific tokens not whole projects
     if (messageType === MessageTypes.WALLET) {
       const wallet = afterTheHash.split(' ')[0]
@@ -231,10 +237,18 @@ export class ArtIndexerBot {
         )
         return
       }
-      return this.sendRandomWalletTokenMessage(msg, wallet, projectKey)
+      let token
+      try {
+        token = await this.getRandomWalletToken(wallet, projectKey)
+      } catch (err) {
+        msg.channel.send(err.message)
+        return
+      }
+      msg.content = `#${token?.invocation}`
+      projectBot = this.projects[this.toProjectKey(token.project.name ?? '')]
+    } else {
+      projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
     }
-
-    const projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
 
     if (!projectBot) {
       console.log("Wasn't able to parse message", content)
@@ -243,23 +257,44 @@ export class ArtIndexerBot {
     projectBot.handleNumberMessage(msg)
   }
 
-  async handleNumberTweet(tweet: string): Promise<ProjectBot | undefined> {
-    const content = tweet
+  async handleNumberTweet(tweet: string): Promise<ProjectBotAndToken> {
+    let content = tweet
+    let afterTheHash = content.replace(/#(\?|\d+)/g, '').trim()
+    let key = this.toProjectKey(afterTheHash)
+    key = content === '#?' ? '#?' : key
 
-    const afterTheHash = content.replace(/#(\?|\d+)/, '')
-    const projectKey = this.toProjectKey(afterTheHash)
-
-    const messageType = this.getMessageType(projectKey, afterTheHash)
+    const messageType = this.getMessageType(key, afterTheHash)
+    let projectBot
     if (messageType === MessageTypes.WALLET) {
-      // TODO: support wallet tweets https://app.asana.com/0/1201568815538912/1205173752010557/f
+      const walletMatch = afterTheHash.match(
+        /(0x[a-fA-F0-9]{40})|([a-zA-Z0-9.-]+\.eth)/g
+      )
+      if (!walletMatch) {
+        throw new Error(`Wasn't able to parse wallet from tweet ${content}`)
+      }
+      const wallet = walletMatch[0]
+
+      afterTheHash = afterTheHash.replace(wallet, '')
+      key = this.toProjectKey(afterTheHash)
+      key = key === '' ? '#?' : key
+      if (this.getMessageType(key, afterTheHash) === MessageTypes.UNKNOWN) {
+        throw new Error(`Invalid wallet tweet: ${afterTheHash}`)
+      }
+      const token = await this.getRandomWalletToken(wallet, key)
+
+      content = `#${token?.invocation}`
+      projectBot = this.projects[this.toProjectKey(token.project.name ?? '')]
+    } else {
+      projectBot = await this.projectBotForMessage(key, afterTheHash)
     }
-    const projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
 
     if (!projectBot) {
-      console.log("Wasn't able to parse tweet", content)
-      return
+      throw new Error(`Wasn't able to parse tweet ${content}`)
     }
-    return projectBot
+
+    const tokenId = await projectBot.handleTweet(content)
+
+    return { projectBot, tokenId }
   }
 
   toProjectKey(projectName: string) {
@@ -328,107 +363,91 @@ export class ArtIndexerBot {
   }
 
   // Sends a random token from this wallet's collection
-  async sendRandomWalletTokenMessage(
-    msg: Message,
+  async getRandomWalletToken(
     wallet: string,
     projectKey = ''
-  ) {
+  ): Promise<TokenDetailFragment> {
     console.log(
       `Getting random token${
         projectKey ? ` from ${projectKey}` : ''
       } in wallet ${wallet}`
     )
-    try {
-      // Resolve ENS name if ends in .eth
-      if (wallet.toLowerCase().endsWith('.eth')) {
-        const ensName = wallet
+    // Resolve ENS name if ends in .eth
+    if (wallet.toLowerCase().endsWith('.eth')) {
+      const ensName = wallet
 
-        wallet = await resolveEnsName(ensName)
+      wallet = await resolveEnsName(ensName)
 
-        if (!wallet || wallet === '') {
-          msg.channel.send(
-            `Sorry, I wasn't able to resolve ENS name ${ensName}`
-          )
-          return
-        }
+      if (!wallet || wallet === '') {
+        throw new Error(`Sorry, I wasn't able to resolve ENS name ${ensName}`)
       }
+    }
 
-      wallet = wallet.toLowerCase()
+    wallet = wallet.toLowerCase()
 
-      let tokens = []
-      if (this.walletTokens[wallet]) {
-        tokens = this.walletTokens[wallet]
-      } else {
-        tokens = (await getAllTokensInWallet(wallet)) ?? []
-        this.walletTokens[wallet] = tokens
-      }
+    let tokens = []
+    if (this.walletTokens[wallet]) {
+      tokens = this.walletTokens[wallet]
+    } else {
+      tokens = (await getAllTokensInWallet(wallet)) ?? []
+      this.walletTokens[wallet] = tokens
+    }
 
-      if (tokens.length === 0) {
-        msg.channel.send(
-          `Sorry, I wasn't able to find any Art Blocks tokens in that wallet: ${wallet}`
-        )
-        return
-      }
-
-      const messageType = this.getMessageType(projectKey, '')
-      let chosenToken: TokenDetailFragment | undefined
-      switch (messageType) {
-        case MessageTypes.ARTIST:
-          chosenToken = this.getRandomizedWalletProjectBot(
-            tokens,
-            (projectBot) => {
-              return this.toProjectKey(projectBot.artistName) === projectKey
-            }
-          )
-          break
-        case MessageTypes.COLLECTION:
-          chosenToken = this.getRandomizedWalletProjectBot(
-            tokens,
-            (projectBot) => {
-              return projectBot.collection?.toLowerCase() === projectKey
-            }
-          )
-          break
-        case MessageTypes.TAG:
-          chosenToken = this.getRandomizedWalletProjectBot(
-            tokens,
-            (projectBot) => {
-              return projectBot.tags?.includes(projectKey) ?? false
-            }
-          )
-          break
-        case MessageTypes.PROJECT:
-          chosenToken = this.getRandomizedWalletProjectBot(
-            tokens,
-            (projectBot) => {
-              return this.toProjectKey(projectBot.projectName) === projectKey
-            }
-          )
-          break
-        case MessageTypes.RANDOM:
-          chosenToken = tokens[Math.floor(Math.random() * tokens.length)]
-          break
-        default:
-          break
-      }
-
-      if (!chosenToken) {
-        msg.reply(
-          `Sorry! Wasn't able to find any tokens matching ${projectKey} in that wallet ${wallet}`
-        )
-        return
-      }
-
-      msg.content = `#${chosenToken?.invocation}`
-      return this.projects[
-        this.toProjectKey(chosenToken.project.name ?? '')
-      ].handleNumberMessage(msg)
-    } catch (err) {
-      console.log(`Error when getting wallet tokens: ${err}`)
-      msg.channel.send(
-        `Sorry, something unexpected went wrong - pester Grant about it til he fixes it :)`
+    if (tokens.length === 0) {
+      throw new Error(
+        `Sorry, I wasn't able to find any Art Blocks tokens in that wallet: ${wallet}`
       )
     }
+
+    const messageType = this.getMessageType(projectKey, '')
+    let chosenToken: TokenDetailFragment | undefined
+    switch (messageType) {
+      case MessageTypes.ARTIST:
+        chosenToken = this.getRandomizedWalletProjectBot(
+          tokens,
+          (projectBot) => {
+            return this.toProjectKey(projectBot.artistName) === projectKey
+          }
+        )
+        break
+      case MessageTypes.COLLECTION:
+        chosenToken = this.getRandomizedWalletProjectBot(
+          tokens,
+          (projectBot) => {
+            return projectBot.collection?.toLowerCase() === projectKey
+          }
+        )
+        break
+      case MessageTypes.TAG:
+        chosenToken = this.getRandomizedWalletProjectBot(
+          tokens,
+          (projectBot) => {
+            return projectBot.tags?.includes(projectKey) ?? false
+          }
+        )
+        break
+      case MessageTypes.PROJECT:
+        chosenToken = this.getRandomizedWalletProjectBot(
+          tokens,
+          (projectBot) => {
+            return this.toProjectKey(projectBot.projectName) === projectKey
+          }
+        )
+        break
+      case MessageTypes.RANDOM:
+        chosenToken = tokens[Math.floor(Math.random() * tokens.length)]
+        break
+      default:
+        break
+    }
+
+    if (!chosenToken) {
+      throw new Error(
+        `Sorry! Wasn't able to find any tokens matching ${projectKey} in that wallet ${wallet}`
+      )
+    }
+
+    return chosenToken
   }
 
   async startBirthdayRoutine(
