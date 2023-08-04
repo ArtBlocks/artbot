@@ -46,10 +46,14 @@ export class TriviaBot {
 
   async askTriviaQuestion(project: ProjectBot) {
     // List of ideas:
+    // Phase 1:
     // TODO: Add more question types: Name this artist?
-    // TODO: Price is right style trivia - would need to change the way the answers come in
+    // TODO: Reveal answer for unanswered questions after a certain amount of time
+    // Phase 2:
     // TODO: Different triggers? Not just time based - number of sales, LJ cursing, thank grant, etc.
     // TODO: Trait data type questions? (e.g. "Name a project that has a trait of 'blue'"), Which of these is not a Meridian trait?
+    // Phase 3:
+    // TODO: Price is right style trivia - would need to change the way the answers come in
 
     enum QuestionType {
       CHAT_GPT = 0,
