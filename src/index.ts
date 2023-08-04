@@ -138,6 +138,13 @@ app.listen(PORT, function () {
   console.log('Server is listening on port ', PORT)
 })
 
+app.get('/callback', (req: any, res: any) => {
+  console.log('here!!!!!!!!!!!!!!!!!!!!!')
+  // Extract state and code from query string
+
+  mintBot.abTwitterBot?.verify(res, req)
+})
+
 // Bot setup.
 const bot = new Client({
   intents: [
