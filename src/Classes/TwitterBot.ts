@@ -204,16 +204,16 @@ export class TwitterBot {
     for (let i = 0; i < NUM_RETRIES; i++) {
       try {
         // Get a single tweet
-        throw new ApiResponseError('test', {
-          code: 403,
-          data: {},
-          headers: {},
-          rateLimit: {
-            limit: 1,
-            remaining: 1,
-            reset: 1691174855,
-          },
-        })
+        // throw new ApiResponseError('test', {
+        //   code: 403,
+        //   data: {},
+        //   headers: {},
+        //   rateLimit: {
+        //     limit: 1,
+        //     remaining: 1,
+        //     reset: 1691174855,
+        //   },
+        // })
         await this.twitterClient.v2.reply(tweetMessage, tweet.id, {
           media: {
             media_ids: [media_id],
@@ -257,13 +257,17 @@ export class TwitterBot {
       url: assetUrl,
     })
 
-    let imageBuff: Buffer = downStream.data as Buffer
+    let buff = downStream.data as Buffer
 
-    while (imageBuff.length > TWITTER_MEDIA_BYTE_LIMIT) {
+    while (buff.length > TWITTER_MEDIA_BYTE_LIMIT) {
+      if (assetUrl.includes('.mp4')) {
+        // Can't resize videos, so try again with the png
+        return await this.uploadMedia(assetUrl.replace('.mp4', '.png'))
+      }
       console.log('Resizing...')
-      const ratio = TWITTER_MEDIA_BYTE_LIMIT / imageBuff.length
-      const metadata = await sharp(imageBuff).metadata()
-      imageBuff = await sharp(imageBuff)
+      const ratio = TWITTER_MEDIA_BYTE_LIMIT / buff.length
+      const metadata = await sharp(buff).metadata()
+      buff = await sharp(buff)
         .resize({ width: Math.floor((metadata.width ?? 0) * ratio) })
         .toBuffer()
     }
@@ -271,7 +275,7 @@ export class TwitterBot {
     console.log('Uploading media to twitter...', assetUrl)
     for (let i = 0; i < NUM_RETRIES; i++) {
       try {
-        const mediaId = await this.twitterClient.v1.uploadMedia(imageBuff, {
+        const mediaId = await this.twitterClient.v1.uploadMedia(buff, {
           mimeType: this.getMimeType(assetUrl),
         })
         return mediaId
