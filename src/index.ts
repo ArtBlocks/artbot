@@ -21,6 +21,7 @@ import {
 } from './Data/queryGraphQL'
 import { TriviaBot } from './Classes/TriviaBot'
 import { waitForEngineContracts } from './Classes/APIBots/utils'
+import { verifyTwitter } from './Utils/twitterUtils'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
@@ -136,6 +137,11 @@ app.post('/new-mint', function (req: any, res: any) {
 
 app.listen(PORT, function () {
   console.log('Server is listening on port ', PORT)
+})
+
+app.get('/callback', (req: any, res: any) => {
+  // Used for Twitter OAuth
+  verifyTwitter(res, req)
 })
 
 // Bot setup.
