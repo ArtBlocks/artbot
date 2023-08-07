@@ -5,8 +5,7 @@ let _codeVerifier = ''
 let _state = ''
 
 // NOTE: You'll need to update this callback URL to match your own ngrok thing
-const CALLBACK_URL =
-  'https://b4f8-2601-581-c300-5400-a547-e430-b205-e9c0.ngrok-free.app/callback'
+const CALLBACK_URL = process.env.TWITTER_CALLBACK_URL ?? ''
 
 // Use these two functions if we need to regenerate the status account tokens
 export function start() {
