@@ -196,7 +196,8 @@ export class MintBot {
       collectionType !== CollectionType.ENGINE &&
       collectionType !== CollectionType.STAGING
     ) {
-      this.abTwitterBot?.sendToTwitter(mint)
+      // Turned off for now to avoid rate limiting
+      // this.abTwitterBot?.sendToTwitter(mint)
     }
     if (this.contractToTwitterBot[mint.contractAddress]) {
       this.contractToTwitterBot[mint.contractAddress].sendToTwitter(mint)
