@@ -180,7 +180,9 @@ export function sendEmbedToSaleChannels(
       artBlocksData.platform.includes('Tender') ||
       artBlocksData.platform.includes('MOMENT') ||
       artBlocksData.platform.includes('Bright Moments') ||
-      artBlocksData.platform.includes('Art Blocks')
+      artBlocksData.platform.includes('Art Blocks') ||
+      artBlocksData.platform.includes('Grailers') ||
+      artBlocksData.platform.includes('Sotheby')
     ) {
       sendEmbedToChannel(bot, embed, TENDER_SALES)
     }
