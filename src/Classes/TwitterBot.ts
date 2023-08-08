@@ -83,7 +83,7 @@ export class TwitterBot {
       // @${ARTBOT_TWITTER_HANDLE} = Mentions artbotartbot
 
       artbotTweets = await this.twitterClient.v2.search({
-        query: `(to:${ARTBOT_TWITTER_HANDLE} OR @${ARTBOT_TWITTER_HANDLE} -is:retweet -is:quote -has:links has:mentions -from:${STATUS_TWITTER_HANDLE} -from:${ARTBOT_TWITTER_HANDLE}`,
+        query: `(to:${ARTBOT_TWITTER_HANDLE} OR @${ARTBOT_TWITTER_HANDLE}) -is:retweet -is:quote -has:links has:mentions -from:${STATUS_TWITTER_HANDLE} -from:${ARTBOT_TWITTER_HANDLE}`,
         since_id: this.lastTweetId,
       })
     } catch (error) {
