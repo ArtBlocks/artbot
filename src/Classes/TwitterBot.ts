@@ -80,11 +80,10 @@ export class TwitterBot {
     try {
       // Query breakdown:
       // to:${ARTBOT_TWITTER_HANDLE} = Original tweets that start with @artbotartbot or direct replies to @artbotartbot tweets
-      // ("@${ARTBOT_TWITTER_HANDLE} @${ARTBOT_TWITTER_HANDLE}") gets mentions in other people's threads (e.g. I tweet "@artbot #?", then you respond to my tweet saying "@artbot #?"")
-      // @${ARTBOT_TWITTER_HANDLE} -is:reply = Original that don't start with @artbotartbot
+      // @${ARTBOT_TWITTER_HANDLE} = Mentions artbotartbot
 
       artbotTweets = await this.twitterClient.v2.search({
-        query: `(to:${ARTBOT_TWITTER_HANDLE} OR ("@${ARTBOT_TWITTER_HANDLE} @${ARTBOT_TWITTER_HANDLE}") OR (@${ARTBOT_TWITTER_HANDLE} -is:reply)) -is:retweet -is:quote -has:links has:mentions -from:${STATUS_TWITTER_HANDLE} -from:${ARTBOT_TWITTER_HANDLE}`,
+        query: `(to:${ARTBOT_TWITTER_HANDLE} OR @${ARTBOT_TWITTER_HANDLE} -is:retweet -is:quote -has:links has:mentions -from:${STATUS_TWITTER_HANDLE} -from:${ARTBOT_TWITTER_HANDLE}`,
         since_id: this.lastTweetId,
       })
     } catch (error) {
