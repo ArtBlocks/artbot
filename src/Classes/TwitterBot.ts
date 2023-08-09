@@ -134,7 +134,7 @@ export class TwitterBot {
     await updateLastTweetId(tweetId, prod)
   }
   async replyToTweet(tweet: TweetV2) {
-    const cleanedTweet = tweet.text.match(/#(\?|\d*).+/g)?.[0]?.trim() // Regex to remove all mentions
+    const cleanedTweet = tweet.text.match(/#(\?|\d*).+/g)?.[0]?.trim() // Regex to fetch the first hashtag and everything after it (until a newline)
     if (!cleanedTweet) {
       console.warn(`Tweet '${tweet.text}' is not a supported action`)
       return
