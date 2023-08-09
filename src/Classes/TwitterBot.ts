@@ -1,6 +1,11 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
-import { EUploadMimeType, TweetV2, TwitterApi } from 'twitter-api-v2'
+import {
+  ApiResponseError,
+  EUploadMimeType,
+  TweetV2,
+  TwitterApi,
+} from 'twitter-api-v2'
 import { Mint } from './MintBot'
 import {
   TWITTER_PROJECTBOT_UTM,
@@ -12,22 +17,30 @@ import {
 import axios from 'axios'
 import { artIndexerBot } from '..'
 import sharp from 'sharp'
-import { getLastTweetId, updateLastTweetId } from '../Data/supabase'
+import {
+  getLastTweetId,
+  getStatusRefreshToken,
+  updateLastTweetId,
+  updateStatusRefreshToken,
+} from '../Data/supabase'
 
 const TWITTER_MEDIA_BYTE_LIMIT = 5242880
 // Search rate limit is 60 queries per 15 minutes - shortest interval is 15 secs (though we should keep it a bit longer)
 const SEARCH_INTERVAL_MS = 20000
-const NUM_RETRIES = 3
-const RETRY_DELAY_MS = 1000
+const NUM_RETRIES = 5
+const RETRY_DELAY_MS = 5000
 const prod = process.env.ARTBOT_IS_PROD
   ? process.env.ARTBOT_IS_PROD.toLowerCase() === 'true'
   : false
 
-const ARTBOT_TWITTER_HANDLE = '@artbotartbot'
+const ARTBOT_TWITTER_HANDLE = 'artbotartbot'
+const STATUS_TWITTER_HANDLE = 'ArtbotStatus'
 
 export class TwitterBot {
   twitterClient: TwitterApi
+  twitterStatusAccount?: TwitterApi
   lastTweetId: string
+
   constructor({
     appKey,
     appSecret,
@@ -41,22 +54,28 @@ export class TwitterBot {
     accessSecret: string
     listener?: boolean
   }) {
+    this.lastTweetId = ''
+    if (listener && process.env.TWITTER_ENABLED === 'true') {
+      console.log('Starting Twitter listener')
+      // this.startSearchAndReplyRoutine()
+    }
     this.twitterClient = new TwitterApi({
       appKey,
       appSecret,
       accessToken,
       accessSecret,
     })
-
-    this.lastTweetId = ''
-    if (listener && process.env.TWITTER_ENABLED === 'true') {
-      console.log('Starting Twitter listener')
-      this.startSearchAndReplyRoutine()
-    }
   }
 
   async startSearchAndReplyRoutine() {
-    this.lastTweetId = await getLastTweetId(prod)
+    try {
+      this.lastTweetId = await getLastTweetId(prod)
+    } catch (e) {
+      console.error('Error getting last tweet id:', e)
+      console.log('Aborting Twitter listener')
+      return
+    }
+
     setInterval(() => {
       this.search()
     }, SEARCH_INTERVAL_MS)
@@ -64,12 +83,34 @@ export class TwitterBot {
 
   async search() {
     console.log(`Searching Twitter... (last tweet id: ${this.lastTweetId})`)
-    const artbotTweets = await this.twitterClient.v2.search(
-      `${ARTBOT_TWITTER_HANDLE} -has:links`,
-      {
+    let artbotTweets: any
+    try {
+      // Query breakdown:
+      // to:${ARTBOT_TWITTER_HANDLE} = Original tweets that start with @artbotartbot or direct replies to @artbotartbot tweets
+      // @${ARTBOT_TWITTER_HANDLE} = Mentions artbotartbot
+
+      const query = `(to:${ARTBOT_TWITTER_HANDLE} OR @${ARTBOT_TWITTER_HANDLE}) -is:retweet -is:quote -has:links has:mentions -from:${STATUS_TWITTER_HANDLE} -from:${ARTBOT_TWITTER_HANDLE}`
+      const devQuery = `to:ArtbotTesting from:ArtbotTesting`
+      artbotTweets = await this.twitterClient.v2.search({
+        query: prod ? query : devQuery,
         since_id: this.lastTweetId,
+      })
+    } catch (error) {
+      if (
+        error instanceof ApiResponseError &&
+        error.rateLimitError &&
+        error.rateLimit
+      ) {
+        console.log(
+          `Search rate limit hit! Limit will reset at timestamp ${error.rateLimit.reset}`
+        )
+      } else {
+        console.error('Error searching Twitter:', error)
       }
-    )
+      return
+    }
+
+    console.log('artbotTweets', artbotTweets?.meta?.result_count)
 
     if (artbotTweets.meta.result_count === 0) {
       console.log('No new tweets found')
@@ -93,8 +134,8 @@ export class TwitterBot {
     await updateLastTweetId(tweetId, prod)
   }
   async replyToTweet(tweet: TweetV2) {
-    const cleanedTweet = tweet.text.replaceAll(/@\w+/g, '').trim() // Regex to remove all mentions
-    if (!tweet.text.includes('#')) {
+    const cleanedTweet = tweet.text.match(/#(\?|\d*).+/g)?.[0]?.trim() // Regex to fetch the first hashtag and everything after it (until a newline)
+    if (!cleanedTweet) {
       console.warn(`Tweet '${tweet.text}' is not a supported action`)
       return
     }
@@ -159,12 +200,32 @@ export class TwitterBot {
           },
         })
         return
-      } catch (err) {
-        console.log(`Error replying to ${tweet.id}:`, err)
-        console.log(`Retrying (attempt ${i} of ${NUM_RETRIES})...`)
-        await delay(RETRY_DELAY_MS)
+      } catch (error) {
+        if (error instanceof ApiResponseError && error.rateLimit) {
+          console.log(
+            `Rate limit hit on tweet sending: \nLimit: ${error.rateLimit.limit}\nRemaining: ${error.rateLimit.remaining}\nReset: ${error.rateLimit.reset}`
+          )
+          const reset = new Date(error.rateLimit.reset * 1000)
+          const now = new Date()
+          const diff = reset.getTime() - now.getTime()
+          const diffMinutes = Math.ceil(diff / 60000)
+          try {
+            await this.sendStatusMessage(
+              `@${ARTBOT_TWITTER_HANDLE} has been rate limited by Twitter :( Please try again in ${diffMinutes} minutes`,
+              tweet.id
+            )
+          } catch (e) {
+            console.error('Error sending status message:', e)
+          }
+          return
+        } else {
+          console.log(`Error replying to ${tweet.id}:`, error)
+          console.log(`Retrying (attempt ${i} of ${NUM_RETRIES})...`)
+          await delay(RETRY_DELAY_MS)
+        }
       }
     }
+    console.error('Retry attempts failed :( - dropping tweet')
   }
 
   async uploadMedia(assetUrl: string): Promise<string> {
@@ -174,13 +235,17 @@ export class TwitterBot {
       url: assetUrl,
     })
 
-    let imageBuff: Buffer = downStream.data as Buffer
+    let buff = downStream.data as Buffer
 
-    while (imageBuff.length > TWITTER_MEDIA_BYTE_LIMIT) {
+    while (buff.length > TWITTER_MEDIA_BYTE_LIMIT) {
+      if (assetUrl.includes('.mp4')) {
+        // Can't resize videos, so try again with the png
+        return await this.uploadMedia(assetUrl.replace('.mp4', '.png'))
+      }
       console.log('Resizing...')
-      const ratio = TWITTER_MEDIA_BYTE_LIMIT / imageBuff.length
-      const metadata = await sharp(imageBuff).metadata()
-      imageBuff = await sharp(imageBuff)
+      const ratio = TWITTER_MEDIA_BYTE_LIMIT / buff.length
+      const metadata = await sharp(buff).metadata()
+      buff = await sharp(buff)
         .resize({ width: Math.floor((metadata.width ?? 0) * ratio) })
         .toBuffer()
     }
@@ -188,7 +253,7 @@ export class TwitterBot {
     console.log('Uploading media to twitter...', assetUrl)
     for (let i = 0; i < NUM_RETRIES; i++) {
       try {
-        const mediaId = await this.twitterClient.v1.uploadMedia(imageBuff, {
+        const mediaId = await this.twitterClient.v1.uploadMedia(buff, {
           mimeType: this.getMimeType(assetUrl),
         })
         return mediaId
@@ -248,5 +313,37 @@ export class TwitterBot {
     } catch (e) {
       console.error('Error posting to Twitter: ', e)
     }
+  }
+
+  // Have to log in with OAuth2 to access status account
+  // Refresh token is stored in supabase
+  async signIntoStatusAccount() {
+    console.log('Signing in to status account')
+    const token = await getStatusRefreshToken()
+    const API = new TwitterApi({
+      clientId: process.env.AB_TWITTER_CLIENT_ID ?? '',
+      clientSecret: process.env.AB_TWITTER_CLIENT_SECRET ?? '',
+    })
+    console.log('Connecting with', token)
+    const { client: refreshedClient, refreshToken: newRefreshToken } =
+      await API.refreshOAuth2Token(token)
+    console.log('Connected to status account! New token:', newRefreshToken)
+    await updateStatusRefreshToken(newRefreshToken ?? '')
+    console.log('Saved new refresh token')
+    this.twitterStatusAccount = refreshedClient
+  }
+
+  async sendStatusMessage(message: string, replyId?: string) {
+    if (!this.twitterStatusAccount) {
+      await this.signIntoStatusAccount()
+    }
+
+    console.log(`Sending status message ${replyId ? `to ${replyId}` : ''}`)
+
+    if (replyId) {
+      await this.twitterStatusAccount?.v2.reply(message, replyId)
+      return
+    }
+    await this.twitterStatusAccount?.v2.tweet(message)
   }
 }

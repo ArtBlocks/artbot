@@ -80,3 +80,33 @@ export const updateLastTweetId = async (tweetId: string, prod: boolean) => {
     throw new Error(`Error updating last tweet id ${error}`)
   }
 }
+
+export const getStatusRefreshToken = async () => {
+  if (!supabaseClient) {
+    throw new Error('No Supabase client configured')
+  }
+  const { data } = await supabaseClient
+    .from('twitter_tokens')
+    .select(`token`)
+    .eq('id', 'statusRefresh')
+    .limit(1)
+
+  if (!data?.length) {
+    throw new Error('No last tweet id found')
+  }
+
+  return data[0].token
+}
+
+export const updateStatusRefreshToken = async (token: string) => {
+  if (!supabaseClient) {
+    throw new Error('No Supabase client configured')
+  }
+  const { error } = await supabaseClient
+    .from('twitter_tokens')
+    .upsert({ id: 'statusRefresh', token: token })
+
+  if (error) {
+    throw new Error(`Error updating status token ${error}`)
+  }
+}
