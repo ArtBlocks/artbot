@@ -455,18 +455,20 @@ export class ArtIndexerBot {
       })
     }
   }
-
-  async handleTrivia() {
-    let attempts = 0
-    while (attempts < 10) {
-      const keys = Object.keys(this.projects)
-      const projectKey = keys[Math.floor(Math.random() * keys.length)]
-      const projBot = this.projects[projectKey]
-      if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
-        triviaBot.askTriviaQuestion(projBot)
-        return
+  async startTriviaRoutine() {
+    setInterval(() => {
+      console.log("It's trivia time!")
+      let attempts = 0
+      while (attempts < 10) {
+        const keys = Object.keys(this.projects)
+        const projectKey = keys[Math.floor(Math.random() * keys.length)]
+        const projBot = this.projects[projectKey]
+        if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
+          triviaBot.askTriviaQuestion(projBot)
+          return
+        }
+        attempts++
       }
-      attempts++
-    }
+    }, ONE_MINUTE_IN_MS)
   }
 }
