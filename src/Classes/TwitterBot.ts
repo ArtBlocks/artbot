@@ -68,7 +68,14 @@ export class TwitterBot {
   }
 
   async startSearchAndReplyRoutine() {
-    this.lastTweetId = await getLastTweetId(prod)
+    try {
+      this.lastTweetId = await getLastTweetId(prod)
+    } catch (e) {
+      console.error('Error getting last tweet id:', e)
+      console.log('Aborting Twitter listener')
+      return
+    }
+
     setInterval(() => {
       this.search()
     }, SEARCH_INTERVAL_MS)
@@ -82,8 +89,10 @@ export class TwitterBot {
       // to:${ARTBOT_TWITTER_HANDLE} = Original tweets that start with @artbotartbot or direct replies to @artbotartbot tweets
       // @${ARTBOT_TWITTER_HANDLE} = Mentions artbotartbot
 
+      const query = `(to:${ARTBOT_TWITTER_HANDLE} OR @${ARTBOT_TWITTER_HANDLE}) -is:retweet -is:quote -has:links has:mentions -from:${STATUS_TWITTER_HANDLE} -from:${ARTBOT_TWITTER_HANDLE}`
+      const devQuery = `to:ArtbotTesting from:ArtbotTesting`
       artbotTweets = await this.twitterClient.v2.search({
-        query: `(to:${ARTBOT_TWITTER_HANDLE} OR @${ARTBOT_TWITTER_HANDLE}) -is:retweet -is:quote -has:links has:mentions -from:${STATUS_TWITTER_HANDLE} -from:${ARTBOT_TWITTER_HANDLE}`,
+        query: prod ? query : devQuery,
         since_id: this.lastTweetId,
       })
     } catch (error) {
@@ -125,8 +134,8 @@ export class TwitterBot {
     await updateLastTweetId(tweetId, prod)
   }
   async replyToTweet(tweet: TweetV2) {
-    const cleanedTweet = tweet.text.replaceAll(/@\w+/g, '').trim() // Regex to remove all mentions
-    if (!tweet.text.includes('#')) {
+    const cleanedTweet = tweet.text.match(/#(\?|\d*).+/g)?.[0]?.trim() // Regex to remove all mentions
+    if (!cleanedTweet) {
       console.warn(`Tweet '${tweet.text}' is not a supported action`)
       return
     }
