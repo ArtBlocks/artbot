@@ -160,10 +160,6 @@ export const triviaBot = new TriviaBot(bot)
 new ScheduleBot(bot.channels.cache, projectConfig)
 bot.on('ready', () => {
   console.info(`Logged in as ${bot.user?.tag}!`)
-  // artIndexerBot.startBirthdayRoutine(bot.channels.cache, projectConfig)
-
-  // TODO: Uncomment when trivia game is ready (also probs want to tweak the timing)
-  // artIndexerBot.startTriviaRoutine()
 })
 
 export const artIndexerBot = new ArtIndexerBot()

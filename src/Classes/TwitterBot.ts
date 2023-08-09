@@ -57,7 +57,7 @@ export class TwitterBot {
     this.lastTweetId = ''
     if (listener && process.env.TWITTER_ENABLED === 'true') {
       console.log('Starting Twitter listener')
-      // this.startSearchAndReplyRoutine()
+      this.startSearchAndReplyRoutine()
     }
     this.twitterClient = new TwitterApi({
       appKey,
