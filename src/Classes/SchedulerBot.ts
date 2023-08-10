@@ -5,7 +5,8 @@ import { delay } from './APIBots/utils'
 import { randomColor } from '../Utils/smartBotResponse'
 
 const cron = require('node-cron')
-
+// Time to wait for bot to connect and channels to load
+const INIT_DELAY = 8000
 export class ScheduleBot {
   channels: Collection<string, Channel>
   projectConfig: ProjectConfig
@@ -19,14 +20,14 @@ export class ScheduleBot {
   }
 
   async initialize() {
-    await delay(8000) // Wait for bot to connect and channels to load
-    console.log('Starting Scheduler')
+    await delay(INIT_DELAY)
+    console.log('Starting Scheduler...')
     const channels = this.channels
     const projectConfig = this.projectConfig
 
     // Birthdays
     cron.schedule(
-      '0 1,9,17 * * *',
+      '0 1,9,17 * * *', // Every day at 1am, 9am, and 5pm CT
       function () {
         console.log('Birthday Time!')
         artIndexerBot.checkBirthdays(channels, projectConfig)
@@ -39,7 +40,7 @@ export class ScheduleBot {
     // Marfa
     const sendMarfaMessage = this.sendMarfaMessage
     cron.schedule(
-      '0 11 * * *',
+      '0 11 * * *', // Every day at 11am CT
       function () {
         sendMarfaMessage(
           channels?.get(projectConfig.chIdByName['block-talk']) as TextChannel
@@ -51,7 +52,7 @@ export class ScheduleBot {
     )
 
     cron.schedule(
-      '0 11 * * * 1', // Every Monday
+      '0 11 * * * 1', // Every Monday at 11am CT
       function () {
         sendMarfaMessage(
           channels?.get(projectConfig.chIdByName['marfa']) as TextChannel
