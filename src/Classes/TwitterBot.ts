@@ -89,7 +89,7 @@ export class TwitterBot {
       // to:${ARTBOT_TWITTER_HANDLE} = Original tweets that start with @artbotartbot or direct replies to @artbotartbot tweets
       // @${ARTBOT_TWITTER_HANDLE} = Mentions artbotartbot
 
-      const query = `(to:${ARTBOT_TWITTER_HANDLE} OR @${ARTBOT_TWITTER_HANDLE}) -is:retweet -is:quote -has:links has:mentions -from:${STATUS_TWITTER_HANDLE} -from:${ARTBOT_TWITTER_HANDLE}`
+      const query = `(to:${ARTBOT_TWITTER_HANDLE} OR @${ARTBOT_TWITTER_HANDLE}) -is:retweet -has:links has:mentions -from:${STATUS_TWITTER_HANDLE} -from:${ARTBOT_TWITTER_HANDLE}`
       const devQuery = `to:ArtbotTesting from:ArtbotTesting`
       artbotTweets = await this.twitterClient.v2.search({
         query: prod ? query : devQuery,
@@ -134,7 +134,10 @@ export class TwitterBot {
     await updateLastTweetId(tweetId, prod)
   }
   async replyToTweet(tweet: TweetV2) {
-    const cleanedTweet = tweet.text.match(/#(\?|\d*).+/g)?.[0]?.trim() // Regex to fetch the first hashtag and everything after it (until a newline)
+    const cleanedTweet = tweet.text
+      .replaceAll(/@\w+/g, '') // Remove all mentions
+      .match(/#(\?|\d*).+/g)?.[0] // Fetch the first hashtag and everything after it (until a newline)
+      ?.trim()
     if (!cleanedTweet) {
       console.warn(`Tweet '${tweet.text}' is not a supported action`)
       return
