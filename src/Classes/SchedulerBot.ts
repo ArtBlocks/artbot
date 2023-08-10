@@ -4,7 +4,8 @@ import { artIndexerBot } from '..'
 import { delay } from './APIBots/utils'
 import { randomColor } from '../Utils/smartBotResponse'
 
-const cron = require('node-cron')
+import { Cron } from 'croner'
+
 // Time to wait for bot to connect and channels to load
 const INIT_DELAY = 8000
 export class ScheduleBot {
@@ -22,52 +23,58 @@ export class ScheduleBot {
   async initialize() {
     await delay(INIT_DELAY)
     console.log('Starting Scheduler...')
-    const channels = this.channels
-    const projectConfig = this.projectConfig
 
-    // Birthdays
-    cron.schedule(
-      '0 1,9,17 * * *', // Every day at 1am, 9am, and 5pm CT
-      function () {
+    const bdayJob = Cron(
+      '0 1,9,17 * * *',
+      { timezone: 'America/Chicago', name: 'Bday' },
+      () => {
         console.log('Birthday Time!')
-        artIndexerBot.checkBirthdays(channels, projectConfig)
-      },
-      null,
-      true,
-      'America/Chicago'
+        artIndexerBot.checkBirthdays(this.channels, this.projectConfig)
+      }
     )
 
     // Marfa
-    const sendMarfaMessage = this.sendMarfaMessage
-    cron.schedule(
-      '0 11 * * *', // Every day at 11am CT
-      function () {
-        sendMarfaMessage(
-          channels?.get(projectConfig.chIdByName['block-talk']) as TextChannel
+
+    const btMarfaJob = Cron(
+      '40 11 * * *',
+      { timezone: 'America/Chicago', name: 'Block Talk Marfa' },
+      () => {
+        console.log('Block Talk Marfa Time!')
+        this.sendMarfaMessage(
+          this.channels?.get(
+            this.projectConfig.chIdByName['block-talk']
+          ) as TextChannel
         )
-      },
-      null,
-      true,
-      'America/Chicago'
+      }
     )
 
-    cron.schedule(
-      '0 11 * * * 1', // Every Monday at 11am CT
-      function () {
-        sendMarfaMessage(
-          channels?.get(projectConfig.chIdByName['marfa']) as TextChannel
+    const marfaMarfaJob = Cron(
+      '00 11 * * 1',
+      { timezone: 'America/Chicago', name: 'Marfa Marfa' },
+      () => {
+        console.log('Marfa Marfa Time!')
+        this.sendMarfaMessage(
+          this.channels?.get(
+            this.projectConfig.chIdByName['block-talk']
+          ) as TextChannel
         )
-      },
-      null,
-      true,
-      'America/Chicago'
+      }
     )
 
+    // Temporary logging for debugging!
+    setInterval(async () => {
+      const a = bdayJob.nextRun()
+      const b = btMarfaJob.nextRun()
+      const c = marfaMarfaJob.nextRun()
+      console.log(
+        `Current Time: ${new Date().toISOString()}\n`,
+        `Next runs: Bday: ${a?.toISOString()}, BT: ${b?.toISOString()}, Marfa: ${c?.toISOString()}`
+      )
+    }, 60 * 60000) // Every hour
     // TODO: Trivia
   }
 
   sendMarfaMessage(channel: TextChannel) {
-    console.log('Marfa Time!')
     const marfaTime = new Date()
     marfaTime.setMonth(8) // Indexed at 0 :facepalm:
     marfaTime.setDate(21)
