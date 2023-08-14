@@ -36,7 +36,7 @@ export class ScheduleBot {
     // Marfa
 
     const btMarfaJob = Cron(
-      '40 11 * * *',
+      '00 11 * * *',
       { timezone: 'America/Chicago', name: 'Block Talk Marfa' },
       () => {
         console.log('Block Talk Marfa Time!')
@@ -55,7 +55,7 @@ export class ScheduleBot {
         console.log('Marfa Marfa Time!')
         this.sendMarfaMessage(
           this.channels?.get(
-            this.projectConfig.chIdByName['block-talk']
+            this.projectConfig.chIdByName['marfa']
           ) as TextChannel
         )
       }
