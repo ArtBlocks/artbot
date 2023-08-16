@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios'
-import { Message } from 'discord.js'
+import { Channel, Collection, Message, TextChannel } from 'discord.js'
 import {
   PROJECTBOT_UTM,
   getTokenApiUrl,
@@ -14,6 +14,7 @@ import {
   getTokenOwnerAddress,
 } from '../Data/queryGraphQL'
 import { triviaBot } from '..'
+import { ProjectConfig } from '../ProjectConfig/projectConfig'
 const { EmbedBuilder } = require('discord.js')
 const axios = require('axios')
 const Web3 = require('web3')
@@ -382,7 +383,11 @@ export class ProjectBot {
     return `${numSales}`
   }
 
-  async sendBirthdayMessage(channels: any, projectConfig: any) {
+  async sendBirthdayMessage(
+    channels: Collection<string, Channel>,
+    projectConfig: ProjectConfig,
+    artistChannel: boolean
+  ) {
     try {
       console.log('sending birthday message(s) for:', this.projectName)
 
@@ -424,17 +429,20 @@ export class ProjectBot {
         })
 
       // Send all birthdays to #block-talk
-      let channel = channels.get(projectConfig.chIdByName['block-talk'])
-      channel.send({ embeds: [embedContent] })
+      let channel = channels.get(
+        projectConfig.chIdByName['block-talk']
+      ) as TextChannel
+      channel?.send({ embeds: [embedContent] })
 
       if (
+        artistChannel &&
         isCoreContract(this.coreContract) &&
         projectConfig.projectToChannel[this.projectNumber]
       ) {
         // Send in artist channel if one exists
         channel = channels.get(
           projectConfig.projectToChannel[this.projectNumber]
-        )
+        ) as TextChannel
         channel.send({ embeds: [embedContent] })
       }
     } catch (err) {

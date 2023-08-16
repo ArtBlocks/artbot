@@ -55,7 +55,6 @@ export class ArtIndexerBot {
   birthdays: { [id: string]: ProjectBot[] }
   collections: { [id: string]: ProjectBot[] }
   tags: { [id: string]: ProjectBot[] }
-  sentBirthdays: { [id: string]: boolean }
   walletTokens: { [id: string]: TokenDetailFragment[] }
 
   constructor(projectFetch = getAllProjects) {
@@ -65,7 +64,6 @@ export class ArtIndexerBot {
     this.birthdays = {}
     this.collections = {}
     this.tags = {}
-    this.sentBirthdays = {}
     this.walletTokens = {}
     this.init()
   }
@@ -438,7 +436,8 @@ export class ArtIndexerBot {
 
   async checkBirthdays(
     channels: Collection<string, Channel>,
-    projectConfig: ProjectConfig
+    projectConfig: ProjectConfig,
+    artistChannel: boolean
   ) {
     const now = new Date()
     const [year, month, day] = now.toISOString().split('T')[0].split('-')
@@ -446,11 +445,9 @@ export class ArtIndexerBot {
       this.birthdays[`${month}-${day}`].forEach((projBot) => {
         if (
           projBot.startTime &&
-          projBot.startTime.getFullYear().toString() !== year &&
-          !this.sentBirthdays[projBot.projectNumber]
+          projBot.startTime.getFullYear().toString() !== year
         ) {
-          projBot.sendBirthdayMessage(channels, projectConfig)
-          this.sentBirthdays[projBot.projectNumber] = true
+          projBot.sendBirthdayMessage(channels, projectConfig, artistChannel)
         }
       })
     }

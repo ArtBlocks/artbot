@@ -23,13 +23,21 @@ export class ScheduleBot {
   async initialize() {
     await delay(INIT_DELAY)
     console.log('Starting Scheduler...')
-
     const bdayJob = Cron(
       '0 1,9,17 * * *',
       { timezone: 'America/Chicago', name: 'Bday' },
       () => {
         console.log('Birthday Time!')
-        artIndexerBot.checkBirthdays(this.channels, this.projectConfig)
+        const now = new Date()
+        const hour = now.toLocaleString('en-US', {
+          timeZone: 'America/Chicago',
+          hour: 'numeric',
+        })
+        artIndexerBot.checkBirthdays(
+          this.channels,
+          this.projectConfig,
+          hour.includes('9') // Only post in artist channels at 9am runtime
+        )
       }
     )
 
