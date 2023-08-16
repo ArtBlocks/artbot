@@ -23,12 +23,6 @@ export class ScheduleBot {
   async initialize() {
     await delay(INIT_DELAY)
     console.log('Starting Scheduler...')
-    const now = new Date()
-    const hi = now.toLocaleString('en-US', {
-      timeZone: 'America/Chicago',
-      hour: 'numeric',
-    })
-    console.log(hi)
     const bdayJob = Cron(
       '0 1,9,17 * * *',
       { timezone: 'America/Chicago', name: 'Bday' },
