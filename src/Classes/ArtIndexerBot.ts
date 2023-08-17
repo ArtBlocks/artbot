@@ -8,7 +8,7 @@ import {
   getArtblocksOpenProjects,
   getAllTokensInWallet,
 } from '../Data/queryGraphQL'
-import { triviaBot } from '..'
+import { projectConfig, triviaBot } from '..'
 import {
   Categories_Enum,
   ProjectDetailFragment,
@@ -56,6 +56,7 @@ export class ArtIndexerBot {
   collections: { [id: string]: ProjectBot[] }
   tags: { [id: string]: ProjectBot[] }
   walletTokens: { [id: string]: TokenDetailFragment[] }
+  initialized = false
 
   constructor(projectFetch = getAllProjects) {
     this.projectFetch = projectFetch
@@ -74,6 +75,9 @@ export class ArtIndexerBot {
   async init() {
     await this.buildProjectBots()
 
+    if (this.projectFetch === getAllProjects) {
+      projectConfig.initializeProjectBots()
+    }
     setInterval(async () => {
       await this.buildProjectBots()
     }, parseInt(METADATA_REFRESH_INTERVAL_MINUTES) * ONE_MINUTE_IN_MS)

@@ -1,13 +1,18 @@
 /* eslint-disable no-prototype-builtins */
 const { EmbedBuilder } = require('discord.js')
 class ProjectHandlerHelper {
-  constructor(singles, sets) {
+  singles: { [id: string]: string }
+  sets: { [id: string]: number[] }
+  constructor(
+    singles: { [id: string]: string },
+    sets: { [id: string]: number[] }
+  ) {
     this.singles = singles
     this.sets = sets
   }
 
   listMappings() {
-    let message = new EmbedBuilder()
+    const message = new EmbedBuilder()
       // Set the title of the field.
       .setTitle('Available Named Pieces / Sets')
       .setDescription(
@@ -43,7 +48,7 @@ class ProjectHandlerHelper {
     return message
   }
 
-  transform(messageContent) {
+  transform(messageContent: string) {
     return (
       (this.singles && this._singlesTransform(messageContent)) ||
       (this.sets && this._setsTransform(messageContent)) ||
@@ -51,7 +56,7 @@ class ProjectHandlerHelper {
     )
   }
 
-  _singlesTransform(messageContent) {
+  _singlesTransform(messageContent: string) {
     if (messageContent.length <= 1) {
       return null
     }
@@ -69,7 +74,7 @@ class ProjectHandlerHelper {
     return `#${this.singles[singleKeyStringLowercase]}`
   }
 
-  _setsTransform(messageContent) {
+  _setsTransform(messageContent: string) {
     if (messageContent.length <= 1) {
       return null
     }

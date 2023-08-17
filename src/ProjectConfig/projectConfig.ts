@@ -17,6 +17,7 @@ const PROJECT_BOTS = ARTBOT_IS_PROD
   : require('./projectBots_dev.json')
 import { ProjectBot } from '../Classes/ProjectBot'
 import { getProject } from '../Data/queryGraphQL'
+import { artIndexerBot } from '..'
 const PARTNER_CONTRACTS = require('../ProjectConfig/partnerContracts.json')
 const EXPLORATIONS_CONTRACTS = require('../ProjectConfig/explorationsContracts.json')
 const COLLAB_CONTRACTS = require('../ProjectConfig/collaborationContracts.json')
@@ -132,11 +133,10 @@ export class ProjectConfig {
     this.chIdByName = ProjectConfig.buildChannelIDByName(this.channels)
     this.projectToChannel = {}
     this.projectBots = {}
-    this.initialize()
   }
 
   // Initialize async aspects of the ProjectConfig
-  async initialize() {
+  async initializeProjectBots() {
     try {
       this.projectBots = await this.buildProjectBots(CHANNELS, PROJECT_BOTS)
       setInterval(
@@ -206,27 +206,16 @@ export class ProjectConfig {
         return
       }
       const projectNumber = parseInt(projectId)
-      const {
-        id,
-        invocations,
-        max_invocations,
-        name,
-        active,
-        contract_address,
-        artist_name,
-      } = await getProject(projectNumber, configContract)
+      const { name } = await getProject(projectNumber, configContract)
 
-      projectBots[botId] = new ProjectBot({
-        id,
-        projectNumber,
-        coreContract: contract_address,
-        editionSize: invocations,
-        maxEditionSize: max_invocations,
-        projectName: name ?? 'Unknown',
-        artistName: artist_name ?? 'Unknown',
-        projectActive: active,
-        namedMappings,
-      })
+      const projBot =
+        artIndexerBot.projects[artIndexerBot.toProjectKey(name ?? '')]
+
+      projBot.namedMappings = namedMappings
+        ? ProjectBot.getProjectHandlerHelper(namedMappings)
+        : undefined
+
+      projectBots[botId] = projBot
     })
 
     await Promise.all(promises)
