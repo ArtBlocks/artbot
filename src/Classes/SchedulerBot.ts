@@ -24,7 +24,7 @@ export class ScheduleBot {
     await delay(INIT_DELAY)
     console.log('Starting Scheduler...')
     const bdayJob = Cron(
-      '0 1,9,17 * * *',
+      '00 1,9,17 * * *',
       { timezone: 'America/Chicago', name: 'Bday' },
       () => {
         console.log('Birthday Time!')
