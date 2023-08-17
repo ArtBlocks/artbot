@@ -441,13 +441,17 @@ export class ArtIndexerBot {
   ) {
     const now = new Date()
     const [year, month, day] = now.toISOString().split('T')[0].split('-')
+    const sentMessages: { [id: string]: boolean } = {}
+    console.log(`${this.birthdays[`${month}-${day}`]?.length} birthdays today!`)
     if (this.birthdays[`${month}-${day}`]) {
       this.birthdays[`${month}-${day}`].forEach((projBot) => {
         if (
           projBot.startTime &&
-          projBot.startTime.getFullYear().toString() !== year
+          projBot.startTime.getFullYear().toString() !== year &&
+          !sentMessages[projBot.id]
         ) {
           projBot.sendBirthdayMessage(channels, projectConfig, artistChannel)
+          sentMessages[projBot.id] = true
         }
       })
     }
