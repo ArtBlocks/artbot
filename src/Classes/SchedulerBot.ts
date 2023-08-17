@@ -91,8 +91,11 @@ export class ScheduleBot {
     const days = Math.floor(diff / (1000 * 60 * 60 * 24))
     const emojis = [':cactus:', ':cowboy:', ':tada:', ':desert:']
     const emoji = emojis[Math.floor(Math.random() * emojis.length)]
+    const marfaLink =
+      'https://www.artblocks.io/info/spectrum/third-annual-open-house-weekend'
     const embed = new EmbedBuilder()
       .setTitle(`${emoji}  ${days} days until Marfa!  ${emoji}`)
+      .setDescription(`[Click here for more info!](${marfaLink})`)
       .setColor(randomColor())
     channel.send({ embeds: [embed] }).catch((err) => {
       console.log(`Error posting Marfa message`, err.message)
