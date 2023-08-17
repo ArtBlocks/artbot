@@ -112,7 +112,6 @@ export class ArtIndexerBot {
           projectName: project.name ?? 'unknown',
           description: project.description ?? '',
           projectActive: project.active,
-          namedMappings: undefined,
           artistName: project.artist_name ?? 'unknown artist',
           collection,
           tags,
@@ -475,5 +474,12 @@ export class ArtIndexerBot {
         attempts++
       }
     }, ONE_MINUTE_IN_MS)
+  }
+
+  getProjectsWithNamedMappings(): ProjectBot[] {
+    const projects = Object.values(this.projects).filter((projBot) => {
+      return projBot.namedHandler?.hasNamed()
+    })
+    return projects
   }
 }

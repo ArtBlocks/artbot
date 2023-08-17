@@ -1,5 +1,11 @@
-import { AxiosError } from 'axios'
-import { Channel, Collection, Message, TextChannel } from 'discord.js'
+import axios, { AxiosError } from 'axios'
+import {
+  Channel,
+  Collection,
+  EmbedBuilder,
+  Message,
+  TextChannel,
+} from 'discord.js'
 import {
   PROJECTBOT_UTM,
   getTokenApiUrl,
@@ -15,16 +21,9 @@ import {
 } from '../Data/queryGraphQL'
 import { triviaBot } from '..'
 import { ProjectConfig } from '../ProjectConfig/projectConfig'
-const { EmbedBuilder } = require('discord.js')
-const axios = require('axios')
-const Web3 = require('web3')
-const { ProjectHandlerHelper } = require('./ProjectHandlerHelper')
-
-const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
+import { ProjectHandlerHelper } from './ProjectHandlerHelper'
 
 const EMBED_COLOR = 0xff0000
-const UNKNOWN_ADDRESS = 'unknown'
-const UNKNOWN_USERNAME = 'unknown'
 
 const ONE_MILLION = 1e6
 
@@ -39,7 +38,7 @@ export class ProjectBot {
   maxEditionSize: number
   projectName: string
   projectActive: boolean
-  namedMappings: any
+  namedHandler: ProjectHandlerHelper | undefined
   artistName: string
   collection?: string
   tags?: string[]
@@ -54,7 +53,6 @@ export class ProjectBot {
     maxEditionSize,
     projectName,
     projectActive,
-    namedMappings,
     artistName,
     collection,
     tags,
@@ -68,7 +66,6 @@ export class ProjectBot {
     maxEditionSize: number
     projectName: string
     projectActive: boolean
-    namedMappings: any
     artistName: string
     collection?: string
     tags?: string[]
@@ -82,9 +79,6 @@ export class ProjectBot {
     this.maxEditionSize = maxEditionSize
     this.projectName = projectName
     this.projectActive = projectActive
-    this.namedMappings = namedMappings
-      ? ProjectBot.getProjectHandlerHelper(namedMappings)
-      : undefined
     this.artistName = artistName
     this.collection = collection
     this.tags = tags
@@ -92,10 +86,11 @@ export class ProjectBot {
     this.description = description
   }
 
-  static getProjectHandlerHelper({ singles, sets }: any) {
-    const singlesMap = singles ? require(`../NamedMappings/${singles}`) : null
-    const setsMap = sets ? require(`../NamedMappings/${sets}`) : null
-    return new ProjectHandlerHelper(singlesMap, setsMap)
+  setNamedMappings(
+    singles?: { [id: string]: string },
+    sets?: { [id: string]: number[] }
+  ) {
+    this.namedHandler = new ProjectHandlerHelper(singles, sets)
   }
 
   // If project is still minting, refresh edition size to see if piece is in bounds
@@ -122,22 +117,24 @@ export class ProjectBot {
     }
 
     if (content.toLowerCase().includes('named')) {
-      if (this.namedMappings) {
-        msg.channel.send({ embeds: [this.namedMappings.listMappings()] })
+      if (this.namedHandler) {
+        msg.channel.send({ embeds: [this.namedHandler.listMappings()] })
       } else {
-        msg.channel.send(
-          new EmbedBuilder()
-            // Set the title of the field.
-            .setTitle('Named Pieces / Sets')
-            .setDescription(
-              'These are special tokens or sets of tokens that have been given a name by the community! Try them out here with `#<token>` or `#? <set>`'
-            )
-            .addFields({
-              name: 'No named tokens or sets!',
-              value:
-                "I don't have any named tokens or sets for this project yet! [You can propose some here](https://github.com/ArtBlocks/artbot/issues/new/choose)",
-            })
-        )
+        msg.channel.send({
+          embeds: [
+            new EmbedBuilder()
+              // Set the title of the field.
+              .setTitle('Named Pieces / Sets')
+              .setDescription(
+                'These are special tokens or sets of tokens that have been given a name by the community! Try them out here with `#<token/set> <project>`'
+              )
+              .addFields({
+                name: 'No named tokens or sets!',
+                value:
+                  "I don't have any named tokens or sets for this project yet! [You can propose some here](https://github.com/ArtBlocks/artbot/issues/new/choose)",
+              }),
+          ],
+        })
       }
       return
     }
@@ -155,8 +152,8 @@ export class ProjectBot {
     }
 
     // decode any mappings
-    if (this.namedMappings) {
-      content = this.namedMappings.transform(content)
+    if (this.namedHandler) {
+      content = this.namedHandler.transform(content)
     }
 
     const detailsRequested = content.toLowerCase().includes('detail')
@@ -338,49 +335,6 @@ export class ProjectBot {
     )
 
     msg.channel.send({ embeds: [embedContent] })
-  }
-
-  parseSaleInfo(saleInfo: any) {
-    if (saleInfo !== null && saleInfo.event_type == 'successful') {
-      const eventDate = new Date(saleInfo.created_date).toLocaleDateString()
-      const sellerAccount = saleInfo.transaction.to_account
-      let sellerAddress
-      let sellerAddressPreview
-      let sellerUsername
-      if (sellerAccount !== null) {
-        sellerAddress = sellerAccount.address
-        sellerAddressPreview =
-          sellerAddress !== null ? sellerAddress.slice(0, 8) : UNKNOWN_ADDRESS
-        sellerUsername =
-          sellerAccount.user !== null
-            ? sellerAccount.user.username
-            : UNKNOWN_USERNAME
-        if (sellerUsername === null) {
-          sellerUsername = UNKNOWN_USERNAME
-        }
-      }
-
-      return {
-        name: 'Last Sale',
-        value: `Sold for ${web3.utils.fromWei(
-          saleInfo.total_price,
-          'ether'
-        )}Ξ by [${sellerAddressPreview}](https://opensea.io/accounts/${sellerAddress}) (${sellerUsername}) on ${eventDate}`,
-        inline: true,
-      }
-    }
-    return {
-      name: 'Last Sale',
-      value: 'N/A',
-      inline: true,
-    }
-  }
-
-  parseNumSales(numSales: number) {
-    if (numSales == 0) {
-      return 'None'
-    }
-    return `${numSales}`
   }
 
   async sendBirthdayMessage(

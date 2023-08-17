@@ -211,9 +211,14 @@ export class ProjectConfig {
       const projBot =
         artIndexerBot.projects[artIndexerBot.toProjectKey(name ?? '')]
 
-      projBot.namedMappings = namedMappings
-        ? ProjectBot.getProjectHandlerHelper(namedMappings)
-        : undefined
+      const singlesMap = namedMappings?.singles
+        ? require(`../NamedMappings/${namedMappings.singles}`)
+        : null
+      const setsMap = namedMappings?.sets
+        ? require(`../NamedMappings/${namedMappings.sets}`)
+        : null
+
+      projBot.setNamedMappings(singlesMap, setsMap)
 
       projectBots[botId] = projBot
     })
