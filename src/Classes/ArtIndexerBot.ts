@@ -80,6 +80,9 @@ export class ArtIndexerBot {
     }
     setInterval(async () => {
       await this.buildProjectBots()
+      if (this.projectFetch === getAllProjects) {
+        projectConfig.initializeProjectBots()
+      }
     }, parseInt(METADATA_REFRESH_INTERVAL_MINUTES) * ONE_MINUTE_IN_MS)
   }
 
