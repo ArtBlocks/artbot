@@ -1,6 +1,6 @@
 import { EmbedBuilder, ColorResolvable, Message } from 'discord.js'
 import * as dotenv from 'dotenv'
-import { projectConfig, triviaBot } from '..'
+import { artIndexerBot, projectConfig, triviaBot } from '..'
 dotenv.config()
 const fetch = require('node-fetch')
 
@@ -507,6 +507,27 @@ export async function smartBotResponse(
   }
   if (msgContentLowercase.includes('leaderboard')) {
     triviaBot.leaderboard(msg)
+  }
+
+  if (msgContentLowercase.includes('named')) {
+    const projects = artIndexerBot.getProjectsWithNamedMappings()
+    let msg = ''
+    for (const project of projects) {
+      msg += `${project.projectName} - ${project.artistName}
+      `
+    }
+    return (
+      new EmbedBuilder()
+        // Set the title of the field
+        .setTitle(`Here are all projects with named tokens / sets`)
+        // Set the color of the embed
+        .setColor(ARTBOT_GREEN)
+        // Set the main content of the embed
+        .setDescription(msg)
+        .setFooter({
+          text: 'Use `#named <project name>` to list the named tokens/sets for a specific project.',
+        })
+    )
   }
   return null
 }

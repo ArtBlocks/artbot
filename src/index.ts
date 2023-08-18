@@ -46,6 +46,11 @@ getArbitrumContracts().then((contracts) => {
   ARBITRUM_CONTRACTS = contracts ?? []
 })
 
+export const artIndexerBot = new ArtIndexerBot()
+const pbabIndexerBot = new ArtIndexerBot(getEngineProjects)
+const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
+const abXbmIndexerBot = new ArtIndexerBot(getArtBlocksXBMProjects)
+
 // Factory Channel
 const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects']
 
@@ -161,11 +166,6 @@ new ScheduleBot(bot.channels.cache, projectConfig)
 bot.on('ready', () => {
   console.info(`Logged in as ${bot.user?.tag}!`)
 })
-
-export const artIndexerBot = new ArtIndexerBot()
-const pbabIndexerBot = new ArtIndexerBot(getEngineProjects)
-const abXpaceIndexerBot = new ArtIndexerBot(getArtBlocksXPaceProjects)
-const abXbmIndexerBot = new ArtIndexerBot(getArtBlocksXBMProjects)
 
 bot.on(Events.MessageCreate, async (msg) => {
   const msgAuthor = msg.author.username

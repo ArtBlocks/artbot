@@ -114,6 +114,7 @@ export async function getOSName(address: string): Promise<string> {
       // Probably rate limited - return empty sting but don't cache
       name = ''
       console.log(err)
+      console.log("Error getting user's OpenSea name")
     }
   }
 

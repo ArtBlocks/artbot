@@ -1,17 +1,22 @@
-/* eslint-disable no-prototype-builtins */
-const { EmbedBuilder } = require('discord.js')
-class ProjectHandlerHelper {
-  constructor(singles, sets) {
+import { EmbedBuilder } from 'discord.js'
+
+export class ProjectHandlerHelper {
+  singles?: { [id: string]: string }
+  sets?: { [id: string]: number[] }
+  constructor(
+    singles?: { [id: string]: string },
+    sets?: { [id: string]: number[] }
+  ) {
     this.singles = singles
     this.sets = sets
   }
 
   listMappings() {
-    let message = new EmbedBuilder()
+    const message = new EmbedBuilder()
       // Set the title of the field.
       .setTitle('Available Named Pieces / Sets')
       .setDescription(
-        'These are special tokens or sets of tokens that have been given a name by the community! Try them out here with `#<token>` or `#? <set>`'
+        'These are special tokens or sets of tokens that have been given a name by the community! Try them out here with `#<token/set>`'
       )
 
     let singles = ''
@@ -43,7 +48,7 @@ class ProjectHandlerHelper {
     return message
   }
 
-  transform(messageContent) {
+  transform(messageContent: string) {
     return (
       (this.singles && this._singlesTransform(messageContent)) ||
       (this.sets && this._setsTransform(messageContent)) ||
@@ -51,8 +56,8 @@ class ProjectHandlerHelper {
     )
   }
 
-  _singlesTransform(messageContent) {
-    if (messageContent.length <= 1) {
+  _singlesTransform(messageContent: string) {
+    if (messageContent.length <= 1 || !this.singles) {
       return null
     }
 
@@ -63,35 +68,36 @@ class ProjectHandlerHelper {
     }
 
     const singleKeyStringLowercase = singleKeyString.toLowerCase()
-    if (!this.singles.hasOwnProperty(singleKeyStringLowercase)) {
+    if (!this.singles[singleKeyStringLowercase]) {
       return null
     }
     return `#${this.singles[singleKeyStringLowercase]}`
   }
 
-  _setsTransform(messageContent) {
-    if (messageContent.length <= 1) {
+  _setsTransform(messageContent: string) {
+    if (messageContent.length <= 1 || !this.sets) {
       return null
     }
 
     const afterTheHash = messageContent.substring(1)
-    if (!(afterTheHash[0] == '?')) {
-      return null
-    }
 
-    const setKeyString = afterTheHash.split(' ')[1]
+    const setKeyString = afterTheHash.split(' ')[0]
     if (setKeyString === null || !setKeyString) {
       return null
     }
 
     const setKeyStringLowercase = setKeyString.toLowerCase()
-    if (!this.sets.hasOwnProperty(setKeyStringLowercase)) {
+    if (!this.sets[setKeyStringLowercase]) {
       return null
     }
 
     const setItems = this.sets[setKeyStringLowercase]
     const randomSetItem = setItems[Math.floor(Math.random() * setItems.length)]
     return `#${randomSetItem}`
+  }
+
+  hasNamed() {
+    return !!this.singles || !!this.sets
   }
 }
 
