@@ -702,16 +702,6 @@
       }
     }
   },
-  "880280317477404713": {
-    "name": "doodle-labs-the-lab",
-    "projectBotHandlers": {
-      "default": "0-DOODLE",
-      "stringTriggers": {
-        "1-DOODLE": ["slider"],
-        "2-DOODLE": ["neo", "neogen"]
-      }
-    }
-  },
   "888929189862977646": {
     "name": "generative-artworks-democracity",
     "projectBotHandlers": {
@@ -730,12 +720,7 @@
       "default": "33"
     }
   },
-  "932737393788850266": {
-    "name": "generative-artworks-neogen",
-    "projectBotHandlers": {
-      "default": "2-DOODLE"
-    }
-  },
+
   "822563871473795073": {
     "name": "factory-projects"
   },
@@ -828,9 +813,6 @@
   },
   "1109104401135718460": {
     "name": "rozendaal-mints"
-  },
-  "937547685215473664": {
-    "name": "doodle-mints"
   },
   "919937880288284722": {
     "name": "plottables-numbersinmotion",
