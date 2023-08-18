@@ -11,7 +11,7 @@
       "default": "13",
       "stringTriggers": {
         "22": ["eternal", "pump"],
-        "2-DOODLE": ["doodle"],
+        "2-PLOTTABLES": ["plottables"],
         "1-EXPLORATIONS": ["marfa yucca", "yucca"],
         "0-AB_X_BM": ["metropolis", "metro"]
       },
