@@ -6,9 +6,6 @@ const ARTBOT_IS_PROD =
   process.env.ARTBOT_IS_PROD &&
   process.env.ARTBOT_IS_PROD.toLowerCase() == 'true'
 console.log('ARTBOT_IS_PROD: ', ARTBOT_IS_PROD)
-// Refresh takes around one minute, so recommend setting this to 60 minutes
-const METADATA_REFRESH_INTERVAL_MINUTES =
-  process.env.METADATA_REFRESH_INTERVAL_MINUTES ?? '60'
 const CHANNELS = ARTBOT_IS_PROD
   ? require('./channels.json')
   : require('./channels_dev.json')
@@ -139,10 +136,6 @@ export class ProjectConfig {
   async initializeProjectBots() {
     try {
       this.projectBots = await this.buildProjectBots(CHANNELS, PROJECT_BOTS)
-      setInterval(
-        () => this.buildProjectBots(CHANNELS, PROJECT_BOTS),
-        parseInt(METADATA_REFRESH_INTERVAL_MINUTES) * 60000
-      )
     } catch (err) {
       console.error(`Error while initializing ProjectBots: ${err}`)
     }
