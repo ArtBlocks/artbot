@@ -13,6 +13,10 @@ import {
   GetProjectInContractsDocument,
   GetProjectFloorDocument,
   TokenDetailFragment,
+  ProjectTokenDetailFragment,
+  GetMostRecentMintedTokenByContractDocument,
+  GetAllContractsDocument,
+  ContractDetailFragment,
 } from './generated/graphql'
 import { isArbitrumContract } from '../Classes/APIBots/utils'
 import { ARBITRUM_CONTRACTS, ENGINE_CONTRACTS } from '..'
@@ -427,4 +431,32 @@ export async function getProjectFloor(projectId: string) {
     console.error(err)
     return undefined
   }
+}
+
+export async function getMostRecentMintedTokenByContracts(
+  contracts: string[]
+): Promise<ProjectTokenDetailFragment> {
+  const { data } = await client
+    .query(GetMostRecentMintedTokenByContractDocument, {
+      contracts: contracts,
+    })
+    .toPromise()
+
+  if (!data || !data.tokens_metadata.length) {
+    throw Error(
+      'No data returned from getMostRecentMintedTokenByContracts Hasura query'
+    )
+  }
+
+  return data.tokens_metadata[0]
+}
+
+export async function getAllContracts(): Promise<ContractDetailFragment[]> {
+  const { data } = await client.query(GetAllContractsDocument, {}).toPromise()
+
+  if (!data || !data.contracts_metadata.length) {
+    throw Error('No data returned from getAllContracts Hasura query')
+  }
+
+  return data.contracts_metadata
 }

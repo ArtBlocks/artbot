@@ -27,6 +27,17 @@ fragment TokenDetail on tokens_metadata {
   }
 }
 
+fragment ProjectTokenDetail on tokens_metadata {
+  id
+  project_id
+  invocation
+}
+
+fragment ContractDetail on contracts_metadata {
+  address
+  name
+}
+
 query getAllProjects($first: Int!, $skip: Int) {
   projects_metadata(
     limit: $first
@@ -126,5 +137,24 @@ query getTokenOwner($id: String!) {
     owner {
       public_address
     }
+  }
+}
+
+query getAllContracts {
+  contracts_metadata {
+    ...ContractDetail
+  }
+}
+
+query getMostRecentMintedTokenByContract($contracts: [String!]!) {
+  tokens_metadata(
+    order_by: { minted_at: desc }
+    limit: 1
+    where: {
+      contract_address: { _in: $contracts }
+      image_id: { _is_null: false }
+    }
+  ) {
+    ...ProjectTokenDetail
   }
 }

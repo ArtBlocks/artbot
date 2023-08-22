@@ -7,10 +7,13 @@ import {
   getAllProjects,
   getArtblocksOpenProjects,
   getAllTokensInWallet,
+  getMostRecentMintedTokenByContracts,
+  getAllContracts,
 } from '../Data/queryGraphQL'
 import { projectConfig, triviaBot } from '..'
 import {
   Categories_Enum,
+  ContractDetailFragment,
   ProjectDetailFragment,
   TokenDetailFragment,
 } from '../Data/generated/graphql'
@@ -40,6 +43,7 @@ export enum MessageTypes {
   PROJECT = 'project',
   OPEN = 'open',
   WALLET = 'wallet',
+  RECENT = 'recent',
   UNKNOWN = 'unknown',
 }
 
@@ -55,12 +59,16 @@ export class ArtIndexerBot {
   birthdays: { [id: string]: ProjectBot[] }
   collections: { [id: string]: ProjectBot[] }
   tags: { [id: string]: ProjectBot[] }
+  idProjects: { [id: string]: ProjectBot }
+  contracts: { [id: string]: ContractDetailFragment }
   walletTokens: { [id: string]: TokenDetailFragment[] }
   initialized = false
 
   constructor(projectFetch = getAllProjects) {
     this.projectFetch = projectFetch
     this.projects = {}
+    this.idProjects = {}
+    this.contracts = {}
     this.artists = {}
     this.birthdays = {}
     this.collections = {}
@@ -73,6 +81,7 @@ export class ArtIndexerBot {
    * Initialize async aspects of the FactoryBot
    */
   async init() {
+    await this.buildContracts()
     await this.buildProjectBots()
 
     if (this.projectFetch === getAllProjects) {
@@ -84,6 +93,16 @@ export class ArtIndexerBot {
         projectConfig.initializeProjectBots()
       }
     }, parseInt(METADATA_REFRESH_INTERVAL_MINUTES) * ONE_MINUTE_IN_MS)
+  }
+
+  async buildContracts() {
+    const contractArr = await getAllContracts()
+    for (let i = 0; i < contractArr.length; i++) {
+      const name = contractArr[i].name
+      if (typeof name === 'string') {
+        this.contracts[name] = contractArr[i]
+      }
+    }
   }
 
   async buildProjectBots() {
@@ -123,6 +142,7 @@ export class ArtIndexerBot {
 
         const projectKey = this.toProjectKey(project.name ?? 'unknown project')
         this.projects[projectKey] = newBot
+        this.idProjects[project.id] = newBot
 
         if (bday) {
           const [, month, day] = bday.split('T')[0].split('-')
@@ -150,9 +170,15 @@ export class ArtIndexerBot {
   }
 
   // Please update HASHTAG_MESSAGE in smartBotResponse.ts if you add more options here
-  getMessageType(key: string, afterTheHash: string): MessageTypes {
+  getMessageType(
+    key: string,
+    afterTheHash: string,
+    messageContent?: string
+  ): MessageTypes {
     if (key === '#?') {
       return MessageTypes.RANDOM
+    } else if (messageContent?.startsWith('#recent')) {
+      return MessageTypes.RECENT
     } else if (key === 'open') {
       return MessageTypes.OPEN
     } else if (isVerticalName(key)) {
@@ -190,6 +216,7 @@ export class ArtIndexerBot {
       case MessageTypes.PROJECT:
         return this.projects[key]
       case MessageTypes.WALLET:
+      case MessageTypes.RECENT:
       case MessageTypes.UNKNOWN:
         return undefined
     }
@@ -210,11 +237,19 @@ export class ArtIndexerBot {
 
     let projectKey = this.toProjectKey(afterTheHash)
 
-    const messageType = this.getMessageType(projectKey, afterTheHash)
+    const messageType = this.getMessageType(
+      projectKey,
+      afterTheHash,
+      msg.content
+    )
 
     let projectBot
+    if (messageType === MessageTypes.RECENT) {
+      await this.getRecentProjectBot(afterTheHash, msg)
+      return
+    }
     // Wallet has to be handled separately as it is dealing with specific tokens not whole projects
-    if (messageType === MessageTypes.WALLET) {
+    if (messageType === MessageTypes.WALLET && !projectBot) {
       const wallet = afterTheHash.split(' ')[0]
       afterTheHash = afterTheHash.replace(wallet, '')
       projectKey = this.toProjectKey(afterTheHash)
@@ -237,13 +272,16 @@ export class ArtIndexerBot {
       msg.content = `#${token?.invocation}`
       projectBot = this.projects[this.toProjectKey(token.project.name ?? '')]
     } else {
-      projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
+      if (!projectBot) {
+        projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
+      }
     }
 
     if (!projectBot) {
       console.log("Wasn't able to parse message", content)
       return
     }
+
     projectBot.handleNumberMessage(msg)
   }
 
@@ -314,6 +352,45 @@ export class ArtIndexerBot {
       attempts++
     }
     return undefined
+  }
+
+  async getRecentProjectBot(key: string, message: Message) {
+    //get the project on the contracts that was most recently minted within indexer bot and then use the correct project bot to send the most recently minted token on that contract
+
+    // functionality:
+    // DONE: 1. #recent <contract_address> then it just gets the most recent token that was minted on that contract - harder to understand but easier to implement
+    // 2. #recet <engine_name> this has a mapping from <engine_name> to all the contracts that partner controls and it will get the most recently minted token on that contract
+
+    // TODO:
+    //  - alias
+    //  - contract name
+    try {
+      let contracts: string[]
+      const namedContract = this.contracts[key]
+      if (namedContract) {
+        contracts = [namedContract.address]
+      } else if (false) {
+        // aliases
+      } else {
+        // try it being just a contract address
+        contracts = [key.toLowerCase()]
+      }
+      if (key === '') {
+        //use core contract
+      }
+
+      const token = await getMostRecentMintedTokenByContracts(contracts)
+      const projectId = token.project_id
+
+      const projectBot = this.idProjects[projectId]
+      const msg = message
+      msg.content = `#${token?.invocation}`
+
+      projectBot.handleNumberMessage(msg)
+      return
+    } catch (err) {
+      console.error('Error in getRecentProjectBot', err)
+    }
   }
 
   // This function takes a channel and sends a message containing a random
