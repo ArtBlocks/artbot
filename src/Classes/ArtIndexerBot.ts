@@ -59,7 +59,7 @@ export class ArtIndexerBot {
   birthdays: { [id: string]: ProjectBot[] }
   collections: { [id: string]: ProjectBot[] }
   tags: { [id: string]: ProjectBot[] }
-  idProjects: { [id: string]: ProjectBot }
+  projectsById: { [id: string]: ProjectBot }
   contracts: { [id: string]: ContractDetailFragment }
   walletTokens: { [id: string]: TokenDetailFragment[] }
   initialized = false
@@ -67,7 +67,7 @@ export class ArtIndexerBot {
   constructor(projectFetch = getAllProjects) {
     this.projectFetch = projectFetch
     this.projects = {}
-    this.idProjects = {}
+    this.projectsById = {}
     this.contracts = {}
     this.artists = {}
     this.birthdays = {}
@@ -81,10 +81,10 @@ export class ArtIndexerBot {
    * Initialize async aspects of the FactoryBot
    */
   async init() {
-    await this.buildContracts()
     await this.buildProjectBots()
 
     if (this.projectFetch === getAllProjects) {
+      await this.buildContracts()
       projectConfig.initializeProjectBots()
     }
     setInterval(async () => {
@@ -248,12 +248,8 @@ export class ArtIndexerBot {
     )
 
     let projectBot
-    if (messageType === MessageTypes.RECENT) {
-      await this.getRecentProjectBot(afterTheHash, msg)
-      return
-    }
     // Wallet has to be handled separately as it is dealing with specific tokens not whole projects
-    if (messageType === MessageTypes.WALLET && !projectBot) {
+    if (messageType === MessageTypes.WALLET) {
       const wallet = afterTheHash.split(' ')[0]
       afterTheHash = afterTheHash.replace(wallet, '')
       projectKey = this.toProjectKey(afterTheHash)
@@ -275,10 +271,11 @@ export class ArtIndexerBot {
       }
       msg.content = `#${token?.invocation}`
       projectBot = this.projects[this.toProjectKey(token.project.name ?? '')]
+    } else if (messageType === MessageTypes.RECENT) {
+      await this.getRecentProjectBot(afterTheHash, msg)
+      return
     } else {
-      if (!projectBot) {
-        projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
-      }
+      projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
     }
 
     if (!projectBot) {
@@ -386,7 +383,7 @@ export class ArtIndexerBot {
       const token = await getMostRecentMintedTokenByContracts(contracts)
       const projectId = token.project_id
 
-      const projectBot = this.idProjects[projectId]
+      const projectBot = this.projectsById[projectId]
       const msg = message
       msg.content = `#${token?.invocation}`
 
