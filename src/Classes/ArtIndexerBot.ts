@@ -96,12 +96,16 @@ export class ArtIndexerBot {
   }
 
   async buildContracts() {
-    const contractArr = await getAllContracts()
-    for (let i = 0; i < contractArr.length; i++) {
-      const name = contractArr[i].name
-      if (typeof name === 'string') {
-        this.contracts[name] = contractArr[i]
+    try {
+      const contractArr = await getAllContracts()
+      for (let i = 0; i < contractArr.length; i++) {
+        const name = contractArr[i].name
+        if (typeof name === 'string') {
+          this.contracts[name] = contractArr[i]
+        }
       }
+    } catch (e) {
+      console.error('Error in buildContracts', e)
     }
   }
 
