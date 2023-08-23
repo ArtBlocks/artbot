@@ -287,20 +287,21 @@ export class ArtIndexerBot {
       msg.content = `#${token?.invocation}`
       projectBot = this.projects[this.toProjectKey(token.project.name ?? '')]
     } else if (messageType === MessageTypes.RECENT) {
-      try {
-        let token = await this.getContractTokenForKey(afterTheHash)
-        if (!token) {
-          // use flagship contract
-          token = await getMostRecentMintedFlagshipToken()
-        }
-
-        const projectId = token.project_id
-
-        projectBot = this.projectsById[projectId]
-        msg.content = `#${token?.invocation}`
-      } catch (err) {
-        console.error('Error in getRecentProjectBot', err)
+      const after = msg.content.split(' ')[1]
+      let token = await this.getContractTokenForKey(after)
+      if (!token && !after) {
+        // use flagship contract
+        token = await getMostRecentMintedFlagshipToken()
+      } else if (!token) {
+        console.error('Bad value specified for recent', after)
+        msg.channel.send('Sorry, I was not able to understand that.')
+        return
       }
+
+      const projectId = token.project_id
+
+      projectBot = this.projectsById[projectId]
+      msg.content = `#${token?.invocation}`
     } else {
       projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
     }
