@@ -296,14 +296,11 @@ export class ArtIndexerBot {
 
         const projectId = token.project_id
 
-        const projectBot = this.projectsById[projectId]
+        projectBot = this.projectsById[projectId]
         msg.content = `#${token?.invocation}`
-
-        projectBot.handleNumberMessage(msg)
       } catch (err) {
         console.error('Error in getRecentProjectBot', err)
       }
-      return
     } else {
       projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
     }
