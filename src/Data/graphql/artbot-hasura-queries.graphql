@@ -160,7 +160,7 @@ query getAllContracts {
 
 query getMostRecentMintedTokenByContract($contracts: [String!]!) {
   tokens_metadata(
-    order_by: { minted_at: desc }
+    order_by: [{ minted_at: desc }, { invocation: desc }]
     limit: 1
     where: {
       contract_address: { _in: $contracts }
@@ -173,7 +173,7 @@ query getMostRecentMintedTokenByContract($contracts: [String!]!) {
 
 query getMostRecentMintedFlagshipToken {
   tokens_metadata(
-    order_by: { minted_at: desc }
+    order_by: [{ minted_at: desc }, { invocation: desc }]
     limit: 1
     where: {
       project: { vertical: { category: { hosted: { _eq: true } } } }
