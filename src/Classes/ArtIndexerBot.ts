@@ -292,7 +292,6 @@ export class ArtIndexerBot {
         msg.content = `#${token?.invocation}`
 
         projectBot.handleNumberMessage(msg)
-        return
       } catch (err) {
         console.error('Error in getRecentProjectBot', err)
       }
