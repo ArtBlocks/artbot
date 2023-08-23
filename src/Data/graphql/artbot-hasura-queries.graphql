@@ -158,3 +158,16 @@ query getMostRecentMintedTokenByContract($contracts: [String!]!) {
     ...ProjectTokenDetail
   }
 }
+
+query getMostRecentMintedFlagshipToken {
+  tokens_metadata(
+    order_by: { minted_at: desc }
+    limit: 1
+    where: {
+      project: { vertical: { category: { hosted: { _eq: true } } } }
+      image_id: { _is_null: false }
+    }
+  ) {
+    ...ProjectTokenDetail
+  }
+}

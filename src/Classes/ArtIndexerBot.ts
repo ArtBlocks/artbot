@@ -9,12 +9,14 @@ import {
   getAllTokensInWallet,
   getMostRecentMintedTokenByContracts,
   getAllContracts,
+  getMostRecentMintedFlagshipToken,
 } from '../Data/queryGraphQL'
 import { projectConfig, triviaBot } from '..'
 import {
   Categories_Enum,
   ContractDetailFragment,
   ProjectDetailFragment,
+  ProjectTokenDetailFragment,
   TokenDetailFragment,
 } from '../Data/generated/graphql'
 import {
@@ -28,6 +30,11 @@ dotenv.config()
 const deburr = require('lodash.deburr')
 
 const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
+const CONTRACT_ALIASES: {
+  aliases: string[]
+  named_contracts: string[]
+}[] = require('../ProjectConfig/contract_aliases.json')
+
 const { isWallet } = require('./APIBots/utils')
 
 // Refresh takes around one minute, so recommend setting this to 60 minutes
@@ -146,7 +153,7 @@ export class ArtIndexerBot {
 
         const projectKey = this.toProjectKey(project.name ?? 'unknown project')
         this.projects[projectKey] = newBot
-        this.idProjects[project.id] = newBot
+        this.projectsById[project.id] = newBot
 
         if (bday) {
           const [, month, day] = bday.split('T')[0].split('-')
@@ -355,6 +362,32 @@ export class ArtIndexerBot {
     return undefined
   }
 
+  async getContractTokenForKey(
+    key: string
+  ): Promise<ProjectTokenDetailFragment | null> {
+    try {
+      let contracts: string[]
+      const namedContract = this.contracts[key]
+      const alias = CONTRACT_ALIASES.filter((obj) => obj.aliases.includes(key))
+      if (namedContract) {
+        contracts = [namedContract.address]
+      } else if (alias) {
+        // aliases
+        contracts = alias[0].named_contracts.map(
+          (contract) => this.contracts[contract].address
+        )
+      } else {
+        // try it being just a contract address
+        contracts = [key.toLowerCase()]
+      }
+      const token = await getMostRecentMintedTokenByContracts(contracts)
+      return token
+    } catch (e) {
+      console.error('Error in getContractTokenForKey', e)
+      return null
+    }
+  }
+
   async getRecentProjectBot(key: string, message: Message) {
     //get the project on the contracts that was most recently minted within indexer bot and then use the correct project bot to send the most recently minted token on that contract
 
@@ -366,21 +399,12 @@ export class ArtIndexerBot {
     //  - alias
     //  - contract name
     try {
-      let contracts: string[]
-      const namedContract = this.contracts[key]
-      if (namedContract) {
-        contracts = [namedContract.address]
-      } else if (false) {
-        // aliases
-      } else {
-        // try it being just a contract address
-        contracts = [key.toLowerCase()]
-      }
-      if (key === '') {
+      let token = await this.getContractTokenForKey(key)
+      if (!token) {
         //use core contract
+        token = await getMostRecentMintedFlagshipToken()
       }
 
-      const token = await getMostRecentMintedTokenByContracts(contracts)
       const projectId = token.project_id
 
       const projectBot = this.projectsById[projectId]

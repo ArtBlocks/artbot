@@ -17,6 +17,7 @@ import {
   GetMostRecentMintedTokenByContractDocument,
   GetAllContractsDocument,
   ContractDetailFragment,
+  GetMostRecentMintedFlagshipTokenDocument,
 } from './generated/graphql'
 import { isArbitrumContract } from '../Classes/APIBots/utils'
 import { ARBITRUM_CONTRACTS, ENGINE_CONTRACTS } from '..'
@@ -445,6 +446,20 @@ export async function getMostRecentMintedTokenByContracts(
   if (!data || !data.tokens_metadata.length) {
     throw Error(
       'No data returned from getMostRecentMintedTokenByContracts Hasura query'
+    )
+  }
+
+  return data.tokens_metadata[0]
+}
+
+export async function getMostRecentMintedFlagshipToken(): Promise<ProjectTokenDetailFragment> {
+  const { data } = await client
+    .query(GetMostRecentMintedFlagshipTokenDocument, {})
+    .toPromise()
+
+  if (!data || !data.tokens_metadata.length) {
+    throw Error(
+      'No data returned from getMostRecentMintedFlagshipToken Hasura query'
     )
   }
 
