@@ -251,7 +251,7 @@ export class ArtIndexerBot {
     const messageType = this.getMessageType(
       projectKey,
       afterTheHash,
-      msg.content
+      msg.content.toLowerCase()
     )
 
     let projectBot
@@ -279,7 +279,23 @@ export class ArtIndexerBot {
       msg.content = `#${token?.invocation}`
       projectBot = this.projects[this.toProjectKey(token.project.name ?? '')]
     } else if (messageType === MessageTypes.RECENT) {
-      await this.getRecentProjectBot(afterTheHash, msg)
+      try {
+        let token = await this.getContractTokenForKey(afterTheHash)
+        if (!token) {
+          // use flagship contract
+          token = await getMostRecentMintedFlagshipToken()
+        }
+
+        const projectId = token.project_id
+
+        const projectBot = this.projectsById[projectId]
+        msg.content = `#${token?.invocation}`
+
+        projectBot.handleNumberMessage(msg)
+        return
+      } catch (err) {
+        console.error('Error in getRecentProjectBot', err)
+      }
       return
     } else {
       projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
@@ -388,27 +404,6 @@ export class ArtIndexerBot {
     } catch (e) {
       console.error('Error in getContractTokenForKey', e)
       return null
-    }
-  }
-
-  async getRecentProjectBot(key: string, message: Message) {
-    try {
-      let token = await this.getContractTokenForKey(key)
-      if (!token) {
-        // use flagship contract
-        token = await getMostRecentMintedFlagshipToken()
-      }
-
-      const projectId = token.project_id
-
-      const projectBot = this.projectsById[projectId]
-      const msg = message
-      msg.content = `#${token?.invocation}`
-
-      projectBot.handleNumberMessage(msg)
-      return
-    } catch (err) {
-      console.error('Error in getRecentProjectBot', err)
     }
   }
 
