@@ -288,7 +288,7 @@ export class ProjectBot {
       inline: true,
     })
 
-    if (tokenMetadata.list_price) {
+    if (tokenMetadata.list_price && !tokenMetadata.isFlaggedAsSuspicious) {
       embedContent.addFields({
         name: 'Buy Now',
         value: `[**${tokenMetadata.list_price} ${
