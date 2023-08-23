@@ -1,10 +1,10 @@
 [
   {
-    "aliases": ["bm", "bright moments"],
+    "aliases": ["bm", "brightmoments"],
     "named_contracts": [
       "Bright Moments Flex",
       "MOMENT",
-      "Art Blocks × Bright Moments",
+      "Art Blocks x Bright Moments",
       "Bright Moments II",
       "CryptoCitizens"
     ]
@@ -12,5 +12,9 @@
   {
     "aliases": ["plottables"],
     "named_contracts": ["Plottables Flex", "Plottables"]
+  },
+  {
+    "aliases": ["pace"],
+    "named_contracts": ["Art Blocks x Pace (V3)", "Art Blocks x Pace"]
   }
 ]
