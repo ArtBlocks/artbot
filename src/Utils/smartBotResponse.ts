@@ -227,6 +227,9 @@ const HASHTAG_MESSAGE = new EmbedBuilder()
     \`#? [wallet or ENS]\` = Random token from wallet
     \`#? [wallet or ENS] [project name / artist / vertical / tag]\` = Random token from wallet with criteria described above
     \`#? open\` = Random token from an open (still minting) collection
+    \`#recent\` = Get the most recently minted flagship token
+    \`#recent [contract_address]\` = Get the most recently minted token for that contract
+    \`#recent [name_contract or alias]\` = Get the most recently minted token for that contract (e.g. #recent plottables; #recent bm; #recent Plottables Flex)
 
     Ask me about \`aliases\` to see a list of project name shortcuts you can use in #? commands!
     `
