@@ -12,15 +12,12 @@ import {
   GetProjectInContractsDocument,
   GetProjectFloorDocument,
   TokenDetailFragment,
-<<<<<<< HEAD
   ProjectTokenDetailFragment,
   GetMostRecentMintedTokenByContractDocument,
   GetAllContractsDocument,
   ContractDetailFragment,
   GetMostRecentMintedFlagshipTokenDocument,
-=======
   GetTokenDocument,
->>>>>>> 53b5da03d05c8b274c2f731e389a865234f2891c
 } from './generated/graphql'
 import { isArbitrumContract } from '../Classes/APIBots/utils'
 import { ARBITRUM_CONTRACTS, ENGINE_CONTRACTS } from '..'
