@@ -389,19 +389,10 @@ export class ArtIndexerBot {
   }
 
   async getRecentProjectBot(key: string, message: Message) {
-    //get the project on the contracts that was most recently minted within indexer bot and then use the correct project bot to send the most recently minted token on that contract
-
-    // functionality:
-    // DONE: 1. #recent <contract_address> then it just gets the most recent token that was minted on that contract - harder to understand but easier to implement
-    // 2. #recet <engine_name> this has a mapping from <engine_name> to all the contracts that partner controls and it will get the most recently minted token on that contract
-
-    // TODO:
-    //  - alias
-    //  - contract name
     try {
       let token = await this.getContractTokenForKey(key)
       if (!token) {
-        //use core contract
+        // use flagship contract
         token = await getMostRecentMintedFlagshipToken()
       }
 
