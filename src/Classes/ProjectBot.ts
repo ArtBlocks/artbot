@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import {
   Channel,
   Collection,
@@ -7,6 +7,7 @@ import {
   TextChannel,
 } from 'discord.js'
 import {
+  PROJECTBOT_BUY_UTM,
   PROJECTBOT_UTM,
   getTokenApiUrl,
   getTokenUrl,
@@ -17,13 +18,11 @@ import { ensOrAddress, replaceVideoWithGIF } from './APIBots/utils'
 import {
   getProjectFloor,
   getProjectInvocations,
-  getTokenOwnerAddress,
+  getToken,
 } from '../Data/queryGraphQL'
 import { triviaBot } from '..'
 import { ProjectConfig } from '../ProjectConfig/projectConfig'
 import { ProjectHandlerHelper } from './ProjectHandlerHelper'
-
-const EMBED_COLOR = 0xff0000
 
 const ONE_MILLION = 1e6
 
@@ -156,7 +155,6 @@ export class ProjectBot {
       content = this.namedHandler.transform(content)
     }
 
-    const detailsRequested = content.toLowerCase().includes('detail')
     const afterTheHash = content.substring(1)
     let pieceNumber
     if (afterTheHash[0] == '?') {
@@ -176,19 +174,7 @@ export class ProjectBot {
 
     const tokenID = pieceNumber + this.projectNumber * 1e6
 
-    this.sendMetaDataMessage(msg, tokenID.toString(), detailsRequested).catch(
-      (err: Error | AxiosError) => {
-        console.error('Error sending metadata message', err)
-        if (axios.isAxiosError(err)) {
-          const axErr = err as AxiosError
-          if (axErr?.code === '429') {
-            msg.channel.send(
-              'Sorry! Our API is temporarily rate limited, please try again in a little bit'
-            )
-          }
-        }
-      }
-    )
+    this.sendMetaDataMessage(msg, tokenID.toString())
   }
 
   async handleTweet(tweetText: string): Promise<string> {
@@ -228,92 +214,65 @@ export class ProjectBot {
    * @param {*} tokenID
    * @param {*} detailsRequested
    */
-  async sendMetaDataMessage(
-    msg: Message,
-    tokenID: string,
-    detailsRequested: boolean
-  ) {
-    const artBlocksResponse = await axios.get(
-      getTokenApiUrl(this.coreContract, `${tokenID}`)
+  async sendMetaDataMessage(msg: Message, tokenID: string) {
+    let tokenMetadata
+    try {
+      tokenMetadata = await getToken(`${this.coreContract}-${tokenID}`)
+    } catch (e) {
+      console.log(
+        `Error getting token metadata for ${msg.content}: ${this.coreContract}-${tokenID}`,
+        e
+      )
+      return
+    }
+    const tokenUrl = getTokenUrl(
+      tokenMetadata.contract?.token_base_url
+        ? `${tokenMetadata.contract?.token_base_url}/${tokenID}`
+        : '',
+      this.coreContract,
+      tokenID
     )
-    const artBlocksData = artBlocksResponse.data
+    const titleLink = tokenUrl + PROJECTBOT_UTM
 
-    const titleLink =
-      getTokenUrl(artBlocksData.external_url, this.coreContract, tokenID) +
-      PROJECTBOT_UTM
+    let title = `${tokenMetadata.project.name} #${tokenMetadata.invocation} - ${tokenMetadata.project.artist_name}`
 
-    let title = artBlocksData.name + ' - ' + artBlocksData.artist
-
-    // If PBAB project, add PBAB name to front
+    // If Engine project, add Engine platform name to front
     if (
-      artBlocksData.platform &&
-      artBlocksData.platform !== '' &&
-      !artBlocksData.platform.includes('Art Blocks')
+      tokenMetadata.contract?.name &&
+      !tokenMetadata.contract?.name.includes('Art Blocks')
     ) {
-      if (artBlocksData.platform === 'MOMENT') {
-        artBlocksData.platform = 'Bright Moments'
+      let platform = tokenMetadata.contract?.name
+      if (platform === 'MOMENT') {
+        platform = 'Bright Moments'
       }
 
-      title = artBlocksData.platform + ' - ' + title
+      title = platform + ' - ' + title
     }
 
-    const ownerAddress = await getTokenOwnerAddress(
-      `${this.coreContract}-${tokenID}`
-    )
-    let ownerText = ownerAddress ? await ensOrAddress(ownerAddress) : ''
+    let ownerText = tokenMetadata.owner?.public_address
+      ? await ensOrAddress(tokenMetadata.owner?.public_address)
+      : ''
     if (ownerText.startsWith('0x') && !ownerText.endsWith('.eth')) {
       ownerText = ownerText.substring(0, 6) + '...' + ownerText.substring(38)
     }
 
-    const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url)
+    const assetUrl = await replaceVideoWithGIF(
+      tokenMetadata.preview_asset_url ?? ''
+    )
 
-    const ownerProfileLink = ownerAddress
-      ? 'https://www.artblocks.io/user/' + ownerAddress + PROJECTBOT_UTM
+    const ownerProfileLink = tokenMetadata.owner?.public_address
+      ? 'https://www.artblocks.io/user/' +
+        tokenMetadata.owner?.public_address +
+        PROJECTBOT_UTM
       : ''
-    // If user did *not* request full details, return just a large image,
-    // along with a link to the OpenSea page and ArtBlocks live script.
-    if (!detailsRequested) {
-      const embedContent = new EmbedBuilder()
-        // Set the title of the field.
-        .setTitle(title)
-        // Add link to title.
-        .setURL(titleLink)
-        // Set the full image for embed.
-        .setImage(assetUrl)
 
-      if (ownerText) {
-        embedContent.addFields({
-          name: 'Owner',
-          value: `[${ownerText}](${ownerProfileLink})`,
-          inline: true,
-        })
-      }
-      embedContent.addFields({
-        name: 'Live Script',
-        value: `[Generator](${artBlocksData.generator_url + PROJECTBOT_UTM})`,
-        inline: true,
-      })
-      msg.channel.send({ embeds: [embedContent] })
-      return
-    }
-
-    // Otherwise, return full metadata for the asset.
-    const { features } = artBlocksData
-    const assetFeatures =
-      !!features && Object.keys(features).length
-        ? Object.keys(features)
-            .map((key) => `${key}: ${features[key]}`)
-            .join('\n')
-        : 'Not yet available.'
     const embedContent = new EmbedBuilder()
       // Set the title of the field.
       .setTitle(title)
       // Add link to title.
       .setURL(titleLink)
-      // Set the color of the embed.
-      .setColor(EMBED_COLOR)
-      // Set the main content of the embed
-      .setThumbnail(assetUrl)
+      // Set the full image for embed.
+      .setImage(assetUrl)
 
     if (ownerText) {
       embedContent.addFields({
@@ -322,18 +281,21 @@ export class ProjectBot {
         inline: true,
       })
     }
-    embedContent.addFields(
-      {
-        name: 'Live Script',
-        value: `[Generator](${artBlocksData.generator_url})`,
-        inline: true,
-      },
-      {
-        name: 'Features',
-        value: assetFeatures,
-      }
-    )
 
+    embedContent.addFields({
+      name: 'Live Script',
+      value: `[Generator](${tokenMetadata.live_view_url + PROJECTBOT_UTM})`,
+      inline: true,
+    })
+
+    if (tokenMetadata.list_price && !tokenMetadata.isFlaggedAsSuspicious) {
+      embedContent.addFields({
+        name: 'Buy Now',
+        value: `[**${tokenMetadata.list_price} ${
+          tokenMetadata.list_currency_symbol
+        }** on Art Blocks Marketplace](${tokenUrl + PROJECTBOT_BUY_UTM})`,
+      })
+    }
     msg.channel.send({ embeds: [embedContent] })
   }
 

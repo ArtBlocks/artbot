@@ -8,16 +8,19 @@ import {
   GetOpenProjectsDocument,
   GetProjectDocument,
   GetContractProjectsDocument,
-  GetTokenOwnerDocument,
   GetProjectInvocationsDocument,
   GetProjectInContractsDocument,
   GetProjectFloorDocument,
   TokenDetailFragment,
+<<<<<<< HEAD
   ProjectTokenDetailFragment,
   GetMostRecentMintedTokenByContractDocument,
   GetAllContractsDocument,
   ContractDetailFragment,
   GetMostRecentMintedFlagshipTokenDocument,
+=======
+  GetTokenDocument,
+>>>>>>> 53b5da03d05c8b274c2f731e389a865234f2891c
 } from './generated/graphql'
 import { isArbitrumContract } from '../Classes/APIBots/utils'
 import { ARBITRUM_CONTRACTS, ENGINE_CONTRACTS } from '..'
@@ -366,32 +369,6 @@ async function getContractsProjects(
   }
 }
 
-export async function getTokenOwnerAddress(tokenId: string) {
-  const hasuraClient = getClientForContract(tokenId.split('-')[0])
-  try {
-    const { data, error } = await hasuraClient
-      .query(GetTokenOwnerDocument, {
-        id: tokenId,
-      })
-      .toPromise()
-
-    if (
-      !data ||
-      !data.tokens_metadata?.length ||
-      !data.tokens_metadata[0]?.owner?.public_address
-    ) {
-      console.log(error)
-      console.log(data, tokenId)
-      throw Error('No data returned from get token owner Hasura query')
-    }
-
-    return data.tokens_metadata[0]?.owner?.public_address
-  } catch (err) {
-    console.error(err)
-    return undefined
-  }
-}
-
 export async function getProjectInvocations(projectId: string) {
   const hasuraClient = getClientForContract(projectId.split('-')[0])
   try {
@@ -425,13 +402,29 @@ export async function getProjectFloor(projectId: string) {
     if (!data) {
       throw Error('No data returned from getProjectFloor Hasura query')
     }
-    return data.projects_metadata.length > 0
-      ? data.projects_metadata[0].tokens?.[0]
-      : null
+    return data.projects_metadata[0].tokens.find(
+      (token) => !token.isFlaggedAsSuspicious
+    )
   } catch (err) {
     console.error(err)
     return undefined
   }
+}
+
+export async function getToken(tokenId: string): Promise<TokenDetailFragment> {
+  const hasuraClient = getClientForContract(tokenId.split('-')[0])
+
+  const { data } = await hasuraClient
+    .query(GetTokenDocument, {
+      token_id: tokenId,
+    })
+    .toPromise()
+
+  if (!data || !data.tokens_metadata?.length) {
+    throw Error('No data returned from get token Hasura query')
+  }
+
+  return data.tokens_metadata[0]
 }
 
 export async function getMostRecentMintedTokenByContracts(
@@ -448,7 +441,6 @@ export async function getMostRecentMintedTokenByContracts(
       'No data returned from getMostRecentMintedTokenByContracts Hasura query'
     )
   }
-
   return data.tokens_metadata[0]
 }
 
