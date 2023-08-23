@@ -24,6 +24,18 @@ fragment TokenDetail on tokens_metadata {
   invocation
   project {
     name
+    artist_name
+  }
+  contract {
+    token_base_url
+    name
+  }
+  preview_asset_url
+  live_view_url
+  list_currency_symbol
+  list_price
+  owner {
+    public_address
   }
 }
 
@@ -63,6 +75,12 @@ query getWalletTokens(
       contract_address: { _in: $contracts }
     }
   ) {
+    ...TokenDetail
+  }
+}
+
+query getToken($token_id: String!) {
+  tokens_metadata(limit: 1, where: { id: { _eq: $token_id } }) {
     ...TokenDetail
   }
 }
@@ -117,14 +135,6 @@ query getProjectFloor($id: String!) {
     tokens(limit: 1, order_by: { list_eth_price: asc }) {
       invocation
       list_eth_price
-    }
-  }
-}
-
-query getTokenOwner($id: String!) {
-  tokens_metadata(where: { id: { _eq: $id } }) {
-    owner {
-      public_address
     }
   }
 }
