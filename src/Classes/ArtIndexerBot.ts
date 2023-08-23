@@ -108,7 +108,7 @@ export class ArtIndexerBot {
       for (let i = 0; i < contractArr.length; i++) {
         const name = contractArr[i].name
         if (typeof name === 'string') {
-          this.contracts[name] = contractArr[i]
+          this.contracts[name.toLowerCase()] = contractArr[i]
         }
       }
     } catch (e) {
@@ -366,19 +366,22 @@ export class ArtIndexerBot {
     key: string
   ): Promise<ProjectTokenDetailFragment | null> {
     try {
+      const lowerCaseKey = key.toLowerCase()
       let contracts: string[]
-      const namedContract = this.contracts[key]
-      const alias = CONTRACT_ALIASES.filter((obj) => obj.aliases.includes(key))
+      const namedContract = this.contracts[lowerCaseKey]
+      const alias = CONTRACT_ALIASES.filter((obj) =>
+        obj.aliases.includes(lowerCaseKey)
+      )
       if (namedContract) {
         contracts = [namedContract.address]
       } else if (alias) {
         // aliases
         contracts = alias[0].named_contracts.map(
-          (contract) => this.contracts[contract].address
+          (contract) => this.contracts[contract.toLowerCase()].address
         )
       } else {
         // try it being just a contract address
-        contracts = [key.toLowerCase()]
+        contracts = [lowerCaseKey]
       }
       const token = await getMostRecentMintedTokenByContracts(contracts)
       return token

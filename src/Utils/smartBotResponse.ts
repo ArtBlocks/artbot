@@ -229,7 +229,7 @@ const HASHTAG_MESSAGE = new EmbedBuilder()
     \`#? open\` = Random token from an open (still minting) collection
     \`#recent\` = Get the most recently minted flagship token
     \`#recent [contract_address]\` = Get the most recently minted token for that contract
-    \`#recent [name_contract or alias]\` = Get the most recently minted token for that contract (e.g. #recent plottables; #recent bm; #recent Plottables Flex)
+    \`#recent [name_contract or alias]\` = Get the most recently minted token for that contract (e.g. #recent plottables; #recent bm; #recent plottables flex)
 
     Ask me about \`aliases\` to see a list of project name shortcuts you can use in #? commands!
     `
