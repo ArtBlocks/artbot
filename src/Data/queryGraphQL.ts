@@ -427,7 +427,9 @@ export async function getToken(tokenId: string): Promise<TokenDetailFragment> {
 export async function getMostRecentMintedTokenByContracts(
   contracts: string[]
 ): Promise<ProjectTokenDetailFragment> {
-  const { data } = await client
+  const isArb = contracts.length > 0 && isArbitrumContract(contracts[0])
+  const c = isArb ? arbitrumClient : client
+  const { data } = await c
     .query(GetMostRecentMintedTokenByContractDocument, {
       contracts: contracts,
     })
@@ -455,8 +457,11 @@ export async function getMostRecentMintedFlagshipToken(): Promise<ProjectTokenDe
   return data.tokens_metadata[0]
 }
 
-export async function getAllContracts(): Promise<ContractDetailFragment[]> {
-  const { data } = await client.query(GetAllContractsDocument, {}).toPromise()
+export async function getAllContracts(
+  isArb: boolean
+): Promise<ContractDetailFragment[]> {
+  const c = isArb ? arbitrumClient : client
+  const { data } = await c.query(GetAllContractsDocument, {}).toPromise()
 
   if (!data || !data.contracts_metadata.length) {
     throw Error('No data returned from getAllContracts Hasura query')

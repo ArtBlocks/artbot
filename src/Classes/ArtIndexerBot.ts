@@ -104,11 +104,19 @@ export class ArtIndexerBot {
 
   async buildContracts() {
     try {
-      const contractArr = await getAllContracts()
-      for (let i = 0; i < contractArr.length; i++) {
-        const name = contractArr[i].name
+      const arbContractsArr = await getAllContracts(true)
+      for (let i = 0; i < arbContractsArr.length; i++) {
+        const name = arbContractsArr[i].name
         if (typeof name === 'string') {
-          this.contracts[name.toLowerCase()] = contractArr[i]
+          this.contracts[name.toLowerCase()] = arbContractsArr[i]
+        }
+      }
+
+      const ethContractsArr = await getAllContracts(false)
+      for (let i = 0; i < ethContractsArr.length; i++) {
+        const name = ethContractsArr[i].name
+        if (typeof name === 'string') {
+          this.contracts[name.toLowerCase()] = ethContractsArr[i]
         }
       }
     } catch (e) {
@@ -389,7 +397,7 @@ export class ArtIndexerBot {
       )
       if (namedContract) {
         contracts = [namedContract.address]
-      } else if (alias) {
+      } else if (alias.length > 0) {
         // aliases
         contracts = alias[0].named_contracts.map(
           (contract) => this.contracts[contract.toLowerCase()].address
