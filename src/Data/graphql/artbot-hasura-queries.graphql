@@ -165,6 +165,7 @@ query getMostRecentMintedTokenByContract($contracts: [String!]!) {
     where: {
       contract_address: { _in: $contracts }
       image_id: { _is_null: false }
+      project: { active: { _eq: true } }
     }
   ) {
     ...ProjectTokenDetail
@@ -176,7 +177,10 @@ query getMostRecentMintedFlagshipToken {
     order_by: [{ minted_at: desc }, { invocation: desc }]
     limit: 1
     where: {
-      project: { vertical: { category: { hosted: { _eq: true } } } }
+      project: {
+        vertical: { category: { hosted: { _eq: true } } }
+        active: { _eq: true }
+      }
       image_id: { _is_null: false }
     }
   ) {
