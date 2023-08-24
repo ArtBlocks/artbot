@@ -12,6 +12,11 @@ import {
   GetProjectInContractsDocument,
   GetProjectFloorDocument,
   TokenDetailFragment,
+  ProjectTokenDetailFragment,
+  GetMostRecentMintedTokenByContractDocument,
+  GetAllContractsDocument,
+  ContractDetailFragment,
+  GetMostRecentMintedFlagshipTokenDocument,
   GetTokenDocument,
 } from './generated/graphql'
 import { isArbitrumContract } from '../Classes/APIBots/utils'
@@ -417,4 +422,50 @@ export async function getToken(tokenId: string): Promise<TokenDetailFragment> {
   }
 
   return data.tokens_metadata[0]
+}
+
+export async function getMostRecentMintedTokenByContracts(
+  contracts: string[]
+): Promise<ProjectTokenDetailFragment> {
+  const isArb = contracts.length > 0 && isArbitrumContract(contracts[0])
+  const c = isArb ? arbitrumClient : client
+  const { data } = await c
+    .query(GetMostRecentMintedTokenByContractDocument, {
+      contracts: contracts,
+    })
+    .toPromise()
+
+  if (!data || !data.tokens_metadata.length) {
+    throw Error(
+      'No data returned from getMostRecentMintedTokenByContracts Hasura query'
+    )
+  }
+  return data.tokens_metadata[0]
+}
+
+export async function getMostRecentMintedFlagshipToken(): Promise<ProjectTokenDetailFragment> {
+  const { data } = await client
+    .query(GetMostRecentMintedFlagshipTokenDocument, {})
+    .toPromise()
+
+  if (!data || !data.tokens_metadata.length) {
+    throw Error(
+      'No data returned from getMostRecentMintedFlagshipToken Hasura query'
+    )
+  }
+
+  return data.tokens_metadata[0]
+}
+
+export async function getAllContracts(
+  isArb: boolean
+): Promise<ContractDetailFragment[]> {
+  const c = isArb ? arbitrumClient : client
+  const { data } = await c.query(GetAllContractsDocument, {}).toPromise()
+
+  if (!data || !data.contracts_metadata.length) {
+    throw Error('No data returned from getAllContracts Hasura query')
+  }
+
+  return data.contracts_metadata
 }

@@ -180,35 +180,38 @@ bot.on(Events.MessageCreate, async (msg) => {
     return
   }
 
-  // Handle piece # requests.
-  if (msgContent.startsWith('#')) {
-    switch (channelID) {
-      case CHANNEL_FACTORY:
-        artIndexerBot.handleNumberMessage(msg)
-        break
-      case CHANNEL_BLOCK_TALK:
-        artIndexerBot.handleNumberMessage(msg)
-        break
-      case CHANNEL_ENGINE_CHAT:
-        pbabIndexerBot.handleNumberMessage(msg)
-        break
-      case CHANNEL_AB_X_PACE:
-        abXpaceIndexerBot.handleNumberMessage(msg)
-        break
-      case CHANNEL_AB_X_BM:
-        abXbmIndexerBot.handleNumberMessage(msg)
-        break
-      case CHANNEL_ART_CHAT:
-        artIndexerBot.handleNumberMessage(msg)
-        break
-      // Fall-back - expect a project bot to handle
-      default:
-        projectConfig.routeProjectNumberMsg(channelID, msg)
-        break
+  try {
+    // Handle piece # requests.
+    if (msgContent.startsWith('#')) {
+      switch (channelID) {
+        case CHANNEL_FACTORY:
+          artIndexerBot.handleNumberMessage(msg)
+          break
+        case CHANNEL_BLOCK_TALK:
+          artIndexerBot.handleNumberMessage(msg)
+          break
+        case CHANNEL_ENGINE_CHAT:
+          pbabIndexerBot.handleNumberMessage(msg)
+          break
+        case CHANNEL_AB_X_PACE:
+          abXpaceIndexerBot.handleNumberMessage(msg)
+          break
+        case CHANNEL_AB_X_BM:
+          abXbmIndexerBot.handleNumberMessage(msg)
+          break
+        case CHANNEL_ART_CHAT:
+          artIndexerBot.handleNumberMessage(msg)
+          break
+        // Fall-back - expect a project bot to handle
+        default:
+          projectConfig.routeProjectNumberMsg(channelID, msg)
+          break
+      }
+      return
     }
-    return
+  } catch (e) {
+    console.error('Error handling number message: ', e)
   }
-
   // Handle special info questions that ArtBot knows how to answer.
   const artBotID = bot.user?.id
   // TODO: refactor smartbotresponse to be less irritating / have fewer args

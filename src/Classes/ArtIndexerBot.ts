@@ -7,11 +7,16 @@ import {
   getAllProjects,
   getArtblocksOpenProjects,
   getAllTokensInWallet,
+  getMostRecentMintedTokenByContracts,
+  getAllContracts,
+  getMostRecentMintedFlagshipToken,
 } from '../Data/queryGraphQL'
 import { projectConfig, triviaBot } from '..'
 import {
   Categories_Enum,
+  ContractDetailFragment,
   ProjectDetailFragment,
+  ProjectTokenDetailFragment,
   TokenDetailFragment,
 } from '../Data/generated/graphql'
 import {
@@ -25,6 +30,11 @@ dotenv.config()
 const deburr = require('lodash.deburr')
 
 const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
+const CONTRACT_ALIASES: {
+  aliases: string[]
+  named_contracts: string[]
+}[] = require('../ProjectConfig/contract_aliases.json')
+
 const { isWallet } = require('./APIBots/utils')
 
 // Refresh takes around one minute, so recommend setting this to 60 minutes
@@ -40,6 +50,7 @@ export enum MessageTypes {
   PROJECT = 'project',
   OPEN = 'open',
   WALLET = 'wallet',
+  RECENT = 'recent',
   UNKNOWN = 'unknown',
 }
 
@@ -55,12 +66,16 @@ export class ArtIndexerBot {
   birthdays: { [id: string]: ProjectBot[] }
   collections: { [id: string]: ProjectBot[] }
   tags: { [id: string]: ProjectBot[] }
+  projectsById: { [id: string]: ProjectBot }
+  contracts: { [id: string]: ContractDetailFragment }
   walletTokens: { [id: string]: TokenDetailFragment[] }
   initialized = false
 
   constructor(projectFetch = getAllProjects) {
     this.projectFetch = projectFetch
     this.projects = {}
+    this.projectsById = {}
+    this.contracts = {}
     this.artists = {}
     this.birthdays = {}
     this.collections = {}
@@ -76,6 +91,7 @@ export class ArtIndexerBot {
     await this.buildProjectBots()
 
     if (this.projectFetch === getAllProjects) {
+      await this.buildContracts()
       projectConfig.initializeProjectBots()
     }
     setInterval(async () => {
@@ -84,6 +100,28 @@ export class ArtIndexerBot {
         projectConfig.initializeProjectBots()
       }
     }, parseInt(METADATA_REFRESH_INTERVAL_MINUTES) * ONE_MINUTE_IN_MS)
+  }
+
+  async buildContracts() {
+    try {
+      const arbContractsArr = await getAllContracts(true)
+      for (let i = 0; i < arbContractsArr.length; i++) {
+        const name = arbContractsArr[i].name
+        if (typeof name === 'string') {
+          this.contracts[name.toLowerCase()] = arbContractsArr[i]
+        }
+      }
+
+      const ethContractsArr = await getAllContracts(false)
+      for (let i = 0; i < ethContractsArr.length; i++) {
+        const name = ethContractsArr[i].name
+        if (typeof name === 'string') {
+          this.contracts[name.toLowerCase()] = ethContractsArr[i]
+        }
+      }
+    } catch (e) {
+      console.error('Error in buildContracts', e)
+    }
   }
 
   async buildProjectBots() {
@@ -123,6 +161,7 @@ export class ArtIndexerBot {
 
         const projectKey = this.toProjectKey(project.name ?? 'unknown project')
         this.projects[projectKey] = newBot
+        this.projectsById[project.id] = newBot
 
         if (bday) {
           const [, month, day] = bday.split('T')[0].split('-')
@@ -150,9 +189,15 @@ export class ArtIndexerBot {
   }
 
   // Please update HASHTAG_MESSAGE in smartBotResponse.ts if you add more options here
-  getMessageType(key: string, afterTheHash: string): MessageTypes {
+  getMessageType(
+    key: string,
+    afterTheHash: string,
+    messageContent?: string
+  ): MessageTypes {
     if (key === '#?') {
       return MessageTypes.RANDOM
+    } else if (messageContent?.startsWith('#recent')) {
+      return MessageTypes.RECENT
     } else if (key === 'open') {
       return MessageTypes.OPEN
     } else if (isVerticalName(key)) {
@@ -190,6 +235,7 @@ export class ArtIndexerBot {
       case MessageTypes.PROJECT:
         return this.projects[key]
       case MessageTypes.WALLET:
+      case MessageTypes.RECENT:
       case MessageTypes.UNKNOWN:
         return undefined
     }
@@ -210,7 +256,11 @@ export class ArtIndexerBot {
 
     let projectKey = this.toProjectKey(afterTheHash)
 
-    const messageType = this.getMessageType(projectKey, afterTheHash)
+    const messageType = this.getMessageType(
+      projectKey,
+      afterTheHash,
+      msg.content.toLowerCase()
+    )
 
     let projectBot
     // Wallet has to be handled separately as it is dealing with specific tokens not whole projects
@@ -236,6 +286,25 @@ export class ArtIndexerBot {
       }
       msg.content = `#${token?.invocation}`
       projectBot = this.projects[this.toProjectKey(token.project.name ?? '')]
+    } else if (messageType === MessageTypes.RECENT) {
+      let token = await this.getContractTokenForKey(afterTheHash)
+      if (
+        !token &&
+        (afterTheHash === msg.content ||
+          afterTheHash.replace(' ', '').length === 0)
+      ) {
+        // use flagship contract
+        token = await getMostRecentMintedFlagshipToken()
+      } else if (!token) {
+        console.error('Bad value specified for recent', afterTheHash)
+        msg.channel.send('Sorry, I was not able to understand that.')
+        return
+      }
+
+      const projectId = token.project_id
+
+      projectBot = this.projectsById[projectId]
+      msg.content = `#${token?.invocation}`
     } else {
       projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
     }
@@ -244,6 +313,7 @@ export class ArtIndexerBot {
       console.log("Wasn't able to parse message", content)
       return
     }
+
     projectBot.handleNumberMessage(msg)
   }
 
@@ -314,6 +384,35 @@ export class ArtIndexerBot {
       attempts++
     }
     return undefined
+  }
+
+  async getContractTokenForKey(
+    key: string
+  ): Promise<ProjectTokenDetailFragment | null> {
+    try {
+      const lowerCaseKey = key.toLowerCase()
+      let contracts: string[]
+      const namedContract = this.contracts[lowerCaseKey]
+      const alias = CONTRACT_ALIASES.filter((obj) =>
+        obj.aliases.includes(lowerCaseKey)
+      )
+      if (namedContract) {
+        contracts = [namedContract.address]
+      } else if (alias.length > 0) {
+        // aliases
+        contracts = alias[0].named_contracts.map(
+          (contract) => this.contracts[contract.toLowerCase()].address
+        )
+      } else {
+        // try it being just a contract address
+        contracts = [lowerCaseKey]
+      }
+      const token = await getMostRecentMintedTokenByContracts(contracts)
+      return token
+    } catch (e) {
+      console.error('Error in getContractTokenForKey', e)
+      return null
+    }
   }
 
   // This function takes a channel and sends a message containing a random
