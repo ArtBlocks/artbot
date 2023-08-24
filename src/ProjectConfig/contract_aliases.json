@@ -1,6 +1,6 @@
 [
   {
-    "aliases": ["bm", "brightmoments"],
+    "aliases": ["bm", "bright moments"],
     "named_contracts": [
       "Bright Moments Flex",
       "MOMENT",
@@ -16,5 +16,17 @@
   {
     "aliases": ["pace"],
     "named_contracts": ["Art Blocks x Pace (V3)", "Art Blocks x Pace"]
+  },
+  {
+    "aliases": ["hodler", "hodlers"],
+    "named_contracts": ["Hodlers Projects"]
+  },
+  {
+    "aliases": ["verticalcrypto"],
+    "named_contracts": ["VerticalCrypto Gen Art"]
+  },
+  {
+    "aliases": ["proof"],
+    "named_contracts": ["PROOF Blocks"]
   }
 ]
