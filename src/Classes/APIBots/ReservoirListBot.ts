@@ -5,7 +5,7 @@ import {
   sendEmbedToListChannels,
 } from '../../Utils/activityTriager'
 import { APIPollBot } from './ApiPollBot'
-
+import { paths } from '@reservoir0x/reservoir-sdk'
 import {
   LISTING_UTM,
   ensOrAddress,
@@ -19,30 +19,33 @@ import {
 
 type ReservoirListing = {
   maker: string
+  id: string
   tokenSetId: string
-  contract: string
-  price: {
-    currency: {
-      symbol: string
+  contract?: string
+  price?: {
+    currency?: {
+      symbol?: string
     }
-    amount: {
-      decimal: number
+    amount?: {
+      decimal?: number
     }
   }
-  source: {
-    name: string
-    domain: string
-    url: string
+  source?: {
+    name?: string
+    domain?: string
+    url?: string
   }
   createdAt: string
 }
 
-type ReservoirListResponse = {
-  orders: ReservoirListing[]
-}
+type ReservoirListResponse =
+  paths['/orders/asks/v5']['get']['responses']['200']['schema']
+
+const IDENTICAL_TOLERANCE = 0.0001
 
 /** API Poller for Reservoir Sale events */
 export class ReservoirListBot extends APIPollBot {
+  recentListings: { [key: string]: number } = {}
   /** Constructor just calls super
    * @param {string} apiEndpoint - Endpoint to be hitting
    * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
@@ -66,11 +69,11 @@ export class ReservoirListBot extends APIPollBot {
    */
   async handleAPIResponse(responseData: ReservoirListResponse) {
     let maxTime = 0
-    for (const data of responseData.orders) {
-      const eventTime = Date.parse(data.createdAt)
+    responseData.orders?.forEach((order) => {
+      const eventTime = Date.parse(order.createdAt)
       // Only deal with event if it is new
       if (this.lastUpdatedTime < eventTime) {
-        this.buildDiscordMessage(data).catch((err) => {
+        this.buildDiscordMessage(order).catch((err) => {
           console.error('Error sending listing message', err)
         })
       }
@@ -79,7 +82,7 @@ export class ReservoirListBot extends APIPollBot {
       if (maxTime < eventTime) {
         maxTime = eventTime
       }
-    }
+    })
 
     // Update latest time vars if batch has new latest time
     if (maxTime > this.lastUpdatedTime) {
@@ -99,11 +102,21 @@ export class ReservoirListBot extends APIPollBot {
     // Parsing message to get info
     const tokenID = listing.tokenSetId.split(':')[2]
     const priceText = 'List Price'
-    const price = listing.price.amount.decimal
-    const currency = listing.price.currency.symbol
+    const price = listing.price?.amount?.decimal ?? 0
+    const currency = listing.price?.currency?.symbol
     const owner = listing.maker
-    let platform = listing.source.name
-    if (listing.source.domain.includes('artblocks')) {
+    let platform = listing.source?.name
+
+    if (
+      this.recentListings[tokenID] &&
+      Math.abs(this.recentListings[tokenID] - price) < IDENTICAL_TOLERANCE
+    ) {
+      console.log(`Skipping identical relisting for ${tokenID}`)
+      return
+    }
+    this.recentListings[tokenID] = price
+
+    if (listing.source?.domain?.includes('artblocks')) {
       embed.setColor(this.artblocksListColor)
       platform = 'Art Blocks <:lilsquig:1028047420636020786>'
     } else {
@@ -115,7 +128,7 @@ export class ReservoirListBot extends APIPollBot {
       return
     }
 
-    if (listing.source.name.toLowerCase().includes('looksrare')) {
+    if (listing.source?.name?.toLowerCase().includes('looksrare')) {
       console.log(`Skipping message propagation for LooksRare`)
       return
     }
@@ -137,12 +150,12 @@ export class ReservoirListBot extends APIPollBot {
     )
 
     // Get Art Blocks metadata response for the item.
-    const tokenApiUrl = getTokenApiUrl(listing.contract, tokenID)
+    const tokenApiUrl = getTokenApiUrl(listing.contract ?? '', tokenID)
     const artBlocksResponse = await axios.get(tokenApiUrl)
     const artBlocksData = artBlocksResponse?.data
     const tokenUrl = getTokenUrl(
       artBlocksData.external_url,
-      listing.contract,
+      listing.contract ?? '',
       tokenID
     )
 
@@ -157,9 +170,9 @@ export class ReservoirListBot extends APIPollBot {
       curationStatus = 'AB x Pace'
     } else if (artBlocksData?.platform === 'Art Blocks × Bright Moments') {
       curationStatus = 'AB x Bright Moments'
-    } else if (isExplorationsContract(listing.contract)) {
+    } else if (isExplorationsContract(listing.contract ?? '')) {
       curationStatus = 'Explorations'
-    } else if (isEngineContract(listing.contract)) {
+    } else if (isEngineContract(listing.contract ?? '')) {
       curationStatus = 'Engine'
       if (artBlocksData?.platform) {
         title = `${artBlocksData.platform} - ${title}`
@@ -185,7 +198,7 @@ export class ReservoirListBot extends APIPollBot {
       }
     )
 
-    const platformUrl = listing.source.url
+    const platformUrl = listing.source?.url
 
     embed.setTitle(title)
     if (platformUrl) {
@@ -197,7 +210,7 @@ export class ReservoirListBot extends APIPollBot {
         this.bot,
         embed,
         artBlocksData,
-        await getCollectionType(listing.contract)
+        await getCollectionType(listing.contract ?? '')
       )
     }
   }
