@@ -303,7 +303,7 @@ export async function smartBotResponse(
     if (reactionEmoji) {
       msg.react(reactionEmoji)
     }
-    return 'gm'
+    return null
   }
   // Some shared helper variables.
   const inHelpChannel: boolean = channelID == CHANNEL_HELP
