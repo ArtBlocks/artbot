@@ -16,6 +16,8 @@ const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
 
 // ArtBot details..
 const ARTBOT_USERNAME = 'artbot'
+const ARTBOT_JR_USERNAME = 'artbot-jr'
+
 const ARTBOT_GREEN = 0x00ff00
 const ARTBOT_WARNING = 0xffff00
 
@@ -290,13 +292,24 @@ export async function smartBotResponse(
    * NOTE: It is important to check if the message author is the ArtBot
    *       Itself to avoid a recursive infinite loop.
    */
-  if (msgAuthor == ARTBOT_USERNAME) {
+  if (msgAuthor == ARTBOT_USERNAME || msgAuthor == ARTBOT_JR_USERNAME) {
     return null
+  }
+
+  if (msgContentLowercase === 'gm') {
+    const reactionEmoji = msg.guild?.emojis.cache.find(
+      (emoji) => emoji.name === 'gm-squig'
+    )
+    if (reactionEmoji) {
+      msg.react(reactionEmoji)
+    }
+    return 'gm'
   }
   // Some shared helper variables.
   const inHelpChannel: boolean = channelID == CHANNEL_HELP
   const mentionedArtBot: boolean =
     msgContentLowercase.includes(ARTBOT_USERNAME) ||
+    msgContentLowercase.includes(ARTBOT_JR_USERNAME) ||
     msgContentLowercase.includes(artBotID)
   const mentionedArtBotOrInOrHelp: boolean = mentionedArtBot || inHelpChannel
   const containsQuestion: boolean = msgContentLowercase.includes('?')
