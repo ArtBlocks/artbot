@@ -246,7 +246,7 @@ const initReservoirBots = async () => {
     pollTimeMs: number
   ) => {
     new ReservoirListBot(
-      `https://api.reservoir.tools/orders/asks/v3?${listParams}&sortBy=createdAt&limit=${reservoirListLimit}`,
+      `https://api.reservoir.tools/orders/asks/v5?${listParams}&sortBy=createdAt&limit=${reservoirListLimit}&normalizeRoyalties=true`,
       pollTimeMs,
       bot,
       {
