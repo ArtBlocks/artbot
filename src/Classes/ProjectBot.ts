@@ -291,9 +291,9 @@ export class ProjectBot {
     if (tokenMetadata.list_price && !tokenMetadata.isFlaggedAsSuspicious) {
       embedContent.addFields({
         name: 'Buy Now',
-        value: `[**${tokenMetadata.list_price} ${
+        value: `[${tokenMetadata.list_price} ${
           tokenMetadata.list_currency_symbol
-        }** on Art Blocks Marketplace](${tokenUrl + PROJECTBOT_BUY_UTM})`,
+        } on Art Blocks Marketplace](${tokenUrl + PROJECTBOT_BUY_UTM})`,
       })
     }
     msg.channel.send({ embeds: [embedContent] })
