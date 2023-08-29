@@ -298,7 +298,7 @@ export async function smartBotResponse(
 
   if (msgContentLowercase === 'gm') {
     const reactionEmoji = msg.guild?.emojis.cache.find(
-      (emoji) => emoji.name === 'gm-squig'
+      (emoji) => emoji.name === 'gmsquig'
     )
     if (reactionEmoji) {
       msg.react(reactionEmoji)
