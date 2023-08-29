@@ -109,7 +109,7 @@ export class ReservoirListBot extends APIPollBot {
 
     if (
       this.recentListings[tokenID] &&
-      Math.abs(this.recentListings[tokenID] - price) < IDENTICAL_TOLERANCE
+      Math.abs(this.recentListings[tokenID] - price) <= IDENTICAL_TOLERANCE
     ) {
       console.log(`Skipping identical relisting for ${tokenID}`)
       return
