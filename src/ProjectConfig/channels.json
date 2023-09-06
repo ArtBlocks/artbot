@@ -702,6 +702,12 @@
       }
     }
   },
+  "1146849329156472832":{
+    "name": "jeres",
+    "projectBotHandlers": {
+      "default": "466"
+    }
+  },
   "888929189862977646": {
     "name": "generative-artworks-democracity",
     "projectBotHandlers": {
