@@ -55,13 +55,21 @@ export class MintBot {
         })
       }
       if (process.env.HODLERS_TWITTER_API_KEY) {
-        this.contractToTwitterBot[PARTNER_CONTRACTS['HODLERS']] =
-          new TwitterBot({
-            appKey: process.env.HODLERS_TWITTER_API_KEY ?? '',
-            appSecret: process.env.HODLERS_TWITTER_API_SECRET ?? '',
-            accessToken: process.env.HODLERS_TWITTER_OAUTH_TOKEN ?? '',
-            accessSecret: process.env.HODLERS_TWITTER_OAUTH_SECRET ?? '',
-          })
+        const hodlerBot = new TwitterBot({
+          appKey: process.env.HODLERS_TWITTER_API_KEY ?? '',
+          appSecret: process.env.HODLERS_TWITTER_API_SECRET ?? '',
+          accessToken: process.env.HODLERS_TWITTER_OAUTH_TOKEN ?? '',
+          accessSecret: process.env.HODLERS_TWITTER_OAUTH_SECRET ?? '',
+        })
+        const holderContracts: string[] = []
+        holderContracts.push(
+          PARTNER_CONTRACTS['HODLERS'],
+          PARTNER_CONTRACTS['HODLERS-PASS']
+        )
+
+        holderContracts.forEach((contract: string) => {
+          this.contractToTwitterBot[contract] = hodlerBot
+        })
       }
     }
   }

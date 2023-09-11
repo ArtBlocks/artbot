@@ -6,5 +6,6 @@
   "ENGINE": ["engine-mints"],
   "PLOTTABLES": ["plottables-mints"],
   "ROZENDAAL": ["rozendaal-mints"],
-  "HODLERS": ["hodlers-mints"]
+  "HODLERS": ["hodlers-mints"],
+  "HODLERS-PASS": ["hodlers-mints"]
 }
