@@ -250,6 +250,8 @@ export class ArtIndexerBot {
       return
     }
 
+    console.log('Handling message', content)
+
     let afterTheHash = content
       .substr(content.indexOf(' ') + 1)
       .replace('?details', '')

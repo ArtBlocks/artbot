@@ -411,11 +411,15 @@ export async function getProjectFloor(projectId: string) {
 export async function getToken(tokenId: string): Promise<TokenDetailFragment> {
   const hasuraClient = getClientForContract(tokenId.split('-')[0])
 
-  const { data } = await hasuraClient
+  const { data, error } = await hasuraClient
     .query(GetTokenDocument, {
       token_id: tokenId,
     })
     .toPromise()
+
+  if (error) {
+    throw Error(error.message)
+  }
 
   if (!data || !data.tokens_metadata?.length) {
     throw Error('No data returned from get token Hasura query')
