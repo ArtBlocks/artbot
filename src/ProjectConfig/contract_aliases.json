@@ -18,7 +18,7 @@
     "named_contracts": ["Art Blocks x Pace (V3)", "Art Blocks x Pace"]
   },
   {
-    "aliases": ["hodler", "hodlers"],
+    "aliases": ["hodler", "hodlers", "hodlers collective"],
     "named_contracts": ["Hodlers Projects"]
   },
   {
@@ -27,6 +27,10 @@
   },
   {
     "aliases": ["proof"],
-    "named_contracts": ["PROOF Blocks"]
+    "named_contracts": ["PROOF Blocks", "PROOF Blocks 2"]
+  },
+  {
+    "aliases": ["sothebys"],
+    "named_contracts": ["Sothebys Gen Art"]
   }
 ]

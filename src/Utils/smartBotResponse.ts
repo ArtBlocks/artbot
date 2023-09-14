@@ -168,6 +168,7 @@ const HELP_MESSAGE = new EmbedBuilder()
     **gas?**: An explanation of what gas is and why you should **never** modify the gas limit.
     **staysafe?**: Tips on avoiding scams
     **aliases?**: A handy list of aliases that can be used in \`#\` commands.
+    **hashtag?**: A handy list of all \`#\` functionalities
     `
   )
 // Custom message shown when someone asks about ArtBlocks
@@ -230,9 +231,8 @@ const HASHTAG_MESSAGE = new EmbedBuilder()
     \`#? [wallet or ENS] [project name / artist / vertical / tag]\` = Random token from wallet with criteria described above
     \`#? open\` = Random token from an open (still minting) collection
     \`#recent\` = Get the most recently minted flagship token
-    \`#recent [contract_address]\` = Get the most recently minted token for that contract
-    \`#recent [name_contract or alias]\` = Get the most recently minted token for that contract (e.g. #recent plottables; #recent bm; #recent plottables flex)
-
+    \`#recent [contract_address/name_contract/alias]\` = Get the most recently minted token for that platform (e.g. #recent plottables; #recent bm; #recent plottables flex)
+    \`#? [Engine platform name]\` = Random token from Engine platform (e.g. Bright Moments, Plottables, etc)
     Ask me about \`aliases\` to see a list of project name shortcuts you can use in #? commands!
     `
   )

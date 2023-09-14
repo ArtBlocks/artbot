@@ -44,6 +44,7 @@ const ONE_MINUTE_IN_MS = 60000
 
 export enum MessageTypes {
   RANDOM = 'random',
+  RANDOM_ALL = 'random_all',
   ARTIST = 'artist',
   COLLECTION = 'collection',
   TAG = 'tag',
@@ -51,6 +52,7 @@ export enum MessageTypes {
   OPEN = 'open',
   WALLET = 'wallet',
   RECENT = 'recent',
+  PLATFORM = 'platform',
   UNKNOWN = 'unknown',
 }
 
@@ -61,26 +63,21 @@ type ProjectBotAndToken = {
 
 export class ArtIndexerBot {
   projectFetch: () => Promise<ProjectDetailFragment[]>
-  projects: { [id: string]: ProjectBot }
-  artists: { [id: string]: ProjectBot[] }
-  birthdays: { [id: string]: ProjectBot[] }
-  collections: { [id: string]: ProjectBot[] }
-  tags: { [id: string]: ProjectBot[] }
-  projectsById: { [id: string]: ProjectBot }
-  contracts: { [id: string]: ContractDetailFragment }
-  walletTokens: { [id: string]: TokenDetailFragment[] }
+  projects: { [id: string]: ProjectBot } = {}
+  artists: { [id: string]: ProjectBot[] } = {}
+  birthdays: { [id: string]: ProjectBot[] } = {}
+  collections: { [id: string]: ProjectBot[] } = {}
+  tags: { [id: string]: ProjectBot[] } = {}
+  projectsById: { [id: string]: ProjectBot } = {}
+  contracts: { [id: string]: ContractDetailFragment } = {}
+  walletTokens: { [id: string]: TokenDetailFragment[] } = {}
   initialized = false
+
+  platforms: { [id: string]: ProjectBot[] } = {}
+  flagship: { [id: string]: ProjectBot } = {}
 
   constructor(projectFetch = getAllProjects) {
     this.projectFetch = projectFetch
-    this.projects = {}
-    this.projectsById = {}
-    this.contracts = {}
-    this.artists = {}
-    this.birthdays = {}
-    this.collections = {}
-    this.tags = {}
-    this.walletTokens = {}
     this.init()
   }
 
@@ -160,7 +157,18 @@ export class ArtIndexerBot {
         })
 
         const projectKey = this.toProjectKey(project.name ?? 'unknown project')
-        this.projects[projectKey] = newBot
+        const projectKeyWithArtist = this.toProjectKey(
+          `${project.artist_name} ${project.name}`
+        )
+        this.projects[projectKeyWithArtist] = newBot
+
+        // Overwrite if it's a flagship project
+        if (
+          (this.projects[projectKey] && project.is_artblocks) ||
+          !this.projects[projectKey]
+        ) {
+          this.projects[projectKey] = newBot
+        }
         this.projectsById[project.id] = newBot
 
         if (bday) {
@@ -182,7 +190,34 @@ export class ArtIndexerBot {
           this.tags[tag] = this.tags[tag] ?? []
           this.tags[tag].push(newBot)
         }
+
+        if (project.is_artblocks) {
+          this.flagship[projectKey] = newBot
+          this.platforms['artblocks'] = this.platforms['artblocks'] ?? []
+          this.platforms['artblocks'].push(newBot)
+        } else {
+          const platform = this.toProjectKey(
+            project.contract.name ?? 'Unknown contract'
+          )
+          this.platforms[platform] = this.platforms[platform] ?? []
+          this.platforms[platform].push(newBot)
+        }
       }
+
+      CONTRACT_ALIASES.forEach((item) => {
+        const aliases = item.aliases
+        const named_contracts = item.named_contracts
+        named_contracts.forEach((named_contract) => {
+          const platformName = this.toProjectKey(named_contract)
+          if (platformName && this.platforms[platformName]) {
+            aliases.forEach((alias) => {
+              this.platforms[alias] = this.platforms[alias] ?? []
+              this.platforms[alias].push(...this.platforms[platformName])
+            })
+          }
+        })
+      })
+      console.log(Object.keys(this.platforms))
     } catch (err) {
       console.error(`Error while initializing ArtIndexerBots\n${err}`)
     }
@@ -196,6 +231,8 @@ export class ArtIndexerBot {
   ): MessageTypes {
     if (key === '#?') {
       return MessageTypes.RANDOM
+    } else if (key === 'all') {
+      return MessageTypes.RANDOM_ALL
     } else if (messageContent?.startsWith('#recent')) {
       return MessageTypes.RECENT
     } else if (key === 'open') {
@@ -206,6 +243,8 @@ export class ArtIndexerBot {
       return MessageTypes.TAG
     } else if (this.artists[key]) {
       return MessageTypes.ARTIST
+    } else if (this.platforms[key]) {
+      return MessageTypes.PLATFORM
     } else if (isWallet(afterTheHash?.split(' ')[0])) {
       return MessageTypes.WALLET
     } else if (this.projects[key]) {
@@ -221,7 +260,12 @@ export class ArtIndexerBot {
     const messageType = this.getMessageType(key, afterTheHash)
     switch (messageType) {
       case MessageTypes.RANDOM:
-        return this.getRandomizedProjectBot(Object.values(this.projects))
+        if (Object.keys(this.flagship).length > 0) {
+          return this.getRandomizedProjectBot(Object.values(this.flagship))
+        }
+        return this.getRandomizedProjectBot(Object.values(this.projectsById))
+      case MessageTypes.RANDOM_ALL:
+        return this.getRandomizedProjectBot(Object.values(this.projectsById))
       case MessageTypes.OPEN:
         return await this.getRandomOpenProjectBot()
       case MessageTypes.COLLECTION:
@@ -232,7 +276,12 @@ export class ArtIndexerBot {
         return this.getRandomizedProjectBot(this.tags[key])
       case MessageTypes.ARTIST:
         return this.getRandomizedProjectBot(this.artists[key])
+      case MessageTypes.PLATFORM:
+        return this.getRandomizedProjectBot(this.platforms[key])
       case MessageTypes.PROJECT:
+        if (this.flagship[key]) {
+          return this.flagship[key]
+        }
         return this.projects[key]
       case MessageTypes.WALLET:
       case MessageTypes.RECENT:
