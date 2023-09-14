@@ -162,11 +162,17 @@ export class ArtIndexerBot {
         )
         this.projects[projectKeyWithArtist] = newBot
 
-        // Overwrite if it's a flagship project
+        if (
+          project.vertical.category_name === 'collaborations' ||
+          project.vertical.category_name === 'explorations'
+        ) {
+          project.is_artblocks = true
+        }
         if (
           (this.projects[projectKey] && project.is_artblocks) ||
           !this.projects[projectKey]
         ) {
+          // Overwrite if it's a flagship project
           this.projects[projectKey] = newBot
         }
         this.projectsById[project.id] = newBot
@@ -204,6 +210,7 @@ export class ArtIndexerBot {
         }
       }
 
+      // Set up contract aliases
       CONTRACT_ALIASES.forEach((item) => {
         const aliases = item.aliases
         const named_contracts = item.named_contracts
@@ -217,7 +224,6 @@ export class ArtIndexerBot {
           }
         })
       })
-      console.log(Object.keys(this.platforms))
     } catch (err) {
       console.error(`Error while initializing ArtIndexerBots\n${err}`)
     }
