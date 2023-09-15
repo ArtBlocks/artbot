@@ -400,7 +400,6 @@ export class ProjectBot {
       // Set the full image for embed.
       .setImage(assetUrl)
 
-    console.log(startTime)
     embedContent.addFields({
       name: 'Release Date',
       value: `<t:${startTime.getTime() / 1000}:F> Local Time`,
