@@ -10,7 +10,9 @@
     "format": "prettier --write .",
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "codegen": "graphql-codegen --config ./codegen.ts",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "postinstall": "yarn codegen",
+    "lint-and-format": "yarn lint && yarn format"
   },
   "keywords": [
     "artblocks",
