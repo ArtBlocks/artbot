@@ -18,6 +18,8 @@ import {
   ContractDetailFragment,
   GetMostRecentMintedFlagshipTokenDocument,
   GetTokenDocument,
+  GetNextUpcomingProjectDocument,
+  UpcomingProjectDetailFragment,
 } from './generated/graphql'
 import { isArbitrumContract } from '../Classes/APIBots/utils'
 import { ARBITRUM_CONTRACTS, ENGINE_CONTRACTS } from '..'
@@ -472,4 +474,18 @@ export async function getAllContracts(
   }
 
   return data.contracts_metadata
+}
+
+export async function getArtblocksNextUpcomingProject(): Promise<UpcomingProjectDetailFragment> {
+  const { data } = await client
+    .query(GetNextUpcomingProjectDocument, {})
+    .toPromise()
+
+  if (!data || !data.projects_metadata.length) {
+    throw Error(
+      'No data returned from getArtblocksNextUpcomingProject Hasura query'
+    )
+  }
+
+  return data.projects_metadata[0]
 }

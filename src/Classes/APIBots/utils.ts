@@ -214,6 +214,10 @@ export function getTokenUrl(
   return buildArtBlocksTokenURL(contractAddr, tokenId)
 }
 
+export function getProjectUrl(contractAddr: string, projectId: string): string {
+  return `https://www.artblocks.io/project/${contractAddr}-${projectId}`
+}
+
 function buildArtBlocksTokenURL(contractAddr: string, tokenId: string): string {
   return `https://www.artblocks.io/token/${contractAddr}-${tokenId}`
 }
@@ -272,4 +276,8 @@ export const waitForEngineContracts = async (): Promise<string[]> => {
   }
   console.log('Engine contracts loaded')
   return ENGINE_CONTRACTS
+}
+
+export const ethFromWeiString = (wei: string): string => {
+  return `${parseInt(wei) / 1e18}`
 }
