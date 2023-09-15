@@ -82,7 +82,6 @@ export class TwitterBot {
   }
 
   async search() {
-    console.log(`Searching Twitter... (last tweet id: ${this.lastTweetId})`)
     let artbotTweets: any
     try {
       // Query breakdown:

@@ -12,11 +12,15 @@ fragment ProjectDetail on projects_metadata {
   contract_address
   start_datetime
   vertical_name
+  is_artblocks
   vertical {
     category_name
   }
   tags {
     tag_name
+  }
+  contract {
+    name
   }
 }
 
@@ -134,9 +138,7 @@ query getProject($id: String!) {
 }
 
 query getEngineContracts($ids: [String!]) {
-  contracts_metadata(
-    where: { address: { _nin: $ids }, active: { _eq: true } }
-  ) {
+  contracts_metadata(where: { address: { _nin: $ids } }) {
     address
   }
 }
