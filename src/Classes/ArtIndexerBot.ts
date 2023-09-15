@@ -214,14 +214,17 @@ export class ArtIndexerBot {
       CONTRACT_ALIASES.forEach((item) => {
         const aliases = item.aliases
         const named_contracts = item.named_contracts
+        const allPlatformProjects: ProjectBot[] = []
         named_contracts.forEach((named_contract) => {
           const platformName = this.toProjectKey(named_contract)
-          if (platformName && this.platforms[platformName]) {
-            aliases.forEach((alias) => {
-              this.platforms[alias] = this.platforms[alias] ?? []
-              this.platforms[alias].push(...this.platforms[platformName])
-            })
+          if (this.platforms[platformName]) {
+            allPlatformProjects.push(...this.platforms[platformName])
           }
+        })
+
+        aliases.forEach((alias) => {
+          this.platforms[alias] = this.platforms[alias] ?? []
+          this.platforms[alias].push(...allPlatformProjects)
         })
       })
     } catch (err) {
