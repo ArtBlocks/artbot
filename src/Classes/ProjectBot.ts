@@ -25,7 +25,7 @@ import {
 import { triviaBot } from '..'
 import { ProjectConfig } from '../ProjectConfig/projectConfig'
 import { ProjectHandlerHelper } from './ProjectHandlerHelper'
-import { UpcomingProjectDetailFragment } from '../Data/generated/graphql'
+import { UpcomingProjectDetailFragment } from '../../generated/graphql'
 
 const ONE_MILLION = 1e6
 

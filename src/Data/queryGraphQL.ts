@@ -20,7 +20,7 @@ import {
   GetTokenDocument,
   GetNextUpcomingProjectDocument,
   UpcomingProjectDetailFragment,
-} from './generated/graphql'
+} from '../../generated/graphql'
 import { isArbitrumContract } from '../Classes/APIBots/utils'
 import { ARBITRUM_CONTRACTS, ENGINE_CONTRACTS } from '..'
 

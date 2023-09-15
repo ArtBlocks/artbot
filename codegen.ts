@@ -5,7 +5,7 @@ const config: CodegenConfig = {
   schema: 'https://data.artblocks.io/v1/graphql',
   documents: ['./src/Data/**/*.graphql'],
   generates: {
-    'src/Data/generated/graphql.ts': {
+    'generated/graphql.ts': {
       plugins: [
         'typescript',
         'typescript-operations',
