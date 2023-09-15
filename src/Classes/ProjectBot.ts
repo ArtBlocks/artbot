@@ -9,6 +9,8 @@ import {
 import {
   PROJECTBOT_BUY_UTM,
   PROJECTBOT_UTM,
+  ethFromWeiString,
+  getProjectUrl,
   getTokenApiUrl,
   getTokenUrl,
   isCoreContract,
@@ -23,6 +25,7 @@ import {
 import { triviaBot } from '..'
 import { ProjectConfig } from '../ProjectConfig/projectConfig'
 import { ProjectHandlerHelper } from './ProjectHandlerHelper'
+import { UpcomingProjectDetailFragment } from '../Data/generated/graphql'
 
 const ONE_MILLION = 1e6
 
@@ -369,5 +372,95 @@ export class ProjectBot {
       )
     }
     return
+  }
+
+  async handleUpcomingMessage(
+    msg: Message,
+    upcomingDetails: UpcomingProjectDetailFragment
+  ) {
+    const startTime = new Date(
+      upcomingDetails.auction_start_time || upcomingDetails.start_datetime
+    )
+
+    const projectUrl = getProjectUrl(
+      this.coreContract,
+      this.projectNumber.toString()
+    )
+    const title = `${upcomingDetails.name} by ${upcomingDetails.artist_name}`
+
+    const assetUrl = await replaceVideoWithGIF(
+      upcomingDetails.tokens?.[0]?.preview_asset_url ?? ''
+    )
+
+    const embedContent = new EmbedBuilder()
+      // Set the title of the field.
+      .setTitle(title)
+      // Add link to title.
+      .setURL(projectUrl)
+      // Set the full image for embed.
+      .setImage(assetUrl)
+
+    embedContent.addFields({
+      name: 'Release Date',
+      value: `<t:${startTime.getTime() / 1000}:F> Local Time`,
+    })
+
+    const minterType =
+      upcomingDetails.minter_configuration?.minter?.minter_type ?? ''
+    let dropMechanic = ''
+    let startPrice = ''
+    let restingPrice = ''
+    if (minterType.includes('SetPrice')) {
+      dropMechanic = `Fixed Price`
+      startPrice = `${ethFromWeiString(
+        upcomingDetails.minter_configuration?.base_price ?? ''
+      )} Ξ`
+    } else if (minterType.includes('DAExp')) {
+      dropMechanic = `Exponential Dutch Auction`
+      startPrice = `${ethFromWeiString(
+        upcomingDetails.minter_configuration?.extra_minter_details.startPrice
+      )} Ξ`
+      restingPrice = `${ethFromWeiString(
+        upcomingDetails.minter_configuration?.base_price ?? ''
+      )} Ξ`
+    } else if (minterType.includes('DALin')) {
+      dropMechanic = `Linear Dutch Auction`
+      startPrice = `${ethFromWeiString(
+        upcomingDetails.minter_configuration?.extra_minter_details.startPrice ??
+          ''
+      )} Ξ`
+      restingPrice = `${ethFromWeiString(
+        upcomingDetails.minter_configuration?.base_price ?? ''
+      )} Ξ`
+    } else if (minterType.includes('Merkle')) {
+      dropMechanic = `Allowlist`
+      startPrice = `${ethFromWeiString(
+        upcomingDetails.minter_configuration?.base_price ?? ''
+      )} Ξ`
+    } else {
+      dropMechanic = `${minterType}`
+    }
+
+    embedContent.addFields({
+      name: 'Drop Mechanic',
+      value: dropMechanic,
+      inline: true,
+    })
+    if (startPrice) {
+      embedContent.addFields({
+        name: 'Start Price',
+        value: startPrice,
+        inline: true,
+      })
+    }
+    if (restingPrice) {
+      embedContent.addFields({
+        name: 'Resting Price',
+        value: restingPrice,
+        inline: true,
+      })
+    }
+
+    msg.channel.send({ embeds: [embedContent] })
   }
 }

@@ -194,3 +194,30 @@ query getMostRecentMintedFlagshipToken {
     ...ProjectTokenDetail
   }
 }
+
+fragment UpcomingProjectDetail on projects_metadata {
+  ...ProjectDetail
+  auction_end_time
+  auction_start_time
+  charitable_giving_details
+  minter_configuration {
+    base_price
+    minter {
+      minter_type
+    }
+    extra_minter_details
+  }
+  tokens(limit: 1, order_by: { invocation: asc_nulls_last }) {
+    preview_asset_url
+  }
+}
+
+query GetNextUpcomingProject {
+  projects_metadata(
+    where: { start_datetime: { _gte: "NOW" } }
+    order_by: { start_datetime: asc_nulls_last }
+    limit: 1
+  ) {
+    ...UpcomingProjectDetail
+  }
+}

@@ -10,6 +10,7 @@ import {
   getMostRecentMintedTokenByContracts,
   getAllContracts,
   getMostRecentMintedFlagshipToken,
+  getArtblocksNextUpcomingProject,
 } from '../Data/queryGraphQL'
 import { projectConfig, triviaBot } from '..'
 import {
@@ -53,6 +54,7 @@ export enum MessageTypes {
   WALLET = 'wallet',
   RECENT = 'recent',
   PLATFORM = 'platform',
+  UPCOMING = 'upcoming',
   UNKNOWN = 'unknown',
 }
 
@@ -242,6 +244,8 @@ export class ArtIndexerBot {
       return MessageTypes.RANDOM
     } else if (key === 'all') {
       return MessageTypes.RANDOM_ALL
+    } else if (key === 'upcoming') {
+      return MessageTypes.UPCOMING
     } else if (messageContent?.startsWith('#recent')) {
       return MessageTypes.RECENT
     } else if (key === 'open') {
@@ -294,6 +298,7 @@ export class ArtIndexerBot {
         return this.projects[key]
       case MessageTypes.WALLET:
       case MessageTypes.RECENT:
+      case MessageTypes.UPCOMING:
       case MessageTypes.UNKNOWN:
         return undefined
     }
@@ -365,6 +370,15 @@ export class ArtIndexerBot {
 
       projectBot = this.projectsById[projectId]
       msg.content = `#${token?.invocation}`
+    } else if (messageType === MessageTypes.UPCOMING) {
+      try {
+        const upcomingProjectDetails = await getArtblocksNextUpcomingProject()
+        projectBot = this.projectsById[upcomingProjectDetails.id]
+        projectBot.handleUpcomingMessage(msg, upcomingProjectDetails)
+        return
+      } catch (error) {
+        console.warn(error)
+      }
     } else {
       projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
     }
