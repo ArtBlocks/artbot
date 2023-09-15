@@ -233,6 +233,7 @@ const HASHTAG_MESSAGE = new EmbedBuilder()
     \`#recent\` = Get the most recently minted flagship token
     \`#recent [contract_address/name_contract/alias]\` = Get the most recently minted token for that platform (e.g. #recent plottables; #recent bm; #recent plottables flex)
     \`#? [Engine platform name]\` = Random token from Engine platform (e.g. Bright Moments, Plottables, etc)
+    \`#? upcoming\` = See information about the next upcoming project
     Ask me about \`aliases\` to see a list of project name shortcuts you can use in #? commands!
     `
   )
