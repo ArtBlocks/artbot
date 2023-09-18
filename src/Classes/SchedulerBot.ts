@@ -79,7 +79,12 @@ export class ScheduleBot {
         `Next runs: Bday: ${a?.toISOString()}, BT: ${b?.toISOString()}, Marfa: ${c?.toISOString()}`
       )
     }, 60 * 60000) // Every hour
-    // TODO: Trivia
+
+    // TODO: Uncomment when trivia is ready
+    // Cron('* * * * *', { timezone: 'America/Chicago', name: 'Trivia' }, () => {
+    //   console.log('Trivia Time!')
+    //   artIndexerBot.askRandomTriviaQuestion()
+    // })
   }
 
   sendMarfaMessage(channel: TextChannel) {
