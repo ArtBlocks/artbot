@@ -20,5 +20,7 @@ jobs:
           echo "DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}" >> $GITHUB_ENV
       - name: Install modules
         run: yarn install
+      - name: Run codegen
+        run: yarn codegen
       - name: Run program
         run: timeout 1m yarn start || ( [[ $? -eq 124 ]] && echo "WARNING Timeout reached, but that's OK" )

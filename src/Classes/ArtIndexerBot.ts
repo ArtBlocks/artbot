@@ -19,7 +19,7 @@ import {
   ProjectDetailFragment,
   ProjectTokenDetailFragment,
   TokenDetailFragment,
-} from '../Data/generated/graphql'
+} from '../../generated/graphql'
 import {
   getVerticalName,
   isVerticalName,
