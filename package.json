@@ -44,7 +44,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "ethers": "^5.7.0",
     "googleapis": "^92.0.0",
-    "graphql": "^16.6.0",
+    "graphql": "^16.8.1",
     "jest": "^28.0.3",
     "langchain": "^0.0.66",
     "lodash.deburr": "^4.1.0",
