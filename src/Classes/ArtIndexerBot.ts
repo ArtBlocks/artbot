@@ -388,6 +388,13 @@ export class ArtIndexerBot {
       return
     }
 
+    if (
+      messageType === MessageTypes.ARTIST &&
+      triviaBot.isArtistActiveTriviaAnswer(projectBot?.artistName)
+    ) {
+      triviaBot.tally(msg)
+    }
+
     projectBot.handleNumberMessage(msg)
   }
 
@@ -635,21 +642,19 @@ export class ArtIndexerBot {
       })
     }
   }
-  async startTriviaRoutine() {
-    setInterval(() => {
-      console.log("It's trivia time!")
-      let attempts = 0
-      while (attempts < 10) {
-        const keys = Object.keys(this.projects)
-        const projectKey = keys[Math.floor(Math.random() * keys.length)]
-        const projBot = this.projects[projectKey]
-        if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
-          triviaBot.askTriviaQuestion(projBot)
-          return
-        }
-        attempts++
+
+  askRandomTriviaQuestion() {
+    let attempts = 0
+    while (attempts < 10) {
+      const keys = Object.keys(this.flagship)
+      const projectKey = keys[Math.floor(Math.random() * keys.length)]
+      const projBot = this.flagship[projectKey]
+      if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
+        triviaBot.askTriviaQuestion(projBot)
+        return
       }
-    }, ONE_MINUTE_IN_MS)
+      attempts++
+    }
   }
 
   getProjectsWithNamedMappings(): ProjectBot[] {

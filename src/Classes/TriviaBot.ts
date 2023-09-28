@@ -14,6 +14,7 @@ export class TriviaBot {
   bot: Client
   model?: OpenAIChat
   channel?: TextChannel
+  previousQuestion?: Message
 
   currentTriviaAnswer: string
   constructor(bot: Client) {
@@ -38,22 +39,25 @@ export class TriviaBot {
   }
 
   isActiveTriviaAnswer(projectBot: ProjectBot): boolean {
-    return (
-      projectBot.projectName === this.currentTriviaAnswer ||
-      projectBot.artistName === this.currentTriviaAnswer
-    )
+    return projectBot.projectName === this.currentTriviaAnswer
+  }
+  isArtistActiveTriviaAnswer(artist: string): boolean {
+    return artist === this.currentTriviaAnswer
   }
 
   async askTriviaQuestion(project: ProjectBot) {
     // List of ideas:
-    // Phase 1:
-    // TODO: Add more question types: Name this artist?
-    // TODO: Reveal answer for unanswered questions after a certain amount of time
     // Phase 2:
     // TODO: Different triggers? Not just time based - number of sales, LJ cursing, thank grant, etc.
     // TODO: Trait data type questions? (e.g. "Name a project that has a trait of 'blue'"), Which of these is not a Meridian trait?
     // Phase 3:
     // TODO: Price is right style trivia - would need to change the way the answers come in
+
+    if (this.currentTriviaAnswer && this.previousQuestion) {
+      this.previousQuestion.reply(
+        'No one got this one! The answer was: ' + this.currentTriviaAnswer
+      )
+    }
 
     enum QuestionType {
       CHAT_GPT = 0,
@@ -67,35 +71,46 @@ export class TriviaBot {
       .setFooter({
         text: 'Answer by using the #? command',
       })
-    const questionType = Math.floor(Math.random() * 2)
+    const questionType = Math.floor(Math.random() * 3)
     console.log(`Asking trivia question for ${project.projectName}`)
 
-    switch (questionType) {
-      case QuestionType.CHAT_GPT:
-        embed = await this.askChatGPTQuestion(project, embed)
-        this.currentTriviaAnswer = project.projectName
-        break
-      case QuestionType.PICTURE_ID:
-        embed = await this.askNameProjectQuestion(project, embed)
-        this.currentTriviaAnswer = project.projectName
-        break
-      case QuestionType.ARTIST_NAME:
-        break
+    try {
+      switch (questionType) {
+        case QuestionType.CHAT_GPT:
+          embed = await this.askChatGPTQuestion(project, embed)
+          this.currentTriviaAnswer = project.projectName
+          break
+        case QuestionType.PICTURE_ID:
+          embed = await this.askNameProjectQuestion(project, embed)
+          this.currentTriviaAnswer = project.projectName
+          break
+        case QuestionType.ARTIST_NAME:
+          embed = await this.askNameProjectArtistQuestion(project, embed)
+          this.currentTriviaAnswer = project.artistName
+          embed.setFooter({
+            text: 'Answer by using the ARTIST NAME with the #? command',
+          })
+          break
+      }
+    } catch (err) {
+      console.log('ERROR asking trivia question', err)
+      return
     }
 
     this.channel = this.bot.channels?.cache?.get(
       CHANNEL_BLOCK_TALK
     ) as TextChannel
-    this.channel
-      .send({
-        embeds: [embed],
-      })
-      .catch((err) => {
-        console.log(
-          `Error posting message in channel ${projectConfig.channels[CHANNEL_BLOCK_TALK].name} (id: ${CHANNEL_BLOCK_TALK})`,
-          err.message
-        )
-      })
+    this.previousQuestion =
+      (await this.channel
+        .send({
+          embeds: [embed],
+        })
+        .catch((err) => {
+          console.log(
+            `Error posting message in channel ${projectConfig.channels[CHANNEL_BLOCK_TALK].name} (id: ${CHANNEL_BLOCK_TALK})`,
+            err.message
+          )
+        })) ?? undefined
   }
 
   async askChatGPTQuestion(
@@ -104,8 +119,9 @@ export class TriviaBot {
   ): Promise<EmbedBuilder> {
     if (!this.model) {
       console.log("Can't ask trivia question - no OpenAI API key")
-      throw new Error("Can't ask trivia question - no OpenAI API key") // TODO: catch this
+      throw new Error("Can't ask trivia question - no OpenAI API key")
     }
+
     const question = await this.model.call(
       `Generate a short, cryptic, poetic, vague, difficult riddle that has the answer: "${project.projectName}". It is VERY important that you DO NOT include the answer in your response. The project description is: "${project.description}"`
     )
@@ -119,6 +135,27 @@ export class TriviaBot {
     embed: EmbedBuilder
   ): Promise<EmbedBuilder> {
     const question = 'Name this project!'
+    const tokenNumber =
+      Math.floor(Math.random() * project.editionSize) +
+      project.projectNumber * 1e6
+
+    const artBlocksResponse = await axios.get(
+      getTokenApiUrl(project.coreContract, `${tokenNumber}`)
+    )
+    const artBlocksData = artBlocksResponse.data
+    const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url)
+
+    embed.setDescription(question)
+    embed.setImage(assetUrl)
+
+    return embed
+  }
+
+  async askNameProjectArtistQuestion(
+    project: ProjectBot,
+    embed: EmbedBuilder
+  ): Promise<EmbedBuilder> {
+    const question = 'Name the ARTIST of this project!'
     const tokenNumber =
       Math.floor(Math.random() * project.editionSize) +
       project.projectNumber * 1e6
