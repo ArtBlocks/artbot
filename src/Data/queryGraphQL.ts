@@ -83,6 +83,7 @@ export async function getAllProjectsForClient(
         .query(GetAllProjectsDocument, {
           first: maxProjectsPerQuery,
           skip: allProjects.length,
+          blocked_addresses: Object.values(BLOCKED_ENGINE_CONTRACTS),
         })
         .toPromise()
       if (!data) {

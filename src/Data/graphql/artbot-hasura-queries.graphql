@@ -55,12 +55,15 @@ fragment ContractDetail on contracts_metadata {
   name
 }
 
-query getAllProjects($first: Int!, $skip: Int) {
+query getAllProjects($first: Int!, $skip: Int, $blocked_addresses: [String!]) {
   projects_metadata(
     limit: $first
     offset: $skip
     order_by: { project_id: asc }
-    where: { active: { _eq: true } }
+    where: {
+      active: { _eq: true }
+      contract_address: { _nin: $blocked_addresses }
+    }
   ) {
     ...ProjectDetail
   }
