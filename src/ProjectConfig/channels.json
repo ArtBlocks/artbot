@@ -714,6 +714,17 @@
       "default": "471"
     }
   },
+  "1159160945235468389": {
+    "name": "ixnayokay",
+    "projectBotHandlers": {
+      "default": "472",
+      "stringTriggers": {
+        "395": ["imps", "imp", "implications"],
+        "287": ["zoologic", "zoo"],
+        "175": ["mono no aware", "mna", "mono"]
+      }
+    }
+  },
   "888929189862977646": {
     "name": "generative-artworks-democracity",
     "projectBotHandlers": {
