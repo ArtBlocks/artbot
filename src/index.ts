@@ -67,6 +67,8 @@ const CHANNEL_AB_X_BM = projectConfig.chIdByName['art-blocks-x-bright-moments']
 // AB Art Chat
 const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat']
 
+const CHANNEL_ARTBOT_TESTING = projectConfig.chIdByName['artbot-test-channel']
+
 // Rate (in ms) to poll API endpoints
 const API_POLL_TIME_MS = 10000
 const reservoirListLimit = 50
@@ -184,12 +186,6 @@ bot.on(Events.MessageCreate, async (msg) => {
     // Handle piece # requests.
     if (msgContent.startsWith('#')) {
       switch (channelID) {
-        case CHANNEL_FACTORY:
-          artIndexerBot.handleNumberMessage(msg)
-          break
-        case CHANNEL_BLOCK_TALK:
-          artIndexerBot.handleNumberMessage(msg)
-          break
         case CHANNEL_ENGINE_CHAT:
           pbabIndexerBot.handleNumberMessage(msg)
           break
@@ -199,6 +195,9 @@ bot.on(Events.MessageCreate, async (msg) => {
         case CHANNEL_AB_X_BM:
           abXbmIndexerBot.handleNumberMessage(msg)
           break
+        case CHANNEL_BLOCK_TALK:
+        case CHANNEL_FACTORY:
+        case CHANNEL_ARTBOT_TESTING:
         case CHANNEL_ART_CHAT:
           artIndexerBot.handleNumberMessage(msg)
           break
