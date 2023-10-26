@@ -155,6 +155,16 @@ export class ProjectBot {
 
     // decode any mappings
     if (this.namedHandler) {
+      // because unless until #today feature -- convert '#today buu' to '#October15 buu'
+      if (this.projectNumber === 472 && content.startsWith('#today')) {
+        const months = [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ];
+        const currentDate = new Date();
+        content = `#${months[currentDate.getMonth()]}${currentDate.getDate()} buu`;
+      }
+
       content = this.namedHandler.transform(content)
     }
 
