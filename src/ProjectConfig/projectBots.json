@@ -99,5 +99,10 @@
     "namedMappings": {
       "singles": "qilinSingles.json"
     }
+  },
+  "472": {
+    "namedMappings": {
+      "sets": "buuSets.json"
+    }
   }
 }

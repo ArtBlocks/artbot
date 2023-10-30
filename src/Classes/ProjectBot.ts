@@ -26,6 +26,7 @@ import { triviaBot } from '..'
 import { ProjectConfig } from '../ProjectConfig/projectConfig'
 import { ProjectHandlerHelper } from './ProjectHandlerHelper'
 import { UpcomingProjectDetailFragment } from '../../generated/graphql'
+import { getDayName, getMonthName, getDayOfMonth } from '../Utils/common'
 
 const ONE_MILLION = 1e6
 
@@ -155,6 +156,15 @@ export class ProjectBot {
 
     // decode any mappings
     if (this.namedHandler) {
+      // because unless until #today feature -- convert '#today buu' to '#october15 buu'
+      if (this.projectNumber === 472) {
+        if (content.startsWith('#fiesta')) {
+          content = `#${getMonthName()}${getDayOfMonth()} buu`
+        } else if (content.startsWith('#today')) {
+          content = `#${getDayName()} buu`
+        }
+      }
+
       content = this.namedHandler.transform(content)
     }
 
