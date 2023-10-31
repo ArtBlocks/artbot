@@ -3,7 +3,7 @@ name: Project Named Singles
 about: 'Ticket for requesting bot support for new named singles. '
 title: '[SINGLES] Project #N'
 labels: project-query-support
-assignees: jakerockland, grantoesterling
+assignees: grantoesterling
 ---
 
 ######################################################################
