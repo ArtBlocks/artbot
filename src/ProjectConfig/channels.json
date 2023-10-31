@@ -474,7 +474,10 @@
   "941216187222753320": {
     "name": "marcelo-soria-rodríguez",
     "projectBotHandlers": {
-      "default": "267"
+      "default": "267",
+      "stringTriggers": {
+        "477": ["siempre en mí, siempre en ti", "siempre"]
+      }
     }
   },
   "935789872315260948": {
@@ -510,7 +513,8 @@
           "solar",
           "transits",
           "transit"
-        ]
+        ],
+        "475": ["recollection"]
       }
     }
   },
@@ -548,7 +552,8 @@
     "projectBotHandlers": {
       "default": "328",
       "stringTriggers": {
-        "366": ["sandaliya"]
+        "366": ["sandaliya"],
+        "479": ["bakhoor assandal"]
       }
     }
   },

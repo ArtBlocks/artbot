@@ -3,7 +3,7 @@ name: New Command
 about: 'Ticket for requesting a new command (e.g. 'staysafe?') or trigger (e.g. 'otc')'
 title: 'New Command: <COMMAND_NAME>'
 labels: command
-assignees: jakerockland, grantoesterling
+assignees: grantoesterling
 ---
 
 ######################################################################
