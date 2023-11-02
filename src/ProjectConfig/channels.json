@@ -730,6 +730,15 @@
       }
     }
   },
+  "1169674360668299304": {
+    "name": "mountvitruvius",
+    "projectBotHandlers": {
+      "default": "482",
+      "stringTriggers": {
+        "415": ["renders game", "render"]
+      }
+    }
+  },
   "888929189862977646": {
     "name": "generative-artworks-democracity",
     "projectBotHandlers": {
