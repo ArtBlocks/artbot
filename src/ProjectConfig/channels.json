@@ -611,7 +611,10 @@
   "1035223653425610792": {
     "name": "lovid",
     "projectBotHandlers": {
-      "default": "376"
+      "default": "376",
+      "stringTriggers": {
+        "440": ["augury"]
+      }
     }
   },
   "1030149651283836968": {
