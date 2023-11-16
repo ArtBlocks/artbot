@@ -1,4 +1,202 @@
 {
+  "822563871473795073": {
+    "name": "factory-projects"
+  },
+  "880468116226850866": {
+    "name": "ab-art-chat"
+  },
+  "859521842317754369": {
+    "name": "prod_all_activity"
+  },
+  "411959613370400780": {
+    "name": "general"
+  },
+  "815980444905373786": {
+    "name": "help"
+  },
+  "859312767105105941": {
+    "name": "sales-feed"
+  },
+  "830924481627291709": {
+    "name": "block-talk"
+  },
+  "862722281503326288": {
+    "name": "marfa"
+  },
+  "976944919757348965": {
+    "name": "engine-chat"
+  },
+  "983836283954667530": {
+    "name": "art-blocks-x-pace"
+  },
+  "1067538362275201045": {
+    "name": "art-blocks-x-bright-moments"
+  },
+  "830940204441272369": {
+    "name": "listing-feed"
+  },
+  "859316381517348874": {
+    "name": "squiggle-listings"
+  },
+  "874066035618250752": {
+    "name": "trade-swaps"
+  },
+  "782644400084877315": {
+    "name": "for-sale-listings"
+  },
+  "782311037172973618": {
+    "name": "artblocks-mints"
+  },
+  "1039653873066979410": {
+    "name": "explorations-mints"
+  },
+  "1039653771862610001": {
+    "name": "explorations-sales"
+  },
+  "1039653937810255872": {
+    "name": "explorations-listings"
+  },
+  "1014641051140624445": {
+    "name": "engine-mints"
+  },
+  "1039654066122399785": {
+    "name": "engine-sales"
+  },
+  "1039654132279156826": {
+    "name": "engine-listings"
+  },
+  "935377049089097758": {
+    "name": "plottables-mints"
+  },
+  "907425636455444520": {
+    "name": "plottables-sales"
+  },
+  "907425686531227678": {
+    "name": "plottables-listings"
+  },
+  "1062938848105078824": {
+    "name": "flutter-sales"
+  },
+  "987113563753701459": {
+    "name": "tender-sales"
+  },
+  "1076664032146235432": {
+    "name": "hodlers-mints"
+  },
+  "1074004089551196180": {
+    "name": "hodlers-sales"
+  },
+  "1050375648323051650": {
+    "name": "hodlers-listings"
+  },
+  "1109104401135718460": {
+    "name": "rozendaal-mints"
+  },
+  "919937880288284722": {
+    "name": "plottables-numbersinmotion",
+    "projectBotHandlers": {
+      "default": "0-PLOTTABLES",
+      "stringTriggers": {
+        "0-PLOTTABLES": ["streamlines"]
+      }
+    }
+  },
+  "919937961632600064": {
+    "name": "plottables-generative-artworks",
+    "projectBotHandlers": {
+      "default": "1-PLOTTABLES",
+      "stringTriggers": {
+        "1-PLOTTABLES": ["implosion"]
+      }
+    }
+  },
+  "888929189862977646": {
+    "name": "generative-artworks-democracity",
+    "projectBotHandlers": {
+      "default": "162"
+    }
+  },
+  "888929212369600572": {
+    "name": "generative-artworks-enchiridion",
+    "projectBotHandlers": {
+      "default": "101"
+    }
+  },
+  "888929231147499561": {
+    "name": "generative-artworks-empyrean",
+    "projectBotHandlers": {
+      "default": "33"
+    }
+  },
+  "934860865713360976": {
+    "name": "plottables-dandan-dca",
+    "projectBotHandlers": {
+      "default": "2-PLOTTABLES",
+      "stringTriggers": {
+        "2-PLOTTABLES": ["really random rock", "rocks", "rrr"]
+      }
+    }
+  },
+  "938856354242773072": {
+    "name": "plottables-joshua-schachter",
+    "projectBotHandlers": {
+      "default": "3-PLOTTABLES",
+      "stringTriggers": {
+        "3-PLOTTABLES": ["diatom"]
+      }
+    }
+  },
+  "939205416754217021": {
+    "name": "plottables-larswander",
+    "projectBotHandlers": {
+      "default": "4-PLOTTABLES",
+      "stringTriggers": {
+        "4-PLOTTABLES": ["lines walking", "lines"]
+      }
+    }
+  },
+  "941381112280805396": {
+    "name": "plottables-beervangeer",
+    "projectBotHandlers": {
+      "default": "5-PLOTTABLES",
+      "stringTriggers": {
+        "5-PLOTTABLES": ["coalescence"]
+      }
+    }
+  },
+  "945430500082851861": {
+    "name": "plottables-greweb",
+    "projectBotHandlers": {
+      "default": "6-PLOTTABLES",
+      "stringTriggers": {
+        "6-PLOTTABLES": ["shattered"]
+      }
+    }
+  },
+  "948246487299661824": {
+    "name": "plottables-oppos",
+    "projectBotHandlers": {
+      "default": "8-PLOTTABLES",
+      "stringTriggers": {
+        "8-PLOTTABLES": ["spectral"]
+      }
+    }
+  },
+  "1037778085375905812": {
+    "name": "stevie-p-sales"
+  },
+  "1037834993004720158": {
+    "name": "stevie-p-listings"
+  },
+  "1061341199841099777": {
+    "name": "ixnayokay-sales"
+  },
+  "1077311249701945504": {
+    "name": "owmo-sales"
+  },
+  "1161769999141187614": {
+    "name": "artbot-test-channel"
+  },
   "793390526765465600": {
     "name": "hideki-tsukamoto",
     "projectBotHandlers": {
@@ -742,203 +940,10 @@
       }
     }
   },
-  "888929189862977646": {
-    "name": "generative-artworks-democracity",
+  "1174461621985345606": {
+    "name": "olga-fradina",
     "projectBotHandlers": {
-      "default": "162"
+      "default": "483"
     }
-  },
-  "888929212369600572": {
-    "name": "generative-artworks-enchiridion",
-    "projectBotHandlers": {
-      "default": "101"
-    }
-  },
-  "888929231147499561": {
-    "name": "generative-artworks-empyrean",
-    "projectBotHandlers": {
-      "default": "33"
-    }
-  },
-
-  "822563871473795073": {
-    "name": "factory-projects"
-  },
-  "880468116226850866": {
-    "name": "ab-art-chat"
-  },
-  "859521842317754369": {
-    "name": "prod_all_activity"
-  },
-  "411959613370400780": {
-    "name": "general"
-  },
-  "815980444905373786": {
-    "name": "help"
-  },
-  "859312767105105941": {
-    "name": "sales-feed"
-  },
-  "830924481627291709": {
-    "name": "block-talk"
-  },
-  "862722281503326288": {
-    "name": "marfa"
-  },
-  "976944919757348965": {
-    "name": "engine-chat"
-  },
-  "983836283954667530": {
-    "name": "art-blocks-x-pace"
-  },
-  "1067538362275201045": {
-    "name": "art-blocks-x-bright-moments"
-  },
-  "830940204441272369": {
-    "name": "listing-feed"
-  },
-  "859316381517348874": {
-    "name": "squiggle-listings"
-  },
-  "874066035618250752": {
-    "name": "trade-swaps"
-  },
-  "782644400084877315": {
-    "name": "for-sale-listings"
-  },
-  "782311037172973618": {
-    "name": "artblocks-mints"
-  },
-  "1039653873066979410": {
-    "name": "explorations-mints"
-  },
-  "1039653771862610001": {
-    "name": "explorations-sales"
-  },
-  "1039653937810255872": {
-    "name": "explorations-listings"
-  },
-  "1014641051140624445": {
-    "name": "engine-mints"
-  },
-  "1039654066122399785": {
-    "name": "engine-sales"
-  },
-  "1039654132279156826": {
-    "name": "engine-listings"
-  },
-  "935377049089097758": {
-    "name": "plottables-mints"
-  },
-  "907425636455444520": {
-    "name": "plottables-sales"
-  },
-  "907425686531227678": {
-    "name": "plottables-listings"
-  },
-  "1062938848105078824": {
-    "name": "flutter-sales"
-  },
-  "987113563753701459": {
-    "name": "tender-sales"
-  },
-  "1076664032146235432": {
-    "name": "hodlers-mints"
-  },
-  "1074004089551196180": {
-    "name": "hodlers-sales"
-  },
-  "1050375648323051650": {
-    "name": "hodlers-listings"
-  },
-  "1109104401135718460": {
-    "name": "rozendaal-mints"
-  },
-  "919937880288284722": {
-    "name": "plottables-numbersinmotion",
-    "projectBotHandlers": {
-      "default": "0-PLOTTABLES",
-      "stringTriggers": {
-        "0-PLOTTABLES": ["streamlines"]
-      }
-    }
-  },
-  "919937961632600064": {
-    "name": "plottables-generative-artworks",
-    "projectBotHandlers": {
-      "default": "1-PLOTTABLES",
-      "stringTriggers": {
-        "1-PLOTTABLES": ["implosion"]
-      }
-    }
-  },
-  "934860865713360976": {
-    "name": "plottables-dandan-dca",
-    "projectBotHandlers": {
-      "default": "2-PLOTTABLES",
-      "stringTriggers": {
-        "2-PLOTTABLES": ["really random rock", "rocks", "rrr"]
-      }
-    }
-  },
-  "938856354242773072": {
-    "name": "plottables-joshua-schachter",
-    "projectBotHandlers": {
-      "default": "3-PLOTTABLES",
-      "stringTriggers": {
-        "3-PLOTTABLES": ["diatom"]
-      }
-    }
-  },
-  "939205416754217021": {
-    "name": "plottables-larswander",
-    "projectBotHandlers": {
-      "default": "4-PLOTTABLES",
-      "stringTriggers": {
-        "4-PLOTTABLES": ["lines walking", "lines"]
-      }
-    }
-  },
-  "941381112280805396": {
-    "name": "plottables-beervangeer",
-    "projectBotHandlers": {
-      "default": "5-PLOTTABLES",
-      "stringTriggers": {
-        "5-PLOTTABLES": ["coalescence"]
-      }
-    }
-  },
-  "945430500082851861": {
-    "name": "plottables-greweb",
-    "projectBotHandlers": {
-      "default": "6-PLOTTABLES",
-      "stringTriggers": {
-        "6-PLOTTABLES": ["shattered"]
-      }
-    }
-  },
-  "948246487299661824": {
-    "name": "plottables-oppos",
-    "projectBotHandlers": {
-      "default": "8-PLOTTABLES",
-      "stringTriggers": {
-        "8-PLOTTABLES": ["spectral"]
-      }
-    }
-  },
-  "1037778085375905812": {
-    "name": "stevie-p-sales"
-  },
-  "1037834993004720158": {
-    "name": "stevie-p-listings"
-  },
-  "1061341199841099777": {
-    "name": "ixnayokay-sales"
-  },
-  "1077311249701945504": {
-    "name": "owmo-sales"
-  },
-  "1161769999141187614": {
-    "name": "artbot-test-channel"
   }
 }
