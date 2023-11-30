@@ -27,6 +27,7 @@ import { ProjectConfig } from '../ProjectConfig/projectConfig'
 import { ProjectHandlerHelper } from './ProjectHandlerHelper'
 import { UpcomingProjectDetailFragment } from '../../generated/graphql'
 import { getDayName, getMonthName, getDayOfMonth } from '../Utils/common'
+import { randomColor } from '../Utils/smartBotResponse'
 
 const ONE_MILLION = 1e6
 
@@ -349,7 +350,8 @@ export class ProjectBot {
         What are your favorite outputs from ${this.projectName}?
 
         [Explore the full project here](${
-          artBlocksData.external_url + PROJECTBOT_UTM
+          getProjectUrl(this.coreContract, this.projectNumber.toString()) +
+          PROJECTBOT_UTM
         })
         `
         )
@@ -472,5 +474,60 @@ export class ProjectBot {
     }
 
     msg.channel.send({ embeds: [embedContent] })
+  }
+
+  async sendSpecialMessage(channel: TextChannel) {
+    try {
+      const invocation = Math.floor(Math.random() * this.editionSize)
+      const artBlocksResponse = await axios.get(
+        getTokenApiUrl(
+          this.coreContract,
+          `${this.projectNumber * ONE_MILLION + invocation}`
+        )
+      )
+      const artBlocksData = await artBlocksResponse.data
+      let assetUrl = artBlocksData?.preview_asset_url
+      if (
+        !artBlocksData ||
+        !assetUrl ||
+        !artBlocksData.collection_name ||
+        !artBlocksData.artist
+      ) {
+        return
+      }
+      const title = `:tada:  Celebrating ${artBlocksData.collection_name}!  :tada:`
+
+      assetUrl = await replaceVideoWithGIF(assetUrl)
+
+      const embedContent = new EmbedBuilder()
+        .setColor(randomColor())
+        .setTitle(title)
+        .setImage(assetUrl)
+        .setDescription(
+          `${this.projectName} is project #${
+            this.projectNumber
+          } and was released on ${this.startTime?.toLocaleDateString()}! 
+        
+        What are your favorite outputs from ${this.projectName}?
+
+        [Explore the full project here](${
+          getProjectUrl(this.coreContract, this.projectNumber.toString()) +
+          PROJECTBOT_UTM
+        })
+        `
+        )
+        .setFooter({
+          text: artBlocksData.name,
+        })
+
+      channel?.send({ embeds: [embedContent] })
+    } catch (err) {
+      console.error(
+        'Error sending birthday message for:',
+        this.projectName,
+        err
+      )
+    }
+    return
   }
 }
