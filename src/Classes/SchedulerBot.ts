@@ -59,10 +59,8 @@ export class ScheduleBot {
         }
         console.log('Spam Time!')
         const now = new Date()
-        const n = new Date(now.getTime() + 1000 * 60 * 60 * 25)
         const startDate = new Date('2023-12-01T17:00:00.000Z') // 12pm ET 12/1/23
-        if (n > startDate) {
-          // TODO: replace with now
+        if (now > startDate) {
           const currProject = artIndexerBot.tempFlagshipMapping[currProjectId]
           if (!currProject || currProject.editionSize === 0) {
             currProjectId++
