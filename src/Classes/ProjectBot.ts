@@ -504,8 +504,8 @@ export class ProjectBot {
         .setTitle(title)
         .setImage(assetUrl)
         .setDescription(
-          `Project #${this.projectNumber} - **${
-            this.projectName
+          `Project #${this.projectNumber} - **${this.projectName} by ${
+            this.artistName
           }** was released on ${this.startTime?.toLocaleString('en-US', {
             day: 'numeric',
             month: 'long',
