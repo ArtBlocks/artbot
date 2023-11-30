@@ -65,6 +65,7 @@ export class ScheduleBot {
           // TODO: replace with now
           const currProject = artIndexerBot.tempFlagshipMapping[currProjectId]
           if (!currProject || currProject.editionSize === 0) {
+            currProjectId++
             return
           }
           console.log(

@@ -495,7 +495,7 @@ export class ProjectBot {
       ) {
         return
       }
-      const title = `:tada:  Celebrating ${artBlocksData.collection_name}!  :tada:`
+      const title = `:tada:  Block Friday - Celebrating 3 Years of Art Blocks!  :tada:`
 
       assetUrl = await replaceVideoWithGIF(assetUrl)
 
@@ -504,11 +504,13 @@ export class ProjectBot {
         .setTitle(title)
         .setImage(assetUrl)
         .setDescription(
-          `${this.projectName} is project #${
-            this.projectNumber
-          } and was released on ${this.startTime?.toLocaleDateString()}! 
-        
-        What are your favorite outputs from ${this.projectName}?
+          `Project #${this.projectNumber} - **${
+            this.projectName
+          }** was released on ${this.startTime?.toLocaleString('en-US', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })}! 
 
         [Explore the full project here](${
           getProjectUrl(this.coreContract, this.projectNumber.toString()) +
