@@ -50,7 +50,7 @@ export class ScheduleBot {
 
     let currProjectId = parseInt(process.env.SPAM_START_INDEX ?? '0')
     Cron(
-      '* * * * *',
+      '*/3 * * * *',
       { timezone: 'America/New_York', name: 'Bday Spam' },
       () => {
         if (currProjectId === -1) {
