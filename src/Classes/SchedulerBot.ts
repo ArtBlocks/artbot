@@ -1,3 +1,5 @@
+import * as dotenv from 'dotenv'
+dotenv.config()
 import { Channel, Collection } from 'discord.js'
 import { ProjectConfig } from '../ProjectConfig/projectConfig'
 import { artIndexerBot } from '..'

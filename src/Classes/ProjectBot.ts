@@ -349,7 +349,8 @@ export class ProjectBot {
         What are your favorite outputs from ${this.projectName}?
 
         [Explore the full project here](${
-          artBlocksData.external_url + PROJECTBOT_UTM
+          getProjectUrl(this.coreContract, this.projectNumber.toString()) +
+          PROJECTBOT_UTM
         })
         `
         )
