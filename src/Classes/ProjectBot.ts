@@ -238,13 +238,13 @@ export class ProjectBot {
       )
       return
     }
-    const tokenUrl = getTokenUrl(
-      tokenMetadata.contract?.token_base_url
-        ? `${tokenMetadata.contract?.token_base_url}/${tokenID}`
-        : '',
-      this.coreContract,
-      tokenID
-    )
+    let external_url = tokenMetadata.contract?.token_base_url
+      ? `${tokenMetadata.contract?.token_base_url}/${tokenID}`
+      : ''
+    if (tokenMetadata.contract?.name === 'Art Blocks x Pace') {
+      external_url = ''
+    }
+    const tokenUrl = getTokenUrl(external_url, this.coreContract, tokenID)
     const titleLink = tokenUrl + PROJECTBOT_UTM
 
     let title = `${tokenMetadata.project.name} #${tokenMetadata.invocation} - ${tokenMetadata.project.artist_name}`
@@ -349,7 +349,8 @@ export class ProjectBot {
         What are your favorite outputs from ${this.projectName}?
 
         [Explore the full project here](${
-          artBlocksData.external_url + PROJECTBOT_UTM
+          getProjectUrl(this.coreContract, this.projectNumber.toString()) +
+          PROJECTBOT_UTM
         })
         `
         )
