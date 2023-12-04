@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
-import { Channel, Collection, TextChannel } from 'discord.js'
+import { Channel, Collection } from 'discord.js'
 import { ProjectConfig } from '../ProjectConfig/projectConfig'
-import { artIndexerBot, projectConfig } from '..'
+import { artIndexerBot } from '..'
 import { delay } from './APIBots/utils'
 
 import { Cron } from 'croner'
@@ -47,36 +47,5 @@ export class ScheduleBot {
     //   console.log('Trivia Time!')
     //   artIndexerBot.askRandomTriviaQuestion()
     // })
-
-    let currProjectId = parseInt(process.env.SPAM_START_INDEX ?? '0')
-    Cron(
-      '*/3 * * * *',
-      { timezone: 'America/New_York', name: 'Bday Spam' },
-      () => {
-        if (currProjectId === -1) {
-          console.log('Spamming disabled')
-          return
-        }
-        console.log('Spam Time!')
-        const now = new Date()
-        const startDate = new Date('2023-12-01T17:00:00.000Z') // 12pm ET 12/1/23
-        if (now > startDate) {
-          const currProject = artIndexerBot.tempFlagshipMapping[currProjectId]
-          if (!currProject || currProject.editionSize === 0) {
-            currProjectId++
-            return
-          }
-          console.log(
-            'Spamming! ' + currProject.projectName + ' ' + currProjectId
-          )
-          currProject.sendSpecialMessage(
-            this.channels.get(
-              projectConfig.chIdByName['block-talk']
-            ) as TextChannel
-          )
-          currProjectId++
-        }
-      }
-    )
   }
 }

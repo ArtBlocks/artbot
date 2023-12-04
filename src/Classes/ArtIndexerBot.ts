@@ -77,7 +77,6 @@ export class ArtIndexerBot {
 
   platforms: { [id: string]: ProjectBot[] } = {}
   flagship: { [id: string]: ProjectBot } = {}
-  tempFlagshipMapping: { [id: number]: ProjectBot } = {}
 
   constructor(projectFetch = getAllProjects) {
     this.projectFetch = projectFetch
@@ -202,12 +201,6 @@ export class ArtIndexerBot {
 
         if (project.is_artblocks) {
           this.flagship[projectKey] = newBot
-          if (
-            project.vertical.category_name !== 'collaborations' &&
-            project.vertical.category_name !== 'explorations'
-          ) {
-            this.tempFlagshipMapping[newBot.projectNumber] = newBot
-          }
           this.platforms['artblocks'] = this.platforms['artblocks'] ?? []
           this.platforms['artblocks'].push(newBot)
         } else {
