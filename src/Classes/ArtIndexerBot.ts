@@ -185,7 +185,7 @@ export class ArtIndexerBot {
           this.birthdays[bday] = this.birthdays[bday] ?? []
           this.birthdays[bday].push(newBot)
         }
-        const artistName = this.toProjectKey(
+        const artistName = this.cleanKey(
           project.artist_name ?? 'unknown artist'
         )
         this.artists[artistName] = this.artists[artistName] ?? []
@@ -204,7 +204,7 @@ export class ArtIndexerBot {
           this.platforms['artblocks'] = this.platforms['artblocks'] ?? []
           this.platforms['artblocks'].push(newBot)
         } else {
-          const platform = this.toProjectKey(
+          const platform = this.cleanKey(
             project.contract.name ?? 'Unknown contract'
           )
           this.platforms[platform] = this.platforms[platform] ?? []
@@ -218,7 +218,7 @@ export class ArtIndexerBot {
         const named_contracts = item.named_contracts
         const allPlatformProjects: ProjectBot[] = []
         named_contracts.forEach((named_contract) => {
-          const platformName = this.toProjectKey(named_contract)
+          const platformName = this.cleanKey(named_contract)
           if (this.platforms[platformName]) {
             allPlatformProjects.push(...this.platforms[platformName])
           }
@@ -438,16 +438,20 @@ export class ArtIndexerBot {
     return { projectBot, tokenId }
   }
 
-  toProjectKey(projectName: string) {
-    let projectKey = deburr(projectName)
+  cleanKey(key: string): string {
+    let projectKey = deburr(key)
       .toLowerCase()
       .replace(/[^a-z0-9]/gi, '')
 
     // just in case there's a project name with no alphanumerical characters
     if (projectKey === '') {
-      return deburr(projectName).toLowerCase().replace(/\s+/g, '')
+      projectKey = deburr(key).toLowerCase().replace(/\s+/g, '')
     }
+    return projectKey
+  }
 
+  toProjectKey(projectName: string) {
+    let projectKey = this.cleanKey(projectName)
     if (PROJECT_ALIASES[projectKey]) {
       projectKey = this.toProjectKey(PROJECT_ALIASES[projectKey])
     }
