@@ -112,8 +112,8 @@ export async function getOSName(address: string): Promise<string> {
       name = responseBody?.username ?? ''
       osAddressMap[address] = name
     } catch (err) {
-      name = ''
       // Probably rate limited - return empty sting but don't cache
+      name = ''
       console.log(err)
       console.log("Error getting user's OpenSea name")
     }
