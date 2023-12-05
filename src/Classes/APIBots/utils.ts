@@ -97,7 +97,7 @@ export async function getOSName(address: string): Promise<string> {
   } else {
     try {
       const response = await axios.get(
-        `https://api.opensea.io/user/${address}`,
+        `https://api.opensea.io/api/v2/accounts/${address}`,
         {
           headers: {
             Accept: 'application/json',
