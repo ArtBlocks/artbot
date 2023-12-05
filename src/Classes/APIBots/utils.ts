@@ -97,7 +97,7 @@ export async function getOSName(address: string): Promise<string> {
   } else {
     try {
       const response = await axios.get(
-        `https://api.opensea.io/user/${address}`,
+        `https://api.opensea.io/api/v2/accounts/${address}`,
         {
           headers: {
             Accept: 'application/json',
@@ -113,14 +113,9 @@ export async function getOSName(address: string): Promise<string> {
       osAddressMap[address] = name
     } catch (err) {
       name = ''
-      if (err.response?.status === 404) {
-        console.log('OpenSea user not found')
-        osAddressMap[address] = name
-      } else {
-        // Probably rate limited - return empty sting but don't cache
-        console.log(err)
-        console.log("Error getting user's OpenSea name")
-      }
+      // Probably rate limited - return empty sting but don't cache
+      console.log(err)
+      console.log("Error getting user's OpenSea name")
     }
   }
 
