@@ -212,8 +212,6 @@ export class ArtIndexerBot {
         }
       }
 
-      console.log('ArtIndexerBot: Building Contract Aliases')
-
       // Set up contract aliases
       CONTRACT_ALIASES.forEach((item) => {
         const aliases = item.aliases
