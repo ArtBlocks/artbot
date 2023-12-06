@@ -453,7 +453,7 @@ export class ArtIndexerBot {
   toProjectKey(projectName: string) {
     let projectKey = this.cleanKey(projectName)
     if (PROJECT_ALIASES[projectKey]) {
-      projectKey = this.toProjectKey(PROJECT_ALIASES[projectKey])
+      projectKey = this.cleanKey(PROJECT_ALIASES[projectKey])
     }
     return projectKey
   }
