@@ -653,7 +653,12 @@ export class ArtIndexerBot {
       const keys = Object.keys(this.flagship)
       const projectKey = keys[Math.floor(Math.random() * keys.length)]
       const projBot = this.flagship[projectKey]
-      if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
+      if (
+        projBot &&
+        projBot.editionSize > 1 &&
+        projBot.projectActive &&
+        !triviaBot.alreadyAsked(projBot)
+      ) {
         triviaBot.askTriviaQuestion(projBot)
         return
       }

@@ -16,6 +16,7 @@ export class TriviaBot {
   channel?: TextChannel
   previousQuestion?: Message
 
+  previousAnswers: string[] = []
   currentTriviaAnswer: string
   constructor(bot: Client) {
     this.bot = bot
@@ -44,9 +45,21 @@ export class TriviaBot {
   isArtistActiveTriviaAnswer(artist: string): boolean {
     return artist === this.currentTriviaAnswer
   }
+  alreadyAsked(projectBot: ProjectBot): boolean {
+    return (
+      this.previousAnswers.includes(projectBot.projectName) ||
+      this.previousAnswers.includes(projectBot.artistName)
+    )
+  }
 
   async askTriviaQuestion(project: ProjectBot) {
     // List of ideas:
+
+    // TODO: build out trivia hour functionality
+    // TODO: String replace project name in description with "______"
+    // TODO: "close one! not quite" on typo
+    // TODO: trivia info call (maybe restates last question too)
+
     // Phase 2:
     // TODO: Different triggers? Not just time based - number of sales, LJ cursing, thank grant, etc.
     // TODO: Trait data type questions? (e.g. "Name a project that has a trait of 'blue'"), Which of these is not a Meridian trait?
@@ -55,7 +68,9 @@ export class TriviaBot {
 
     if (this.currentTriviaAnswer && this.previousQuestion) {
       this.previousQuestion.reply(
-        'No one got this one! The answer was: ' + this.currentTriviaAnswer
+        `Looks like no one got this one! The answer was: ${this.currentTriviaAnswer}.
+
+Next question:`
       )
     }
 
@@ -96,6 +111,8 @@ export class TriviaBot {
       console.log('ERROR asking trivia question', err)
       return
     }
+
+    this.previousAnswers.push(this.currentTriviaAnswer)
 
     this.channel = this.bot.channels?.cache?.get(
       CHANNEL_BLOCK_TALK
