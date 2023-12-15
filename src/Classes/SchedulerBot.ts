@@ -42,10 +42,17 @@ export class ScheduleBot {
       }
     )
 
-    // TODO: Uncomment when trivia is ready
-    // Cron('* * * * *', { timezone: 'America/Chicago', name: 'Trivia' }, () => {
-    //   console.log('Trivia Time!')
-    //   artIndexerBot.askRandomTriviaQuestion()
-    // })
+    const triviaCadence = parseInt(process.env.TRIVIA_CADENCE ?? '0')
+
+    if (triviaCadence > 0) {
+      Cron(
+        `0 */${triviaCadence} * * *`,
+        { timezone: 'America/Chicago', name: 'Trivia' },
+        () => {
+          console.log('Trivia Time!')
+          artIndexerBot.askRandomTriviaQuestion()
+        }
+      )
+    }
   }
 }
