@@ -90,10 +90,12 @@ export class TwitterBot {
 
       const query = `(to:${ARTBOT_TWITTER_HANDLE} OR @${ARTBOT_TWITTER_HANDLE}) -is:retweet -has:links has:mentions -from:${STATUS_TWITTER_HANDLE} -from:${ARTBOT_TWITTER_HANDLE}`
       const devQuery = `to:ArtbotTesting from:ArtbotTesting`
+      console.log(this.lastTweetId)
       artbotTweets = await this.twitterClient.v2.search({
         query: prod ? query : devQuery,
         since_id: this.lastTweetId,
       })
+      console.log(artbotTweets)
     } catch (error) {
       if (
         error instanceof ApiResponseError &&
@@ -103,6 +105,16 @@ export class TwitterBot {
         console.log(
           `Search rate limit hit! Limit will reset at timestamp ${error.rateLimit.reset}`
         )
+      } else if (
+        error?.code === 400 &&
+        error.errors[0] &&
+        error.errors[0]?.message &&
+        error.errors[0]?.message.includes('since_id')
+      ) {
+        const messageSplit = error.errors[0]?.message.split(' ')
+        const lastId = messageSplit[messageSplit.length - 1]
+        console.log('TwitterBot since_id is invalid - setting to', lastId)
+        this.lastTweetId = lastId
       } else {
         console.error('Error searching Twitter:', error)
       }
