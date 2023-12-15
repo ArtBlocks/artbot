@@ -90,12 +90,10 @@ export class TwitterBot {
 
       const query = `(to:${ARTBOT_TWITTER_HANDLE} OR @${ARTBOT_TWITTER_HANDLE}) -is:retweet -has:links has:mentions -from:${STATUS_TWITTER_HANDLE} -from:${ARTBOT_TWITTER_HANDLE}`
       const devQuery = `to:ArtbotTesting from:ArtbotTesting`
-      console.log(this.lastTweetId)
       artbotTweets = await this.twitterClient.v2.search({
         query: prod ? query : devQuery,
         since_id: this.lastTweetId,
       })
-      console.log(artbotTweets)
     } catch (error) {
       if (
         error instanceof ApiResponseError &&
