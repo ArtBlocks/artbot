@@ -103,6 +103,16 @@ export class TwitterBot {
         console.log(
           `Search rate limit hit! Limit will reset at timestamp ${error.rateLimit.reset}`
         )
+      } else if (
+        error?.code === 400 &&
+        error.errors[0] &&
+        error.errors[0]?.message &&
+        error.errors[0]?.message.includes('since_id')
+      ) {
+        const messageSplit = error.errors[0]?.message.split(' ')
+        const lastId = messageSplit[messageSplit.length - 1]
+        console.log('TwitterBot since_id is invalid - setting to', lastId)
+        this.lastTweetId = lastId
       } else {
         console.error('Error searching Twitter:', error)
       }
