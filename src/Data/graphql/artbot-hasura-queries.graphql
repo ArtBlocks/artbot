@@ -41,7 +41,7 @@ fragment TokenDetail on tokens_metadata {
   owner {
     public_address
   }
-  isFlaggedAsSuspicious
+  is_flagged
 }
 
 fragment ProjectTokenDetail on tokens_metadata {
@@ -157,7 +157,7 @@ query getProjectFloor($id: String!) {
     tokens(limit: 3, order_by: { list_eth_price: asc }) {
       invocation
       list_eth_price
-      isFlaggedAsSuspicious
+      is_flagged
     }
   }
 }
