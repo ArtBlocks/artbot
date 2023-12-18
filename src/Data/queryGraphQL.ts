@@ -402,9 +402,7 @@ export async function getProjectFloor(projectId: string) {
     if (!data) {
       throw Error('No data returned from getProjectFloor Hasura query')
     }
-    return data.projects_metadata[0].tokens.find(
-      (token) => !token.isFlaggedAsSuspicious
-    )
+    return data.projects_metadata[0].tokens.find((token) => !token.is_flagged)
   } catch (err) {
     console.error(err)
     return undefined
