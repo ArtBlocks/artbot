@@ -48,7 +48,10 @@ export class ScheduleBot {
       Cron(
         `0 */${triviaCadence} * * *`,
         { timezone: 'America/Chicago', name: 'Trivia' },
-        () => {
+        async () => {
+          const wait = Math.random() * 1000 * 60 * 60 * triviaCadence
+          console.log(`Waiting ${wait / 60000} mins for trivia`)
+          await delay(wait)
           console.log('Trivia Time!')
           artIndexerBot.askRandomTriviaQuestion()
         }
