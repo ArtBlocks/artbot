@@ -139,9 +139,13 @@ Next question:`
       throw new Error("Can't ask trivia question - no OpenAI API key")
     }
 
-    const question = await this.model.call(
+    let question = await this.model.call(
       `Generate a short, cryptic, poetic, vague, difficult riddle that has the answer: "${project.projectName}". It is VERY important that you DO NOT include the answer in your response. The project description is: "${project.description}"`
     )
+
+    const regex = new RegExp(project.projectName, 'gi')
+    question = question.replaceAll(regex, '_____')
+
     embed.setDescription(question)
 
     return embed
