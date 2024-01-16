@@ -363,7 +363,8 @@
         "212": ["dive"],
         "260": ["non", "either", "non either", "noneither"],
         "292": ["corners"],
-        "336": ["polychrome music", "polychromemusic", "polychrome"]
+        "336": ["polychrome music", "polychromemusic", "polychrome"],
+        "490": ["twist"]
       }
     }
   },
