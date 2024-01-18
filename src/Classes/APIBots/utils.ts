@@ -28,7 +28,7 @@ const osAddressMap: { [id: string]: string } = {}
 const MAX_ENS_RETRIES = 3
 
 // UTM for links so we can track traffic that comes through Artbot
-const ARTBOT_UTM = 'utm_medium=artbot'
+const ARTBOT_UTM = 'utm_source=artbot'
 const DISCORD_UTM = `?utm_medium=discord&${ARTBOT_UTM}`
 const TWITTER_UTM = `?utm_medium=twitter&${ARTBOT_UTM}`
 export const LISTING_UTM = `${DISCORD_UTM}&utm_campaign=listing`
