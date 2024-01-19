@@ -52,10 +52,37 @@ export class ScheduleBot {
           const wait = Math.random() * 1000 * 60 * 60 * triviaCadence
           console.log(`Waiting ${wait / 60000} mins for trivia`)
           await delay(wait)
+
+          if (isTriviaBlackoutTime()) {
+            console.log('Skipping Trivia during blackout times :(')
+            return
+          }
+
           console.log('Trivia Time!')
           artIndexerBot.askRandomTriviaQuestion()
         }
       )
     }
   }
+}
+
+// Don't want to send trivia messages while flagship releases are happening
+// Current blackout times are: Monday 11-2pm CT, Wednesday 11-5pm CT
+const isTriviaBlackoutTime = () => {
+  const now = new Date()
+  const weekday = now.toLocaleString('en-US', {
+    timeZone: 'America/Chicago',
+    weekday: 'long',
+  })
+  const hourText = now.toLocaleString('en-US', {
+    timeZone: 'America/Chicago',
+    hour: 'numeric',
+    hour12: false,
+  })
+  const hour = parseInt(hourText)
+
+  return (
+    (weekday.includes('Monday') && hour > 11 && hour < 14) ||
+    (weekday.includes('Wednesday') && hour > 11 && hour < 17)
+  )
 }
