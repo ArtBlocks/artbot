@@ -258,7 +258,8 @@
         "94": ["portal"],
         "146": ["neighborhood"],
         "208": ["reflection"],
-        "370": ["rectangles", "rectangles (for herbert)"]
+        "370": ["rectangles", "rectangles (for herbert)"],
+        "7-AB_X_PACE_V3": ["schema"]
       }
     }
   },
@@ -963,6 +964,15 @@
     "name": "golan-levin",
     "projectBotHandlers": {
       "default": "487"
+    }
+  },
+  "1197598391803334758": {
+    "name": "tengil",
+    "projectBotHandlers": {
+      "default": "488",
+      "stringTriggers": {
+        "437": ["nara", "nära"]
+      }
     }
   }
 }

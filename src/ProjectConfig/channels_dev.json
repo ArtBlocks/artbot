@@ -13,7 +13,8 @@
         "22": ["eternal", "pump"],
         "2-PLOTTABLES": ["plottables"],
         "1-EXPLORATIONS": ["marfa yucca", "yucca"],
-        "0-AB_X_BM": ["metropolis", "metro"]
+        "0-AB_X_BM": ["metropolis", "metro"],
+        "7-AB_X_PACE_V3": ["schema"]
       },
       "tokenIdTriggers": [
         {
