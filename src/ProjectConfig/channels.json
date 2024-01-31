@@ -790,7 +790,10 @@
   "1020066672939380747": {
     "name": "kelly-milligan",
     "projectBotHandlers": {
-      "default": "364"
+      "default": "364",
+      "stringTriggers": {
+        "489": ["balance"]
+      }
     }
   },
   "1025075763541717023": {
