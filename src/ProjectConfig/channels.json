@@ -977,5 +977,11 @@
         "437": ["nara", "nära"]
       }
     }
+  },
+  "1202665522584621136": {
+    "name": "remnynt",
+    "projectBotHandlers": {
+      "default": "486"
+    }
   }
 }
