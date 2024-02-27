@@ -111,7 +111,7 @@ export class TwitterBot {
       ) {
         const messageSplit = error.errors[0]?.message.split(' ')
         const lastId = BigInt(messageSplit[messageSplit.length - 1])
-        const adjustedLastId = (lastId + BigInt(1000)).toString()
+        const adjustedLastId = (lastId + BigInt(100000000000)).toString()
         console.log(
           'TwitterBot since_id is invalid - setting to',
           adjustedLastId
