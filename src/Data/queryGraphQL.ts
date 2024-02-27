@@ -20,6 +20,8 @@ import {
   GetTokenDocument,
   GetNextUpcomingProjectDocument,
   UpcomingProjectDetailFragment,
+  GetProjectRandomOobDocument,
+  OobTokenDetailFragment,
 } from '../../generated/graphql'
 import { isArbitrumContract } from '../Classes/APIBots/utils'
 import { ARBITRUM_CONTRACTS, ENGINE_CONTRACTS } from '..'
@@ -487,4 +489,26 @@ export async function getArtblocksNextUpcomingProject(): Promise<UpcomingProject
   }
 
   return data.projects_metadata[0]
+}
+export async function getRandomOobForProject(
+  projectId: string
+): Promise<OobTokenDetailFragment> {
+  const seed = Math.random()
+  const { data } = await client
+    .query(GetProjectRandomOobDocument, {
+      project_id: projectId,
+      seed: seed,
+    })
+    .toPromise()
+
+  if (
+    !data ||
+    !data.projects_metadata.length ||
+    !data.projects_metadata?.[0].random_oob_token ||
+    !data.projects_metadata?.[0].random_oob_token?.[0]
+  ) {
+    throw Error('No data returned from GetProjectRandomOob Hasura query')
+  }
+
+  return data.projects_metadata[0].random_oob_token[0]
 }

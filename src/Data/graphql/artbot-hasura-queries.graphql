@@ -224,3 +224,15 @@ query GetNextUpcomingProject {
     ...UpcomingProjectDetail
   }
 }
+
+fragment OobTokenDetail on oob_tokens_metadata {
+  media_url
+  live_view_url
+}
+query GetProjectRandomOOB($project_id: String!, $seed: float8!) {
+  projects_metadata(where: { id: { _eq: $project_id } }) {
+    random_oob_token(args: { seed: $seed }) {
+      ...OobTokenDetail
+    }
+  }
+}
