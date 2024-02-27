@@ -110,9 +110,13 @@ export class TwitterBot {
         error.errors[0]?.message.includes('since_id')
       ) {
         const messageSplit = error.errors[0]?.message.split(' ')
-        const lastId = messageSplit[messageSplit.length - 1]
-        console.log('TwitterBot since_id is invalid - setting to', lastId)
-        this.lastTweetId = lastId
+        const lastId = BigInt(messageSplit[messageSplit.length - 1])
+        const adjustedLastId = (lastId + BigInt(1000)).toString()
+        console.log(
+          'TwitterBot since_id is invalid - setting to',
+          adjustedLastId
+        )
+        this.lastTweetId = adjustedLastId
       } else {
         console.error('Error searching Twitter:', error)
       }
