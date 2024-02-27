@@ -8,6 +8,7 @@ import {
 } from 'discord.js'
 import {
   PROJECTBOT_BUY_UTM,
+  PROJECTBOT_EXPLORE_UTM,
   PROJECTBOT_UTM,
   ethFromWeiString,
   getProjectUrl,
@@ -20,6 +21,7 @@ import { ensOrAddress, replaceVideoWithGIF } from './APIBots/utils'
 import {
   getProjectFloor,
   getProjectInvocations,
+  getRandomOobForProject,
   getToken,
 } from '../Data/queryGraphQL'
 import { triviaBot } from '..'
@@ -152,6 +154,24 @@ export class ProjectBot {
         )
         return
       }
+    }
+
+    if (content.toLowerCase().includes('#explore')) {
+      if (this.editionSize === this.maxEditionSize) {
+        msg.channel.send(
+          `Sorry, explore functionality for ${this.projectName} is disabled as the project is fully minted.`
+        )
+      } else {
+        try {
+          this.sendRandomOob(msg)
+        } catch (e) {
+          console.error('Error sending random OOB:', e)
+          msg.channel.send(
+            `Huh, looks like there was an error getting a random sample from ${this.projectName}. Try again in a bit!`
+          )
+        }
+      }
+      return
     }
 
     // decode any mappings
@@ -471,6 +491,51 @@ export class ProjectBot {
         inline: true,
       })
     }
+
+    msg.channel.send({ embeds: [embedContent] })
+  }
+
+  async sendRandomOob(msg: Message) {
+    const projectUrl = getProjectUrl(
+      this.coreContract,
+      this.projectNumber.toString()
+    )
+    const titleLink = projectUrl + PROJECTBOT_EXPLORE_UTM
+    const title = `${this.projectName} by ${this.artistName}`
+
+    const oobToken = await getRandomOobForProject(this.id)
+
+    const assetUrl = oobToken.media_url ?? ''
+
+    const embedContent = new EmbedBuilder()
+      // Set the title of the field.
+      .setTitle(title)
+      // Add link to title.
+      .setURL(titleLink)
+      // Set the full image for embed.
+      .setImage(assetUrl)
+
+    const now = new Date()
+    if (this.startTime && now < this.startTime) {
+      embedContent.addFields({
+        name: 'Release Date',
+        value: `<t:${this.startTime?.getTime() / 1000}:F>`,
+      })
+    }
+    console.log(assetUrl)
+    embedContent.addFields({
+      name: 'Project Explorer',
+      value: `[Create more samples](${
+        projectUrl + '?section=explorer' + PROJECTBOT_EXPLORE_UTM
+      })`,
+      inline: true,
+    })
+
+    embedContent.addFields({
+      name: 'Live Script',
+      value: `[Generator](${oobToken.live_view_url + PROJECTBOT_EXPLORE_UTM})`,
+      inline: true,
+    })
 
     msg.channel.send({ embeds: [embedContent] })
   }
