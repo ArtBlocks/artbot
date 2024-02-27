@@ -525,6 +525,9 @@ export async function smartBotResponse(
   if (msgContentLowercase.includes('leaderboard')) {
     triviaBot.leaderboard(msg)
   }
+  if (msgContentLowercase.includes('question')) {
+    triviaBot.resurfaceQuestion(msg)
+  }
 
   if (msgContentLowercase.includes('named')) {
     const projects = artIndexerBot.getProjectsWithNamedMappings()

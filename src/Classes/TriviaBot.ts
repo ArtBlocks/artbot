@@ -15,6 +15,7 @@ export class TriviaBot {
   model?: OpenAIChat
   channel?: TextChannel
   previousQuestion?: Message
+  previousQuestionEmbed?: EmbedBuilder
 
   previousAnswers: string[] = []
   currentTriviaAnswer: string
@@ -56,9 +57,7 @@ export class TriviaBot {
     // List of ideas:
 
     // TODO: build out trivia hour functionality
-    // TODO: String replace project name in description with "______"
     // TODO: "close one! not quite" on typo
-    // TODO: trivia info call (maybe restates last question too)
 
     // Phase 2:
     // TODO: Different triggers? Not just time based - number of sales, LJ cursing, thank grant, etc.
@@ -117,6 +116,7 @@ Next question:`
     this.channel = this.bot.channels?.cache?.get(
       CHANNEL_BLOCK_TALK
     ) as TextChannel
+    this.previousQuestionEmbed = embed
     this.previousQuestion =
       (await this.channel
         .send({
@@ -232,6 +232,8 @@ Next question:`
       msg.reply(
         congratsOptions[Math.floor(Math.random() * congratsOptions.length)]
       )
+      this.previousQuestionEmbed = undefined
+      this.previousQuestion = undefined
     } catch (err) {
       console.log('ERROR tallying', err)
       msg.reply('Oh no, looks like there was an unexpected error!')
@@ -286,5 +288,19 @@ Next question:`
           .setDescription(leaderboardString),
       ],
     })
+  }
+
+  async resurfaceQuestion(msg: Message) {
+    if (this.previousQuestionEmbed) {
+      msg.reply({
+        content:
+          'In case you missed it, here is the active trivia question everyone is furiously guessing:',
+        embeds: [this.previousQuestionEmbed],
+      })
+      return
+    }
+    msg.reply(
+      'There is no active trivia question - come back in a little while'
+    )
   }
 }
