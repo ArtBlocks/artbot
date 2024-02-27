@@ -514,6 +514,9 @@ export class ProjectBot {
       .setURL(titleLink)
       // Set the full image for embed.
       .setImage(assetUrl)
+      .setFooter({
+        text: 'Algorithmic sample',
+      })
 
     const now = new Date()
     if (this.startTime && now < this.startTime) {
