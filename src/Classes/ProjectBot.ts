@@ -525,11 +525,13 @@ export class ProjectBot {
         value: `<t:${this.startTime?.getTime() / 1000}:F>`,
       })
     }
-    console.log(assetUrl)
+
     embedContent.addFields({
       name: 'Project Explorer',
-      value: `[Create more samples](${
-        projectUrl + '?section=explorer' + PROJECTBOT_EXPLORE_UTM
+      value: `[Explore possibilities](${
+        projectUrl +
+        '?section=explorer' +
+        PROJECTBOT_EXPLORE_UTM.replace('?', '&')
       })`,
       inline: true,
     })
