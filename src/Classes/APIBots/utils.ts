@@ -36,6 +36,7 @@ export const SALE_UTM = `${DISCORD_UTM}&utm_campaign=sale`
 export const MINT_UTM = `${DISCORD_UTM}&utm_campaign=mint`
 export const PROJECTBOT_UTM = `${DISCORD_UTM}&utm_campaign=projectbot`
 export const PROJECTBOT_BUY_UTM = `${DISCORD_UTM}&utm_campaign=projectbot_buy`
+export const PROJECTBOT_EXPLORE_UTM = `${DISCORD_UTM}&utm_campaign=projectbot_explore`
 export const TWITTER_PROJECTBOT_UTM = `${TWITTER_UTM}&utm_campaign=projectbot`
 
 async function getENSName(address: string): Promise<string> {

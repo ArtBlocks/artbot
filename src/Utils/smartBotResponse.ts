@@ -224,6 +224,7 @@ const HASHTAG_MESSAGE = new EmbedBuilder()
     `\`#?\` = Random project, random token
     \`#? [project name]\` = Random token from project
     \`#[token number] [project name]\` = Specific token from project
+    \`#explore [project name]\` = Out of bounds sample from upcoming/open project
     \`#? [artist name]\` = Random token from artist
     \`#? [vertical]\` = Random token from vertical (e.g. Curated, Explorations, Presents, Engine, Collaborations, etc)
     \`#? [tag]\` = Random token from tag (e.g. Audio, Interactive, Animated, etc)
@@ -524,6 +525,9 @@ export async function smartBotResponse(
   }
   if (msgContentLowercase.includes('leaderboard')) {
     triviaBot.leaderboard(msg)
+  }
+  if (msgContentLowercase.includes('question')) {
+    triviaBot.resurfaceQuestion(msg)
   }
 
   if (msgContentLowercase.includes('named')) {
