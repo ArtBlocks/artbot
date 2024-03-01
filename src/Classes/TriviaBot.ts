@@ -62,6 +62,12 @@ export class TriviaBot {
 
     // TODO: build out trivia hour functionality
     // TODO: "close one! not quite" on typo
+    // Multiple winners?
+    // Timeout questions?
+    // Block talk history questions?
+    // Questions about artist history? - scrape artist history / spectrum and give to GPT
+    // Multiple choice with emoji reactions?
+    // Monthly guest host? Facetime with artist/prominent community
 
     // Phase 2:
     // TODO: Different triggers? Not just time based - number of sales, LJ cursing, thank grant, etc.
