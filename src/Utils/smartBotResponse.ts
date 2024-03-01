@@ -355,6 +355,7 @@ export async function smartBotResponse(
       msgContentLowercase.includes('obrigada') || // portugese
       msgContentLowercase.includes('dziekuje') || // polish
       msgContentLowercase.includes('tack') || // swedish
+      msgContentLowercase.includes('tak') || // danish
       msgContentLowercase.includes('cheers') || // australian
       msgContentLowercase.includes('efcharistó') || // greek
       msgContentLowercase.includes('dyakuyu tobi') || // ukrainian
