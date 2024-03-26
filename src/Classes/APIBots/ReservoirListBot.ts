@@ -202,7 +202,7 @@ export class ReservoirListBot extends APIPollBot {
 
     embed.setTitle(title)
     if (platformUrl) {
-      embed.setURL(platformUrl)
+      embed.setURL(platformUrl + LISTING_UTM)
     }
     if (artBlocksData.collection_name) {
       console.log(artBlocksData.name + ' LIST')
