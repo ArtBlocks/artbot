@@ -68,7 +68,7 @@ The core engine of Artbot is built around the discord.js package. It serves seve
 
 #### Bot ID
 
-A bot ID consists of a project ID and contract name concatinated via a `-`. This is used in the config files to identify which bot should be used where or which bot you're configuring. For Art Blocks projects the contract name is optional and as such the `-` is not required.
+A bot ID consists of a project ID and contract name concatenated via a `-`. This is used in the config files to identify which bot should be used where or which bot you're configuring. For Art Blocks projects the contract name is optional and as such the `-` is not required.
 
 An example of a simple bot ID would be `0` for Chromie Squiggles or `0-DOODLE` for The Family Mooks. Contract names are defined in `partnerContracts.json`.
 
