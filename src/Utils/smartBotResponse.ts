@@ -4,14 +4,6 @@ import { artIndexerBot, projectConfig, triviaBot } from '..'
 dotenv.config()
 const fetch = require('node-fetch')
 
-// Discord channel IDs.
-const CHANNEL_HELP: string = projectConfig.chIdByName['help']
-const CHANNEL_SNOWFRO: string = projectConfig.chIdByName['snowfro']
-
-const CHANNEL_FOR_SALE_LISTINGS: string =
-  projectConfig.chIdByName['for-sale-listings']
-const CHANNEL_TRADE_SWAPS: string = projectConfig.chIdByName['trade-swaps']
-const CHANNEL_BLOCK_TALK: string = projectConfig.chIdByName['block-talk']
 const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
 
 // ArtBot details..
@@ -298,6 +290,14 @@ export async function smartBotResponse(
     return null
   }
 
+  const CHANNEL_HELP: string = projectConfig.chIdByName['help']
+  const CHANNEL_SNOWFRO: string = projectConfig.chIdByName['snowfro']
+
+  const CHANNEL_FOR_SALE_LISTINGS: string =
+    projectConfig.chIdByName['for-sale-listings']
+  const CHANNEL_TRADE_SWAPS: string = projectConfig.chIdByName['trade-swaps']
+  const CHANNEL_BLOCK_TALK: string = projectConfig.chIdByName['block-talk']
+
   if (msgContentLowercase === 'gm') {
     const reactionEmoji = msg.guild?.emojis.cache.find(
       (emoji) => emoji.name === 'gmsquig'
@@ -525,8 +525,17 @@ export async function smartBotResponse(
     return HASHTAG_MESSAGE
   }
   if (msgContentLowercase.includes('leaderboard')) {
-    triviaBot.leaderboard(msg)
+    if (
+      msgContentLowercase.includes('all-time') ||
+      msgContentLowercase.includes('alltime') ||
+      msgContentLowercase.includes('all time')
+    ) {
+      triviaBot.leaderboardAllTime(msg)
+    } else {
+      triviaBot.leaderboard(msg)
+    }
   }
+
   if (msgContentLowercase.includes('question')) {
     triviaBot.resurfaceQuestion(msg)
   }

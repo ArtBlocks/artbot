@@ -7,9 +7,11 @@ import { projectConfig } from '..'
 import { randomColor } from '../Utils/smartBotResponse'
 import axios from 'axios'
 import { getTokenApiUrl, replaceVideoWithGIF } from './APIBots/utils'
-import { getTriviaLeaderboard, updateTriviaScore } from '../Data/supabase'
+import { getAllTriviaScores, updateTriviaScore } from '../Data/supabase'
 
-const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
+// NOTE: if you change this, you'll need to manually update the supabase upsert query in updateTriviaScore
+export const CURRENT_SEASON = 'season_two'
+
 export class TriviaBot {
   bot: Client
   model?: OpenAIChat
@@ -54,10 +56,18 @@ export class TriviaBot {
   }
 
   async askTriviaQuestion(project: ProjectBot) {
+    const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
+
     // List of ideas:
 
     // TODO: build out trivia hour functionality
     // TODO: "close one! not quite" on typo
+    // Multiple winners?
+    // Timeout questions?
+    // Block talk history questions?
+    // Questions about artist history? - scrape artist history / spectrum and give to GPT
+    // Multiple choice with emoji reactions?
+    // Monthly guest host? Facetime with artist/prominent community
 
     // Phase 2:
     // TODO: Different triggers? Not just time based - number of sales, LJ cursing, thank grant, etc.
@@ -240,10 +250,10 @@ Next question:`
     }
   }
 
-  async leaderboard(msg: Message) {
-    let leaderboardData
+  async getLeaderboardData(column: string, msg: Message) {
+    let scoreData
     try {
-      leaderboardData = await getTriviaLeaderboard()
+      scoreData = await getAllTriviaScores()
     } catch (err) {
       console.log('ERROR getting leaderboard', err)
       msg.reply(
@@ -252,7 +262,16 @@ Next question:`
       return
     }
 
-    if (!leaderboardData?.length) {
+    if (!scoreData?.length) {
+      msg.reply(`Uh-oh, looks like there are no scores yet!`)
+      return
+    }
+
+    scoreData = scoreData.filter(
+      (score) => score[column] !== undefined && score[column] !== null
+    )
+
+    if (!scoreData.length) {
       msg.reply(`Uh-oh, looks like there are no scores yet!`)
       return
     }
@@ -272,18 +291,49 @@ Next question:`
       }
     }
 
-    for (let i = 0; i < leaderboardData?.length; i++) {
-      const user = leaderboardData[i].user
-      const score = leaderboardData[i].score
+    scoreData.sort((a, b) => b[column] - a[column])
+
+    const max = Math.min(10, scoreData.length)
+    for (let i = 0; i < max; i++) {
+      const user = scoreData[i].user
+      const score = scoreData[i][column]
       leaderboardString += `${i + 1}. ${getEmoji(
         i
       )} \`${user}\`  - **\`${score}\`** points \n`
     }
 
+    return leaderboardString
+  }
+
+  async leaderboard(msg: Message) {
+    const seasonCol = CURRENT_SEASON
+    const leaderboardString = await this.getLeaderboardData(seasonCol, msg)
+    if (!leaderboardString) {
+      return
+    }
+
+    const seasonTitle = seasonCol.replace('_', ' ').toUpperCase()
+
     msg.reply({
       embeds: [
         new EmbedBuilder()
-          .setTitle('Artbot Trivia Leaderboard')
+          .setTitle(`Artbot Trivia ${seasonTitle} Leaderboard`)
+          .setColor(randomColor())
+          .setDescription(leaderboardString),
+      ],
+    })
+  }
+
+  async leaderboardAllTime(msg: Message) {
+    const leaderboardString = await this.getLeaderboardData('score', msg)
+    if (!leaderboardString) {
+      return
+    }
+
+    msg.reply({
+      embeds: [
+        new EmbedBuilder()
+          .setTitle('Artbot Trivia All-Time Leaderboard')
           .setColor(randomColor())
           .setDescription(leaderboardString),
       ],
