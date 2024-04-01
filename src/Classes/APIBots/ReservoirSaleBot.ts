@@ -255,7 +255,7 @@ export class ReservoirSaleBot extends APIPollBot {
     // rather than token number as the title and URL field..
     embed.setTitle(title)
     if (platformUrl) {
-      embed.setURL(platformUrl)
+      embed.setURL(platformUrl + SALE_UTM)
     }
     if (artBlocksData.collection_name) {
       console.log(artBlocksData.name + ' SALE')
