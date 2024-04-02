@@ -21,6 +21,7 @@ const STEVIE_P_SALES = projectConfig.chIdByName['stevie-p-sales']
 const STEVIE_P_LISTINGS = projectConfig.chIdByName['stevie-p-listings']
 const IXNAYOKAY_SALES = projectConfig.chIdByName['ixnayokay-sales']
 const OWMO_SALES = projectConfig.chIdByName['owmo-sales']
+const JOSHBAGLEY_SALES = projectConfig.chIdByName['joshbagley-sales']
 
 // Engine Partner Servers
 const PLOTTABLES_SALES = projectConfig.chIdByName['plottables-sales']
@@ -169,6 +170,9 @@ export function sendEmbedToSaleChannels(
       artBlocksData.collection_name.includes('WaveShapes')
     ) {
       sendEmbedToChannel(bot, embed, OWMO_SALES)
+    }
+    if (artBlocksData.artist.includes('Joshua Bagley')) {
+      sendEmbedToChannel(bot, embed, JOSHBAGLEY_SALES)
     }
     if (artBlocksData.platform.includes('Plottables')) {
       sendEmbedToChannel(bot, embed, PLOTTABLES_SALES)
