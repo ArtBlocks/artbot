@@ -15,6 +15,7 @@ import {
   ensOrAddress,
   replaceVideoWithGIF,
   getTokenUrl,
+  isStudioContract,
 } from './utils'
 
 type ReservoirSale = {
@@ -227,6 +228,8 @@ export class ReservoirSaleBot extends APIPollBot {
       curationStatus = 'AB x Bright Moments'
     } else if (isExplorationsContract(sale.token.contract)) {
       curationStatus = 'Explorations'
+    } else if (isStudioContract(sale.token.contract)) {
+      curationStatus = 'Studio'
     } else if (isEngineContract(sale.token.contract)) {
       curationStatus = 'Engine'
       if (artBlocksData?.platform) {

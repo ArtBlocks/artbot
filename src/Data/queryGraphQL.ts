@@ -22,8 +22,12 @@ import {
   UpcomingProjectDetailFragment,
   GetProjectRandomOobDocument,
   OobTokenDetailFragment,
+  GetStudioContractsDocument,
 } from '../../generated/graphql'
-import { isArbitrumContract } from '../Classes/APIBots/utils'
+import {
+  isArbitrumContract,
+  waitForStudioContracts,
+} from '../Classes/APIBots/utils'
 import { ARBITRUM_CONTRACTS, ENGINE_CONTRACTS } from '..'
 
 dotenv.config()
@@ -137,11 +141,32 @@ export async function getArbitrumContracts() {
   }
 }
 
+export async function getStudioContracts() {
+  try {
+    const { data } = await client
+      .query(GetStudioContractsDocument, {})
+      .toPromise()
+
+    if (!data) {
+      throw Error('No data returned from getStudioContracts Hasura query')
+    }
+
+    const allContracts = data.contracts_metadata.map(({ address }) => address)
+
+    return allContracts
+  } catch (err) {
+    console.error(err)
+    return undefined
+  }
+}
+
 export async function getEngineContracts() {
+  const studioContracts = await waitForStudioContracts()
   const nonPBABContracts: string[] = Object.values(CORE_CONTRACTS)
     .concat(Object.values(COLLAB_CONTRACTS))
     .concat(Object.values(EXPLORATION_CONTRACTS))
     .concat(Object.values(BLOCKED_ENGINE_CONTRACTS))
+    .concat(studioContracts ?? [])
   try {
     const { data } = await client
       .query(GetEngineContractsDocument, {

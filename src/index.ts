@@ -4,6 +4,7 @@ import { Client, Events, GatewayIntentBits } from 'discord.js'
 const express = require('express')
 const bodyParser = require('body-parser')
 import { ProjectConfig } from './ProjectConfig/projectConfig'
+export let STUDIO_CONTRACTS: string[] = []
 export let ENGINE_CONTRACTS: string[] = []
 export let ARBITRUM_CONTRACTS: string[] = []
 export const projectConfig = new ProjectConfig()
@@ -18,9 +19,13 @@ import {
   getArtBlocksXPaceProjects,
   getEngineContracts,
   getEngineProjects,
+  getStudioContracts,
 } from './Data/queryGraphQL'
 import { TriviaBot } from './Classes/TriviaBot'
-import { waitForEngineContracts } from './Classes/APIBots/utils'
+import {
+  waitForEngineContracts,
+  waitForStudioContracts,
+} from './Classes/APIBots/utils'
 import { ScheduleBot } from './Classes/SchedulerBot'
 import { verifyTwitter } from './Utils/twitterUtils'
 
@@ -39,6 +44,9 @@ export const EXPLORATIONS_CONTRACTS: {
 export const COLLAB_CONTRACTS: {
   [id: string]: string
 } = require('./ProjectConfig/collaborationContracts.json')
+getStudioContracts().then((contracts) => {
+  STUDIO_CONTRACTS = contracts ?? []
+})
 getEngineContracts().then((contracts) => {
   ENGINE_CONTRACTS = contracts ?? []
 })
@@ -232,6 +240,7 @@ bot.on(Events.MessageCreate, async (msg) => {
 })
 
 const initReservoirBots = async () => {
+  const studioContracts = await waitForStudioContracts()
   const engineContracts = await waitForEngineContracts()
 
   const buildContractsString = (contracts: string[]): string => {
@@ -268,6 +277,7 @@ const initReservoirBots = async () => {
   const allContracts = Object.values(CORE_CONTRACTS)
     .concat(Object.values(COLLAB_CONTRACTS))
     .concat(Object.values(EXPLORATIONS_CONTRACTS))
+    .concat(studioContracts ?? [])
     .concat(engineContracts ?? [])
 
   const RESERVOIR_CONTRACT_LIMIT = 20

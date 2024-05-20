@@ -147,6 +147,7 @@ export function sendEmbedToSaleChannels(
         break
       case CollectionType.COLLAB:
       case CollectionType.CORE:
+      case CollectionType.STUDIO:
         sendEmbedToChannel(bot, embed, CHANNEL_SALES)
         sendEmbedToChannel(bot, embed, CHANNEL_SALES_CHAT)
         break
@@ -218,6 +219,7 @@ export function sendEmbedToListChannels(
         break
       case CollectionType.COLLAB:
       case CollectionType.CORE:
+      case CollectionType.STUDIO:
         sendEmbedToChannel(bot, embed, CHANNEL_LISTINGS)
         break
       default:

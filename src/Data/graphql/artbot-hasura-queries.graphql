@@ -236,3 +236,9 @@ query GetProjectRandomOOB($project_id: String!, $seed: float8!) {
     }
   }
 }
+
+query GetStudioContracts {
+  contracts_metadata(where: { default_vertical: { name: { _eq: studio } } }) {
+    ...ContractDetail
+  }
+}
