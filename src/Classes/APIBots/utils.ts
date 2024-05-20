@@ -4,6 +4,7 @@ import {
   ARBITRUM_CONTRACTS,
   COLLAB_CONTRACTS,
   ENGINE_CONTRACTS,
+  STUDIO_CONTRACTS,
 } from '../../index'
 import { CollectionType } from '../MintBot'
 import { AxiosError } from 'axios'
@@ -172,6 +173,10 @@ export function isExplorationsContract(contractAddress: string): boolean {
   )
 }
 
+export function isStudioContract(contractAddress: string): boolean {
+  return STUDIO_CONTRACTS.includes(contractAddress.toLowerCase())
+}
+
 export function isEngineContract(contractAddress: string): boolean {
   return ENGINE_CONTRACTS.includes(contractAddress.toLowerCase())
 }
@@ -199,6 +204,8 @@ export async function getCollectionType(
     return CollectionType.COLLAB
   } else if (isEngineContract(contractAddress)) {
     return CollectionType.ENGINE
+  } else if (isStudioContract(contractAddress)) {
+    return CollectionType.STUDIO
   }
 
   throw new Error('Unknown collection type')
@@ -270,6 +277,14 @@ export async function replaceVideoWithGIF(url: string) {
 }
 
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
+export const waitForStudioContracts = async (): Promise<string[]> => {
+  while (STUDIO_CONTRACTS.length === 0) {
+    console.log('Waiting for studio contracts to load...')
+    await delay(4000)
+  }
+  console.log('studio contracts loaded')
+  return STUDIO_CONTRACTS
+}
 export const waitForEngineContracts = async (): Promise<string[]> => {
   while (ENGINE_CONTRACTS.length === 0) {
     console.log('Waiting for engine contracts to load...')

@@ -8,6 +8,7 @@ import {
   getTokenUrl,
   replaceVideoWithGIF,
   waitForEngineContracts,
+  waitForStudioContracts,
 } from './APIBots/utils'
 import { ensOrAddress } from './APIBots/utils'
 import { TwitterBot } from './TwitterBot'
@@ -29,6 +30,7 @@ export enum CollectionType {
   COLLAB = 'COLLAB',
   ENGINE = 'ENGINE',
   STAGING = 'STAGING',
+  STUDIO = 'STUDIO',
 }
 
 // Handles all logic and posting of new project mints!
@@ -77,6 +79,7 @@ export class MintBot {
   async buildContractToChannel() {
     const contractToChannel: { [id: string]: string[] } = {}
     const engineContracts = await waitForEngineContracts()
+    const studioContracts = await waitForStudioContracts()
     Object.entries(MINT_CONFIG).forEach(([mintType, channels]) => {
       let contracts: string[] = []
       switch (mintType) {
@@ -91,6 +94,9 @@ export class MintBot {
           break
         case CollectionType.ENGINE:
           contracts = engineContracts ?? []
+          break
+        case CollectionType.STUDIO:
+          contracts = studioContracts ?? []
           break
         case CollectionType.STAGING:
           contracts = Object.values(STAGING_CONTRACTS)
