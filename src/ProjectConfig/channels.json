@@ -994,28 +994,33 @@
     }
   },
   
-    "947051892834443347": {
-    "name": "phenomena-general",
-    "projectBotHandlers": {
-      "default": "472",
-      "stringTriggers": {
-      "291": ["apex", "apx"],
-      "413": ["longing", "lng"]
-      },
+"947051892834443347": {
+  "name": "phenomena-general",
+  "projectBotHandlers": {
+  "default": "472",
+  "stringTriggers": {
+  "291": ["apex", "apx"],
+  "413": ["longing", "lng"]
+    }
+  }
+},
       
-    "1011909976178044969": {
-    "name": "phenomena-longing",
-    "projectBotHandlers": {
-      "default": "472",
-      "stringTriggers": {
-      "413": ["longing", "lng"]
-      },
+"1011909976178044969": {
+"name": "phenomena-longing",
+"projectBotHandlers": {
+  "default": "472",
+  "stringTriggers": {
+  "413": ["longing", "lng"]
+  }
+ }
+},
 
-    "958643782725799988": {
-    "name": "phenomena-apex",
-    "projectBotHandlers": {
-      "default": "472",
-      "stringTriggers": {
-      "291": ["apex", "apx"],
-      },
+"958643782725799988": {
+"name": "phenomena-apex",
+"projectBotHandlers": {
+"default": "472",
+"stringTriggers": {
+"291": ["apex", "apx"],
+  }
+ }
 }
