@@ -20,6 +20,8 @@ const CHANNEL_SQUIGGLE_LISTINGS = projectConfig.chIdByName['squiggle-listings']
 const STEVIE_P_SALES = projectConfig.chIdByName['stevie-p-sales']
 const STEVIE_P_LISTINGS = projectConfig.chIdByName['stevie-p-listings']
 const IXNAYOKAY_SALES = projectConfig.chIdByName['ixnayokay-sales']
+const EDG_SALES = projectConfig.chIdByName['edg-sales']
+const EDG_LISTINGS = projectConfig.chIdByName['edg-listings']
 const OWMO_SALES = projectConfig.chIdByName['owmo-sales']
 const JOSHBAGLEY_SALES = projectConfig.chIdByName['joshbagley-sales']
 
@@ -166,6 +168,9 @@ export function sendEmbedToSaleChannels(
     if (artBlocksData.artist.includes('ixnayokay')) {
       sendEmbedToChannel(bot, embed, IXNAYOKAY_SALES)
     }
+    if (artBlocksData.artist.includes('Eric De Giuli')) {
+      sendEmbedToChannel(bot, embed, EDG_SALES)
+    }
     if (
       artBlocksData.artist.includes('Owen Moore') ||
       artBlocksData.collection_name.includes('WaveShapes')
@@ -233,6 +238,9 @@ export function sendEmbedToListChannels(
     // Non-AB Discord servers
     if (artBlocksData.artist.includes('Steve Pikelny')) {
       sendEmbedToChannel(bot, embed, STEVIE_P_LISTINGS)
+    }
+    if (artBlocksData.artist.includes('Eric De Giuli')) {
+      sendEmbedToChannel(bot, embed, EDG_LISTINGS)
     }
     if (artBlocksData.platform.includes('Plottables')) {
       sendEmbedToChannel(bot, embed, PLOTTABLES_LISTINGS)
