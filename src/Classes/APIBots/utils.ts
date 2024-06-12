@@ -223,7 +223,6 @@ export function getTokenUrl(
 }
 
 export function getProjectUrl(contractAddr: string, projectId: string): string {
-  // TODO: support new curated pages when ready
   return `https://www.artblocks.io/marketplace/collections/${contractAddr}-${projectId}`
 }
 

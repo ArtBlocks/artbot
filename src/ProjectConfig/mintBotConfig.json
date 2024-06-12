@@ -8,5 +8,6 @@
   "PLOTTABLESV3": ["plottables-mints"],
   "ROZENDAAL": ["rozendaal-mints"],
   "HODLERS": ["hodlers-mints"],
-  "HODLERS-PASS": ["hodlers-mints"]
+  "HODLERS-PASS": ["hodlers-mints"],
+  "STUDIO": ["studio-mints"]
 }
