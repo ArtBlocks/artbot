@@ -125,3 +125,5 @@ dist
 package-lock.json
 
 generated/
+
+.DS_Store
