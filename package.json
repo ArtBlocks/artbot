@@ -55,7 +55,7 @@
     "reconnecting-websocket": "^4.4.0",
     "sharp": "^0.32.6",
     "timeago.js": "^4.0.2",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "twitter-api-v2": "^1.14.1",
     "typescript": "^4.8.4",
     "urql": "^3.0.3",
