@@ -21,7 +21,8 @@
     "eth"
   ],
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.0.0",
+    "yarn": ">=4.3.1"
   },
   "author": "duggan roberts",
   "license": "MIT",
