@@ -11,12 +11,12 @@ jobs:
   build-check:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - uses: actions/checkout@v4
       - name: Enable corepack
         run: corepack enable
-      - uses: actions/setup-node@v4
-        with:
-          cache: 'yarn'
       - name: Set env vars
         run: |
           echo "PRODUCTION_MODE=false" >> $GITHUB_ENV
