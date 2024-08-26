@@ -22,7 +22,7 @@
     "eth"
   ],
   "engines": {
-    "node": ">=20.0.0"
+    "node": "20.x"
   },
   "author": "duggan roberts",
   "license": "MIT",
