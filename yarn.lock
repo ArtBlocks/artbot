@@ -2606,14 +2606,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reservoir0x/reservoir-sdk@npm:^1.3.0":
-  version: 1.3.0
-  resolution: "@reservoir0x/reservoir-sdk@npm:1.3.0"
+"@reservoir0x/reservoir-sdk@npm:^2.4.11":
+  version: 2.4.11
+  resolution: "@reservoir0x/reservoir-sdk@npm:2.4.11"
   dependencies:
-    axios: "npm:^0.27.2"
+    axios: "npm:^1.6.7"
   peerDependencies:
-    viem: ~1.6.4
-  checksum: 10c0/ef0d67c11ad77f916a8d75d82fb7d52aba22ec351779efc34bed00e11eb914d622c52a0fdf465fd50345bb8123bf5e035538f04a0fac95fe245a0d2d8bf691cf
+    viem: ~2.17.4
+  checksum: 10c0/0b90356a47b66ae31c6976616d5511249f6f859678b8a737fa9de3e05c7a0bc072da40b80b3451faac0cd3a1464d1830125a0464eaccc4b197e3f8bbe4f43de3
   languageName: node
   linkType: hard
 
@@ -3587,7 +3587,7 @@ __metadata:
     "@graphql-codegen/typescript-urql": "npm:^3.7.3"
     "@graphql-codegen/urql-introspection": "npm:^2.2.1"
     "@graphql-tools/utils": "npm:^8.3.0"
-    "@reservoir0x/reservoir-sdk": "npm:^1.3.0"
+    "@reservoir0x/reservoir-sdk": "npm:^2.4.11"
     "@supabase/supabase-js": "npm:^2.29.0"
     "@types/node": "npm:20.1.2"
     "@types/node-cron": "npm:^3.0.8"
@@ -3745,16 +3745,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^0.27.2":
-  version: 0.27.2
-  resolution: "axios@npm:0.27.2"
-  dependencies:
-    follow-redirects: "npm:^1.14.9"
-    form-data: "npm:^4.0.0"
-  checksum: 10c0/76d673d2a90629944b44d6f345f01e58e9174690f635115d5ffd4aca495d99bcd8f95c590d5ccb473513f5ebc1d1a6e8934580d0c57cdd0498c3a101313ef771
-  languageName: node
-  linkType: hard
-
 "axios@npm:^1.6.0":
   version: 1.6.8
   resolution: "axios@npm:1.6.8"
@@ -3763,6 +3753,17 @@ __metadata:
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
   checksum: 10c0/0f22da6f490335479a89878bc7d5a1419484fbb437b564a80c34888fc36759ae4f56ea28d55a191695e5ed327f0bad56e7ff60fb6770c14d1be6501505d47ab9
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.6.7":
+  version: 1.7.5
+  resolution: "axios@npm:1.7.5"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10c0/1d5daeb28b3d1bb2a7b9f0743433c4bfbeaddc15461e50ebde487eec6c009af2515749d5261096dd430c90cd891bd310bcba5ec3967bae2033c4a307f58a6ad3
   languageName: node
   linkType: hard
 
@@ -6440,7 +6441,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.14.8, follow-redirects@npm:^1.14.9, follow-redirects@npm:^1.15.6":
+"follow-redirects@npm:^1.14.8, follow-redirects@npm:^1.15.6":
   version: 1.15.6
   resolution: "follow-redirects@npm:1.15.6"
   peerDependenciesMeta:
