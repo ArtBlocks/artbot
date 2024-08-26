@@ -64,9 +64,7 @@
     "urql": "^3.0.3",
     "viem": "2.17.4",
     "web3": "^1.7.0",
-    "ws": "^8.17.1"
-  },
-  "devDependencies": {
+    "ws": "^8.17.1",
     "@ardatan/aggregate-error": "^0.0.6",
     "@graphql-codegen/cli": "^2.13.11",
     "@graphql-codegen/typed-document-node": "^2.3.6",
@@ -79,5 +77,6 @@
     "@urql/exchange-retry": "^1.0.0",
     "graphql-tag": "^2.12.6",
     "husky": "^8.0.3"
-  }
+  },
+  "devDependencies": {}
 }
