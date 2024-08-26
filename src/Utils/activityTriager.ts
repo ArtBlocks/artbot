@@ -32,6 +32,7 @@ const FLUTTER_SALES = projectConfig.chIdByName['flutter-sales']
 const TENDER_SALES = projectConfig.chIdByName['tender-sales']
 const HODLERS_SALES = projectConfig.chIdByName['hodlers-sales']
 const HODLERS_LISTINGS = projectConfig.chIdByName['hodlers-listings']
+const PROOF = projectConfig.chIdByName['proof-all']
 
 // Addresses which should be omitted entirely from event feeds.
 export const BAN_ADDRESSES = new Set([
@@ -199,6 +200,12 @@ export function sendEmbedToSaleChannels(
       artBlocksData.platform.includes('Sotheby')
     ) {
       sendEmbedToChannel(bot, embed, TENDER_SALES)
+    }
+    if (
+      artBlocksData.platform.toLowerCase().includes('proof') ||
+      artBlocksData.platform.includes('Art Blocks')
+    ) {
+      sendEmbedToChannel(bot, embed, PROOF)
     }
   } catch (e) {
     console.warn(e)
