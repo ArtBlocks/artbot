@@ -43,7 +43,7 @@
     "@typescript-eslint/eslint-plugin": "^5.41.0",
     "@typescript-eslint/parser": "^5.41.0",
     "@urql/exchange-retry": "^1.0.0",
-    "axios": "^1.6.0",
+    "axios": "^1.7.4",
     "body-parser": "^1.15.2",
     "chatgpt": "^5.2.5",
     "croner": "^6.0.7",
