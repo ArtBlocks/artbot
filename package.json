@@ -47,7 +47,7 @@
     "body-parser": "^1.15.2",
     "chatgpt": "^5.2.5",
     "croner": "^6.0.7",
-    "discord.js": "^14.6.0",
+    "discord.js": "^14.16.3",
     "dotenv": "^16.0.3",
     "eslint": "^8.26.0",
     "eslint-config-airbnb-base": "^15.0.0",
