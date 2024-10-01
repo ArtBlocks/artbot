@@ -111,6 +111,9 @@ export class ProjectBot {
 
   async handleNumberMessage(msg: Message) {
     let content = msg.content
+    if (!msg.channel.isSendable()) {
+      return
+    }
     if (content.length <= 1) {
       msg.channel.send(
         `Invalid format, enter # followed by the piece number of interest.`
@@ -249,6 +252,9 @@ export class ProjectBot {
    */
   async sendMetaDataMessage(msg: Message, tokenID: string) {
     let tokenMetadata
+    if (!msg.channel.isSendable()) {
+      return
+    }
     try {
       tokenMetadata = await getToken(`${this.coreContract}-${tokenID}`)
     } catch (e) {
@@ -409,6 +415,9 @@ export class ProjectBot {
     msg: Message,
     upcomingDetails: UpcomingProjectDetailFragment
   ) {
+    if (!msg.channel.isSendable()) {
+      return
+    }
     const startTime = new Date(
       upcomingDetails.auction_start_time || upcomingDetails.start_datetime
     )
@@ -496,6 +505,9 @@ export class ProjectBot {
   }
 
   async sendRandomOob(msg: Message) {
+    if (!msg.channel.isSendable()) {
+      return
+    }
     const projectUrl = getProjectUrl(
       this.coreContract,
       this.projectNumber.toString()

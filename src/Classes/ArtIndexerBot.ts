@@ -306,6 +306,11 @@ export class ArtIndexerBot {
 
   async handleNumberMessage(msg: Message) {
     const content = msg.content
+
+    if (!msg.channel.isSendable()) {
+      return
+    }
+
     if (content.length <= 1) {
       msg.channel.send(
         `Invalid format, enter # followed by the piece number of interest.`
