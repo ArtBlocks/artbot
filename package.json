@@ -44,7 +44,7 @@
     "@typescript-eslint/parser": "^5.41.0",
     "@urql/exchange-retry": "^1.0.0",
     "axios": "^1.6.0",
-    "body-parser": "^1.15.2",
+    "body-parser": "^1.20.3",
     "chatgpt": "^5.2.5",
     "croner": "^6.0.7",
     "discord.js": "^14.16.3",
