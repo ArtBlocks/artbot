@@ -24,6 +24,7 @@ const EDG_SALES = projectConfig.chIdByName['edg-sales']
 const EDG_LISTINGS = projectConfig.chIdByName['edg-listings']
 const OWMO_SALES = projectConfig.chIdByName['owmo-sales']
 const JOSHBAGLEY_SALES = projectConfig.chIdByName['joshbagley-sales']
+const REMNYNT_SALES = projectConfig.chIdByName['remnynt-sales']
 
 // Engine Partner Servers
 const PLOTTABLES_SALES = projectConfig.chIdByName['plottables-sales']
@@ -180,6 +181,9 @@ export function sendEmbedToSaleChannels(
     }
     if (artBlocksData.artist.includes('Joshua Bagley')) {
       sendEmbedToChannel(bot, embed, JOSHBAGLEY_SALES)
+    }
+    if (artBlocksData.artist.includes('remnynt')) {
+      sendEmbedToChannel(bot, embed, REMNYNT_SALES)
     }
     if (artBlocksData.platform.includes('Plottables')) {
       sendEmbedToChannel(bot, embed, PLOTTABLES_SALES)
