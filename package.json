@@ -60,7 +60,7 @@
     "graphql-tag": "^2.12.6",
     "husky": "^8.0.3",
     "jest": "^28.0.3",
-    "langchain": "^0.0.66",
+    "langchain": "^0.2.19",
     "lodash.deburr": "^4.1.0",
     "ms": "^2.0.0",
     "node-fetch": "^2.6.1",
