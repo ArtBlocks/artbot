@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
-import { OpenAIChat } from 'langchain/llms/openai'
+import { OpenAI } from 'openai'
 import { ProjectBot } from './ProjectBot'
 import { Client, EmbedBuilder, Message, TextChannel } from 'discord.js'
 import { projectConfig } from '..'
@@ -10,32 +10,21 @@ import { getTokenApiUrl, replaceVideoWithGIF } from './APIBots/utils'
 import { getAllTriviaScores, updateTriviaScore } from '../Data/supabase'
 
 // NOTE: if you change this, you'll need to manually update the supabase upsert query in updateTriviaScore
-export const CURRENT_SEASON = 'season_two'
+export const CURRENT_SEASON = 'season_three'
 
 export class TriviaBot {
   bot: Client
-  model?: OpenAIChat
+  model?: OpenAI
   channel?: TextChannel
   previousQuestion?: Message
   previousQuestionEmbed?: EmbedBuilder
-
   previousAnswers: string[] = []
   currentTriviaAnswer: string
   constructor(bot: Client) {
     this.bot = bot
     this.model = process.env.OPENAI_API_KEY
-      ? new OpenAIChat({
-          modelName: 'gpt-3.5-turbo', // With valid API keys can also use 'gpt-4'
-          temperature: 0,
-          prefixMessages: [
-            {
-              role: 'system',
-              content: `
-          You are a bot that thinks of trivia questions with art projects as the answers. I will provide the title of the project and the project description.
-         DO NOT include the answer in your response.
-          `,
-            },
-          ],
+      ? new OpenAI({
+          apiKey: process.env.OPENAI_API_KEY, // This is the default and can be omitted
         })
       : undefined
 
@@ -149,14 +138,30 @@ Next question:`
       throw new Error("Can't ask trivia question - no OpenAI API key")
     }
 
-    let question = await this.model.call(
-      `Generate a short, cryptic, poetic, vague, difficult riddle that has the answer: "${project.projectName}". It is VERY important that you DO NOT include the answer in your response. The project description is: "${project.description}"`
-    )
+    const completion = await this.model.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are a trivia bot that generates trivia questions about generative art projects. The most important rule is NEVER to state the answer in your response',
+        },
+        {
+          role: 'user',
+          content: `Generate a short, cryptic, poetic, vague, difficult riddle that has the answer: "${project.projectName}". It is VERY important that you DO NOT include the answer in your response. The project description is: "${project.description}"`,
+        },
+      ],
+    })
 
+    let answer = completion.choices[0].message.content ?? ''
     const regex = new RegExp(project.projectName, 'gi')
-    question = question.replaceAll(regex, '_____')
+    answer = answer.replaceAll(regex, '_____')
 
-    embed.setDescription(question)
+    if (!answer.length) {
+      throw new Error('No answer from GPT')
+    }
+
+    embed.setDescription(answer)
 
     return embed
   }
