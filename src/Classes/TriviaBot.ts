@@ -9,7 +9,6 @@ import axios from 'axios'
 import { getTokenApiUrl, replaceVideoWithGIF } from './APIBots/utils'
 import { getAllTriviaScores, updateTriviaScore } from '../Data/supabase'
 
-// NOTE: if you change this, you'll need to manually update the supabase upsert query in updateTriviaScore
 export const CURRENT_SEASON = 'season_three'
 
 export class TriviaBot {
