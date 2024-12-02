@@ -252,6 +252,10 @@ export function timeout(
   })
 }
 
+export function replaceToPNG(url: string): string {
+  return url.replace(/\.(gif|mp4)$/i, '.png')
+}
+
 // defaulting our discord embeds to always send GIFs
 export async function replaceVideoWithGIF(url: string) {
   if (url.includes('mp4')) {

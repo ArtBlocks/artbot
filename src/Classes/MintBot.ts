@@ -6,7 +6,7 @@ import {
   getCollectionType,
   getTokenApiUrl,
   getTokenUrl,
-  replaceVideoWithGIF,
+  replaceToPNG,
   waitForEngineContracts,
   waitForStudioContracts,
 } from './APIBots/utils'
@@ -147,28 +147,55 @@ export class MintBot {
         try {
           const artBlocksData = artBlocksResponse.data
           let assetUrl = artBlocksData?.preview_asset_url
-          if (assetUrl) {
-            assetUrl = await replaceVideoWithGIF(assetUrl)
+          if (!assetUrl) {
+            console.log(`No preview asset URL for mint ${id}`)
+            return
+          }
 
-            const imageRes = await axios.get(assetUrl)
-            // Double check to ensure image/gif is available
-            if (imageRes.status === 200) {
-              delete this.mintsToPost[id]
-              mint.image = assetUrl
-              mint.generatorLink = artBlocksData.generator_url
-              mint.tokenName = artBlocksData.name
-              mint.artistName = artBlocksData.artist
-              mint.artblocksUrl = getTokenUrl(
-                artBlocksData.external_url,
-                mint.contractAddress,
-                mint.tokenId
-              )
-              mint.postToDiscord()
-              this.postToTwitter(mint)
+          assetUrl = replaceToPNG(assetUrl)
+
+          // Validate URL format
+          try {
+            new URL(assetUrl)
+          } catch (e) {
+            console.log(`Invalid asset URL for mint ${id}: ${assetUrl}`)
+            return
+          }
+
+          // Check image with timeout and content-type validation
+          try {
+            const imageRes = await axios.get(assetUrl, {
+              timeout: 10000, // 10 second timeout
+              validateStatus: (status) => status === 200,
+              headers: { Accept: 'image/*' },
+            })
+
+            const contentType = imageRes.headers['content-type']
+            if (!contentType?.startsWith('image/')) {
+              console.log(`Invalid content type for mint ${id}: ${contentType}`)
+              return
             }
+
+            // If we get here, the image is valid
+            delete this.mintsToPost[id]
+            mint.image = assetUrl
+            mint.generatorLink = artBlocksData.generator_url
+            mint.tokenName = artBlocksData.name
+            mint.artistName = artBlocksData.artist
+            mint.artblocksUrl = getTokenUrl(
+              artBlocksData.external_url,
+              mint.contractAddress,
+              mint.tokenId
+            )
+            mint.postToDiscord()
+            this.postToTwitter(mint)
+          } catch (e) {
+            console.log(`Error fetching image for mint ${id}:`, e)
+            // Keep in queue to retry later
+            return
           }
         } catch (e) {
-          console.log(`Error getting mint ${id}:`, e)
+          console.log(`Error processing mint ${id}:`, e)
           return
         }
       })
