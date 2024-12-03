@@ -36,7 +36,7 @@
     "@graphql-codegen/typescript-urql": "^3.7.3",
     "@graphql-codegen/urql-introspection": "^2.2.1",
     "@graphql-tools/utils": "^8.3.0",
-    "@reservoir0x/reservoir-sdk": "^2.4.11",
+    "@reservoir0x/reservoir-sdk": "^2.4.32",
     "@supabase/supabase-js": "^2.29.0",
     "@types/node": "20.1.2",
     "@types/node-cron": "^3.0.8",

@@ -29,8 +29,12 @@ import { ProjectConfig } from '../ProjectConfig/projectConfig'
 import { ProjectHandlerHelper } from './ProjectHandlerHelper'
 import { UpcomingProjectDetailFragment } from '../../generated/graphql'
 import { getDayName, getMonthName, getDayOfMonth } from '../Utils/common'
+import { paths } from '@reservoir0x/reservoir-sdk'
 
 const ONE_MILLION = 1e6
+
+type ReservoirTokenResponse =
+  paths['/tokens/v7']['get']['responses']['200']['schema']
 
 /**
  * Bot for handling projects
@@ -327,13 +331,35 @@ export class ProjectBot {
       inline: true,
     })
 
-    if (tokenMetadata.list_price && !tokenMetadata.is_flagged) {
-      embedContent.addFields({
-        name: 'Buy Now',
-        value: `[${tokenMetadata.list_price} ${
-          tokenMetadata.list_currency_symbol
-        } on Art Blocks Marketplace](${tokenUrl + PROJECTBOT_BUY_UTM})`,
+    try {
+      const response = await axios.request<ReservoirTokenResponse>({
+        method: 'GET',
+        url: `https://api.reservoir.tools/tokens/v7?tokens=${this.coreContract}%3A${tokenID}`,
+        headers: { accept: '*/*', 'x-api-key': process.env.RESERVOIR_API_KEY },
+        timeout: 3000,
       })
+
+      if (
+        response.data &&
+        response.data.tokens &&
+        response.data.tokens.length > 0
+      ) {
+        const price =
+          response.data.tokens[0].market?.floorAsk?.price?.amount?.native
+        const symbol =
+          response.data.tokens[0].market?.floorAsk?.price?.currency?.symbol
+
+        if (price && symbol) {
+          embedContent.addFields({
+            name: 'Buy Now',
+            value: `[${price} ${symbol} on Art Blocks Marketplace](${
+              tokenUrl + PROJECTBOT_BUY_UTM
+            })`,
+          })
+        }
+      }
+    } catch (e) {
+      console.error('Error getting price info for token:', tokenID, e)
     }
     msg.channel.send({ embeds: [embedContent] })
   }

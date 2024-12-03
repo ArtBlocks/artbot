@@ -28,6 +28,8 @@ import {
 } from './Classes/APIBots/utils'
 import { ScheduleBot } from './Classes/SchedulerBot'
 import { verifyTwitter } from './Utils/twitterUtils'
+import axios from 'axios'
+import { paths } from '@reservoir0x/reservoir-sdk'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
@@ -243,43 +245,40 @@ const initReservoirBots = async () => {
   const studioContracts = await waitForStudioContracts()
   const engineContracts = await waitForEngineContracts()
 
-  const buildContractsString = (contracts: string[]): string => {
-    const ans = 'contracts=' + contracts.join('&contracts=')
-    return ans
-  }
-
-  const createReservoirBots = (
-    listParams: string,
-    saleParams: string,
-    pollTimeMs: number
-  ) => {
-    new ReservoirListBot(
-      `https://api.reservoir.tools/orders/asks/v5?${listParams}&sortBy=createdAt&limit=${reservoirListLimit}&normalizeRoyalties=true`,
-      pollTimeMs,
-      bot,
-      {
-        Accept: 'application/json',
-        'x-api-key': process.env.RESERVOIR_API_KEY,
-      }
-    )
-
-    new ReservoirSaleBot(
-      `https://api.reservoir.tools/sales/v4?${saleParams}&limit=${reservoirSaleLimit}`,
-      pollTimeMs,
-      bot,
-      {
-        Accept: 'application/json',
-        'x-api-key': process.env.RESERVOIR_API_KEY,
-      }
-    )
-  }
-
   const allContracts = Object.values(CORE_CONTRACTS)
     .concat(Object.values(COLLAB_CONTRACTS))
     .concat(Object.values(EXPLORATIONS_CONTRACTS))
     .concat(studioContracts ?? [])
     .concat(engineContracts ?? [])
 
+  type ReservoirContractSetResponse =
+    paths['/contracts-sets/v1']['post']['responses']['200']['schema']
+
+  const response = await axios.request<ReservoirContractSetResponse>({
+    method: 'POST',
+    url: 'https://api.reservoir.tools/contracts-sets/v1',
+    headers: {
+      accept: '*/*',
+      'content-type': 'application/json',
+      'x-api-key': process.env.RESERVOIR_API_KEY,
+    },
+    data: { contracts: allContracts },
+  })
+
+  const contractSetID = response.data.contractsSetId
+
+  // List endpoint lets you use contractSet param which is very nice
+  new ReservoirListBot(
+    `https://api.reservoir.tools/orders/asks/v5?contractsSetId=${contractSetID}&sortBy=createdAt&limit=${reservoirListLimit}&normalizeRoyalties=true`,
+    API_POLL_TIME_MS,
+    bot,
+    {
+      Accept: 'application/json',
+      'x-api-key': process.env.RESERVOIR_API_KEY,
+    }
+  )
+
+  // Sadly sales endpoint does not support contractSet param yet - need to batch by 20 contracts
   const RESERVOIR_CONTRACT_LIMIT = 20
   const numBotInstances = Math.ceil(
     allContracts.length / RESERVOIR_CONTRACT_LIMIT
@@ -287,10 +286,18 @@ const initReservoirBots = async () => {
   for (let i = 0; i < numBotInstances; i++) {
     const start = i * RESERVOIR_CONTRACT_LIMIT
     const end = start + RESERVOIR_CONTRACT_LIMIT
-    const listParams = buildContractsString(allContracts.slice(start, end))
-    const saleParams = listParams.replaceAll('contracts', 'contract')
+    const saleParams =
+      'contract=' + allContracts.slice(start, end).join('&contract=')
 
-    createReservoirBots(listParams, saleParams, API_POLL_TIME_MS + i * 3000)
+    new ReservoirSaleBot(
+      `https://api.reservoir.tools/sales/v4?${saleParams}&limit=${reservoirSaleLimit}`,
+      API_POLL_TIME_MS + i * 3000,
+      bot,
+      {
+        Accept: 'application/json',
+        'x-api-key': process.env.RESERVOIR_API_KEY,
+      }
+    )
   }
 }
 

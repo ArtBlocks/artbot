@@ -36,8 +36,6 @@ fragment TokenDetail on tokens_metadata {
   }
   preview_asset_url
   live_view_url
-  list_currency_symbol
-  list_price
   owner {
     public_address
   }

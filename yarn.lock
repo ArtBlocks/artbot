@@ -2619,14 +2619,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reservoir0x/reservoir-sdk@npm:^2.4.11":
-  version: 2.4.11
-  resolution: "@reservoir0x/reservoir-sdk@npm:2.4.11"
+"@reservoir0x/reservoir-sdk@npm:^2.4.32":
+  version: 2.4.32
+  resolution: "@reservoir0x/reservoir-sdk@npm:2.4.32"
   dependencies:
     axios: "npm:^1.6.7"
   peerDependencies:
     viem: ~2.17.4
-  checksum: 10c0/0b90356a47b66ae31c6976616d5511249f6f859678b8a737fa9de3e05c7a0bc072da40b80b3451faac0cd3a1464d1830125a0464eaccc4b197e3f8bbe4f43de3
+  checksum: 10c0/c383bc4d431fb96426f4704a645bb289c27f4da3b99ef791173586f216bb014d853ec7b8a21e075a3981ee3a60f71c538f258f93603b232a6df9fc382cf0678c
   languageName: node
   linkType: hard
 
@@ -3630,7 +3630,7 @@ __metadata:
     "@graphql-codegen/typescript-urql": "npm:^3.7.3"
     "@graphql-codegen/urql-introspection": "npm:^2.2.1"
     "@graphql-tools/utils": "npm:^8.3.0"
-    "@reservoir0x/reservoir-sdk": "npm:^2.4.11"
+    "@reservoir0x/reservoir-sdk": "npm:^2.4.32"
     "@supabase/supabase-js": "npm:^2.29.0"
     "@types/node": "npm:20.1.2"
     "@types/node-cron": "npm:^3.0.8"
