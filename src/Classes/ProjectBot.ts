@@ -19,7 +19,6 @@ import {
 
 import { ensOrAddress, replaceVideoWithGIF } from './APIBots/utils'
 import {
-  getProjectFloor,
   getProjectInvocations,
   getRandomOobForProject,
   getToken,
@@ -35,6 +34,9 @@ const ONE_MILLION = 1e6
 
 type ReservoirTokenResponse =
   paths['/tokens/v7']['get']['responses']['200']['schema']
+
+type ReservoirCollectionResponse =
+  paths['/collections/v5']['get']['responses']['200']['schema']
 
 /**
  * Bot for handling projects
@@ -152,9 +154,19 @@ export class ProjectBot {
     }
 
     if (content.toLowerCase().includes('#floor')) {
-      const floorToken = await getProjectFloor(this.id)
-      if (floorToken && floorToken.list_eth_price) {
-        content = `#${floorToken.invocation}`
+      // Reservoir API collections are indexed like: 78000000:78999999
+      const floorResponse = await axios.get<ReservoirCollectionResponse>(
+        `https://api.reservoir.tools/collections/v5?useNonFlaggedFloorAsk=true&id=${
+          this.coreContract
+        }%3A${this.projectNumber * ONE_MILLION}%3A${
+          (this.projectNumber + 1) * ONE_MILLION - 1
+        }`
+      )
+      const floorToken =
+        floorResponse.data.collections?.[0]?.floorAsk?.token?.tokenId ?? ''
+
+      if (floorToken) {
+        content = `#${parseInt(floorToken) % ONE_MILLION}`
       } else {
         msg.channel.send(
           `Sorry, looks like no ${this.projectName} tokens are for sale!`
