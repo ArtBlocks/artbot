@@ -154,22 +154,36 @@ export class ProjectBot {
     }
 
     if (content.toLowerCase().includes('#floor')) {
-      // Reservoir API collections are indexed like: 78000000:78999999
-      const floorResponse = await axios.get<ReservoirCollectionResponse>(
-        `https://api.reservoir.tools/collections/v5?useNonFlaggedFloorAsk=true&id=${
-          this.coreContract
-        }%3A${this.projectNumber * ONE_MILLION}%3A${
-          (this.projectNumber + 1) * ONE_MILLION - 1
-        }`
-      )
-      const floorToken =
-        floorResponse.data.collections?.[0]?.floorAsk?.token?.tokenId ?? ''
+      try {
+        // Reservoir API collections are indexed like: 78000000:78999999
+        const floorResponse = await axios.request<ReservoirCollectionResponse>({
+          method: 'GET',
+          url: `https://api.reservoir.tools/collections/v5?useNonFlaggedFloorAsk=true&id=${
+            this.coreContract
+          }%3A${this.projectNumber * ONE_MILLION}%3A${
+            (this.projectNumber + 1) * ONE_MILLION - 1
+          }`,
+          headers: {
+            accept: '*/*',
+            'x-api-key': process.env.RESERVOIR_API_KEY,
+          },
+          timeout: 3000,
+        })
+        const floorToken =
+          floorResponse.data.collections?.[0]?.floorAsk?.token?.tokenId ?? ''
 
-      if (floorToken) {
-        content = `#${parseInt(floorToken) % ONE_MILLION}`
-      } else {
+        if (floorToken) {
+          content = `#${parseInt(floorToken) % ONE_MILLION}`
+        } else {
+          msg.channel.send(
+            `Sorry, looks like no ${this.projectName} tokens are for sale!`
+          )
+          return
+        }
+      } catch (e) {
+        console.error('Error getting floor token for:', this.projectName, e)
         msg.channel.send(
-          `Sorry, looks like no ${this.projectName} tokens are for sale!`
+          `Sorry, looks like there was an error retrieving the floor token for ${this.projectName}. Try again in a bit!`
         )
         return
       }
