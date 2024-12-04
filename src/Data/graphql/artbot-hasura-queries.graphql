@@ -150,16 +150,6 @@ query getProjectInvocations($id: String!) {
   }
 }
 
-query getProjectFloor($id: String!) {
-  projects_metadata(where: { id: { _eq: $id } }) {
-    tokens(limit: 3, order_by: { list_eth_price: asc }) {
-      invocation
-      list_eth_price
-      is_flagged
-    }
-  }
-}
-
 query getAllContracts {
   contracts_metadata {
     ...ContractDetail

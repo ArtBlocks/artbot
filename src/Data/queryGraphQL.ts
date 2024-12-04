@@ -10,7 +10,6 @@ import {
   GetContractProjectsDocument,
   GetProjectInvocationsDocument,
   GetProjectInContractsDocument,
-  GetProjectFloorDocument,
   TokenDetailFragment,
   ProjectTokenDetailFragment,
   GetMostRecentMintedTokenByContractDocument,
@@ -411,25 +410,6 @@ export async function getProjectInvocations(projectId: string) {
     return data.projects_metadata.length > 0
       ? data.projects_metadata[0].invocations
       : null
-  } catch (err) {
-    console.error(err)
-    return undefined
-  }
-}
-
-export async function getProjectFloor(projectId: string) {
-  const hasuraClient = getClientForContract(projectId.split('-')[0])
-  try {
-    const { data } = await hasuraClient
-      .query(GetProjectFloorDocument, {
-        id: projectId,
-      })
-      .toPromise()
-
-    if (!data) {
-      throw Error('No data returned from getProjectFloor Hasura query')
-    }
-    return data.projects_metadata[0].tokens.find((token) => !token.is_flagged)
   } catch (err) {
     console.error(err)
     return undefined
