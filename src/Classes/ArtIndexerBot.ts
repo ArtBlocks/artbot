@@ -677,4 +677,19 @@ export class ArtIndexerBot {
     })
     return projects
   }
+
+  checkMintedOut(projectId: string, invocation: string) {
+    const projectBot = this.projectsById[projectId]
+    const invocationNumber = parseInt(invocation)
+    if (
+      !projectBot ||
+      !projectBot.editionSize ||
+      projectBot.editionSize - 1 !== invocationNumber
+    ) {
+      return
+    }
+    console.log('SEND MINTED OUT MESSAGE')
+
+    projectBot.sendMintedOutMessage()
+  }
 }

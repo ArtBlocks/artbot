@@ -1,5 +1,5 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js'
-import { mintBot, projectConfig } from '../index'
+import { artIndexerBot, mintBot, projectConfig } from '../index'
 import axios, { AxiosError } from 'axios'
 import {
   MINT_UTM,
@@ -54,23 +54,6 @@ export class MintBot {
           accessToken: process.env.AB_TWITTER_OAUTH_TOKEN ?? '',
           accessSecret: process.env.AB_TWITTER_OAUTH_SECRET ?? '',
           listener: true,
-        })
-      }
-      if (process.env.HODLERS_TWITTER_API_KEY) {
-        const hodlerBot = new TwitterBot({
-          appKey: process.env.HODLERS_TWITTER_API_KEY ?? '',
-          appSecret: process.env.HODLERS_TWITTER_API_SECRET ?? '',
-          accessToken: process.env.HODLERS_TWITTER_OAUTH_TOKEN ?? '',
-          accessSecret: process.env.HODLERS_TWITTER_OAUTH_SECRET ?? '',
-        })
-        const holderContracts: string[] = []
-        holderContracts.push(
-          PARTNER_CONTRACTS['HODLERS'],
-          PARTNER_CONTRACTS['HODLERS-PASS']
-        )
-
-        holderContracts.forEach((contract: string) => {
-          this.contractToTwitterBot[contract] = hodlerBot
         })
       }
     }
@@ -203,7 +186,13 @@ export class MintBot {
   }
 
   // Function to add a new mint to the queue!
-  addMint(contractAddress: string, tokenID: string, owner: string) {
+  addMint(
+    contractAddress: string,
+    tokenID: string,
+    owner: string,
+    invocation: string,
+    projectId: string
+  ) {
     console.log('NEW MINT', contractAddress, tokenID, owner)
     const id = `${contractAddress}-${tokenID}`
 
@@ -216,6 +205,8 @@ export class MintBot {
       console.log('Skipping mint for contract not in config')
       return
     }
+
+    artIndexerBot.checkMintedOut(projectId, invocation)
 
     this.mintsToPost[id] = new Mint(this.bot, contractAddress, tokenID, owner)
   }

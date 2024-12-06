@@ -23,7 +23,7 @@ import {
   getRandomOobForProject,
   getToken,
 } from '../Data/queryGraphQL'
-import { triviaBot } from '..'
+import { CHANNEL_BLOCK_TALK, discordClient, triviaBot } from '..'
 import { ProjectConfig } from '../ProjectConfig/projectConfig'
 import { ProjectHandlerHelper } from './ProjectHandlerHelper'
 import { UpcomingProjectDetailFragment } from '../../generated/graphql'
@@ -437,9 +437,7 @@ export class ProjectBot {
         })
 
       // Send all birthdays to #block-talk
-      let channel = channels.get(
-        projectConfig.chIdByName['block-talk']
-      ) as TextChannel
+      let channel = channels.get(CHANNEL_BLOCK_TALK) as TextChannel
       channel?.send({ embeds: [embedContent] })
 
       if (
@@ -461,6 +459,33 @@ export class ProjectBot {
       )
     }
     return
+  }
+
+  async sendMintedOutMessage() {
+    const blockTalk = discordClient.channels.cache.get(
+      CHANNEL_BLOCK_TALK
+    ) as TextChannel
+
+    const artBlocksResponse = await axios.get(
+      getTokenApiUrl(this.coreContract, `${this.projectNumber * ONE_MILLION}`)
+    )
+    const artBlocksData = await artBlocksResponse.data
+    const assetUrl = artBlocksData?.preview_asset_url
+
+    // Send congratulations message
+    const title = `:tada: ${this.projectName} has minted out! Congratulations ${this.artistName}!  :tada:`
+    const description = `Check out the whole collection [here](${
+      getProjectUrl(this.coreContract, this.projectNumber.toString()) +
+      PROJECTBOT_UTM
+    })`
+    const embedContent = new EmbedBuilder()
+      .setColor('#9370DB')
+      .setTitle(title)
+      .setImage(assetUrl)
+      .setDescription(description)
+    if (blockTalk) {
+      blockTalk.send({ embeds: [embedContent] })
+    }
   }
 
   async handleUpcomingMessage(

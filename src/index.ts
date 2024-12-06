@@ -65,7 +65,7 @@ const abXbmIndexerBot = new ArtIndexerBot(getArtBlocksXBMProjects)
 const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects']
 
 // Block Talk
-const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
+export const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 
 // PBAB Chat
 const CHANNEL_ENGINE_CHAT = projectConfig.chIdByName['engine-chat']
@@ -127,6 +127,8 @@ type MintEvent = {
         project_name: string
         token_id: string
         minted_at: string
+        invocation: string
+        project_id: string
       }
     }
   }
@@ -145,7 +147,9 @@ app.post('/new-mint', function (req: any, res: any) {
   mintBot.addMint(
     mintData.contract_address,
     mintData.token_id,
-    mintData.owner_address
+    mintData.owner_address,
+    mintData.invocation,
+    mintData.project_id
   )
   res.setHeader('Content-Type', 'application/json')
   res.json({
@@ -163,7 +167,7 @@ app.get('/callback', (req: any, res: any) => {
 })
 
 // Bot setup.
-const bot = new Client({
+export const discordClient = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
@@ -171,15 +175,15 @@ const bot = new Client({
   ],
 })
 if (PRODUCTION_MODE) {
-  bot.login(DISCORD_TOKEN)
+  discordClient.login(DISCORD_TOKEN)
 }
-export const triviaBot = new TriviaBot(bot)
-new ScheduleBot(bot.channels.cache, projectConfig)
-bot.on('ready', () => {
-  console.info(`Logged in as ${bot.user?.tag}!`)
+export const triviaBot = new TriviaBot(discordClient)
+new ScheduleBot(discordClient.channels.cache, projectConfig)
+discordClient.on('ready', () => {
+  console.info(`Logged in as ${discordClient.user?.tag}!`)
 })
 
-bot.on(Events.MessageCreate, async (msg) => {
+discordClient.on(Events.MessageCreate, async (msg) => {
   const msgAuthor = msg.author.username
   const msgContent = msg.content
   const msgContentLowercase = msgContent.toLowerCase()
@@ -222,7 +226,7 @@ bot.on(Events.MessageCreate, async (msg) => {
     console.error('Error handling number message: ', e)
   }
   // Handle special info questions that ArtBot knows how to answer.
-  const artBotID = bot.user?.id
+  const artBotID = discordClient.user?.id
   // TODO: refactor smartbotresponse to be less irritating / have fewer args
   smartBotResponse(
     msgContentLowercase,
@@ -271,7 +275,7 @@ const initReservoirBots = async () => {
   new ReservoirListBot(
     `https://api.reservoir.tools/orders/asks/v5?contractsSetId=${contractSetID}&sortBy=createdAt&limit=${reservoirListLimit}&normalizeRoyalties=true`,
     API_POLL_TIME_MS,
-    bot,
+    discordClient,
     {
       Accept: 'application/json',
       'x-api-key': process.env.RESERVOIR_API_KEY,
@@ -292,7 +296,7 @@ const initReservoirBots = async () => {
     new ReservoirSaleBot(
       `https://api.reservoir.tools/sales/v4?${saleParams}&limit=${reservoirSaleLimit}`,
       API_POLL_TIME_MS + i * 3000,
-      bot,
+      discordClient,
       {
         Accept: 'application/json',
         'x-api-key': process.env.RESERVOIR_API_KEY,
@@ -301,7 +305,7 @@ const initReservoirBots = async () => {
   }
 }
 
-export const mintBot = new MintBot(bot)
+export const mintBot = new MintBot(discordClient)
 
 // Instantiate API Pollers (if not in test mode)
 if (PRODUCTION_MODE) {
