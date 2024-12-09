@@ -308,7 +308,8 @@ export class ProjectBot {
     // If Engine project, add Engine platform name to front
     if (
       tokenMetadata.contract?.name &&
-      !tokenMetadata.contract?.name.includes('Art Blocks')
+      !tokenMetadata.contract?.name.includes('Art Blocks') &&
+      !tokenMetadata.contract?.name.includes('artblocks')
     ) {
       let platform = tokenMetadata.contract?.name
       if (platform === 'MOMENT') {
