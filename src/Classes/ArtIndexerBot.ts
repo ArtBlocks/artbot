@@ -683,12 +683,14 @@ export class ArtIndexerBot {
     const invocationNumber = parseInt(invocation)
     if (
       !projectBot ||
-      !projectBot.editionSize ||
-      projectBot.editionSize - 1 !== invocationNumber
+      !projectBot.maxEditionSize ||
+      projectBot.maxEditionSize - 1 !== invocationNumber
     ) {
       return
     }
-    console.log('SEND MINTED OUT MESSAGE')
+    console.log(
+      `Sending minted out message for ${projectBot.projectName} with ${projectBot.maxEditionSize} tokens. Invocation: ${invocation}`
+    )
 
     projectBot.sendMintedOutMessage()
   }
