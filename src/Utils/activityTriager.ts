@@ -119,6 +119,10 @@ function sendEmbedToChannel(
   channelId: string
 ) {
   const channel = bot.channels?.cache?.get(channelId) as TextChannel
+  if (!channel) {
+    console.log('Channel not found', channelId)
+    return
+  }
   channel
     .send({
       embeds: [embed],
