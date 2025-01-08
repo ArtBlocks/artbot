@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "A bot to provide info for artblocks",
   "main": "index.js",
-  "packageManager": "yarn@4.3.1",
   "scripts": {
     "start": "ts-node src/index.ts",
     "dev": "yarn start",
@@ -21,10 +20,11 @@
     "crypto",
     "eth"
   ],
+  "packageManager": "yarn@4.3.1",
   "engines": {
     "node": "20.x"
   },
-  "author": "duggan roberts",
+  "author": "grant oesterling",
   "license": "MIT",
   "dependencies": {
     "@ardatan/aggregate-error": "^0.0.6",
