@@ -15,7 +15,8 @@ const ARTBOT_WARNING = 0xffff00
 
 // Returns a random color
 export function randomColor(): ColorResolvable {
-  return `#${Math.floor(Math.random() * 16777215).toString(16)}`
+  // Generate random hex color value between 0x000000 and 0xFFFFFF
+  return Math.floor(Math.random() * 0xffffff) as ColorResolvable
 }
 
 // Thank you message for people asking the artbot how it is.
