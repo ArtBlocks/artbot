@@ -157,8 +157,8 @@ app.post('/new-mint', function (req: any, res: any) {
   })
 })
 
-app.listen(PORT, function () {
-  console.log('Server is listening on port ', PORT)
+app.listen(PORT, '0.0.0.0', function () {
+  console.log('Server is listening on port', PORT)
 })
 
 app.get('/callback', (req: any, res: any) => {
@@ -174,14 +174,37 @@ export const discordClient = new Client({
     GatewayIntentBits.MessageContent,
   ],
 })
+
+console.log('Discord client created')
+console.log('PRODUCTION_MODE:', PRODUCTION_MODE)
+console.log('DISCORD_TOKEN exists:', !!DISCORD_TOKEN)
+
 if (PRODUCTION_MODE) {
-  discordClient.login(DISCORD_TOKEN)
+  console.log('Attempting Discord login...')
+  discordClient
+    .login(DISCORD_TOKEN)
+    .then(() => {
+      console.log('Discord login attempt successful')
+    })
+    .catch((error) => {
+      console.error('Discord login failed:', error)
+    })
 }
+
+discordClient.on('ready', () => {
+  console.log(`Logged in as ${discordClient.user?.tag}!`)
+})
+
+discordClient.on('error', (error) => {
+  console.error('Discord client error:', error)
+})
+
+discordClient.on('disconnect', () => {
+  console.log('Discord client disconnected')
+})
+
 export const triviaBot = new TriviaBot(discordClient)
 new ScheduleBot(discordClient.channels.cache, projectConfig)
-discordClient.on('ready', () => {
-  console.info(`Logged in as ${discordClient.user?.tag}!`)
-})
 
 discordClient.on(Events.MessageCreate, async (msg) => {
   const msgAuthor = msg.author.username
