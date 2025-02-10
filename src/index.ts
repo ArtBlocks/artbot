@@ -21,6 +21,7 @@ import {
   getEngineProjects,
   getStudioContracts,
 } from './Data/queryGraphQL'
+import { InsightsBot } from './Classes/InsightsBot'
 import { TriviaBot } from './Classes/TriviaBot'
 import {
   waitForEngineContracts,
@@ -204,6 +205,8 @@ discordClient.on('disconnect', () => {
 })
 
 export const triviaBot = new TriviaBot(discordClient)
+export const insightsBot = new InsightsBot()
+
 new ScheduleBot(discordClient.channels.cache, projectConfig)
 
 discordClient.on(Events.MessageCreate, async (msg) => {

@@ -1,6 +1,6 @@
 import { EmbedBuilder, ColorResolvable, Message } from 'discord.js'
 import * as dotenv from 'dotenv'
-import { artIndexerBot, projectConfig, triviaBot } from '..'
+import { artIndexerBot, projectConfig, triviaBot, insightsBot } from '..'
 dotenv.config()
 const fetch = require('node-fetch')
 
@@ -162,6 +162,7 @@ const HELP_MESSAGE = new EmbedBuilder()
     **staysafe?**: Tips on avoiding scams
     **aliases?**: A handy list of aliases that can be used in \`#\` commands.
     **hashtag?**: A handy list of all \`#\` functionalities
+    **!artBot**: Ask Artbot AI a question.
     `
   )
 // Custom message shown when someone asks about ArtBlocks
@@ -307,6 +308,11 @@ export async function smartBotResponse(
       msg.react(reactionEmoji)
     }
     return null
+  }
+
+  // Handle messages to the Insights API for AI responses
+  if (msgContentLowercase.includes('!artBot')) {
+    return insightsBot.getInsightsApiResponse(msg)
   }
   // Some shared helper variables.
   const inHelpChannel: boolean = channelID == CHANNEL_HELP
