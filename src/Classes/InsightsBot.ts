@@ -11,19 +11,25 @@ export class InsightsBot {
 
     // TODO: Implement insights API endpoint once deployed
     const insightsResponse = await axios.post(
-      'https://www.example.com/insights',
+      'https://zod9thrxp5.execute-api.us-east-1.amazonaws.com/development-stage/insights',
       {
-        message: messageContent,
+        query: messageContent,
+      },
+      {
+        headers: {
+          'x-api-key': process.env.INSIGHTS_API_KEY ?? '',
+          'Content-Type': 'application/json',
+        },
       }
     )
 
-    let answer = insightsResponse?.data ?? ''
+    const answer = insightsResponse?.data?.[0]?.content ?? ''
 
     if (!answer.length) {
       throw new Error('No answer from Insights API')
     }
 
-    let embed = new EmbedBuilder()
+    const embed = new EmbedBuilder()
       .setTitle('Artbot AI (Beta)')
       .setColor(randomColor())
       .setDescription(answer)
