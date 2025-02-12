@@ -11,7 +11,7 @@ export class InsightsBot {
       const messageContent = msg.content.replace('!artBot', '').trim()
 
       const insightsResponse = await axios.post(
-        'https://zod9thrxp5.execute-api.us-east-1.amazonaws.com/development-stage/insights',
+        'https://qhjte7logh.execute-api.us-east-1.amazonaws.com/production-stage/insights',
         {
           query: messageContent,
         },
