@@ -311,7 +311,7 @@ export async function smartBotResponse(
   }
 
   // Handle messages to the Insights API for AI responses
-  if (msgContentLowercase.includes('!artBot')) {
+  if (msgContentLowercase.includes('!artbot')) {
     return insightsBot.getInsightsApiResponse(msg)
   }
   // Some shared helper variables.
