@@ -162,7 +162,7 @@ const HELP_MESSAGE = new EmbedBuilder()
     **staysafe?**: Tips on avoiding scams
     **aliases?**: A handy list of aliases that can be used in \`#\` commands.
     **hashtag?**: A handy list of all \`#\` functionalities
-    **!artBot**: Ask Artbot AI a question.
+    **!artBot**: Ask Artbot about Art Blocks artists and projects by using !artBot at the start of your question. This AI-powered feature is in beta.
     `
   )
 // Custom message shown when someone asks about ArtBlocks
