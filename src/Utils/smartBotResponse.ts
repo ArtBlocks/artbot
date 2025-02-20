@@ -162,7 +162,7 @@ const HELP_MESSAGE = new EmbedBuilder()
     **staysafe?**: Tips on avoiding scams
     **aliases?**: A handy list of aliases that can be used in \`#\` commands.
     **hashtag?**: A handy list of all \`#\` functionalities
-    **!artBot**: Ask Artbot about Art Blocks artists and projects by using !artBot at the start of your question. This AI-powered feature is in beta.
+    **artBot**: Ask about Art Blocks artists and projects by tagging @artbot at the start of your question. This AI-powered feature is in beta.
     `
   )
 // Custom message shown when someone asks about ArtBlocks
@@ -310,10 +310,6 @@ export async function smartBotResponse(
     return null
   }
 
-  // Handle messages to the Insights API for AI responses
-  if (msgContentLowercase.includes('!artbot')) {
-    return insightsBot.getInsightsApiResponse(msg)
-  }
   // Some shared helper variables.
   const inHelpChannel: boolean = channelID == CHANNEL_HELP
   const mentionedArtBot: boolean =
@@ -402,6 +398,11 @@ export async function smartBotResponse(
         // Set the main content of the embed
         .setDescription(msg)
     )
+  }
+
+  if (channelID == CHANNEL_BLOCK_TALK && containsQuestion && mentionedArtBot) {
+    // Handle messages to the Insights API for AI responses
+    return insightsBot.getInsightsApiResponse(msg)
   }
 
   if (
