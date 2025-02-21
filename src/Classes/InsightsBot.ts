@@ -29,13 +29,12 @@ export class InsightsBot {
         throw new Error('No answer from Insights API')
       }
 
+      const answerWithFeedback = `${answer}\n\nThis response is AI-generated. Let us know what you think in <#769251416778604562>!`
+
       const embed = new EmbedBuilder()
         .setTitle('Artbot AI (Beta)')
         .setColor(randomColor())
-        .setDescription(answer)
-        .setFooter({
-          text: 'This response is AI-generated. Let us know what you think!',
-        })
+        .setDescription(answerWithFeedback)
 
       return embed
     } catch (error) {
