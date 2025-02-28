@@ -40,10 +40,10 @@ export class InsightsBot {
     } catch (error) {
       console.error('Error getting insights API response:', error)
       return new EmbedBuilder()
-        .setTitle('Error')
+        .setTitle('Artbot AI (Beta)')
         .setColor('#FF0000')
         .setDescription(
-          'Sorry, I encountered an error while processing your request. Please try again later.'
+          "Sorry, I'm not sure how to answer that. Please check out the [Art Blocks website](https://www.artblocks.io)."
         )
         .setFooter({
           text: 'If this persists, please contact the bot administrator.',
