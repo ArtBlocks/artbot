@@ -180,16 +180,39 @@ console.log('Discord client created')
 console.log('PRODUCTION_MODE:', PRODUCTION_MODE)
 console.log('DISCORD_TOKEN exists:', !!DISCORD_TOKEN)
 
-if (PRODUCTION_MODE) {
+const DISCORD_LOGIN_TIMEOUT = 30000 // 30 seconds timeout
+const MAX_LOGIN_RETRIES = 3
+let loginRetryCount = 0
+
+async function attemptDiscordLogin() {
   console.log('Attempting Discord login...')
-  discordClient
-    .login(DISCORD_TOKEN)
-    .then(() => {
-      console.log('Discord login attempt successful')
+
+  try {
+    const loginPromise = discordClient.login(DISCORD_TOKEN)
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(
+        () => reject(new Error('Discord login timed out')),
+        DISCORD_LOGIN_TIMEOUT
+      )
     })
-    .catch((error) => {
-      console.error('Discord login failed:', error)
-    })
+
+    await Promise.race([loginPromise, timeoutPromise])
+    console.log('Discord login attempt successful')
+    loginRetryCount = 0 // Reset retry count on success
+  } catch (error) {
+    console.error('Discord login failed:', error)
+
+    if (loginRetryCount < MAX_LOGIN_RETRIES) {
+      loginRetryCount++
+      console.log(
+        `Retrying login attempt ${loginRetryCount}/${MAX_LOGIN_RETRIES}...`
+      )
+      setTimeout(attemptDiscordLogin, 5000) // Wait 5 seconds before retrying
+    } else {
+      console.error('Max login retries reached. Giving up.')
+      process.exit(1)
+    }
+  }
 }
 
 discordClient.on('ready', () => {
@@ -336,4 +359,8 @@ export const mintBot = new MintBot(discordClient)
 // Instantiate API Pollers (if not in test mode)
 if (PRODUCTION_MODE) {
   initReservoirBots()
+}
+
+if (PRODUCTION_MODE) {
+  attemptDiscordLogin()
 }
