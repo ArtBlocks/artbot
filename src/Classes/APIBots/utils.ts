@@ -223,11 +223,11 @@ export function getTokenUrl(
 }
 
 export function getProjectUrl(contractAddr: string, projectId: string): string {
-  return `https://www.artblocks.io/marketplace/collections/${contractAddr}-${projectId}`
+  return `https://www.artblocks.io/collections/${contractAddr}-${projectId}`
 }
 
 function buildArtBlocksTokenURL(contractAddr: string, tokenId: string): string {
-  return `https://www.artblocks.io/marketplace/asset/${contractAddr}/${tokenId}`
+  return `https://www.artblocks.io/token/${contractAddr}/${tokenId}`
 }
 
 export function buildOpenseaURL(contractAddr: string, tokenId: string): string {

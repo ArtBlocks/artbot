@@ -19,6 +19,7 @@ export class APIPollBot {
   artblocksSaleColor: ColorResolvable
   artblocksListColor: ColorResolvable
   lastUpdatedTime: number
+  intervalId?: NodeJS.Timeout
 
   /**
    * Constructor
@@ -47,8 +48,31 @@ export class APIPollBot {
     this.lastUpdatedTime = Date.now()
 
     // Poll the specified API every refreshRateMS millis
-    // (the .bind is needed for some JS weirdness with setInterval and 'this')
-    setInterval(this.pollApi.bind(this), this.refreshRateMs)
+    this.startPolling()
+  }
+
+  /**
+   * Start polling the API
+   */
+  startPolling() {
+    this.intervalId = setInterval(this.pollApi.bind(this), this.refreshRateMs)
+  }
+
+  /**
+   * Stop polling the API
+   */
+  stopPolling() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+      this.intervalId = undefined
+    }
+  }
+
+  /**
+   * Cleanup method to be called when the bot is being destroyed
+   */
+  cleanup() {
+    this.stopPolling()
   }
 
   /**

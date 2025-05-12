@@ -1,6 +1,6 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js'
 import { artIndexerBot, mintBot, projectConfig } from '../index'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import {
   MINT_UTM,
   getCollectionType,
@@ -38,6 +38,7 @@ export class MintBot {
   bot: Client
   abTwitterBot?: TwitterBot
   newMints: { [id: string]: Mint } = {}
+  intervalId?: NodeJS.Timeout
   mintsToPost: { [id: string]: Mint } = {}
   contractToChannel: { [id: string]: string[] } = {}
   contractToTwitterBot: { [id: string]: TwitterBot } = {}
@@ -109,80 +110,77 @@ export class MintBot {
   // If it does, report to discord and remove from the queue
   // If it doesn't, add it back in the queue to check again later
   async checkAndPostMints() {
-    await Promise.all(
-      Object.entries(this.mintsToPost).map(async ([id, mint]) => {
-        const tokenUrl = getTokenApiUrl(mint.contractAddress, mint.tokenId)
+    if (Object.keys(this.mintsToPost).length === 0) {
+      return
+    }
 
-        let artBlocksResponse
-        try {
-          artBlocksResponse = await axios.get(tokenUrl)
-        } catch (e) {
-          const axiosError = e as AxiosError
-          if (axiosError && e.response?.status === 404) {
-            console.log('Mint for inactive project')
-            delete this.mintsToPost[id]
-            return
-          }
-          console.log(`Error on fetching token API for ${id}`, e)
-          return
-        }
-
-        try {
-          const artBlocksData = artBlocksResponse.data
-          let assetUrl = artBlocksData?.preview_asset_url
-          if (!assetUrl) {
-            console.log(`No preview asset URL for mint ${id}`)
-            return
-          }
-
-          assetUrl = replaceToPNG(assetUrl)
-
-          // Validate URL format
+    try {
+      await Promise.all(
+        Object.entries(this.mintsToPost).map(async ([id, mint]) => {
           try {
-            new URL(assetUrl)
-          } catch (e) {
-            console.log(`Invalid asset URL for mint ${id}: ${assetUrl}`)
-            return
-          }
+            const tokenUrl = getTokenApiUrl(mint.contractAddress, mint.tokenId)
+            const artBlocksResponse = await axios.get(tokenUrl)
 
-          // Check image with timeout and content-type validation
-          try {
-            const imageRes = await axios.get(assetUrl, {
-              timeout: 10000, // 10 second timeout
-              validateStatus: (status) => status === 200,
-              headers: { Accept: 'image/*' },
-            })
-
-            const contentType = imageRes.headers['content-type']
-            if (!contentType?.startsWith('image/')) {
-              console.log(`Invalid content type for mint ${id}: ${contentType}`)
+            const artBlocksData = artBlocksResponse.data
+            let assetUrl = artBlocksData?.preview_asset_url
+            if (!assetUrl) {
+              console.log(`No preview asset URL for mint ${id}`)
               return
             }
 
-            // If we get here, the image is valid
-            delete this.mintsToPost[id]
-            mint.image = assetUrl
-            mint.generatorLink = artBlocksData.generator_url
-            mint.tokenName = artBlocksData.name
-            mint.artistName = artBlocksData.artist
-            mint.artblocksUrl = getTokenUrl(
-              artBlocksData.external_url,
-              mint.contractAddress,
-              mint.tokenId
-            )
-            mint.postToDiscord()
-            this.postToTwitter(mint)
+            assetUrl = replaceToPNG(assetUrl)
+
+            // Validate URL format
+            try {
+              new URL(assetUrl)
+            } catch (e) {
+              console.log(`Invalid asset URL for mint ${id}: ${assetUrl}`)
+              return
+            }
+
+            // Check image with timeout and content-type validation
+            try {
+              const imageRes = await axios.get(assetUrl, {
+                timeout: 10000, // 10 second timeout
+                validateStatus: (status) => status === 200,
+                headers: { Accept: 'image/*' },
+              })
+
+              const contentType = imageRes.headers['content-type']
+              if (!contentType?.startsWith('image/')) {
+                console.log(
+                  `Invalid content type for mint ${id}: ${contentType}`
+                )
+                return
+              }
+
+              // If we get here, the image is valid
+              delete this.mintsToPost[id]
+              mint.image = assetUrl
+              mint.generatorLink = artBlocksData.generator_url
+              mint.tokenName = artBlocksData.name
+              mint.artistName = artBlocksData.artist
+              mint.artblocksUrl = getTokenUrl(
+                artBlocksData.external_url,
+                mint.contractAddress,
+                mint.tokenId
+              )
+              await mint.postToDiscord()
+              await this.postToTwitter(mint)
+            } catch (e) {
+              console.log(`Error fetching image for mint ${id}:`, e)
+              // Keep in queue to retry later
+              return
+            }
           } catch (e) {
-            console.log(`Error fetching image for mint ${id}:`, e)
-            // Keep in queue to retry later
+            console.log(`Error processing mint ${id}:`, e)
             return
           }
-        } catch (e) {
-          console.log(`Error processing mint ${id}:`, e)
-          return
-        }
-      })
-    )
+        })
+      )
+    } catch (e) {
+      console.error('Error in checkAndPostMints:', e)
+    }
   }
 
   // Function to add a new mint to the queue!
@@ -214,7 +212,7 @@ export class MintBot {
   // Routine that runs every MINT_REFRESH_TIME_SECONDS seconds and
   // tries to report any new mints to the discord!
   startRoutine() {
-    setInterval(async () => {
+    this.intervalId = setInterval(async () => {
       if (Object.keys(this.mintsToPost).length > 0) {
         console.log(`${Object.keys(this.mintsToPost).length} mints to post`)
       }
@@ -234,6 +232,18 @@ export class MintBot {
     if (this.contractToTwitterBot[mint.contractAddress]) {
       this.contractToTwitterBot[mint.contractAddress].sendToTwitter(mint)
     }
+  }
+
+  /**
+   * Cleanup method to be called when the bot is being destroyed
+   */
+  cleanup() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+      this.intervalId = undefined
+    }
+    // Clear any pending mints
+    this.mintsToPost = {}
   }
 }
 
