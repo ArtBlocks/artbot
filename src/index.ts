@@ -167,6 +167,9 @@ app.get('/callback', (req: any, res: any) => {
   verifyTwitter(res, req)
 })
 
+// Store references to all bots that need cleanup
+const botsToCleanup: { cleanup: () => void }[] = []
+
 // Bot setup.
 export const discordClient = new Client({
   intents: [
@@ -180,8 +183,8 @@ console.log('Discord client created')
 console.log('PRODUCTION_MODE:', PRODUCTION_MODE)
 console.log('DISCORD_TOKEN exists:', !!DISCORD_TOKEN)
 
-const DISCORD_LOGIN_TIMEOUT = 30000 // 30 seconds timeout
-const MAX_LOGIN_RETRIES = 3
+const DISCORD_LOGIN_TIMEOUT = 30000 // 30 seconds
+const MAX_LOGIN_RETRIES = 5
 let loginRetryCount = 0
 
 async function attemptDiscordLogin() {
@@ -198,16 +201,23 @@ async function attemptDiscordLogin() {
 
     await Promise.race([loginPromise, timeoutPromise])
     console.log('Discord login attempt successful')
-    loginRetryCount = 0 // Reset retry count on success
+    loginRetryCount = 0
   } catch (error) {
     console.error('Discord login failed:', error)
 
     if (loginRetryCount < MAX_LOGIN_RETRIES) {
       loginRetryCount++
-      console.log(
-        `Retrying login attempt ${loginRetryCount}/${MAX_LOGIN_RETRIES}...`
+      // Exponential backoff: 5s, 10s, 20s, 40s, 80s
+      const backoffTime = Math.min(
+        5000 * Math.pow(2, loginRetryCount - 1),
+        80000
       )
-      setTimeout(attemptDiscordLogin, 5000) // Wait 5 seconds before retrying
+      console.log(
+        `Retrying login attempt ${loginRetryCount}/${MAX_LOGIN_RETRIES} in ${
+          backoffTime / 1000
+        }s...`
+      )
+      setTimeout(attemptDiscordLogin, backoffTime)
     } else {
       console.error('Max login retries reached. Giving up.')
       process.exit(1)
@@ -225,6 +235,8 @@ discordClient.on('error', (error) => {
 
 discordClient.on('disconnect', () => {
   console.log('Discord client disconnected')
+  // Cleanup all bots
+  botsToCleanup.forEach((bot) => bot.cleanup())
 })
 
 export const triviaBot = new TriviaBot(discordClient)
@@ -321,7 +333,7 @@ const initReservoirBots = async () => {
   const contractSetID = response.data.contractsSetId
 
   // List endpoint lets you use contractSet param which is very nice
-  new ReservoirListBot(
+  const listBot = new ReservoirListBot(
     `https://api.reservoir.tools/orders/asks/v5?contractsSetId=${contractSetID}&sortBy=createdAt&limit=${reservoirListLimit}&normalizeRoyalties=true`,
     API_POLL_TIME_MS,
     discordClient,
@@ -330,6 +342,7 @@ const initReservoirBots = async () => {
       'x-api-key': process.env.RESERVOIR_API_KEY,
     }
   )
+  botsToCleanup.push(listBot)
 
   // Sadly sales endpoint does not support contractSet param yet - need to batch by 20 contracts
   const RESERVOIR_CONTRACT_LIMIT = 20
@@ -342,7 +355,7 @@ const initReservoirBots = async () => {
     const saleParams =
       'contract=' + allContracts.slice(start, end).join('&contract=')
 
-    new ReservoirSaleBot(
+    const saleBot = new ReservoirSaleBot(
       `https://api.reservoir.tools/sales/v4?${saleParams}&limit=${reservoirSaleLimit}`,
       API_POLL_TIME_MS + i * 3000,
       discordClient,
@@ -351,6 +364,7 @@ const initReservoirBots = async () => {
         'x-api-key': process.env.RESERVOIR_API_KEY,
       }
     )
+    botsToCleanup.push(saleBot)
   }
 }
 
@@ -364,3 +378,22 @@ if (PRODUCTION_MODE) {
 if (PRODUCTION_MODE) {
   attemptDiscordLogin()
 }
+
+// Handle application shutdown
+process.on('SIGINT', () => {
+  console.log('Received SIGINT. Cleaning up...')
+  // Cleanup all bots
+  botsToCleanup.forEach((bot) => bot.cleanup())
+  // Disconnect Discord client
+  discordClient.destroy()
+  process.exit(0)
+})
+
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM. Cleaning up...')
+  // Cleanup all bots
+  botsToCleanup.forEach((bot) => bot.cleanup())
+  // Disconnect Discord client
+  discordClient.destroy()
+  process.exit(0)
+})

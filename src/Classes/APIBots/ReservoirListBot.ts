@@ -42,10 +42,10 @@ type ReservoirListResponse =
   paths['/orders/asks/v5']['get']['responses']['200']['schema']
 
 const IDENTICAL_TOLERANCE = 0.0001
-
+const LISTING_TTL_MS = 24 * 60 * 60 * 1000 // 24 hours
 /** API Poller for Reservoir Sale events */
 export class ReservoirListBot extends APIPollBot {
-  recentListings: { [key: string]: number } = {}
+  recentListings: { [key: string]: { price: number; timestamp: number } } = {}
   /** Constructor just calls super
    * @param {string} apiEndpoint - Endpoint to be hitting
    * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
@@ -88,6 +88,21 @@ export class ReservoirListBot extends APIPollBot {
     if (maxTime > this.lastUpdatedTime) {
       this.lastUpdatedTime = maxTime
     }
+
+    // Cleanup old listings
+    this.cleanupOldListings()
+  }
+
+  /**
+   * Cleanup listings older than TTL
+   */
+  private cleanupOldListings() {
+    const now = Date.now()
+    Object.entries(this.recentListings).forEach(([key, value]) => {
+      if (now - value.timestamp > LISTING_TTL_MS) {
+        delete this.recentListings[key]
+      }
+    })
   }
 
   /**
@@ -109,7 +124,8 @@ export class ReservoirListBot extends APIPollBot {
 
     if (
       this.recentListings[tokenID] &&
-      Math.abs(this.recentListings[tokenID] - price) <= IDENTICAL_TOLERANCE
+      Math.abs(this.recentListings[tokenID].price - price) <=
+        IDENTICAL_TOLERANCE
     ) {
       console.log(`Skipping identical relisting for ${tokenID}`)
       console.log(
@@ -118,7 +134,7 @@ export class ReservoirListBot extends APIPollBot {
       )
       return
     }
-    this.recentListings[tokenID] = price
+    this.recentListings[tokenID] = { price, timestamp: Date.now() }
 
     if (listing.source?.domain?.includes('artblocks')) {
       embed.setColor(this.artblocksListColor)
@@ -217,5 +233,13 @@ export class ReservoirListBot extends APIPollBot {
         await getCollectionType(listing.contract ?? '')
       )
     }
+  }
+
+  /**
+   * Cleanup method to be called when the bot is being destroyed
+   */
+  cleanup() {
+    super.cleanup()
+    this.recentListings = {}
   }
 }

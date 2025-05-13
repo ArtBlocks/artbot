@@ -38,9 +38,8 @@ const CONTRACT_ALIASES: {
 
 const { isWallet } = require('./APIBots/utils')
 
-// Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES =
-  process.env.METADATA_REFRESH_INTERVAL_MINUTES ?? '60'
+  process.env.METADATA_REFRESH_INTERVAL_MINUTES ?? '480' // 8 hours
 const ONE_MINUTE_IN_MS = 60000
 
 export enum MessageTypes {
@@ -94,11 +93,26 @@ export class ArtIndexerBot {
       projectConfig.initializeProjectBots()
     }
     setInterval(async () => {
+      this.logDictionarySizes()
       await this.buildProjectBots()
       if (this.projectFetch === getAllProjects) {
         projectConfig.initializeProjectBots()
       }
     }, parseInt(METADATA_REFRESH_INTERVAL_MINUTES) * ONE_MINUTE_IN_MS)
+  }
+
+  private logDictionarySizes() {
+    console.log('ArtIndexerBot Dictionary Sizes:')
+    console.log(`projects: ${Object.keys(this.projects).length}`)
+    console.log(`artists: ${Object.keys(this.artists).length}`)
+    console.log(`birthdays: ${Object.keys(this.birthdays).length}`)
+    console.log(`collections: ${Object.keys(this.collections).length}`)
+    console.log(`tags: ${Object.keys(this.tags).length}`)
+    console.log(`projectsById: ${Object.keys(this.projectsById).length}`)
+    console.log(`contracts: ${Object.keys(this.contracts).length}`)
+    console.log(`walletTokens: ${Object.keys(this.walletTokens).length}`)
+    console.log(`platforms: ${Object.keys(this.platforms).length}`)
+    console.log(`flagship: ${Object.keys(this.flagship).length}`)
   }
 
   async buildContracts() {
@@ -125,6 +139,7 @@ export class ArtIndexerBot {
 
   async buildProjectBots() {
     try {
+      this.clearDictionaries()
       const projects = await this.projectFetch()
       console.log(
         `ArtIndexerBot: Building ${projects.length} ProjectBots using: ${this.projectFetch.name}`
@@ -232,6 +247,18 @@ export class ArtIndexerBot {
     } catch (err) {
       console.error(`Error while initializing ArtIndexerBots\n${err}`)
     }
+  }
+
+  private clearDictionaries() {
+    this.projects = {}
+    this.artists = {}
+    this.birthdays = {}
+    this.collections = {}
+    this.tags = {}
+    this.projectsById = {}
+    this.platforms = {}
+    this.flagship = {}
+    // Don't clear contracts or walletTokens as they are managed separately
   }
 
   // Please update HASHTAG_MESSAGE in smartBotResponse.ts if you add more options here

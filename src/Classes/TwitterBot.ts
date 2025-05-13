@@ -40,6 +40,7 @@ export class TwitterBot {
   twitterClient: TwitterApi
   twitterStatusAccount?: TwitterApi
   lastTweetId: string
+  intervalId?: NodeJS.Timeout
 
   constructor({
     appKey,
@@ -76,9 +77,19 @@ export class TwitterBot {
       return
     }
 
-    setInterval(() => {
+    this.intervalId = setInterval(() => {
       this.search()
     }, SEARCH_INTERVAL_MS)
+  }
+
+  /**
+   * Cleanup method to be called when the bot is being destroyed
+   */
+  cleanup() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+      this.intervalId = undefined
+    }
   }
 
   async search() {
