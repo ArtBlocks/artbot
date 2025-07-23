@@ -49,7 +49,6 @@ type ReservoirSaleResponse = {
 
 /** API Poller for Reservoir Sale events */
 export class ReservoirSaleBot extends APIPollBot {
-  contract: string
   saleIds: Set<string>
   twitterBot?: TwitterBot
   /** Constructor just calls super
@@ -63,13 +62,11 @@ export class ReservoirSaleBot extends APIPollBot {
     refreshRateMs: number,
     bot: Client,
     headers: any,
-    contract = '',
     twitterBot?: TwitterBot
   ) {
     apiEndpoint =
       apiEndpoint + '&startTimestamp=' + (Date.now() / 1000).toFixed()
     super(apiEndpoint, refreshRateMs, bot, headers)
-    this.contract = contract
     this.twitterBot = twitterBot
     this.lastUpdatedTime = Math.floor(this.lastUpdatedTime / 1000)
     this.saleIds = new Set()

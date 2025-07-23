@@ -42,21 +42,11 @@ export class MintBot {
   mintsToPost: { [id: string]: Mint } = {}
   contractToChannel: { [id: string]: string[] } = {}
   contractToTwitterBot: { [id: string]: TwitterBot } = {}
-  constructor(bot: Client) {
+  constructor(bot: Client, abTwitterBot?: TwitterBot) {
     this.bot = bot
+    this.abTwitterBot = abTwitterBot
     this.buildContractToChannel()
     this.startRoutine()
-
-    if (process.env.PRODUCTION_MODE) {
-      if (process.env.AB_TWITTER_API_KEY) {
-        this.abTwitterBot = new TwitterBot({
-          appKey: process.env.AB_TWITTER_API_KEY ?? '',
-          appSecret: process.env.AB_TWITTER_API_SECRET ?? '',
-          accessToken: process.env.AB_TWITTER_OAUTH_TOKEN ?? '',
-          accessSecret: process.env.AB_TWITTER_OAUTH_SECRET ?? '',
-        })
-      }
-    }
   }
 
   async buildContractToChannel() {
