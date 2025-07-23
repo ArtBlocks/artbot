@@ -52,9 +52,9 @@ const STATUS_TWITTER_HANDLE = 'ArtbotStatus'
  * The bot can be used for posting functionality (sales, mints, etc.) even when listener is disabled
  */
 export class TwitterBot {
-  twitterClient: TwitterApi
+  twitterClient?: TwitterApi
   twitterStatusAccount?: TwitterApi
-  lastTweetId: string
+  lastTweetId?: string
   intervalId?: NodeJS.Timeout
 
   constructor({
@@ -69,6 +69,13 @@ export class TwitterBot {
     accessSecret: string
   }) {
     this.lastTweetId = ''
+
+    if (!appKey || !appSecret || !accessToken || !accessSecret) {
+      console.warn(
+        'Twitter credentials are missing - not initializing TwitterBot'
+      )
+      return
+    }
 
     // Initialize Twitter client for posting capabilities
     this.twitterClient = new TwitterApi({
@@ -122,7 +129,7 @@ export class TwitterBot {
 
       const query = `(to:${ARTBOT_TWITTER_HANDLE} OR @${ARTBOT_TWITTER_HANDLE}) -is:retweet -has:links has:mentions -from:${STATUS_TWITTER_HANDLE} -from:${ARTBOT_TWITTER_HANDLE}`
       const devQuery = `to:ArtbotTesting from:ArtbotTesting`
-      artbotTweets = await this.twitterClient.v2.search({
+      artbotTweets = await this.twitterClient?.v2.search({
         query: prod ? query : devQuery,
         since_id: this.lastTweetId,
       })
@@ -243,7 +250,7 @@ export class TwitterBot {
     console.log(`Replying to ${tweet.id} with ${artBlocksData.name}`)
     for (let i = 0; i < NUM_RETRIES; i++) {
       try {
-        await this.twitterClient.v2.reply(tweetMessage, tweet.id, {
+        await this.twitterClient?.v2.reply(tweetMessage, tweet.id, {
           media: {
             media_ids: [media_id],
           },
@@ -302,9 +309,12 @@ export class TwitterBot {
     console.log('Uploading media to twitter...', assetUrl)
     for (let i = 0; i < NUM_RETRIES; i++) {
       try {
-        const mediaId = await this.twitterClient.v1.uploadMedia(buff, {
+        const mediaId = await this.twitterClient?.v1.uploadMedia(buff, {
           mimeType: this.getMimeType(assetUrl),
         })
+        if (!mediaId) {
+          throw new Error('No media id returned')
+        }
         return mediaId
       } catch (err) {
         console.log(`Error uploading ${assetUrl}:`, err)
@@ -354,7 +364,7 @@ export class TwitterBot {
     }. \n\n${artBlock.artblocksUrl + TWITTER_PROJECTBOT_UTM}`
     console.log(`Tweeting ${tweetText}`)
 
-    const tweetRes = await this.twitterClient.v2.tweet(tweetText, {
+    const tweetRes = await this.twitterClient?.v2.tweet(tweetText, {
       text: tweetText,
       media: { media_ids: [mediaId] },
     })
@@ -465,7 +475,7 @@ ${saleData.tokenUrl + TWITTER_PROJECTBOT_UTM}`
       // Post the tweet with retry logic
       for (let i = 0; i < NUM_RETRIES; i++) {
         try {
-          await this.twitterClient.v2.tweet(tweetMessage, {
+          await this.twitterClient?.v2.tweet(tweetMessage, {
             media: {
               media_ids: [media_id],
             },
