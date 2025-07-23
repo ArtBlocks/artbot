@@ -24,6 +24,11 @@ import {
   updateStatusRefreshToken,
 } from '../Data/supabase'
 
+// Twitter Bot Feature Toggles - Modify these to enable/disable functionality
+const TWITTER_LISTENING_ENABLED = false // Enables listening and responding to tweet mentions
+const TWITTER_SALE_POSTING_ENABLED = false // Enables posting sale tweets
+const TWITTER_MINT_POSTING_ENABLED = false // Enables posting mint tweets
+
 const TWITTER_MEDIA_BYTE_LIMIT = 5242880
 // Search rate limit is 60 queries per 15 minutes - shortest interval is 15 secs (though we should keep it a bit longer)
 const SEARCH_INTERVAL_MS = 20000
@@ -36,10 +41,20 @@ const prod = process.env.ARTBOT_IS_PROD
 const ARTBOT_TWITTER_HANDLE = 'artbotartbot'
 const STATUS_TWITTER_HANDLE = 'ArtbotStatus'
 
+/**
+ * TwitterBot handles Twitter API interactions for posting tweets and listening/responding to mentions
+ *
+ * Feature Toggles (constants at top of file):
+ * - TWITTER_LISTENING_ENABLED: Controls whether the bot listens for and responds to tweets (default: false)
+ * - TWITTER_SALE_POSTING_ENABLED: Controls whether the bot posts sale tweets (default: false)
+ * - TWITTER_MINT_POSTING_ENABLED: Controls whether the bot posts mint tweets (default: false)
+ *
+ * The bot can be used for posting functionality (sales, mints, etc.) even when listener is disabled
+ */
 export class TwitterBot {
-  twitterClient: TwitterApi
+  twitterClient?: TwitterApi
   twitterStatusAccount?: TwitterApi
-  lastTweetId: string
+  lastTweetId?: string
   intervalId?: NodeJS.Timeout
 
   constructor({
@@ -47,25 +62,38 @@ export class TwitterBot {
     appSecret,
     accessToken,
     accessSecret,
-    listener,
   }: {
     appKey: string
     appSecret: string
     accessToken: string
     accessSecret: string
-    listener?: boolean
   }) {
     this.lastTweetId = ''
-    if (listener && process.env.TWITTER_ENABLED === 'true') {
-      console.log('Starting Twitter listener')
-      this.startSearchAndReplyRoutine()
+
+    if (!appKey || !appSecret || !accessToken || !accessSecret) {
+      console.warn(
+        'Twitter credentials are missing - not initializing TwitterBot'
+      )
+      return
     }
+
+    // Initialize Twitter client for posting capabilities
     this.twitterClient = new TwitterApi({
       appKey,
       appSecret,
       accessToken,
       accessSecret,
     })
+
+    // Only start listener if enabled via constant
+    if (TWITTER_LISTENING_ENABLED) {
+      console.log('Starting Twitter listener')
+      this.startSearchAndReplyRoutine()
+    } else {
+      console.log(
+        'Twitter listener disabled via TWITTER_LISTENING_ENABLED constant'
+      )
+    }
   }
 
   async startSearchAndReplyRoutine() {
@@ -101,7 +129,7 @@ export class TwitterBot {
 
       const query = `(to:${ARTBOT_TWITTER_HANDLE} OR @${ARTBOT_TWITTER_HANDLE}) -is:retweet -has:links has:mentions -from:${STATUS_TWITTER_HANDLE} -from:${ARTBOT_TWITTER_HANDLE}`
       const devQuery = `to:ArtbotTesting from:ArtbotTesting`
-      artbotTweets = await this.twitterClient.v2.search({
+      artbotTweets = await this.twitterClient?.v2.search({
         query: prod ? query : devQuery,
         since_id: this.lastTweetId,
       })
@@ -150,6 +178,7 @@ export class TwitterBot {
     }
     this.updateLastTweetId(artbotTweets.meta.newest_id)
   }
+
   async updateLastTweetId(tweetId: string) {
     if (tweetId === this.lastTweetId) {
       return
@@ -221,7 +250,7 @@ export class TwitterBot {
     console.log(`Replying to ${tweet.id} with ${artBlocksData.name}`)
     for (let i = 0; i < NUM_RETRIES; i++) {
       try {
-        await this.twitterClient.v2.reply(tweetMessage, tweet.id, {
+        await this.twitterClient?.v2.reply(tweetMessage, tweet.id, {
           media: {
             media_ids: [media_id],
           },
@@ -280,9 +309,12 @@ export class TwitterBot {
     console.log('Uploading media to twitter...', assetUrl)
     for (let i = 0; i < NUM_RETRIES; i++) {
       try {
-        const mediaId = await this.twitterClient.v1.uploadMedia(buff, {
+        const mediaId = await this.twitterClient?.v1.uploadMedia(buff, {
           mimeType: this.getMimeType(assetUrl),
         })
+        if (!mediaId) {
+          throw new Error('No media id returned')
+        }
         return mediaId
       } catch (err) {
         console.log(`Error uploading ${assetUrl}:`, err)
@@ -303,7 +335,15 @@ export class TwitterBot {
     }
   }
 
-  async tweetArtblock(artBlock: Mint) {
+  async _tweetMint(artBlock: Mint) {
+    // Check if Twitter mint posting is enabled
+    if (!TWITTER_MINT_POSTING_ENABLED) {
+      console.log(
+        'Twitter mint posting disabled via TWITTER_MINT_POSTING_ENABLED constant'
+      )
+      return
+    }
+
     const assetUrl = artBlock.image
     if (!artBlock.image) {
       console.error('No artblock image defined', JSON.stringify(artBlock))
@@ -324,7 +364,7 @@ export class TwitterBot {
     }. \n\n${artBlock.artblocksUrl + TWITTER_PROJECTBOT_UTM}`
     console.log(`Tweeting ${tweetText}`)
 
-    const tweetRes = await this.twitterClient.v2.tweet(tweetText, {
+    const tweetRes = await this.twitterClient?.v2.tweet(tweetText, {
       text: tweetText,
       media: { media_ids: [mediaId] },
     })
@@ -334,9 +374,9 @@ export class TwitterBot {
     }
   }
 
-  async sendToTwitter(mint: Mint) {
+  async tweetMint(mint: Mint) {
     try {
-      await this.tweetArtblock(mint)
+      await this._tweetMint(mint)
     } catch (e) {
       console.error('Error posting to Twitter: ', e)
     }
@@ -361,6 +401,14 @@ export class TwitterBot {
   }
 
   async sendStatusMessage(message: string, replyId?: string) {
+    // Check if Twitter listening is enabled (status messages are mainly for user interactions)
+    if (!TWITTER_LISTENING_ENABLED) {
+      console.log(
+        'Twitter status messaging disabled via TWITTER_LISTENING_ENABLED constant'
+      )
+      return
+    }
+
     if (!this.twitterStatusAccount) {
       await this.signIntoStatusAccount()
     }
@@ -372,5 +420,95 @@ export class TwitterBot {
       return
     }
     await this.twitterStatusAccount?.v2.tweet(message)
+  }
+
+  async tweetSale(saleData: {
+    tokenName: string
+    projectName: string
+    artist: string
+    salePrice: number
+    currency: string
+    buyer: string
+    seller: string
+    assetUrl: string
+    tokenUrl: string
+    platform?: string
+  }) {
+    // Check if Twitter sale posting is enabled
+    if (!TWITTER_SALE_POSTING_ENABLED) {
+      console.log(
+        'Twitter sale posting disabled via TWITTER_SALE_POSTING_ENABLED constant'
+      )
+      return
+    }
+
+    try {
+      console.log(`Tweeting sale for ${saleData.tokenName}`)
+
+      // Upload the token image to Twitter
+      let media_id: string
+      try {
+        media_id = await this.uploadMedia(saleData.assetUrl)
+      } catch (error) {
+        console.error(`Error uploading media for sale tweet:`, error)
+        return
+      }
+
+      // Get ENS names for buyer and seller
+      const buyerText = await ensOrAddress(saleData.buyer)
+      const sellerText = await ensOrAddress(saleData.seller)
+
+      // Format the platform text if provided
+      const platformText = saleData.platform ? ` on ${saleData.platform}` : ''
+
+      // Construct the tweet message
+      const tweetMessage = `🔥 SALE: ${saleData.tokenName} by ${saleData.artist}
+
+💰 ${saleData.salePrice} ${saleData.currency}${platformText}
+👤 Sold by ${sellerText}
+🛒 Bought by ${buyerText}
+
+${saleData.tokenUrl + TWITTER_PROJECTBOT_UTM}`
+
+      console.log(`Posting sale tweet: ${saleData.tokenName}`)
+
+      // Post the tweet with retry logic
+      for (let i = 0; i < NUM_RETRIES; i++) {
+        try {
+          await this.twitterClient?.v2.tweet(tweetMessage, {
+            media: {
+              media_ids: [media_id],
+            },
+          })
+          console.log(`Successfully tweeted sale for ${saleData.tokenName}`)
+          return
+        } catch (error) {
+          if (error instanceof ApiResponseError && error.rateLimit) {
+            console.log(
+              `Rate limit hit on sale tweet: \nLimit: ${error.rateLimit.limit}\nRemaining: ${error.rateLimit.remaining}\nReset: ${error.rateLimit.reset}`
+            )
+            const reset = new Date(error.rateLimit.reset * 1000)
+            const now = new Date()
+            const diff = reset.getTime() - now.getTime()
+            const diffMinutes = Math.ceil(diff / 60000)
+            try {
+              await this.sendStatusMessage(
+                `Sale tweet rate limited :( Will retry in ${diffMinutes} minutes`
+              )
+            } catch (e) {
+              console.error('Error sending rate limit status message:', e)
+            }
+            return
+          } else {
+            console.log(`Error posting sale tweet:`, error)
+            console.log(`Retrying (attempt ${i + 1} of ${NUM_RETRIES})...`)
+            await delay(RETRY_DELAY_MS)
+          }
+        }
+      }
+      console.error('Failed to post sale tweet after all retry attempts')
+    } catch (error) {
+      console.error('Error in tweetSale:', error)
+    }
   }
 }

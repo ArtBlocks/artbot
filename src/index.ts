@@ -31,6 +31,7 @@ import { ScheduleBot } from './Classes/SchedulerBot'
 import { verifyTwitter } from './Utils/twitterUtils'
 import axios from 'axios'
 import { paths } from '@reservoir0x/reservoir-sdk'
+import { TwitterBot } from './Classes/TwitterBot'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
@@ -362,13 +363,21 @@ const initReservoirBots = async () => {
       {
         Accept: 'application/json',
         'x-api-key': process.env.RESERVOIR_API_KEY,
-      }
+      },
+      abTwitterBot
     )
     botsToCleanup.push(saleBot)
   }
 }
 
-export const mintBot = new MintBot(discordClient)
+const abTwitterBot = new TwitterBot({
+  appKey: process.env.AB_TWITTER_API_KEY ?? '',
+  appSecret: process.env.AB_TWITTER_API_SECRET ?? '',
+  accessToken: process.env.AB_TWITTER_OAUTH_TOKEN ?? '',
+  accessSecret: process.env.AB_TWITTER_OAUTH_SECRET ?? '',
+})
+
+export const mintBot = new MintBot(discordClient, abTwitterBot)
 
 // Instantiate API Pollers (if not in test mode)
 if (PRODUCTION_MODE) {
