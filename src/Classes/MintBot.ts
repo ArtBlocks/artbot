@@ -54,7 +54,6 @@ export class MintBot {
           appSecret: process.env.AB_TWITTER_API_SECRET ?? '',
           accessToken: process.env.AB_TWITTER_OAUTH_TOKEN ?? '',
           accessSecret: process.env.AB_TWITTER_OAUTH_SECRET ?? '',
-          listener: true,
         })
       }
     }
@@ -230,7 +229,7 @@ export class MintBot {
       // this.abTwitterBot?.sendToTwitter(mint)
     }
     if (this.contractToTwitterBot[mint.contractAddress]) {
-      this.contractToTwitterBot[mint.contractAddress].sendToTwitter(mint)
+      this.contractToTwitterBot[mint.contractAddress].tweetMint(mint)
     }
   }
 

@@ -6,6 +6,7 @@ import {
 } from '../../Utils/activityTriager'
 import { CollectionType } from '../MintBot'
 import { APIPollBot } from './ApiPollBot'
+import { TwitterBot } from '../TwitterBot'
 import {
   getTokenApiUrl,
   isExplorationsContract,
@@ -50,22 +51,26 @@ type ReservoirSaleResponse = {
 export class ReservoirSaleBot extends APIPollBot {
   contract: string
   saleIds: Set<string>
+  twitterBot?: TwitterBot
   /** Constructor just calls super
    * @param {string} apiEndpoint - Endpoint to be hitting
    * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
    * @param {*} bot - Discord bot that will be sending messages
+   * @param {TwitterBot} twitterBot - Optional TwitterBot instance for posting sale tweets
    */
   constructor(
     apiEndpoint: string,
     refreshRateMs: number,
     bot: Client,
     headers: any,
-    contract = ''
+    contract = '',
+    twitterBot?: TwitterBot
   ) {
     apiEndpoint =
       apiEndpoint + '&startTimestamp=' + (Date.now() / 1000).toFixed()
     super(apiEndpoint, refreshRateMs, bot, headers)
     this.contract = contract
+    this.twitterBot = twitterBot
     this.lastUpdatedTime = Math.floor(this.lastUpdatedTime / 1000)
     this.saleIds = new Set()
   }
@@ -269,6 +274,55 @@ export class ReservoirSaleBot extends APIPollBot {
         await getCollectionType(sale.token.contract)
       )
     }
+
+    // Post to Twitter if TwitterBot is available and sale meets criteria
+    if (this.twitterBot && this.shouldTweetSale(sale, artBlocksData)) {
+      try {
+        await this.twitterBot.tweetSale({
+          tokenName: artBlocksData.name,
+          projectName: artBlocksData.collection_name,
+          artist: artBlocksData.artist,
+          salePrice: price,
+          currency: currency,
+          buyer: sale.to,
+          seller: sale.from,
+          assetUrl: assetUrl || artBlocksData.preview_asset_url,
+          tokenUrl: tokenUrl,
+          platform: platform
+            .replace('<:lilsquig:1028047420636020786>', '')
+            .trim(),
+        })
+      } catch (error) {
+        console.error('Error posting sale to Twitter:', error)
+      }
+    }
+  }
+
+  /**
+   * Determines whether a sale should be posted to Twitter
+   * Currently filters out low-value sales and certain platforms
+   * Can be customized to add more filtering criteria
+   */
+  private shouldTweetSale(sale: ReservoirSale, _artBlocksData: any): boolean {
+    const price = sale.price.amount.decimal
+    const currency = sale.price.currency.symbol
+
+    // Filter out very low-value sales (less than 0.1 ETH)
+    if (currency === 'ETH' && price < 0.1) {
+      return false
+    }
+
+    // Filter out mint events (though these should already be filtered out)
+    if (sale.orderKind === 'mint') {
+      return false
+    }
+
+    // Could add more filters here, for example:
+    // - Only certain collections
+    // - Only sales above certain thresholds
+    // - Only certain platforms
+
+    return true
   }
 
   async buildSweepDiscordMessage(sales: ReservoirSale[]) {
