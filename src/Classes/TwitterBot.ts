@@ -15,7 +15,7 @@ import {
   getTokenUrl,
 } from './APIBots/utils'
 import axios from 'axios'
-import { artIndexerBot } from '..'
+import { artIndexerBot, ARTIST_TWITTER_HANDLES } from '..'
 import sharp from 'sharp'
 import {
   getLastTweetId,
@@ -461,8 +461,14 @@ export class TwitterBot {
       // Format the platform text if provided
       const platformText = saleData.platform ? ` on ${saleData.platform}` : ''
 
+      // Get artist Twitter handle if available
+      const artistTwitterHandle = ARTIST_TWITTER_HANDLES.get(saleData.artist)
+      const artistText = artistTwitterHandle
+        ? `@${artistTwitterHandle}`
+        : saleData.artist
+
       // Construct the tweet message
-      const tweetMessage = `🔥 SALE: ${saleData.tokenName} by ${saleData.artist}
+      const tweetMessage = `🔥 SALE: ${saleData.tokenName} by ${artistText}
 
 💰 ${saleData.salePrice} ${saleData.currency}${platformText}
 👤 Sold by ${sellerText}

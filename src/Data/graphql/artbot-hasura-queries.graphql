@@ -230,3 +230,15 @@ query GetStudioContracts {
     ...ContractDetail
   }
 }
+
+query GetArtistsTwitterHandles {
+  artistEditorialPages {
+    data {
+      attributes {
+        twitter
+        userProfileAddress
+        artistName
+      }
+    }
+  }
+}

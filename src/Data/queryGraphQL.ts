@@ -22,6 +22,7 @@ import {
   GetProjectRandomOobDocument,
   OobTokenDetailFragment,
   GetStudioContractsDocument,
+  GetArtistsTwitterHandlesDocument,
 } from '../../generated/graphql'
 import {
   isArbitrumContract,
@@ -516,4 +517,76 @@ export async function getRandomOobForProject(
   }
 
   return data.projects_metadata[0].random_oob_token[0]
+}
+
+/**
+ * Utility function to extract Twitter handle from a Twitter URL
+ * @param twitterUrl - Full Twitter URL (e.g., "https://twitter.com/msoriaro")
+ * @returns Twitter handle without @ symbol (e.g., "msoriaro")
+ */
+function extractTwitterHandle(twitterUrl: string): string | null {
+  if (!twitterUrl) {
+    return null
+  }
+
+  try {
+    // Handle both twitter.com and x.com URLs
+    const url = new URL(twitterUrl)
+    if (url.hostname === 'twitter.com' || url.hostname === 'x.com') {
+      const pathSegments = url.pathname
+        .split('/')
+        .filter((segment) => segment !== '')
+      if (pathSegments.length > 0) {
+        return pathSegments[0] // Return the first path segment which should be the handle
+      }
+    }
+  } catch (error) {
+    console.error('Error parsing Twitter URL:', twitterUrl, error)
+  }
+
+  return null
+}
+
+export async function getArtistsTwitterHandles(): Promise<Map<string, string>> {
+  const artistTwitterMap = new Map<string, string>()
+
+  try {
+    const { data } = await client
+      .query(GetArtistsTwitterHandlesDocument, {})
+      .toPromise()
+
+    if (!data || !data.artistEditorialPages?.data) {
+      throw Error('No data returned from GetArtistsTwitterHandles query')
+    }
+
+    // Process each artist and extract Twitter handle
+    data.artistEditorialPages.data.forEach((artist) => {
+      if (!artist?.attributes) return
+
+      const artistName = artist.attributes.artistName
+      const twitter = artist.attributes.twitter
+
+      if (artistName && twitter) {
+        const handle = extractTwitterHandle(twitter)
+        if (handle) {
+          artistTwitterMap.set(artistName, handle)
+          console.log(
+            `Mapped artist "${artistName}" to Twitter handle "@${handle}"`
+          )
+        } else {
+          console.warn(
+            `Could not extract Twitter handle from URL: ${twitter} for artist: ${artistName}`
+          )
+        }
+      }
+    })
+
+    console.log(
+      `Successfully loaded ${artistTwitterMap.size} artist Twitter handles`
+    )
+    return artistTwitterMap
+  } catch (error) {
+    console.error('Error fetching artists Twitter handles:', error)
+    return artistTwitterMap
+  }
 }

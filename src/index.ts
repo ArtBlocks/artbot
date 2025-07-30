@@ -7,6 +7,7 @@ import { ProjectConfig } from './ProjectConfig/projectConfig'
 export let STUDIO_CONTRACTS: string[] = []
 export let ENGINE_CONTRACTS: string[] = []
 export let ARBITRUM_CONTRACTS: string[] = []
+export let ARTIST_TWITTER_HANDLES: Map<string, string> = new Map()
 export const projectConfig = new ProjectConfig()
 
 import { ArtIndexerBot } from './Classes/ArtIndexerBot'
@@ -20,6 +21,7 @@ import {
   getEngineContracts,
   getEngineProjects,
   getStudioContracts,
+  getArtistsTwitterHandles,
 } from './Data/queryGraphQL'
 import { InsightsBot } from './Classes/InsightsBot'
 import { TriviaBot } from './Classes/TriviaBot'
@@ -56,6 +58,9 @@ getEngineContracts().then((contracts) => {
 })
 getArbitrumContracts().then((contracts) => {
   ARBITRUM_CONTRACTS = contracts ?? []
+})
+getArtistsTwitterHandles().then((handles) => {
+  ARTIST_TWITTER_HANDLES = handles
 })
 
 export const artIndexerBot = new ArtIndexerBot()
