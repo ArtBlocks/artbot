@@ -14,6 +14,7 @@ import {
   getTokenApiUrl,
   getTokenUrl,
 } from './APIBots/utils'
+import { lookupUserByAddress } from '../Data/queryGraphQL'
 import axios from 'axios'
 import { artIndexerBot, ARTIST_TWITTER_HANDLES } from '..'
 import sharp from 'sharp'
@@ -118,6 +119,59 @@ export class TwitterBot {
       clearInterval(this.intervalId)
       this.intervalId = undefined
     }
+  }
+
+  /**
+   * Sanitizes a Twitter username by extracting handle from URLs and validating format
+   * @param twitterUsername - Raw twitter username from database
+   * @returns Clean Twitter handle without @ symbol, or null if invalid
+   */
+  private sanitizeTwitterUsername(twitterUsername: string): string | null {
+    if (!twitterUsername || twitterUsername.trim() === '') {
+      return null
+    }
+
+    let handle = twitterUsername.trim()
+
+    // Remove @ symbol if present
+    if (handle.startsWith('@')) {
+      handle = handle.substring(1)
+    }
+
+    // Extract handle from Twitter URLs
+    if (handle.includes('twitter.com/') || handle.includes('x.com/')) {
+      try {
+        const url = new URL(
+          handle.startsWith('http') ? handle : `https://${handle}`
+        )
+        if (url.hostname === 'twitter.com' || url.hostname === 'x.com') {
+          const pathSegments = url.pathname
+            .split('/')
+            .filter((segment) => segment !== '')
+          if (pathSegments.length > 0) {
+            handle = pathSegments[0]
+          }
+        }
+      } catch (error) {
+        // If URL parsing fails, try to extract manually
+        const match = handle.match(/(?:twitter\.com\/|x\.com\/)([^/\s?]+)/)
+        if (match && match[1]) {
+          handle = match[1]
+        } else {
+          return null
+        }
+      }
+    }
+
+    // Validate Twitter handle format
+    // Twitter handles can only contain letters, numbers, and underscores
+    // Must be 1-15 characters long
+    const twitterHandleRegex = /^[a-zA-Z0-9_]{1,15}$/
+    if (!twitterHandleRegex.test(handle)) {
+      return null
+    }
+
+    return handle
   }
 
   async search() {
@@ -422,6 +476,77 @@ export class TwitterBot {
     await this.twitterStatusAccount?.v2.tweet(message)
   }
 
+  /**
+   * Get artist display name following fallback rules:
+   * 1. @twitterHandle
+   * 2. Artist Name (AB DB)
+   * Returns null if no valid name is found
+   */
+  private async getArtistDisplayName(
+    artistName: string
+  ): Promise<string | null> {
+    // 1. Try Twitter handle first
+    const artistTwitterHandle = ARTIST_TWITTER_HANDLES.get(artistName)
+    if (artistTwitterHandle) {
+      return `@${artistTwitterHandle}`
+    }
+
+    // 2. Use Artist Name from AB DB if it exists and isn't an address
+    if (artistName && artistName !== 'unknown artist') {
+      return artistName
+    }
+
+    return null
+  }
+
+  /**
+   * Get collector display name following fallback rules:
+   * 1. @twitterHandle
+   * 2. name
+   * 3. username
+   * 4. ENS
+   * Returns null if no valid name is found (avoids ethereum addresses)
+   */
+  private async getCollectorDisplayName(
+    address: string
+  ): Promise<string | null> {
+    try {
+      // Try to lookup user profile by address
+      const userProfile = await lookupUserByAddress(address)
+
+      // 1. Try Twitter handle first
+      if (userProfile.twitter_username) {
+        const sanitizedHandle = this.sanitizeTwitterUsername(
+          userProfile.twitter_username
+        )
+        if (sanitizedHandle) {
+          return `@${sanitizedHandle}`
+        }
+      }
+
+      // 2. Try name
+      if (userProfile.name) {
+        return userProfile.name
+      }
+
+      // 3. Try username (Art Blocks username)
+      if (userProfile.username) {
+        return userProfile.username
+      }
+    } catch (error) {
+      // User profile not found, continue to ENS fallback
+      console.log(`No user profile found for address ${address}, trying ENS`)
+    }
+
+    // 4. Try ENS
+    const ensName = await ensOrAddress(address)
+    if (ensName && !ensName.startsWith('0x')) {
+      return ensName
+    }
+
+    return null
+  }
+
   async tweetSale(saleData: {
     tokenName: string
     projectName: string
@@ -454,27 +579,33 @@ export class TwitterBot {
         return
       }
 
-      // Get ENS names for buyer and seller
-      const buyerText = await ensOrAddress(saleData.buyer)
-      const sellerText = await ensOrAddress(saleData.seller)
+      // Get display names with fallback logic
+      const artistDisplayName = await this.getArtistDisplayName(saleData.artist)
+      const collectorDisplayName = await this.getCollectorDisplayName(
+        saleData.buyer
+      )
 
-      // Format the platform text if provided
-      const platformText = saleData.platform ? ` on ${saleData.platform}` : ''
+      // Build the tweet message according to the new format
+      let tweetMessage = saleData.tokenName
 
-      // Get artist Twitter handle if available
-      const artistTwitterHandle = ARTIST_TWITTER_HANDLES.get(saleData.artist)
-      const artistText = artistTwitterHandle
-        ? `@${artistTwitterHandle}`
-        : saleData.artist
+      // Add artist line if we have a valid artist name
+      if (artistDisplayName) {
+        tweetMessage += `\nby ${artistDisplayName}`
+      }
 
-      // Construct the tweet message
-      const tweetMessage = `🔥 SALE: ${saleData.tokenName} by ${artistText}
+      // Add empty line
+      tweetMessage += '\n'
 
-💰 ${saleData.salePrice} ${saleData.currency}${platformText}
-👤 Sold by ${sellerText}
-🛒 Bought by ${buyerText}
+      // Add collector line if we have a valid collector name
+      if (collectorDisplayName) {
+        tweetMessage += `\nacquired by ${collectorDisplayName}`
+        tweetMessage += `\nfor ${saleData.salePrice} ${saleData.currency}`
+      } else {
+        tweetMessage += `\nacquired for ${saleData.salePrice} ${saleData.currency}`
+      }
 
-${saleData.tokenUrl + TWITTER_PROJECTBOT_UTM}`
+      // Add view link
+      tweetMessage += `\n\nview: ${saleData.tokenUrl + TWITTER_PROJECTBOT_UTM}`
 
       console.log(`Posting sale tweet: ${saleData.tokenName}`)
 

@@ -23,6 +23,8 @@ import {
   OobTokenDetailFragment,
   GetStudioContractsDocument,
   GetArtistsTwitterHandlesDocument,
+  UserProfileNamingDetailsFragment,
+  LookupUserByAddressDocument,
 } from '../../generated/graphql'
 import {
   isArbitrumContract,
@@ -589,4 +591,20 @@ export async function getArtistsTwitterHandles(): Promise<Map<string, string>> {
     console.error('Error fetching artists Twitter handles:', error)
     return artistTwitterMap
   }
+}
+
+export async function lookupUserByAddress(
+  address: string
+): Promise<UserProfileNamingDetailsFragment> {
+  const { data } = await client
+    .query(LookupUserByAddressDocument, {
+      address: address.toLowerCase(),
+    })
+    .toPromise()
+
+  if (!data || !data.user_profiles.length) {
+    throw Error('No data returned from LookupUserByAddress query')
+  }
+
+  return data.user_profiles[0]
 }
