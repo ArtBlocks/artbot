@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv'
 import { Client, createClient } from 'urql/core'
 import * as fs from 'fs'
 import * as path from 'path'
+import { sanitizeTwitterHandle } from '../Utils/twitterUtils'
 import {
   ProjectDetailFragment,
   GetAllProjectsDocument,
@@ -523,34 +524,6 @@ export async function getRandomOobForProject(
   return data.projects_metadata[0].random_oob_token[0]
 }
 
-/**
- * Utility function to extract Twitter handle from a Twitter URL
- * @param twitterUrl - Full Twitter URL (e.g., "https://twitter.com/msoriaro")
- * @returns Twitter handle without @ symbol (e.g., "msoriaro")
- */
-function extractTwitterHandle(twitterUrl: string): string | null {
-  if (!twitterUrl) {
-    return null
-  }
-
-  try {
-    // Handle both twitter.com and x.com URLs
-    const url = new URL(twitterUrl)
-    if (url.hostname === 'twitter.com' || url.hostname === 'x.com') {
-      const pathSegments = url.pathname
-        .split('/')
-        .filter((segment) => segment !== '')
-      if (pathSegments.length > 0) {
-        return pathSegments[0] // Return the first path segment which should be the handle
-      }
-    }
-  } catch (error) {
-    console.error('Error parsing Twitter URL:', twitterUrl, error)
-  }
-
-  return null
-}
-
 export async function getArtistsTwitterHandles(): Promise<Map<string, string>> {
   const artistTwitterMap = new Map<string, string>()
 
@@ -569,7 +542,7 @@ export async function getArtistsTwitterHandles(): Promise<Map<string, string>> {
         const twitter = artist.attributes.twitter
 
         if (artistName && twitter) {
-          const handle = extractTwitterHandle(twitter)
+          const handle = sanitizeTwitterHandle(twitter)
           if (handle) {
             artistTwitterMap.set(artistName, handle)
             console.log(
@@ -600,16 +573,7 @@ export async function getArtistsTwitterHandles(): Promise<Map<string, string>> {
       artistsData.forEach((artist) => {
         if (artist.name && artist.twitterUsername) {
           // Clean up twitter username (remove @ if present and remove URL if it's a full URL)
-          let handle = artist.twitterUsername
-          if (
-            handle.startsWith('https://x.com/') ||
-            handle.startsWith('https://twitter.com/')
-          ) {
-            handle = extractTwitterHandle(handle) || handle
-          }
-          if (handle.startsWith('@')) {
-            handle = handle.substring(1)
-          }
+          const handle = sanitizeTwitterHandle(artist.twitterUsername)
 
           if (handle) {
             const wasOverwritten = artistTwitterMap.has(artist.name)

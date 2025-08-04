@@ -281,7 +281,6 @@ export class ReservoirSaleBot extends APIPollBot {
     // Post to Twitter if TwitterBot is available and sale meets criteria
     if (this.twitterBot && this.shouldTweetSale(sale, artBlocksData)) {
       try {
-        console.log('Posting sale to Twitter!!')
         await this.twitterBot.tweetSale({
           tokenName: artBlocksData.name,
           projectName: artBlocksData.collection_name,
@@ -309,8 +308,6 @@ export class ReservoirSaleBot extends APIPollBot {
    * Can be customized to add more filtering criteria
    */
   private shouldTweetSale(sale: ReservoirSale, artBlocksData: any): boolean {
-    const price = sale.price.amount.decimal
-    const currency = sale.price.currency.symbol
     const projectId = `${sale.token.contract.toLowerCase()}-${
       artBlocksData.project_id
     }`
@@ -320,20 +317,12 @@ export class ReservoirSaleBot extends APIPollBot {
       console.log('Skipping twitter sale for non-AB500 project', projectId)
       return false
     }
-    // Filter out very low-value sales (less than 0.1 ETH)
-    if (currency === 'ETH' && price < 0.01) {
-      return false
-    }
 
     // Filter out mint events (though these should already be filtered out)
     if (sale.orderKind === 'mint') {
       return false
     }
 
-    // Could add more filters here, for example:
-    // - Only certain collections
-    // - Only sales above certain thresholds
-    // - Only certain platforms
     return true
   }
 

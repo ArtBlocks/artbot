@@ -18,6 +18,7 @@ import { lookupUserByAddress } from '../Data/queryGraphQL'
 import axios from 'axios'
 import { artIndexerBot, ARTIST_TWITTER_HANDLES } from '..'
 import sharp from 'sharp'
+import { sanitizeTwitterHandle } from '../Utils/twitterUtils'
 import {
   getLastTweetId,
   getStatusRefreshToken,
@@ -139,59 +140,6 @@ export class TwitterBot {
       clearInterval(this.intervalId)
       this.intervalId = undefined
     }
-  }
-
-  /**
-   * Sanitizes a Twitter username by extracting handle from URLs and validating format
-   * @param twitterUsername - Raw twitter username from database
-   * @returns Clean Twitter handle without @ symbol, or null if invalid
-   */
-  private sanitizeTwitterUsername(twitterUsername: string): string | null {
-    if (!twitterUsername || twitterUsername.trim() === '') {
-      return null
-    }
-
-    let handle = twitterUsername.trim()
-
-    // Remove @ symbol if present
-    if (handle.startsWith('@')) {
-      handle = handle.substring(1)
-    }
-
-    // Extract handle from Twitter URLs
-    if (handle.includes('twitter.com/') || handle.includes('x.com/')) {
-      try {
-        const url = new URL(
-          handle.startsWith('http') ? handle : `https://${handle}`
-        )
-        if (url.hostname === 'twitter.com' || url.hostname === 'x.com') {
-          const pathSegments = url.pathname
-            .split('/')
-            .filter((segment) => segment !== '')
-          if (pathSegments.length > 0) {
-            handle = pathSegments[0]
-          }
-        }
-      } catch (error) {
-        // If URL parsing fails, try to extract manually
-        const match = handle.match(/(?:twitter\.com\/|x\.com\/)([^/\s?]+)/)
-        if (match && match[1]) {
-          handle = match[1]
-        } else {
-          return null
-        }
-      }
-    }
-
-    // Validate Twitter handle format
-    // Twitter handles can only contain letters, numbers, and underscores
-    // Must be 1-15 characters long
-    const twitterHandleRegex = /^[a-zA-Z0-9_]{1,15}$/
-    if (!twitterHandleRegex.test(handle)) {
-      return null
-    }
-
-    return handle
   }
 
   async search() {
@@ -552,7 +500,7 @@ export class TwitterBot {
 
       // 1. Try Twitter handle first
       if (userProfile.twitter_username) {
-        const sanitizedHandle = this.sanitizeTwitterUsername(
+        const sanitizedHandle = sanitizeTwitterHandle(
           userProfile.twitter_username
         )
         if (sanitizedHandle) {

@@ -55,3 +55,60 @@ export function verifyTwitter(res: any, req: any) {
     })
     .catch(() => res.status(403).send('Invalid verifier or access tokens!'))
 }
+
+/**
+ * Sanitizes a Twitter username by extracting handle from URLs and validating format
+ * This function handles:
+ * - Plain handles (with or without @)
+ * - Twitter/X URLs
+ * - Validates final handle format
+ * @param twitterInput - Raw twitter username/URL from any source
+ * @returns Clean Twitter handle without @ symbol, or null if invalid
+ */
+export function sanitizeTwitterHandle(twitterInput: string): string | null {
+  if (!twitterInput || twitterInput.trim() === '') {
+    return null
+  }
+
+  let handle = twitterInput.trim()
+
+  // Remove @ symbol if present
+  if (handle.startsWith('@')) {
+    handle = handle.substring(1)
+  }
+
+  // Extract handle from Twitter URLs
+  if (handle.includes('twitter.com/') || handle.includes('x.com/')) {
+    try {
+      const url = new URL(
+        handle.startsWith('http') ? handle : `https://${handle}`
+      )
+      if (url.hostname === 'twitter.com' || url.hostname === 'x.com') {
+        const pathSegments = url.pathname
+          .split('/')
+          .filter((segment) => segment !== '')
+        if (pathSegments.length > 0) {
+          handle = pathSegments[0]
+        }
+      }
+    } catch (error) {
+      // If URL parsing fails, try to extract manually
+      const match = handle.match(/(?:twitter\.com\/|x\.com\/)([^/\s?]+)/)
+      if (match && match[1]) {
+        handle = match[1]
+      } else {
+        return null
+      }
+    }
+  }
+
+  // Validate Twitter handle format
+  // Twitter handles can only contain letters, numbers, and underscores
+  // Must be 1-15 characters long
+  const twitterHandleRegex = /^[a-zA-Z0-9_]{1,15}$/
+  if (!twitterHandleRegex.test(handle)) {
+    return null
+  }
+
+  return handle
+}
