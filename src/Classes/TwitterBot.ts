@@ -27,7 +27,7 @@ import {
 
 // Twitter Bot Feature Toggles - Modify these to enable/disable functionality
 const TWITTER_LISTENING_ENABLED = false // Enables listening and responding to tweet mentions
-const TWITTER_SALE_POSTING_ENABLED = false // Enables posting sale tweets
+const TWITTER_SALE_POSTING_ENABLED = true // Enables posting sale tweets
 const TWITTER_MINT_POSTING_ENABLED = false // Enables posting mint tweets
 
 const TWITTER_MEDIA_BYTE_LIMIT = 5242880
@@ -363,8 +363,8 @@ export class TwitterBot {
     console.log('Uploading media to twitter...', assetUrl)
     for (let i = 0; i < NUM_RETRIES; i++) {
       try {
-        const mediaId = await this.twitterClient?.v1.uploadMedia(buff, {
-          mimeType: this.getMimeType(assetUrl),
+        const mediaId = await this.twitterClient?.v2.uploadMedia(buff, {
+          media_type: this.getMimeType(assetUrl),
         })
         if (!mediaId) {
           throw new Error('No media id returned')
@@ -552,6 +552,7 @@ export class TwitterBot {
     projectName: string
     artist: string
     salePrice: number
+    usdPrice: number
     currency: string
     buyer: string
     seller: string
@@ -588,6 +589,10 @@ export class TwitterBot {
       // Build the tweet message according to the new format
       let tweetMessage = saleData.tokenName
 
+      // Replace WETH with ETH for display purposes
+      const displayCurrency =
+        saleData.currency === 'WETH' ? 'ETH' : saleData.currency
+
       // Add artist line if we have a valid artist name
       if (artistDisplayName) {
         tweetMessage += `\nby ${artistDisplayName}`
@@ -599,9 +604,13 @@ export class TwitterBot {
       // Add collector line if we have a valid collector name
       if (collectorDisplayName) {
         tweetMessage += `\nacquired by ${collectorDisplayName}`
-        tweetMessage += `\nfor ${saleData.salePrice} ${saleData.currency}`
+        tweetMessage += `\nfor ${
+          saleData.salePrice
+        } ${displayCurrency} ($${saleData.usdPrice.toFixed(2)})`
       } else {
-        tweetMessage += `\nacquired for ${saleData.salePrice} ${saleData.currency}`
+        tweetMessage += `\nacquired for ${
+          saleData.salePrice
+        } ${displayCurrency} ($${saleData.usdPrice.toFixed(2)})`
       }
 
       // Add view link
