@@ -1,5 +1,7 @@
 import * as dotenv from 'dotenv'
 import { Client, createClient } from 'urql/core'
+import * as fs from 'fs'
+import * as path from 'path'
 import {
   ProjectDetailFragment,
   GetAllProjectsDocument,
@@ -553,38 +555,81 @@ export async function getArtistsTwitterHandles(): Promise<Map<string, string>> {
   const artistTwitterMap = new Map<string, string>()
 
   try {
+    // First, get data from Hasura
     const { data } = await client
       .query(GetArtistsTwitterHandlesDocument, {})
       .toPromise()
 
-    if (!data || !data.artistEditorialPages?.data) {
-      throw Error('No data returned from GetArtistsTwitterHandles query')
+    if (data && data.artistEditorialPages?.data) {
+      // Process each artist and extract Twitter handle
+      data.artistEditorialPages.data.forEach((artist) => {
+        if (!artist?.attributes) return
+
+        const artistName = artist.attributes.artistName
+        const twitter = artist.attributes.twitter
+
+        if (artistName && twitter) {
+          const handle = extractTwitterHandle(twitter)
+          if (handle) {
+            artistTwitterMap.set(artistName, handle)
+            console.log(
+              `Mapped artist "${artistName}" to Twitter handle "@${handle}" (from Hasura)`
+            )
+          } else {
+            console.warn(
+              `Could not extract Twitter handle from URL: ${twitter} for artist: ${artistName}`
+            )
+          }
+        }
+      })
+    } else {
+      console.warn('No data returned from GetArtistsTwitterHandles query')
     }
 
-    // Process each artist and extract Twitter handle
-    data.artistEditorialPages.data.forEach((artist) => {
-      if (!artist?.attributes) return
+    // Then, supplement with local JSON file data
+    try {
+      const jsonFilePath = path.join(__dirname, 'artist-twitter.json')
+      const jsonData = fs.readFileSync(jsonFilePath, 'utf8')
+      const artistsData = JSON.parse(jsonData) as Array<{
+        name: string
+        walletAddress?: string
+        slug: string
+        twitterUsername: string
+      }>
 
-      const artistName = artist.attributes.artistName
-      const twitter = artist.attributes.twitter
+      artistsData.forEach((artist) => {
+        if (artist.name && artist.twitterUsername) {
+          // Clean up twitter username (remove @ if present and remove URL if it's a full URL)
+          let handle = artist.twitterUsername
+          if (
+            handle.startsWith('https://x.com/') ||
+            handle.startsWith('https://twitter.com/')
+          ) {
+            handle = extractTwitterHandle(handle) || handle
+          }
+          if (handle.startsWith('@')) {
+            handle = handle.substring(1)
+          }
 
-      if (artistName && twitter) {
-        const handle = extractTwitterHandle(twitter)
-        if (handle) {
-          artistTwitterMap.set(artistName, handle)
-          console.log(
-            `Mapped artist "${artistName}" to Twitter handle "@${handle}"`
-          )
-        } else {
-          console.warn(
-            `Could not extract Twitter handle from URL: ${twitter} for artist: ${artistName}`
-          )
+          if (handle) {
+            const wasOverwritten = artistTwitterMap.has(artist.name)
+            artistTwitterMap.set(artist.name, handle)
+            console.log(
+              `Mapped artist "${
+                artist.name
+              }" to Twitter handle "@${handle}" (from JSON${
+                wasOverwritten ? ' - overwriting Hasura data' : ''
+              })`
+            )
+          }
         }
-      }
-    })
+      })
+    } catch (jsonError) {
+      console.warn('Error reading or parsing artist-twitter.json:', jsonError)
+    }
 
     console.log(
-      `Successfully loaded ${artistTwitterMap.size} artist Twitter handles`
+      `Successfully loaded ${artistTwitterMap.size} artist Twitter handles (Hasura + JSON supplement)`
     )
     return artistTwitterMap
   } catch (error) {
