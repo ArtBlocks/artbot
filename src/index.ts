@@ -375,12 +375,22 @@ const initReservoirBots = async () => {
   }
 }
 
-const abTwitterBot = new TwitterBot({
-  appKey: process.env.AB_TWITTER_API_KEY ?? '',
-  appSecret: process.env.AB_TWITTER_API_SECRET ?? '',
-  accessToken: process.env.AB_TWITTER_OAUTH_TOKEN ?? '',
-  accessSecret: process.env.AB_TWITTER_OAUTH_SECRET ?? '',
-})
+// Only instantiate TwitterBot if TWITTER_ENABLED is true
+const isTwitterEnabled = process.env.TWITTER_ENABLED?.toLowerCase() === 'true'
+console.log('Twitter functionality enabled:', isTwitterEnabled)
+
+const abTwitterBot = isTwitterEnabled
+  ? new TwitterBot({
+      appKey: process.env.AB_TWITTER_API_KEY ?? '',
+      appSecret: process.env.AB_TWITTER_API_SECRET ?? '',
+      accessToken: process.env.AB_TWITTER_OAUTH_TOKEN ?? '',
+      accessSecret: process.env.AB_TWITTER_OAUTH_SECRET ?? '',
+    })
+  : undefined
+
+if (!isTwitterEnabled) {
+  console.log('TwitterBot disabled via TWITTER_ENABLED environment variable')
+}
 
 export const mintBot = new MintBot(discordClient, abTwitterBot)
 

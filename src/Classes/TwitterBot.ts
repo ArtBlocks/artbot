@@ -39,6 +39,10 @@ const prod = process.env.ARTBOT_IS_PROD
   ? process.env.ARTBOT_IS_PROD.toLowerCase() === 'true'
   : false
 
+// Global Twitter enable/disable flag
+const isTwitterGloballyEnabled =
+  process.env.TWITTER_ENABLED?.toLowerCase() === 'true'
+
 const ARTBOT_TWITTER_HANDLE = 'artbotartbot'
 const STATUS_TWITTER_HANDLE = 'ArtbotStatus'
 
@@ -71,6 +75,14 @@ export class TwitterBot {
   }) {
     this.lastTweetId = ''
 
+    // Check if Twitter is globally disabled
+    if (!isTwitterGloballyEnabled) {
+      console.log(
+        'TwitterBot instantiated but Twitter is globally disabled via TWITTER_ENABLED environment variable'
+      )
+      return
+    }
+
     if (!appKey || !appSecret || !accessToken || !accessSecret) {
       console.warn(
         'Twitter credentials are missing - not initializing TwitterBot'
@@ -98,6 +110,14 @@ export class TwitterBot {
   }
 
   async startSearchAndReplyRoutine() {
+    // Check if Twitter is globally disabled
+    if (!isTwitterGloballyEnabled) {
+      console.log(
+        'Twitter listener disabled via TWITTER_ENABLED environment variable'
+      )
+      return
+    }
+
     try {
       this.lastTweetId = await getLastTweetId(prod)
     } catch (e) {
@@ -390,6 +410,14 @@ export class TwitterBot {
   }
 
   async _tweetMint(artBlock: Mint) {
+    // Check if Twitter is globally disabled
+    if (!isTwitterGloballyEnabled) {
+      console.log(
+        'Twitter mint posting disabled via TWITTER_ENABLED environment variable'
+      )
+      return
+    }
+
     // Check if Twitter mint posting is enabled
     if (!TWITTER_MINT_POSTING_ENABLED) {
       console.log(
@@ -455,6 +483,14 @@ export class TwitterBot {
   }
 
   async sendStatusMessage(message: string, replyId?: string) {
+    // Check if Twitter is globally disabled
+    if (!isTwitterGloballyEnabled) {
+      console.log(
+        'Twitter status messaging disabled via TWITTER_ENABLED environment variable'
+      )
+      return
+    }
+
     // Check if Twitter listening is enabled (status messages are mainly for user interactions)
     if (!TWITTER_LISTENING_ENABLED) {
       console.log(
@@ -560,6 +596,14 @@ export class TwitterBot {
     tokenUrl: string
     platform?: string
   }) {
+    // Check if Twitter is globally disabled
+    if (!isTwitterGloballyEnabled) {
+      console.log(
+        'Twitter sale posting disabled via TWITTER_ENABLED environment variable'
+      )
+      return
+    }
+
     // Check if Twitter sale posting is enabled
     if (!TWITTER_SALE_POSTING_ENABLED) {
       console.log(
@@ -604,13 +648,17 @@ export class TwitterBot {
       // Add collector line if we have a valid collector name
       if (collectorDisplayName) {
         tweetMessage += `\nacquired by ${collectorDisplayName}`
-        tweetMessage += `\nfor ${
-          saleData.salePrice
-        } ${displayCurrency} ($${saleData.usdPrice.toFixed(2)})`
+        tweetMessage += `\nfor ${saleData.salePrice} ${displayCurrency}`
+        // Don't show USD price if currency is already USDC
+        if (displayCurrency !== 'USDC') {
+          tweetMessage += ` ($${saleData.usdPrice.toFixed(2)})`
+        }
       } else {
-        tweetMessage += `\nacquired for ${
-          saleData.salePrice
-        } ${displayCurrency} ($${saleData.usdPrice.toFixed(2)})`
+        tweetMessage += `\nacquired for ${saleData.salePrice} ${displayCurrency}`
+        // Don't show USD price if currency is already USDC
+        if (displayCurrency !== 'USDC') {
+          tweetMessage += ` ($${saleData.usdPrice.toFixed(2)})`
+        }
       }
 
       // Add view link
