@@ -3665,7 +3665,7 @@ __metadata:
     sharp: "npm:^0.32.6"
     timeago.js: "npm:^4.0.2"
     ts-node: "npm:^10.9.2"
-    twitter-api-v2: "npm:^1.14.1"
+    twitter-api-v2: "npm:^1.24.0"
     typescript: "npm:^5.1.6"
     urql: "npm:^3.0.3"
     viem: "npm:2.17.4"
@@ -11768,10 +11768,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"twitter-api-v2@npm:^1.14.1":
-  version: 1.14.1
-  resolution: "twitter-api-v2@npm:1.14.1"
-  checksum: 10c0/a4ffe374274b0d84a4b78fdcaf4fb02067917f639db1421504dc85a8f161901d18d8e266218cb9d7fb16800fa1a32cfb6d7bc130271c42aedbb55145c55f4a11
+"twitter-api-v2@npm:^1.24.0":
+  version: 1.24.0
+  resolution: "twitter-api-v2@npm:1.24.0"
+  checksum: 10c0/09fa38bf4b6058da1c71a0b068e622afc8668a860c713c219f497aed0121d83a4a7c30b0d9893c3ec8a5513fa84669864ac4a739e3fdabef1a0c2f5b53818df4
   languageName: node
   linkType: hard
 

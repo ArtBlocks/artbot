@@ -18,6 +18,7 @@ import {
   getTokenUrl,
   isStudioContract,
 } from './utils'
+import { artIndexerBot } from '../..'
 
 type ReservoirSale = {
   from: string
@@ -37,6 +38,7 @@ type ReservoirSale = {
     amount: {
       decimal: number
       native: number
+      usd: number
     }
   }
   timestamp: number
@@ -56,6 +58,7 @@ export class ReservoirSaleBot extends APIPollBot {
    * @param {number} refreshRateMs - How often to poll the endpoint (in ms)
    * @param {*} bot - Discord bot that will be sending messages
    * @param {TwitterBot} twitterBot - Optional TwitterBot instance for posting sale tweets
+   * @param {number} testTimestamp - Optional: timestamp for testing with older events (in seconds)
    */
   constructor(
     apiEndpoint: string,
@@ -125,7 +128,9 @@ export class ReservoirSaleBot extends APIPollBot {
     if (maxTime > this.lastUpdatedTime) {
       this.lastUpdatedTime = maxTime
 
-      this.apiEndpoint.split('&startTimestamp=')[0] +
+      // Actually update the API endpoint with the new timestamp
+      this.apiEndpoint =
+        this.apiEndpoint.split('&startTimestamp=')[0] +
         '&startTimestamp=' +
         this.lastUpdatedTime
     }
@@ -147,6 +152,7 @@ export class ReservoirSaleBot extends APIPollBot {
     }
     const priceText = 'Sale Price'
     const price = sale.price.amount.decimal
+    const usdPrice = sale.price.amount.usd
     const currency = sale.price.currency.symbol
     const owner = sale.from
     let platform = sale.fillSource.toLowerCase()
@@ -280,6 +286,7 @@ export class ReservoirSaleBot extends APIPollBot {
           projectName: artBlocksData.collection_name,
           artist: artBlocksData.artist,
           salePrice: price,
+          usdPrice: usdPrice,
           currency: currency,
           buyer: sale.to,
           seller: sale.from,
@@ -300,12 +307,14 @@ export class ReservoirSaleBot extends APIPollBot {
    * Currently filters out low-value sales and certain platforms
    * Can be customized to add more filtering criteria
    */
-  private shouldTweetSale(sale: ReservoirSale, _artBlocksData: any): boolean {
-    const price = sale.price.amount.decimal
-    const currency = sale.price.currency.symbol
+  private shouldTweetSale(sale: ReservoirSale, artBlocksData: any): boolean {
+    const projectId = `${sale.token.contract.toLowerCase()}-${
+      artBlocksData.project_id
+    }`
+    const isAB500 = artIndexerBot.isAB500(projectId)
 
-    // Filter out very low-value sales (less than 0.1 ETH)
-    if (currency === 'ETH' && price < 0.1) {
+    if (!isAB500) {
+      console.log('Skipping twitter sale for non-AB500 project', projectId)
       return false
     }
 
@@ -313,11 +322,6 @@ export class ReservoirSaleBot extends APIPollBot {
     if (sale.orderKind === 'mint') {
       return false
     }
-
-    // Could add more filters here, for example:
-    // - Only certain collections
-    // - Only sales above certain thresholds
-    // - Only certain platforms
 
     return true
   }

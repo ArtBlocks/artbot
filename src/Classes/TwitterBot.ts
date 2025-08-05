@@ -14,9 +14,11 @@ import {
   getTokenApiUrl,
   getTokenUrl,
 } from './APIBots/utils'
+import { lookupUserByAddress } from '../Data/queryGraphQL'
 import axios from 'axios'
-import { artIndexerBot } from '..'
+import { artIndexerBot, ARTIST_TWITTER_HANDLES } from '..'
 import sharp from 'sharp'
+import { sanitizeTwitterHandle } from '../Utils/twitterUtils'
 import {
   getLastTweetId,
   getStatusRefreshToken,
@@ -26,7 +28,7 @@ import {
 
 // Twitter Bot Feature Toggles - Modify these to enable/disable functionality
 const TWITTER_LISTENING_ENABLED = false // Enables listening and responding to tweet mentions
-const TWITTER_SALE_POSTING_ENABLED = false // Enables posting sale tweets
+const TWITTER_SALE_POSTING_ENABLED = true // Enables posting sale tweets
 const TWITTER_MINT_POSTING_ENABLED = false // Enables posting mint tweets
 
 const TWITTER_MEDIA_BYTE_LIMIT = 5242880
@@ -37,6 +39,10 @@ const RETRY_DELAY_MS = 5000
 const prod = process.env.ARTBOT_IS_PROD
   ? process.env.ARTBOT_IS_PROD.toLowerCase() === 'true'
   : false
+
+// Global Twitter enable/disable flag
+const isTwitterGloballyEnabled =
+  process.env.TWITTER_ENABLED?.toLowerCase() === 'true'
 
 const ARTBOT_TWITTER_HANDLE = 'artbotartbot'
 const STATUS_TWITTER_HANDLE = 'ArtbotStatus'
@@ -70,6 +76,14 @@ export class TwitterBot {
   }) {
     this.lastTweetId = ''
 
+    // Check if Twitter is globally disabled
+    if (!isTwitterGloballyEnabled) {
+      console.log(
+        'TwitterBot instantiated but Twitter is globally disabled via TWITTER_ENABLED environment variable'
+      )
+      return
+    }
+
     if (!appKey || !appSecret || !accessToken || !accessSecret) {
       console.warn(
         'Twitter credentials are missing - not initializing TwitterBot'
@@ -97,6 +111,14 @@ export class TwitterBot {
   }
 
   async startSearchAndReplyRoutine() {
+    // Check if Twitter is globally disabled
+    if (!isTwitterGloballyEnabled) {
+      console.log(
+        'Twitter listener disabled via TWITTER_ENABLED environment variable'
+      )
+      return
+    }
+
     try {
       this.lastTweetId = await getLastTweetId(prod)
     } catch (e) {
@@ -309,8 +331,8 @@ export class TwitterBot {
     console.log('Uploading media to twitter...', assetUrl)
     for (let i = 0; i < NUM_RETRIES; i++) {
       try {
-        const mediaId = await this.twitterClient?.v1.uploadMedia(buff, {
-          mimeType: this.getMimeType(assetUrl),
+        const mediaId = await this.twitterClient?.v2.uploadMedia(buff, {
+          media_type: this.getMimeType(assetUrl),
         })
         if (!mediaId) {
           throw new Error('No media id returned')
@@ -336,6 +358,14 @@ export class TwitterBot {
   }
 
   async _tweetMint(artBlock: Mint) {
+    // Check if Twitter is globally disabled
+    if (!isTwitterGloballyEnabled) {
+      console.log(
+        'Twitter mint posting disabled via TWITTER_ENABLED environment variable'
+      )
+      return
+    }
+
     // Check if Twitter mint posting is enabled
     if (!TWITTER_MINT_POSTING_ENABLED) {
       console.log(
@@ -401,6 +431,14 @@ export class TwitterBot {
   }
 
   async sendStatusMessage(message: string, replyId?: string) {
+    // Check if Twitter is globally disabled
+    if (!isTwitterGloballyEnabled) {
+      console.log(
+        'Twitter status messaging disabled via TWITTER_ENABLED environment variable'
+      )
+      return
+    }
+
     // Check if Twitter listening is enabled (status messages are mainly for user interactions)
     if (!TWITTER_LISTENING_ENABLED) {
       console.log(
@@ -422,11 +460,83 @@ export class TwitterBot {
     await this.twitterStatusAccount?.v2.tweet(message)
   }
 
+  /**
+   * Get artist display name following fallback rules:
+   * 1. @twitterHandle
+   * 2. Artist Name (AB DB)
+   * Returns null if no valid name is found
+   */
+  private async getArtistDisplayName(
+    artistName: string
+  ): Promise<string | null> {
+    // 1. Try Twitter handle first
+    const artistTwitterHandle = ARTIST_TWITTER_HANDLES.get(artistName)
+    if (artistTwitterHandle) {
+      return `@${artistTwitterHandle}`
+    }
+
+    // 2. Use Artist Name from AB DB if it exists and isn't an address
+    if (artistName && artistName !== 'unknown artist') {
+      return artistName
+    }
+
+    return null
+  }
+
+  /**
+   * Get collector display name following fallback rules:
+   * 1. @twitterHandle
+   * 2. name
+   * 3. username
+   * 4. ENS
+   * Returns null if no valid name is found (avoids ethereum addresses)
+   */
+  private async getCollectorDisplayName(
+    address: string
+  ): Promise<string | null> {
+    try {
+      // Try to lookup user profile by address
+      const userProfile = await lookupUserByAddress(address)
+
+      // 1. Try Twitter handle first
+      if (userProfile.twitter_username) {
+        const sanitizedHandle = sanitizeTwitterHandle(
+          userProfile.twitter_username
+        )
+        if (sanitizedHandle) {
+          return `@${sanitizedHandle}`
+        }
+      }
+
+      // 2. Try name
+      if (userProfile.name) {
+        return userProfile.name
+      }
+
+      // 3. Try username (Art Blocks username)
+      if (userProfile.username) {
+        return userProfile.username
+      }
+    } catch (error) {
+      // User profile not found, continue to ENS fallback
+      console.log(`No user profile found for address ${address}, trying ENS`)
+    }
+
+    // 4. Try ENS
+    const ensName = await ensOrAddress(address)
+    if (ensName && !ensName.startsWith('0x')) {
+      return ensName
+    }
+
+    return null
+  }
+
   async tweetSale(saleData: {
     tokenName: string
     projectName: string
     artist: string
     salePrice: number
+    usdPrice: number
     currency: string
     buyer: string
     seller: string
@@ -434,6 +544,14 @@ export class TwitterBot {
     tokenUrl: string
     platform?: string
   }) {
+    // Check if Twitter is globally disabled
+    if (!isTwitterGloballyEnabled) {
+      console.log(
+        'Twitter sale posting disabled via TWITTER_ENABLED environment variable'
+      )
+      return
+    }
+
     // Check if Twitter sale posting is enabled
     if (!TWITTER_SALE_POSTING_ENABLED) {
       console.log(
@@ -454,21 +572,45 @@ export class TwitterBot {
         return
       }
 
-      // Get ENS names for buyer and seller
-      const buyerText = await ensOrAddress(saleData.buyer)
-      const sellerText = await ensOrAddress(saleData.seller)
+      // Get display names with fallback logic
+      const artistDisplayName = await this.getArtistDisplayName(saleData.artist)
+      const collectorDisplayName = await this.getCollectorDisplayName(
+        saleData.buyer
+      )
 
-      // Format the platform text if provided
-      const platformText = saleData.platform ? ` on ${saleData.platform}` : ''
+      // Build the tweet message according to the new format
+      let tweetMessage = saleData.tokenName
 
-      // Construct the tweet message
-      const tweetMessage = `🔥 SALE: ${saleData.tokenName} by ${saleData.artist}
+      // Replace WETH with ETH for display purposes
+      const displayCurrency =
+        saleData.currency === 'WETH' ? 'ETH' : saleData.currency
 
-💰 ${saleData.salePrice} ${saleData.currency}${platformText}
-👤 Sold by ${sellerText}
-🛒 Bought by ${buyerText}
+      // Add artist line if we have a valid artist name
+      if (artistDisplayName) {
+        tweetMessage += `\nby ${artistDisplayName}`
+      }
 
-${saleData.tokenUrl + TWITTER_PROJECTBOT_UTM}`
+      // Add empty line
+      tweetMessage += '\n'
+
+      // Add collector line if we have a valid collector name
+      if (collectorDisplayName) {
+        tweetMessage += `\nacquired by ${collectorDisplayName}`
+        tweetMessage += `\nfor ${saleData.salePrice} ${displayCurrency}`
+        // Don't show USD price if currency is already USDC
+        if (displayCurrency !== 'USDC') {
+          tweetMessage += ` ($${saleData.usdPrice.toFixed(2)})`
+        }
+      } else {
+        tweetMessage += `\nacquired for ${saleData.salePrice} ${displayCurrency}`
+        // Don't show USD price if currency is already USDC
+        if (displayCurrency !== 'USDC') {
+          tweetMessage += ` ($${saleData.usdPrice.toFixed(2)})`
+        }
+      }
+
+      // Add view link
+      tweetMessage += `\n\nview: ${saleData.tokenUrl + TWITTER_PROJECTBOT_UTM}`
 
       console.log(`Posting sale tweet: ${saleData.tokenName}`)
 

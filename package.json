@@ -71,7 +71,7 @@
     "sharp": "^0.32.6",
     "timeago.js": "^4.0.2",
     "ts-node": "^10.9.2",
-    "twitter-api-v2": "^1.14.1",
+    "twitter-api-v2": "^1.24.0",
     "typescript": "^5.1.6",
     "urql": "^3.0.3",
     "viem": "2.17.4",

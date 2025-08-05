@@ -230,3 +230,29 @@ query GetStudioContracts {
     ...ContractDetail
   }
 }
+
+query GetArtistsTwitterHandles {
+  artistEditorialPages {
+    data {
+      attributes {
+        twitter
+        userProfileAddress
+        artistName
+      }
+    }
+  }
+}
+
+fragment UserProfileNamingDetails on user_profiles {
+  username
+  twitter_username
+  name
+}
+
+query LookupUserByAddress($address: String!) {
+  user_profiles(
+    where: { linked_accounts: { public_address: { _eq: $address } } }
+  ) {
+    ...UserProfileNamingDetails
+  }
+}

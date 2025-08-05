@@ -7,6 +7,7 @@ import { ProjectConfig } from './ProjectConfig/projectConfig'
 export let STUDIO_CONTRACTS: string[] = []
 export let ENGINE_CONTRACTS: string[] = []
 export let ARBITRUM_CONTRACTS: string[] = []
+export let ARTIST_TWITTER_HANDLES: Map<string, string> = new Map()
 export const projectConfig = new ProjectConfig()
 
 import { ArtIndexerBot } from './Classes/ArtIndexerBot'
@@ -20,6 +21,7 @@ import {
   getEngineContracts,
   getEngineProjects,
   getStudioContracts,
+  getArtistsTwitterHandles,
 } from './Data/queryGraphQL'
 import { InsightsBot } from './Classes/InsightsBot'
 import { TriviaBot } from './Classes/TriviaBot'
@@ -56,6 +58,9 @@ getEngineContracts().then((contracts) => {
 })
 getArbitrumContracts().then((contracts) => {
   ARBITRUM_CONTRACTS = contracts ?? []
+})
+getArtistsTwitterHandles().then((handles) => {
+  ARTIST_TWITTER_HANDLES = handles
 })
 
 export const artIndexerBot = new ArtIndexerBot()
@@ -370,12 +375,22 @@ const initReservoirBots = async () => {
   }
 }
 
-const abTwitterBot = new TwitterBot({
-  appKey: process.env.AB_TWITTER_API_KEY ?? '',
-  appSecret: process.env.AB_TWITTER_API_SECRET ?? '',
-  accessToken: process.env.AB_TWITTER_OAUTH_TOKEN ?? '',
-  accessSecret: process.env.AB_TWITTER_OAUTH_SECRET ?? '',
-})
+// Only instantiate TwitterBot if TWITTER_ENABLED is true
+const isTwitterEnabled = process.env.TWITTER_ENABLED?.toLowerCase() === 'true'
+console.log('Twitter functionality enabled:', isTwitterEnabled)
+
+const abTwitterBot = isTwitterEnabled
+  ? new TwitterBot({
+      appKey: process.env.AB_TWITTER_API_KEY ?? '',
+      appSecret: process.env.AB_TWITTER_API_SECRET ?? '',
+      accessToken: process.env.AB_TWITTER_OAUTH_TOKEN ?? '',
+      accessSecret: process.env.AB_TWITTER_OAUTH_SECRET ?? '',
+    })
+  : undefined
+
+if (!isTwitterEnabled) {
+  console.log('TwitterBot disabled via TWITTER_ENABLED environment variable')
+}
 
 export const mintBot = new MintBot(discordClient, abTwitterBot)
 

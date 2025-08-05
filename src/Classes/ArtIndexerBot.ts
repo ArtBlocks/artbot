@@ -721,4 +721,18 @@ export class ArtIndexerBot {
 
     projectBot.sendMintedOutMessage()
   }
+
+  /**
+   * Check if a project has the AB500 tag
+   * @param projectId The project ID to check
+   * @returns true if the project has the "ab500" tag, false otherwise
+   */
+  isAB500(projectId: string): boolean {
+    const ab500Projects = this.tags['ab500']
+    if (!ab500Projects) {
+      return false
+    }
+
+    return ab500Projects.some((projectBot) => projectBot.id === projectId)
+  }
 }
