@@ -250,18 +250,22 @@ export class ReservoirSaleBot extends APIPollBot {
       assetUrl = await replaceVideoWithGIF(assetUrl)
       embed.setThumbnail(assetUrl)
     }
-    embed.addFields(
-      {
+    // Only add Collection field if curationStatus has a value
+    const fields = []
+    if (curationStatus && curationStatus.trim()) {
+      fields.push({
         name: `Collection`,
         value: `${curationStatus}`,
         inline: true,
-      },
-      {
-        name: 'Live Script',
-        value: `[view on artblocks.io](${tokenUrl + SALE_UTM})`,
-        inline: true,
-      }
-    )
+      })
+    }
+    fields.push({
+      name: 'Live Script',
+      value: `[view on artblocks.io](${tokenUrl + SALE_UTM})`,
+      inline: true,
+    })
+
+    embed.addFields(...fields)
     // Update to remove author name and to reflect this info in piece name
     // rather than token number as the title and URL field..
     embed.setTitle(title)
@@ -315,6 +319,18 @@ export class ReservoirSaleBot extends APIPollBot {
 
     if (!isAB500) {
       console.log('Skipping twitter sale for non-AB500 project', projectId)
+      return false
+    }
+
+    if (
+      sale.price.amount.decimal < 0.1 &&
+      sale.price.currency.symbol.includes('ETH')
+    ) {
+      console.log(
+        'Skipping twitter sale for low-value sale',
+        sale.price.amount.decimal,
+        sale.price.currency.symbol
+      )
       return false
     }
 

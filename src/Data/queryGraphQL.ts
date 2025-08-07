@@ -545,9 +545,6 @@ export async function getArtistsTwitterHandles(): Promise<Map<string, string>> {
           const handle = sanitizeTwitterHandle(twitter)
           if (handle) {
             artistTwitterMap.set(artistName, handle)
-            console.log(
-              `Mapped artist "${artistName}" to Twitter handle "@${handle}" (from Hasura)`
-            )
           } else {
             console.warn(
               `Could not extract Twitter handle from URL: ${twitter} for artist: ${artistName}`
@@ -576,15 +573,7 @@ export async function getArtistsTwitterHandles(): Promise<Map<string, string>> {
           const handle = sanitizeTwitterHandle(artist.twitterUsername)
 
           if (handle) {
-            const wasOverwritten = artistTwitterMap.has(artist.name)
             artistTwitterMap.set(artist.name, handle)
-            console.log(
-              `Mapped artist "${
-                artist.name
-              }" to Twitter handle "@${handle}" (from JSON${
-                wasOverwritten ? ' - overwriting Hasura data' : ''
-              })`
-            )
           }
         }
       })
