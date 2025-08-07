@@ -135,6 +135,9 @@ const acceptedVerticals = [
   'explorations',
   'engine',
   'presents',
+  'factory',
+  'playground',
+  'studio',
 ]
 export function isVerticalName(msg: string): boolean {
   return acceptedVerticals.includes(msg)

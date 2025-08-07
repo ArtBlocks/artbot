@@ -205,18 +205,22 @@ export class ReservoirListBot extends APIPollBot {
       embed.setThumbnail(assetUrl)
     }
 
-    embed.addFields(
-      {
+    // Only add Collection field if curationStatus has a value
+    const fields = []
+    if (curationStatus && curationStatus.trim()) {
+      fields.push({
         name: `Collection`,
         value: `${curationStatus}`,
         inline: true,
-      },
-      {
-        name: 'Live Script',
-        value: `[view on artblocks.io](${tokenUrl + LISTING_UTM})`,
-        inline: true,
-      }
-    )
+      })
+    }
+    fields.push({
+      name: 'Live Script',
+      value: `[view on artblocks.io](${tokenUrl + LISTING_UTM})`,
+      inline: true,
+    })
+
+    embed.addFields(...fields)
 
     const platformUrl = listing.source?.url
 
