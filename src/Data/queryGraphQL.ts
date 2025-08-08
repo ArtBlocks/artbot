@@ -28,6 +28,8 @@ import {
   GetArtistsTwitterHandlesDocument,
   UserProfileNamingDetailsFragment,
   LookupUserByAddressDocument,
+  GetEntryByTagDocument,
+  GetEntryByVerticalDocument,
 } from '../../generated/graphql'
 import {
   isArbitrumContract,
@@ -605,4 +607,50 @@ export async function lookupUserByAddress(
   }
 
   return data.user_profiles[0]
+}
+
+export interface EntryProject {
+  id: string
+  name?: string | null | undefined
+  lowest_listing?: any
+  artist_name?: string | null | undefined
+  contract_address: string
+  project_id: string
+}
+
+export async function getEntryByTag(
+  tagName: string,
+  limit = 5
+): Promise<EntryProject[]> {
+  const { data } = await client
+    .query(GetEntryByTagDocument, {
+      tag_name: tagName,
+      limit: limit,
+    })
+    .toPromise()
+
+  if (!data || !data.projects_metadata) {
+    throw Error('No data returned from GetEntryByTag query')
+  }
+
+  return data.projects_metadata
+}
+
+export async function getEntryByVertical(
+  verticalName: string,
+  limit = 5
+): Promise<EntryProject[]> {
+  console.log('verticalName', verticalName)
+  const { data } = await client
+    .query(GetEntryByVerticalDocument, {
+      vertical_name: verticalName,
+      limit: limit,
+    })
+    .toPromise()
+
+  if (!data || !data.projects_metadata) {
+    throw Error('No data returned from GetEntryByVertical query')
+  }
+
+  return data.projects_metadata
 }

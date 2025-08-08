@@ -256,3 +256,41 @@ query LookupUserByAddress($address: String!) {
     ...UserProfileNamingDetails
   }
 }
+
+query GetEntryByTag($tag_name: String!, $limit: Int!) {
+  projects_metadata(
+    where: {
+      tags: { tag_name: { _eq: $tag_name } }
+      active: { _eq: true }
+      lowest_listing: { _is_null: false }
+    }
+    order_by: { lowest_listing: asc_nulls_last }
+    limit: $limit
+  ) {
+    id
+    name
+    lowest_listing
+    artist_name
+    contract_address
+    project_id
+  }
+}
+
+query GetEntryByVertical($vertical_name: String!, $limit: Int!) {
+  projects_metadata(
+    where: {
+      vertical_name: { _eq: $vertical_name }
+      active: { _eq: true }
+      lowest_listing: { _is_null: false }
+    }
+    order_by: { lowest_listing: asc_nulls_last }
+    limit: $limit
+  ) {
+    id
+    name
+    lowest_listing
+    artist_name
+    contract_address
+    project_id
+  }
+}
