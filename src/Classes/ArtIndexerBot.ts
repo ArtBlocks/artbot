@@ -13,6 +13,8 @@ import {
   getArtblocksNextUpcomingProject,
   getEntryByTag,
   getEntryByVertical,
+  getAllSets,
+  getSetByName,
 } from '../Data/queryGraphQL'
 import { projectConfig, triviaBot } from '..'
 import {
@@ -55,6 +57,7 @@ export enum MessageTypes {
   WALLET = 'wallet',
   RECENT = 'recent',
   ENTRY = 'entry',
+  SET = 'set',
   PLATFORM = 'platform',
   UPCOMING = 'upcoming',
   UNKNOWN = 'unknown',
@@ -75,6 +78,7 @@ export class ArtIndexerBot {
   projectsById: { [id: string]: ProjectBot } = {}
   contracts: { [id: string]: ContractDetailFragment } = {}
   walletTokens: { [id: string]: TokenDetailFragment[] } = {}
+  sets: { [id: string]: boolean } = {}
   initialized = false
 
   platforms: { [id: string]: ProjectBot[] } = {}
@@ -93,6 +97,7 @@ export class ArtIndexerBot {
 
     if (this.projectFetch === getAllProjects) {
       await this.buildContracts()
+      await this.buildSets()
       projectConfig.initializeProjectBots()
     }
     setInterval(async () => {
@@ -114,6 +119,7 @@ export class ArtIndexerBot {
     console.log(`projectsById: ${Object.keys(this.projectsById).length}`)
     console.log(`contracts: ${Object.keys(this.contracts).length}`)
     console.log(`walletTokens: ${Object.keys(this.walletTokens).length}`)
+    console.log(`sets: ${Object.keys(this.sets).length}`)
     console.log(`platforms: ${Object.keys(this.platforms).length}`)
     console.log(`flagship: ${Object.keys(this.flagship).length}`)
   }
@@ -137,6 +143,22 @@ export class ArtIndexerBot {
       }
     } catch (e) {
       console.error('Error in buildContracts', e)
+    }
+  }
+
+  async buildSets() {
+    try {
+      this.sets = {}
+      const setsArr = await getAllSets()
+      console.log(`ArtIndexerBot: Building ${setsArr.length} sets`)
+      for (let i = 0; i < setsArr.length; i++) {
+        const setName = setsArr[i].name
+        if (typeof setName === 'string') {
+          this.sets[setName.toLowerCase()] = true
+        }
+      }
+    } catch (e) {
+      console.error('Error in buildSets', e)
     }
   }
 
@@ -261,7 +283,7 @@ export class ArtIndexerBot {
     this.projectsById = {}
     this.platforms = {}
     this.flagship = {}
-    // Don't clear contracts or walletTokens as they are managed separately
+    // Don't clear contracts, walletTokens, or sets as they are managed separately
   }
 
   // Please update HASHTAG_MESSAGE in smartBotResponse.ts if you add more options here
@@ -280,6 +302,8 @@ export class ArtIndexerBot {
       return MessageTypes.RECENT
     } else if (messageContent?.startsWith('#entry')) {
       return MessageTypes.ENTRY
+    } else if (messageContent?.startsWith('#set')) {
+      return MessageTypes.SET
     } else if (key === 'open') {
       return MessageTypes.OPEN
     } else if (isVerticalName(key)) {
@@ -359,6 +383,18 @@ export class ArtIndexerBot {
       } catch (error) {
         msg.channel.send(`Sorry, I had trouble understanding that: ${content}`)
         console.error('Error handling #entry message', error)
+        return
+      }
+      return
+    }
+
+    // Handle #set commands for set collections
+    if (content.toLowerCase().startsWith('#set')) {
+      try {
+        await this.handleSetMessage(msg)
+      } catch (error) {
+        msg.channel.send(`Sorry, I had trouble understanding that: ${content}`)
+        console.error('Error handling #set message', error)
         return
       }
       return
@@ -827,5 +863,97 @@ export class ArtIndexerBot {
 
     await projectBot?.handleNumberMessage(msg)
     return
+  }
+
+  /**
+   * Handle #set commands for set collections
+   */
+  async handleSetMessage(msg: Message) {
+    if (!msg.channel.isSendable()) {
+      return
+    }
+
+    const content = msg.content.trim()
+    const parts = content.split(' ')
+
+    if (parts.length < 2) {
+      msg.channel.send(
+        'Please specify a set name. Format: `#set [set name]`\n' +
+          'Example: `#set Curated`'
+      )
+      return
+    }
+
+    // Extract the set name (everything after "#set")
+    const setName = content.substring(4).trim() // Remove "#set"
+    const setKey = setName.toLowerCase()
+
+    // Check if the set exists and is valid
+    if (!this.sets[setKey]) {
+      msg.channel.send(
+        `Sorry, I wasn't able to find a set named "${setName}". Make sure the set name is spelled correctly.`
+      )
+      return
+    }
+
+    try {
+      // Get the set data with all its buckets
+      const setData = await getSetByName(setName)
+
+      if (!setData || !setData.set_buckets) {
+        msg.channel.send(
+          `Sorry, I wasn't able to find data for the set "${setName}".`
+        )
+        return
+      }
+
+      // Filter out buckets that don't have valid projects with listings
+      const validBuckets = setData.set_buckets.filter(
+        (bucket) =>
+          bucket.project &&
+          bucket.project.lowest_listing !== null &&
+          bucket.project.lowest_listing !== undefined &&
+          bucket.project.lowest_listing > 0
+      )
+
+      if (validBuckets.length === 0) {
+        msg.channel.send(
+          `Sorry, there are no tokens currently for sale in any projects from the set "${setName}".`
+        )
+        return
+      }
+
+      // Calculate total entry price
+      let totalPrice = 0
+      const projectDetails: string[] = []
+
+      for (const bucket of validBuckets) {
+        if (bucket.project && bucket.project.lowest_listing) {
+          const price = Number(bucket.project.lowest_listing)
+          totalPrice += price
+          projectDetails.push(`${bucket.project.name}: ${price.toFixed(4)} ETH`)
+        }
+      }
+
+      // Format the response
+      const response = [
+        `**Set: ${setData.name}**`,
+        `**Total Entry Price: ${totalPrice.toFixed(4)} ETH**`,
+        '',
+        '**Project Breakdown:**',
+        ...projectDetails,
+        '',
+        `*Based on ${validBuckets.length} project${
+          validBuckets.length === 1 ? '' : 's'
+        } with tokens currently for sale*`,
+      ].join('\n')
+
+      msg.channel.send(response)
+    } catch (error) {
+      console.error('Error in handleSetMessage:', error)
+      msg.channel.send(
+        `Sorry, there was an error retrieving data for the set "${setName}". Please try again later.`
+      )
+    }
   }
 }

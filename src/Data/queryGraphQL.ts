@@ -30,6 +30,8 @@ import {
   LookupUserByAddressDocument,
   GetEntryByTagDocument,
   GetEntryByVerticalDocument,
+  GetAllSetsDocument,
+  GetSetByNameDocument,
 } from '../../generated/graphql'
 import {
   isArbitrumContract,
@@ -653,4 +655,54 @@ export async function getEntryByVertical(
   }
 
   return data.projects_metadata
+}
+
+export interface SetBucketProject {
+  __typename?: 'projects_metadata' | undefined
+  lowest_listing?: any
+  name?: string | null | undefined
+  id: string
+  project_id: string
+  artist_name?: string | null | undefined
+  contract_address: string
+}
+
+export interface SetBucket {
+  __typename?: 'set_buckets' | undefined
+  project?: SetBucketProject | null | undefined
+}
+
+export interface SetData {
+  __typename?: 'sets' | undefined
+  name: string
+  set_buckets: SetBucket[]
+}
+
+export interface SetListData {
+  __typename?: 'sets' | undefined
+  name: string
+}
+
+export async function getAllSets(): Promise<SetListData[]> {
+  const { data } = await client.query(GetAllSetsDocument, {}).toPromise()
+
+  if (!data || !data.sets) {
+    throw Error('No data returned from GetAllSets query')
+  }
+
+  return data.sets
+}
+
+export async function getSetByName(setName: string): Promise<SetData | null> {
+  const { data } = await client
+    .query(GetSetByNameDocument, {
+      set_name: setName,
+    })
+    .toPromise()
+
+  if (!data || !data.sets || data.sets.length === 0) {
+    return null
+  }
+
+  return data.sets[0]
 }

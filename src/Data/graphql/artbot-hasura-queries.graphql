@@ -294,3 +294,25 @@ query GetEntryByVertical($vertical_name: String!, $limit: Int!) {
     project_id
   }
 }
+
+query GetAllSets {
+  sets(where: { set_buckets: { project: {} } }) {
+    name
+  }
+}
+
+query GetSetByName($set_name: String!) {
+  sets(where: { name: { _eq: $set_name } }) {
+    name
+    set_buckets {
+      project {
+        lowest_listing
+        name
+        id
+        project_id
+        artist_name
+        contract_address
+      }
+    }
+  }
+}
