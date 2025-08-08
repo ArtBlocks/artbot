@@ -352,6 +352,13 @@ export class ArtIndexerBot {
 
     console.log('Handling message', content)
 
+    if (content.toLowerCase().startsWith('#floor')) {
+      msg.channel.send(
+        `The \`#floor\` command has changed to \`#entry\`. Please try using \`#entry\` instead!`
+      )
+      return
+    }
+
     // Handle #entry commands for groupings
     if (content.toLowerCase().startsWith('#entry')) {
       try {
