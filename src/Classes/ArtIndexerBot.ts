@@ -783,13 +783,10 @@ export class ArtIndexerBot {
     const target = content.substring(6).trim() // Remove "#entry"
     const targetKey = this.toProjectKey(target)
 
-    // First, check if it's a project name - if so, delegate to ProjectBot
-    // const projectBot = await this.projectBotForMessage(targetKey, target)
     const messageType = this.getMessageType(targetKey, target)
     let projectBot: ProjectBot | undefined
 
     if (messageType === MessageTypes.PROJECT) {
-      // Temporarily modify the message content to trigger the existing #entry logic in ProjectBot
       projectBot = await this.projectBotForMessage(targetKey, target)
     } else if (messageType === MessageTypes.COLLECTION) {
       const vertical = getVerticalName(target.toLowerCase())
