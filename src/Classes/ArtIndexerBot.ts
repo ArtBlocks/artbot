@@ -916,7 +916,7 @@ export class ArtIndexerBot {
     const actualSetName = this.sets[setKey]
     if (!actualSetName) {
       msg.channel.send(
-        `Sorry, I wasn't able to find a set named "${setName}". Make sure the set name is spelled correctly.`
+        `Sorry, I wasn't able to find a set named "${setName}". Make sure the set name is spelled correctly. Some examples of valid set names are: \`Curated Series 4\`, \`AB500\`, \`Explorations\`, etc.`
       )
       return
     }
