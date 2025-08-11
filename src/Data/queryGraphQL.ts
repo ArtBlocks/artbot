@@ -32,6 +32,7 @@ import {
   GetEntryByVerticalDocument,
   GetAllSetsDocument,
   GetSetByNameDocument,
+  SetDataFragment,
 } from '../../generated/graphql'
 import {
   isArbitrumContract,
@@ -666,17 +667,6 @@ export interface SetBucketProject {
   contract_address: string
 }
 
-export interface SetBucket {
-  __typename?: 'set_buckets' | undefined
-  project?: SetBucketProject | null | undefined
-}
-
-export interface SetData {
-  __typename?: 'sets' | undefined
-  name: string
-  set_buckets: SetBucket[]
-}
-
 export interface SetListData {
   __typename?: 'sets' | undefined
   name: string
@@ -692,7 +682,9 @@ export async function getAllSets(): Promise<SetListData[]> {
   return data.sets
 }
 
-export async function getSetByName(setName: string): Promise<SetData | null> {
+export async function getSetByName(
+  setName: string
+): Promise<SetDataFragment | null> {
   const { data } = await client
     .query(GetSetByNameDocument, {
       set_name: setName,

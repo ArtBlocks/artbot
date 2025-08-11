@@ -301,18 +301,24 @@ query GetAllSets {
   }
 }
 
+fragment SetData on sets {
+  name
+  slug
+  set_buckets {
+    project {
+      lowest_listing
+      slug
+      name
+      id
+      project_id
+      artist_name
+      contract_address
+    }
+  }
+}
+
 query GetSetByName($set_name: String!) {
   sets(where: { name: { _eq: $set_name } }) {
-    name
-    set_buckets {
-      project {
-        lowest_listing
-        name
-        id
-        project_id
-        artist_name
-        contract_address
-      }
-    }
+    ...SetData
   }
 }

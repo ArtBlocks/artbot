@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import { Channel, Collection, Message } from 'discord.js'
+import { Channel, Collection, EmbedBuilder, Message } from 'discord.js'
 import * as dotenv from 'dotenv'
 
 import { ProjectBot } from './ProjectBot'
@@ -28,8 +28,11 @@ import {
   getVerticalName,
   isVerticalName,
   resolveEnsName,
+  getProjectUrl,
+  getProjectSlugUrl,
 } from './APIBots/utils'
 import { ProjectConfig } from '../ProjectConfig/projectConfig'
+import { randomColor } from '../Utils/smartBotResponse'
 dotenv.config()
 
 const deburr = require('lodash.deburr')
@@ -158,6 +161,7 @@ export class ArtIndexerBot {
           this.sets[setName.toLowerCase()] = setName
         }
       }
+      this.sets['ab500'] = 'Art Blocks 500'
     } catch (e) {
       console.error('Error in buildSets', e)
     }
@@ -889,10 +893,26 @@ export class ArtIndexerBot {
       return
     }
 
+    // Helper function for smart price formatting
+    const formatPrice = (price: number): string => {
+      if (price < 0.01) {
+        // For very small prices, use 5-6 decimals to show meaningful precision
+        return price < 0.001 ? price.toFixed(6) : price.toFixed(5)
+      } else if (price >= 10) {
+        // For larger numbers, trim trailing zeros
+        const formatted = price.toFixed(4)
+        return formatted.replace(/\.?0+$/, '')
+      } else {
+        // Standard 4 decimals for most cases
+        return price.toFixed(4)
+      }
+    }
+
     // Extract the set name (everything after "#set")
     const setName = content.substring(4).trim() // Remove "#set"
     const setKey = setName.toLowerCase()
 
+    console.log(this.sets)
     // Check if the set exists and get the correct case
     const actualSetName = this.sets[setKey]
     if (!actualSetName) {
@@ -906,6 +926,8 @@ export class ArtIndexerBot {
       // Get the set data with all its buckets using the correct case
       const setData = await getSetByName(actualSetName)
 
+      console.log(setData)
+
       if (!setData || !setData.set_buckets) {
         msg.channel.send(
           `Sorry, I wasn't able to find data for the set "${setName}".`
@@ -915,11 +937,7 @@ export class ArtIndexerBot {
 
       // Filter out buckets that don't have valid projects with listings
       const validBuckets = setData.set_buckets.filter(
-        (bucket) =>
-          bucket.project &&
-          bucket.project.lowest_listing !== null &&
-          bucket.project.lowest_listing !== undefined &&
-          bucket.project.lowest_listing > 0
+        (bucket) => bucket.project
       )
 
       if (validBuckets.length === 0) {
@@ -929,32 +947,172 @@ export class ArtIndexerBot {
         return
       }
 
-      // Calculate total entry price
+      // Calculate total entry price and collect all prices for statistics
       let totalPrice = 0
-      const projectDetails: string[] = []
+      const totalProjects = validBuckets.length
+      let totalProjectsWithListings = 0
+      const projectPrices: {
+        price: number
+        name: string
+        contractAddress: string
+        projectId: string
+        slug?: string
+      }[] = []
+      const projectsWithoutListings: {
+        name: string
+        contractAddress: string
+        projectId: string
+        slug?: string
+      }[] = []
 
       for (const bucket of validBuckets) {
-        if (bucket.project && bucket.project.lowest_listing) {
-          const price = Number(bucket.project.lowest_listing)
-          totalPrice += price
-          projectDetails.push(`${bucket.project.name}: ${price.toFixed(4)} ETH`)
+        if (bucket.project) {
+          const projectName = bucket.project.name || 'Unknown Project'
+          const contractAddress = bucket.project.contract_address
+          const projectId = bucket.project.project_id
+          const slug = bucket.project.slug
+
+          if (bucket.project.lowest_listing) {
+            const price = Number(bucket.project.lowest_listing)
+            totalPrice += price
+            totalProjectsWithListings++
+            projectPrices.push({
+              price,
+              name: projectName,
+              contractAddress,
+              projectId,
+              slug,
+            })
+          } else {
+            // Project exists but has no listings
+            projectsWithoutListings.push({
+              name: projectName,
+              contractAddress,
+              projectId,
+              slug,
+            })
+          }
         }
       }
 
-      // Format the response
-      const response = [
-        `**Set: ${setData.name}**`,
-        `**Total Entry Price: ${totalPrice.toFixed(4)} ETH**`,
-        '',
-        '**Project Breakdown:**',
-        ...projectDetails,
-        '',
-        `*Based on ${validBuckets.length} project${
-          validBuckets.length === 1 ? '' : 's'
-        } with tokens currently for sale*`,
-      ].join('\n')
+      // Calculate price statistics
+      let cheapestProject = 0
+      let mostExpensiveProject = 0
+      let medianProject = 0
 
-      msg.channel.send(response)
+      if (projectPrices.length > 0) {
+        // Sort prices to find min, max, and median
+        const sortedProjectPrices = [...projectPrices].sort(
+          (a, b) => a.price - b.price
+        )
+
+        cheapestProject = sortedProjectPrices[0].price
+        mostExpensiveProject =
+          sortedProjectPrices[sortedProjectPrices.length - 1].price
+
+        // Calculate median
+        const prices = sortedProjectPrices.map((p) => p.price)
+        const midIndex = Math.floor(prices.length / 2)
+        if (prices.length % 2 === 0) {
+          // Even number of prices - average of two middle values
+          medianProject = (prices[midIndex - 1] + prices[midIndex]) / 2
+        } else {
+          // Odd number of prices - middle value
+          medianProject = prices[midIndex]
+        }
+      }
+
+      const embedContent = new EmbedBuilder()
+        // Set the title of the field.
+        .setTitle(`${setData.name} Set - Data Snapshot`)
+        .setDescription(
+          `Current Price for a **full ${setData.name} Set** is **${formatPrice(
+            totalPrice
+          )} ETH**`
+        )
+        // Add link to title.
+        .setURL(`https://www.artblocks.io/sets/${setData.slug}`)
+        .setColor(randomColor())
+
+      embedContent.addFields({
+        name: 'Availability',
+        value: `${totalProjectsWithListings}/${totalProjects} (${(
+          (totalProjectsWithListings / totalProjects) *
+          100
+        ).toFixed(2)}%)`,
+        inline: true,
+      })
+      embedContent.addFields({
+        name: 'Median Price',
+        value: `${formatPrice(medianProject)} Ξ`,
+        inline: true,
+      })
+
+      // Add price range and top 3 lists if we have projects with listings
+      if (totalProjectsWithListings > 0) {
+        embedContent.addFields({
+          name: 'Range',
+          value: `${formatPrice(cheapestProject)} Ξ - ${formatPrice(
+            mostExpensiveProject
+          )} Ξ`,
+          inline: true,
+        })
+
+        // Generate top 3 cheapest and priciest lists
+        const sortedProjectPrices = [...projectPrices].sort(
+          (a, b) => a.price - b.price
+        )
+
+        // Top 3 cheapest (already sorted ascending)
+        const top3Cheapest = sortedProjectPrices.slice(0, 3)
+        const cheapestText = top3Cheapest
+          .map((p) => {
+            const projectUrl = p.slug
+              ? getProjectSlugUrl(p.slug)
+              : getProjectUrl(p.contractAddress, p.projectId)
+            return `— [${p.name}](${projectUrl}) • ${formatPrice(p.price)} Ξ`
+          })
+          .join('\n')
+
+        // Top 3 priciest (reverse order - most expensive first)
+        const top3Priciest = sortedProjectPrices.slice(-3).reverse()
+        const priciestText = top3Priciest
+          .map((p) => {
+            const projectUrl = p.slug
+              ? getProjectSlugUrl(p.slug)
+              : getProjectUrl(p.contractAddress, p.projectId)
+            return `— [${p.name}](${projectUrl}) • ${formatPrice(p.price)} Ξ`
+          })
+          .join('\n')
+
+        embedContent.addFields({
+          name: 'Easiest Entries',
+          value: cheapestText,
+        })
+
+        embedContent.addFields({
+          name: 'Steepest Entries',
+          value: priciestText,
+        })
+      }
+
+      // Add projects without listings if any exist
+      if (projectsWithoutListings.length > 0) {
+        const noListingsText = projectsWithoutListings
+          .map((p) => {
+            const projectUrl = p.slug
+              ? getProjectSlugUrl(p.slug)
+              : getProjectUrl(p.contractAddress, p.projectId)
+            return `[${p.name}](${projectUrl})`
+          })
+          .join(' • ')
+        embedContent.addFields({
+          name: 'Unavailable (No Current Listings)',
+          value: noListingsText,
+        })
+      }
+
+      msg.channel.send({ embeds: [embedContent] })
     } catch (error) {
       console.error('Error in handleSetMessage:', error)
       msg.channel.send(
