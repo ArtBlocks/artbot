@@ -78,7 +78,7 @@ export class ArtIndexerBot {
   projectsById: { [id: string]: ProjectBot } = {}
   contracts: { [id: string]: ContractDetailFragment } = {}
   walletTokens: { [id: string]: TokenDetailFragment[] } = {}
-  sets: { [id: string]: boolean } = {}
+  sets: { [id: string]: string } = {}
   initialized = false
 
   platforms: { [id: string]: ProjectBot[] } = {}
@@ -154,7 +154,8 @@ export class ArtIndexerBot {
       for (let i = 0; i < setsArr.length; i++) {
         const setName = setsArr[i].name
         if (typeof setName === 'string') {
-          this.sets[setName.toLowerCase()] = true
+          // Store lowercase key mapping to actual set name for case-insensitive lookup
+          this.sets[setName.toLowerCase()] = setName
         }
       }
     } catch (e) {
@@ -888,8 +889,9 @@ export class ArtIndexerBot {
     const setName = content.substring(4).trim() // Remove "#set"
     const setKey = setName.toLowerCase()
 
-    // Check if the set exists and is valid
-    if (!this.sets[setKey]) {
+    // Check if the set exists and get the correct case
+    const actualSetName = this.sets[setKey]
+    if (!actualSetName) {
       msg.channel.send(
         `Sorry, I wasn't able to find a set named "${setName}". Make sure the set name is spelled correctly.`
       )
@@ -897,8 +899,8 @@ export class ArtIndexerBot {
     }
 
     try {
-      // Get the set data with all its buckets
-      const setData = await getSetByName(setName)
+      // Get the set data with all its buckets using the correct case
+      const setData = await getSetByName(actualSetName)
 
       if (!setData || !setData.set_buckets) {
         msg.channel.send(
