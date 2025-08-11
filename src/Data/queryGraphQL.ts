@@ -642,7 +642,6 @@ export async function getEntryByVertical(
   verticalName: string,
   limit = 5
 ): Promise<EntryProject[]> {
-  console.log('verticalName', verticalName)
   const { data } = await client
     .query(GetEntryByVerticalDocument, {
       vertical_name: verticalName,
