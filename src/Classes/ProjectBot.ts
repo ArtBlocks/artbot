@@ -153,10 +153,10 @@ export class ProjectBot {
       return
     }
 
-    if (content.toLowerCase().includes('#floor')) {
+    if (content.toLowerCase().includes('#entry')) {
       try {
         // Reservoir API collections are indexed like: 78000000:78999999
-        const floorResponse = await axios.request<ReservoirCollectionResponse>({
+        const entryResponse = await axios.request<ReservoirCollectionResponse>({
           method: 'GET',
           url: `https://api.reservoir.tools/collections/v5?useNonFlaggedFloorAsk=true&id=${
             this.coreContract
@@ -169,11 +169,11 @@ export class ProjectBot {
           },
           timeout: 3000,
         })
-        const floorToken =
-          floorResponse.data.collections?.[0]?.floorAsk?.token?.tokenId ?? ''
+        const entryToken =
+          entryResponse.data.collections?.[0]?.floorAsk?.token?.tokenId ?? ''
 
-        if (floorToken) {
-          content = `#${parseInt(floorToken) % ONE_MILLION}`
+        if (entryToken) {
+          content = `#${parseInt(entryToken) % ONE_MILLION}`
         } else {
           msg.channel.send(
             `Sorry, looks like no ${this.projectName} tokens are for sale!`
@@ -181,9 +181,9 @@ export class ProjectBot {
           return
         }
       } catch (e) {
-        console.error('Error getting floor token for:', this.projectName, e)
+        console.error('Error getting entry token for:', this.projectName, e)
         msg.channel.send(
-          `Sorry, looks like there was an error retrieving the floor token for ${this.projectName}. Try again in a bit!`
+          `Sorry, looks like there was an error retrieving the entry token for ${this.projectName}. Try again in a bit!`
         )
         return
       }

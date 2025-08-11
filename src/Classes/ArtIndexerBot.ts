@@ -11,6 +11,8 @@ import {
   getAllContracts,
   getMostRecentMintedFlagshipToken,
   getArtblocksNextUpcomingProject,
+  getEntryByTag,
+  getEntryByVertical,
 } from '../Data/queryGraphQL'
 import { projectConfig, triviaBot } from '..'
 import {
@@ -52,6 +54,7 @@ export enum MessageTypes {
   OPEN = 'open',
   WALLET = 'wallet',
   RECENT = 'recent',
+  ENTRY = 'entry',
   PLATFORM = 'platform',
   UPCOMING = 'upcoming',
   UNKNOWN = 'unknown',
@@ -275,6 +278,8 @@ export class ArtIndexerBot {
       return MessageTypes.UPCOMING
     } else if (messageContent?.startsWith('#recent')) {
       return MessageTypes.RECENT
+    } else if (messageContent?.startsWith('#entry')) {
+      return MessageTypes.ENTRY
     } else if (key === 'open') {
       return MessageTypes.OPEN
     } else if (isVerticalName(key)) {
@@ -346,6 +351,25 @@ export class ArtIndexerBot {
     }
 
     console.log('Handling message', content)
+
+    if (content.toLowerCase().startsWith('#floor')) {
+      msg.channel.send(
+        `The \`#floor\` command has changed to \`#entry\`. Please try using \`#entry\` instead!`
+      )
+      return
+    }
+
+    // Handle #entry commands for groupings
+    if (content.toLowerCase().startsWith('#entry')) {
+      try {
+        await this.handleEntryMessage(msg)
+      } catch (error) {
+        msg.channel.send(`Sorry, I had trouble understanding that: ${content}`)
+        console.error('Error handling #entry message', error)
+        return
+      }
+      return
+    }
 
     let afterTheHash = content
       .substr(content.indexOf(' ') + 1)
@@ -734,5 +758,78 @@ export class ArtIndexerBot {
     }
 
     return ab500Projects.some((projectBot) => projectBot.id === projectId)
+  }
+
+  /**
+   * Handle #entry commands for both projects and groupings (tags and verticals)
+   */
+  async handleEntryMessage(msg: Message) {
+    if (!msg.channel.isSendable()) {
+      return
+    }
+
+    const content = msg.content.trim()
+    const parts = content.split(' ')
+
+    if (parts.length < 2) {
+      msg.channel.send(
+        'Please specify a project or grouping. Format: `#entry [project/grouping]`\n' +
+          'Examples: `#entry Fidenza`, `#entry AB500`, `#entry Curated`, `#entry Curated Series 1`'
+      )
+      return
+    }
+
+    // Extract the target name (everything after "#entry")
+    const target = content.substring(6).trim() // Remove "#entry"
+    const targetKey = this.toProjectKey(target)
+
+    const messageType = this.getMessageType(targetKey, target)
+    let projectBot: ProjectBot | undefined
+
+    if (messageType === MessageTypes.PROJECT) {
+      projectBot = await this.projectBotForMessage(targetKey, target)
+    } else if (messageType === MessageTypes.COLLECTION) {
+      const vertical = getVerticalName(target.toLowerCase())
+      const entryProjects = await getEntryByVertical(vertical, 1)
+
+      if (entryProjects.length === 0) {
+        msg.channel.send(
+          `Sorry, I wasn't able to find any projects for sale with the vertical ${vertical}`
+        )
+        return
+      }
+
+      const projectKey = this.toProjectKey(entryProjects[0].name ?? '')
+      projectBot = await this.projectBotForMessage(
+        projectKey,
+        `#entry ${entryProjects[0].name}`
+      )
+    } else if (messageType === MessageTypes.TAG) {
+      const tag = target
+      const entryProjects = await getEntryByTag(tag.toLowerCase(), 1)
+
+      if (entryProjects.length === 0) {
+        msg.channel.send(
+          `Sorry, I wasn't able to find any projects for sale with the tag ${tag}`
+        )
+        return
+      }
+
+      const projectKey = this.toProjectKey(entryProjects[0].name ?? '')
+      projectBot = await this.projectBotForMessage(
+        projectKey,
+        `#entry ${entryProjects[0].name}`
+      )
+    }
+
+    if (!projectBot) {
+      msg.channel.send(
+        `Sorry, I wasn't able to find any projects for sale with the query ${target}`
+      )
+      return
+    }
+
+    await projectBot?.handleNumberMessage(msg)
+    return
   }
 }

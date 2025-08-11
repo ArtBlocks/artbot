@@ -18,6 +18,7 @@ import { lookupUserByAddress } from '../Data/queryGraphQL'
 import axios from 'axios'
 import { artIndexerBot, ARTIST_TWITTER_HANDLES } from '..'
 import sharp from 'sharp'
+import { formatNumberWithCommas } from '../Utils/common'
 import { sanitizeTwitterHandle } from '../Utils/twitterUtils'
 import {
   getLastTweetId,
@@ -599,13 +600,13 @@ export class TwitterBot {
         tweetMessage += `\nfor ${saleData.salePrice} ${displayCurrency}`
         // Don't show USD price if currency is already USDC
         if (displayCurrency !== 'USDC') {
-          tweetMessage += ` ($${saleData.usdPrice.toFixed(2)})`
+          tweetMessage += ` ($${formatNumberWithCommas(saleData.usdPrice)})`
         }
       } else {
         tweetMessage += `\nacquired for ${saleData.salePrice} ${displayCurrency}`
         // Don't show USD price if currency is already USDC
         if (displayCurrency !== 'USDC') {
-          tweetMessage += ` ($${saleData.usdPrice.toFixed(2)})`
+          tweetMessage += ` ($${formatNumberWithCommas(saleData.usdPrice)})`
         }
       }
 
