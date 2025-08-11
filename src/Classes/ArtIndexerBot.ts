@@ -912,7 +912,6 @@ export class ArtIndexerBot {
     const setName = content.substring(4).trim() // Remove "#set"
     const setKey = setName.toLowerCase()
 
-    console.log(this.sets)
     // Check if the set exists and get the correct case
     const actualSetName = this.sets[setKey]
     if (!actualSetName) {
@@ -926,26 +925,17 @@ export class ArtIndexerBot {
       // Get the set data with all its buckets using the correct case
       const setData = await getSetByName(actualSetName)
 
-      console.log(setData)
-
       if (!setData || !setData.set_buckets) {
         msg.channel.send(
-          `Sorry, I wasn't able to find data for the set "${setName}".`
+          `Sorry, I had trouble retrieving data for the set "${setName}". Try again later!`
         )
         return
       }
 
-      // Filter out buckets that don't have valid projects with listings
+      // Filter out buckets that don't have valid projects
       const validBuckets = setData.set_buckets.filter(
         (bucket) => bucket.project
       )
-
-      if (validBuckets.length === 0) {
-        msg.channel.send(
-          `Sorry, there are no tokens currently for sale in any projects from the set "${setName}".`
-        )
-        return
-      }
 
       // Calculate total entry price and collect all prices for statistics
       let totalPrice = 0
@@ -1051,7 +1041,7 @@ export class ArtIndexerBot {
       // Add price range and top 3 lists if we have projects with listings
       if (totalProjectsWithListings > 0) {
         embedContent.addFields({
-          name: 'Range',
+          name: 'Price Range',
           value: `${formatPrice(cheapestProject)} Ξ - ${formatPrice(
             mostExpensiveProject
           )} Ξ`,
