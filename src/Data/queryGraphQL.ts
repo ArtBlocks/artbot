@@ -657,16 +657,6 @@ export async function getEntryByVertical(
   return data.projects_metadata
 }
 
-export interface SetBucketProject {
-  __typename?: 'projects_metadata' | undefined
-  lowest_listing?: any
-  name?: string | null | undefined
-  id: string
-  project_id: string
-  artist_name?: string | null | undefined
-  contract_address: string
-}
-
 export interface SetListData {
   __typename?: 'sets' | undefined
   name: string
