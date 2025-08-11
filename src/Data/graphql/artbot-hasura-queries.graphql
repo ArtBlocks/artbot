@@ -296,7 +296,7 @@ query GetEntryByVertical($vertical_name: String!, $limit: Int!) {
 }
 
 query GetAllSets {
-  sets(where: { set_buckets: { project: {} } }) {
+  sets(where: { is_public: { _eq: true } }) {
     name
   }
 }
