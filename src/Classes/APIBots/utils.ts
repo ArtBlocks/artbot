@@ -225,6 +225,10 @@ export function getTokenUrl(
   return buildArtBlocksTokenURL(contractAddr, tokenId)
 }
 
+export function getProjectSlugUrl(slug: string): string {
+  return `https://www.artblocks.io/collection/${slug}`
+}
+
 export function getProjectUrl(contractAddr: string, projectId: string): string {
   return `https://www.artblocks.io/collections/${contractAddr}-${projectId}`
 }
