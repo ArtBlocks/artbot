@@ -167,6 +167,13 @@ export function sendEmbedToSaleChannels(
       sendEmbedToChannel(bot, embed, CHANNEL_SQUIGGLE_SALES)
     }
 
+    if (
+      artBlocksData.artist.includes('Snowfro') &&
+      collectionType === CollectionType.ENGINE
+    ) {
+      sendEmbedToChannel(bot, embed, CHANNEL_SALES_CHAT)
+    }
+
     // Non-AB Discord servers
     if (artBlocksData.artist.includes('Steve Pikelny')) {
       sendEmbedToChannel(bot, embed, STEVIE_P_SALES)
