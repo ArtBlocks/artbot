@@ -5,7 +5,7 @@ import { projectConfig } from '..'
 dotenv.config()
 
 // Trade activity Discord channel IDs.
-const CHANNEL_SALES_CHAT = projectConfig.chIdByName['block-talk']
+const BLOCK_TALK = projectConfig.chIdByName['block-talk']
 const CHANNEL_SALES = projectConfig.chIdByName['sales-feed']
 const CHANNEL_LISTINGS = projectConfig.chIdByName['listing-feed']
 const ENGINE_SALES = projectConfig.chIdByName['engine-sales']
@@ -151,13 +151,13 @@ export function sendEmbedToSaleChannels(
         break
       case CollectionType.EXPLORATIONS:
         sendEmbedToChannel(bot, embed, EXPLORATIONS_SALES)
-        sendEmbedToChannel(bot, embed, CHANNEL_SALES_CHAT)
+        sendEmbedToChannel(bot, embed, BLOCK_TALK)
         break
       case CollectionType.COLLAB:
       case CollectionType.CORE:
       case CollectionType.STUDIO:
         sendEmbedToChannel(bot, embed, CHANNEL_SALES)
-        sendEmbedToChannel(bot, embed, CHANNEL_SALES_CHAT)
+        sendEmbedToChannel(bot, embed, BLOCK_TALK)
         break
       default:
         break
@@ -165,6 +165,13 @@ export function sendEmbedToSaleChannels(
     // Forward all Chromie Squiggles sales on to the DAO.
     if (artBlocksData.collection_name.includes('Chromie Squiggle')) {
       sendEmbedToChannel(bot, embed, CHANNEL_SQUIGGLE_SALES)
+    }
+
+    if (
+      artBlocksData.artist.includes('Snowfro') &&
+      collectionType === CollectionType.ENGINE
+    ) {
+      sendEmbedToChannel(bot, embed, BLOCK_TALK)
     }
 
     // Non-AB Discord servers
