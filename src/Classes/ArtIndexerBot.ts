@@ -1088,14 +1088,20 @@ export class ArtIndexerBot {
 
       // Add projects without listings if any exist
       if (projectsWithoutListings.length > 0) {
-        const noListingsText = projectsWithoutListings
-          .map((p) => {
-            const projectUrl = p.slug
-              ? getProjectSlugUrl(p.slug)
-              : getProjectUrl(p.contractAddress, p.projectId)
-            return `[${p.name}](${projectUrl})`
-          })
-          .join(' • ')
+        const firstFive = projectsWithoutListings.slice(0, 5)
+        const noListingsText =
+          firstFive
+            .map((p) => {
+              const projectUrl = p.slug
+                ? getProjectSlugUrl(p.slug)
+                : getProjectUrl(p.contractAddress, p.projectId)
+              return `[${p.name}](${projectUrl})`
+            })
+            .join(' • ') +
+          (projectsWithoutListings.length > 5
+            ? ` and ${projectsWithoutListings.length - 5} more`
+            : '')
+
         embedContent.addFields({
           name: 'Unavailable (No Current Listings)',
           value: noListingsText,
