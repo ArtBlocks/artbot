@@ -103,7 +103,7 @@ export async function getOSName(address: string): Promise<string> {
         {
           headers: {
             Accept: 'application/json',
-            'X-API-KEY': process.env.OPENSEA_API_KEY,
+            'x-api-key': process.env.OPENSEA_API_KEY,
           },
         }
       )
