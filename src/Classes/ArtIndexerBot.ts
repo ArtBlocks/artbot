@@ -556,6 +556,9 @@ export class ArtIndexerBot {
   }
 
   getRandomizedProjectBot(projectBots: ProjectBot[]): ProjectBot | undefined {
+    if (!projectBots || projectBots.length === 0) {
+      return undefined
+    }
     let attempts = 0
     while (attempts < 10) {
       const projBot =
