@@ -611,6 +611,10 @@ export class ArtIndexerBot {
       const project =
         openProjects[Math.floor(Math.random() * openProjects.length)]
 
+      if (!project) {
+        continue
+      }
+
       const projBot = this.projects[this.toProjectKey(project.name ?? '')]
       if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
         return projBot
