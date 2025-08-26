@@ -462,6 +462,28 @@ export class TwitterBot {
   }
 
   /**
+   * Get current ETH to USD exchange rate from CoinGecko API
+   * Returns the USD price of 1 ETH
+   * Throws an error if the API call fails
+   */
+  private async getEthToUsdRate(): Promise<number> {
+    const response = await axios.get(
+      'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'
+    )
+    return response.data.ethereum.usd
+  }
+
+  /**
+   * Convert ETH amount to USD using current exchange rate
+   * @param ethAmount The amount in ETH (as a number)
+   * @returns The equivalent USD value
+   */
+  private async convertEthToUsd(ethAmount: number): Promise<number> {
+    const ethToUsdRate = await this.getEthToUsdRate()
+    return ethAmount * ethToUsdRate
+  }
+
+  /**
    * Get artist display name following fallback rules:
    * 1. @twitterHandle
    * 2. Artist Name (AB DB)
@@ -586,6 +608,26 @@ export class TwitterBot {
       const displayCurrency =
         saleData.currency === 'WETH' ? 'ETH' : saleData.currency
 
+      // Calculate USD price - use our own conversion for ETH/WETH, otherwise use API data
+      let usdPrice = saleData.usdPrice
+      if (saleData.currency === 'ETH' || saleData.currency === 'WETH') {
+        try {
+          usdPrice = await this.convertEthToUsd(saleData.salePrice)
+          console.log(
+            `Converted ${saleData.salePrice} ${
+              saleData.currency
+            } to $${usdPrice.toFixed(2)} USD using CoinGecko rate`
+          )
+        } catch (error) {
+          console.error(
+            `CoinGecko API failed, using original API USD price $${saleData.usdPrice} as fallback:`,
+            error
+          )
+          // Keep using the original API usdPrice as fallback (more accurate than hardcoded guess)
+          usdPrice = saleData.usdPrice
+        }
+      }
+
       // Add artist line if we have a valid artist name
       if (artistDisplayName) {
         tweetMessage += `\nby ${artistDisplayName}`
@@ -600,13 +642,13 @@ export class TwitterBot {
         tweetMessage += `\nfor ${saleData.salePrice} ${displayCurrency}`
         // Don't show USD price if currency is already USDC
         if (displayCurrency !== 'USDC') {
-          tweetMessage += ` ($${formatNumberWithCommas(saleData.usdPrice)})`
+          tweetMessage += ` ($${formatNumberWithCommas(usdPrice)})`
         }
       } else {
         tweetMessage += `\nacquired for ${saleData.salePrice} ${displayCurrency}`
         // Don't show USD price if currency is already USDC
         if (displayCurrency !== 'USDC') {
-          tweetMessage += ` ($${formatNumberWithCommas(saleData.usdPrice)})`
+          tweetMessage += ` ($${formatNumberWithCommas(usdPrice)})`
         }
       }
 
