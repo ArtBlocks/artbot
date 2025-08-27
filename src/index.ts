@@ -12,8 +12,7 @@ export const projectConfig = new ProjectConfig()
 
 import { ArtIndexerBot } from './Classes/ArtIndexerBot'
 import { MintBot } from './Classes/MintBot'
-import { ReservoirListBot } from './Classes/APIBots/ReservoirListBot'
-import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
+
 import {
   getArbitrumContracts,
   getArtBlocksXBMProjects,
@@ -25,15 +24,15 @@ import {
 } from './Data/queryGraphQL'
 import { InsightsBot } from './Classes/InsightsBot'
 import { TriviaBot } from './Classes/TriviaBot'
-import {
-  waitForEngineContracts,
-  waitForStudioContracts,
-} from './Classes/APIBots/utils'
 import { ScheduleBot } from './Classes/SchedulerBot'
 import { verifyTwitter } from './Utils/twitterUtils'
-import axios from 'axios'
-import { paths } from '@reservoir0x/reservoir-sdk'
 import { TwitterBot } from './Classes/TwitterBot'
+
+import { OpenSeaStreamClient } from '@opensea/stream-js'
+import { WebSocket } from 'ws'
+import { LocalStorage } from 'node-localstorage'
+import { OpenSeaListBot } from './Classes/APIBots/OpenSeaListBot'
+import { OpenSeaSaleBot } from './Classes/APIBots/OpenSeaSaleBot'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
@@ -87,9 +86,9 @@ const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat']
 const CHANNEL_ARTBOT_TESTING = projectConfig.chIdByName['artbot-test-channel']
 
 // Rate (in ms) to poll API endpoints
-const API_POLL_TIME_MS = 10000
-const reservoirListLimit = 50
-const reservoirSaleLimit = 100
+// const API_POLL_TIME_MS = 10000
+// const reservoirListLimit = 50
+// const reservoirSaleLimit = 100
 
 // Note: Please set PRODUCTION_MODE to true if testing locally
 const PRODUCTION_MODE =
@@ -312,68 +311,68 @@ discordClient.on(Events.MessageCreate, async (msg) => {
   })
 })
 
-const initReservoirBots = async () => {
-  const studioContracts = await waitForStudioContracts()
-  const engineContracts = await waitForEngineContracts()
+// const initReservoirBots = async () => {
+//   const studioContracts = await waitForStudioContracts()
+//   const engineContracts = await waitForEngineContracts()
 
-  const allContracts = Object.values(CORE_CONTRACTS)
-    .concat(Object.values(COLLAB_CONTRACTS))
-    .concat(Object.values(EXPLORATIONS_CONTRACTS))
-    .concat(studioContracts ?? [])
-    .concat(engineContracts ?? [])
+//   const allContracts = Object.values(CORE_CONTRACTS)
+//     .concat(Object.values(COLLAB_CONTRACTS))
+//     .concat(Object.values(EXPLORATIONS_CONTRACTS))
+//     .concat(studioContracts ?? [])
+//     .concat(engineContracts ?? [])
 
-  type ReservoirContractSetResponse =
-    paths['/contracts-sets/v1']['post']['responses']['200']['schema']
+//   type ReservoirContractSetResponse =
+//     paths['/contracts-sets/v1']['post']['responses']['200']['schema']
 
-  const response = await axios.request<ReservoirContractSetResponse>({
-    method: 'POST',
-    url: 'https://api.reservoir.tools/contracts-sets/v1',
-    headers: {
-      accept: '*/*',
-      'content-type': 'application/json',
-      'x-api-key': process.env.RESERVOIR_API_KEY,
-    },
-    data: { contracts: allContracts },
-  })
+//   const response = await axios.request<ReservoirContractSetResponse>({
+//     method: 'POST',
+//     url: 'https://api.reservoir.tools/contracts-sets/v1',
+//     headers: {
+//       accept: '*/*',
+//       'content-type': 'application/json',
+//       'x-api-key': process.env.RESERVOIR_API_KEY,
+//     },
+//     data: { contracts: allContracts },
+//   })
 
-  const contractSetID = response.data.contractsSetId
+//   // const contractSetID = response.data.contractsSetId
 
-  // List endpoint lets you use contractSet param which is very nice
-  const listBot = new ReservoirListBot(
-    `https://api.reservoir.tools/orders/asks/v5?contractsSetId=${contractSetID}&sortBy=createdAt&limit=${reservoirListLimit}&normalizeRoyalties=true`,
-    API_POLL_TIME_MS,
-    discordClient,
-    {
-      Accept: 'application/json',
-      'x-api-key': process.env.RESERVOIR_API_KEY,
-    }
-  )
-  botsToCleanup.push(listBot)
+//   // List endpoint lets you use contractSet param which is very nice
+//   // const listBot = new ReservoirListBot(
+//   //   `https://api.reservoir.tools/orders/asks/v5?contractsSetId=${contractSetID}&sortBy=createdAt&limit=${reservoirListLimit}&normalizeRoyalties=true`,
+//   //   API_POLL_TIME_MS,
+//   //   discordClient,
+//   //   {
+//   //     Accept: 'application/json',
+//   //     'x-api-key': process.env.RESERVOIR_API_KEY,
+//   //   }
+//   // )
+//   // botsToCleanup.push(listBot)
 
-  // Sadly sales endpoint does not support contractSet param yet - need to batch by 20 contracts
-  const RESERVOIR_CONTRACT_LIMIT = 20
-  const numBotInstances = Math.ceil(
-    allContracts.length / RESERVOIR_CONTRACT_LIMIT
-  )
-  for (let i = 0; i < numBotInstances; i++) {
-    const start = i * RESERVOIR_CONTRACT_LIMIT
-    const end = start + RESERVOIR_CONTRACT_LIMIT
-    const saleParams =
-      'contract=' + allContracts.slice(start, end).join('&contract=')
+//   // Sadly sales endpoint does not support contractSet param yet - need to batch by 20 contracts
+//   const RESERVOIR_CONTRACT_LIMIT = 20
+//   const numBotInstances = Math.ceil(
+//     allContracts.length / RESERVOIR_CONTRACT_LIMIT
+//   )
+//   for (let i = 0; i < numBotInstances; i++) {
+//     const start = i * RESERVOIR_CONTRACT_LIMIT
+//     const end = start + RESERVOIR_CONTRACT_LIMIT
+//     const saleParams =
+//       'contract=' + allContracts.slice(start, end).join('&contract=')
 
-    const saleBot = new ReservoirSaleBot(
-      `https://api.reservoir.tools/sales/v4?${saleParams}&limit=${reservoirSaleLimit}`,
-      API_POLL_TIME_MS + i * 3000,
-      discordClient,
-      {
-        Accept: 'application/json',
-        'x-api-key': process.env.RESERVOIR_API_KEY,
-      },
-      abTwitterBot
-    )
-    botsToCleanup.push(saleBot)
-  }
-}
+//     // const saleBot = new ReservoirSaleBot(
+//     //   `https://api.reservoir.tools/sales/v4?${saleParams}&limit=${reservoirSaleLimit}`,
+//     //   API_POLL_TIME_MS + i * 3000,
+//     //   discordClient,
+//     //   {
+//     //     Accept: 'application/json',
+//     //     'x-api-key': process.env.RESERVOIR_API_KEY,
+//     //   },
+//     //   abTwitterBot
+//     // )
+//     // botsToCleanup.push(saleBot)
+//   }
+// }
 
 // Only instantiate TwitterBot if TWITTER_ENABLED is true
 const isTwitterEnabled = process.env.TWITTER_ENABLED?.toLowerCase() === 'true'
@@ -394,10 +393,102 @@ if (!isTwitterEnabled) {
 
 export const mintBot = new MintBot(discordClient, abTwitterBot)
 
-// Instantiate API Pollers (if not in test mode)
-if (PRODUCTION_MODE) {
-  initReservoirBots()
+// Temporarily disabled OpenSea Stream integration due to broken @opensea/stream-js package
+
+const openseaStreamClient = new OpenSeaStreamClient({
+  token: process.env.OPENSEA_API_KEY ?? '',
+  connectOptions: {
+    transport: WebSocket,
+    sessionStorage: LocalStorage,
+  },
+})
+
+// Initialize OpenSea Bots
+const openSeaListBot = new OpenSeaListBot(discordClient)
+const openSeaSaleBot = new OpenSeaSaleBot(discordClient, abTwitterBot)
+botsToCleanup.push(openSeaListBot)
+botsToCleanup.push(openSeaSaleBot)
+
+// Helper function to check if an OpenSea NFT ID contains any of our tracked contracts
+const isTrackedContract = (
+  nftId: string,
+  contractsArray: string[]
+): boolean => {
+  // NFT ID format: "ethereum/0x2308742aa28cc460522ff855d24a365f99deba7b/7111"
+  // Extract the contract address (middle part)
+  const parts = nftId.split('/')
+  if (parts.length !== 3) return false
+
+  const contractAddress = parts[1].toLowerCase()
+
+  // Check if this contract address is in our tracked contracts
+  return contractsArray.some(
+    (contract) => contract.toLowerCase() === contractAddress
+  )
 }
+
+openseaStreamClient.onItemListed('*', async (event) => {
+  if (!PRODUCTION_MODE) {
+    return
+  }
+  try {
+    // Get all contracts (ensures async contracts are loaded)
+    const allContracts = Object.values(CORE_CONTRACTS)
+      .concat(Object.values(COLLAB_CONTRACTS))
+      .concat(Object.values(EXPLORATIONS_CONTRACTS))
+      .concat(STUDIO_CONTRACTS)
+      .concat(ENGINE_CONTRACTS)
+
+    if (event.payload && event.payload.item && event.payload.item.nft_id) {
+      const nftId = event.payload.item.nft_id
+
+      if (isTrackedContract(nftId, allContracts)) {
+        // console.log('Tracked OpenSea item listed:', event)
+
+        // Process the listing with our OpenSeaListBot
+        openSeaListBot.handleListingEvent(event).catch((err) => {
+          console.error('Error processing OpenSea listing event:', err)
+        })
+      }
+    }
+  } catch (error) {
+    console.error('Error handling OpenSea listing event:', error)
+  }
+})
+
+openseaStreamClient.onItemSold('*', async (event) => {
+  if (!PRODUCTION_MODE) {
+    return
+  }
+  try {
+    // Get all contracts (ensures async contracts are loaded)
+    const allContracts = Object.values(CORE_CONTRACTS)
+      .concat(Object.values(COLLAB_CONTRACTS))
+      .concat(Object.values(EXPLORATIONS_CONTRACTS))
+      .concat(STUDIO_CONTRACTS)
+      .concat(ENGINE_CONTRACTS)
+
+    if (event.payload && event.payload.item && event.payload.item.nft_id) {
+      const nftId = event.payload.item.nft_id
+
+      if (isTrackedContract(nftId, allContracts)) {
+        console.log('Tracked OpenSea item sold:', event)
+
+        // Process the sale with our OpenSeaSaleBot
+        openSeaSaleBot.handleSaleEvent(event).catch((err: any) => {
+          console.error('Error processing OpenSea sale event:', err)
+        })
+      }
+    }
+  } catch (error) {
+    console.error('Error handling OpenSea sale event:', error)
+  }
+})
+
+// Instantiate API Pollers (if not in test mode)
+// if (PRODUCTION_MODE) {
+//   initReservoirBots()
+// }
 
 if (PRODUCTION_MODE) {
   attemptDiscordLogin()
