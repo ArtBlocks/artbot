@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { Client, EmbedBuilder } from 'discord.js'
+import { formatEther } from 'viem'
 import {
   BAN_ADDRESSES,
   sendEmbedToSaleChannels,
@@ -130,9 +131,11 @@ export class OpenSeaSaleBot {
 
     const { contractAddress, tokenId } = nftInfo
     const priceText = 'Sale Price'
-    const price = parseFloat(
-      parseFloat(payload.payment_token.eth_price).toFixed(4)
-    )
+
+    // Convert sale_price from wei to ETH using viem
+    const priceInEth = formatEther(BigInt(payload.sale_price))
+    const price = parseFloat(parseFloat(priceInEth).toFixed(4))
+
     const usdPrice = parseFloat(
       parseFloat(payload.payment_token.usd_price).toFixed(2)
     )
@@ -318,7 +321,10 @@ export class OpenSeaSaleBot {
       return false
     }
 
-    const price = parseFloat(payload.payment_token.eth_price)
+    // Convert sale_price from wei to ETH for price threshold check
+    const priceInEth = formatEther(BigInt(payload.sale_price))
+    const price = parseFloat(priceInEth)
+
     if (price < 0.1 && payload.payment_token.symbol.includes('ETH')) {
       console.log(
         'Skipping twitter sale for low-value OpenSea sale',
