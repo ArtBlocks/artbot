@@ -445,8 +445,6 @@ openseaStreamClient.onItemListed('*', async (event) => {
       const nftId = event.payload.item.nft_id
 
       if (isTrackedContract(nftId, allContracts)) {
-        // console.log('Tracked OpenSea item listed:', event)
-
         // Process the listing with our OpenSeaListBot
         openSeaListBot.handleListingEvent(event).catch((err) => {
           console.error('Error processing OpenSea listing event:', err)
@@ -474,9 +472,6 @@ openseaStreamClient.onItemSold('*', async (event) => {
       const nftId = event.payload.item.nft_id
 
       if (isTrackedContract(nftId, allContracts)) {
-        console.log('Tracked OpenSea item sold:', event)
-
-        // Process the sale with our OpenSeaSaleBot
         openSeaSaleBot.handleSaleEvent(event).catch((err: any) => {
           console.error('Error processing OpenSea sale event:', err)
         })
