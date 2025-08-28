@@ -419,6 +419,8 @@ const isTrackedContract = (
   const parts = nftId.split('/')
   if (parts.length !== 3) return false
 
+  if (parts[0] !== 'ethereum') return false
+
   const contractAddress = parts[1].toLowerCase()
 
   // Check if this contract address is in our tracked contracts
@@ -485,6 +487,8 @@ openseaStreamClient.onItemSold('*', async (event) => {
   }
 })
 
+// 8/28/2025 NOTE: We are migrating to OS API off of Reservoir
+// Keeping these around for now in case we need to revert, but these will be deleted soon
 // Instantiate API Pollers (if not in test mode)
 // if (PRODUCTION_MODE) {
 //   initReservoirBots()

@@ -77,6 +77,11 @@ export class OpenSeaListBot {
       return null
     }
 
+    if (parts[0] !== 'ethereum') {
+      console.warn('Invalid NFT ID format:', nftId)
+      return null
+    }
+
     return {
       contractAddress: parts[1].toLowerCase(),
       tokenId: parts[2],
