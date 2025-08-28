@@ -296,7 +296,6 @@ export const waitForStudioContracts = async (): Promise<string[]> => {
     console.log('Waiting for studio contracts to load...')
     await delay(4000)
   }
-  console.log('studio contracts loaded')
   return STUDIO_CONTRACTS
 }
 export const waitForEngineContracts = async (): Promise<string[]> => {
@@ -304,7 +303,6 @@ export const waitForEngineContracts = async (): Promise<string[]> => {
     console.log('Waiting for engine contracts to load...')
     await delay(5000)
   }
-  console.log('Engine contracts loaded')
   return ENGINE_CONTRACTS
 }
 
