@@ -42,14 +42,12 @@ export class OpenSeaListPollBot extends OpenSeaEventsPollBot {
    * Convert Events API event to Stream API format
    */
   private convertToStreamFormat(event: OpenSeaEvent): any | null {
-    if (!event.nft?.identifier || !event.payment) {
+    if (!event.nft?.identifier || !event.nft.contract || !event.payment) {
       return null
     }
 
-    const nftInfo = this.parseNftIdentifier(event.nft.identifier)
-    if (!nftInfo) {
-      return null
-    }
+    // Build stream nft_id from Events API fields: "chain/contract/tokenId"
+    const nftId = `${event.chain}/${event.nft.contract}/${event.nft.identifier}`
 
     // For listings, we need to estimate ETH price from payment quantity
     // The Events API provides the raw payment amount
@@ -62,7 +60,7 @@ export class OpenSeaListPollBot extends OpenSeaEventsPollBot {
     return {
       payload: {
         item: {
-          nft_id: event.nft.identifier,
+          nft_id: nftId,
         },
         payment_token: {
           symbol: event.payment.symbol || 'ETH',

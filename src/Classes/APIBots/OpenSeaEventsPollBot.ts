@@ -14,17 +14,17 @@ export interface OpenSeaEvent {
     timestamp: string
   }
   nft?: {
-    identifier: string
-    collection: string
+    identifier: string // token id within contract
+    collection?: string
     contract: string
-    token_standard: string
+    token_standard?: string
     name?: string
     description?: string
     image_url?: string
     metadata_url?: string
     opensea_url?: string
   }
-  quantity: number
+  quantity?: string | number // listing quantity; API uses strings for big ints
   seller?: {
     address: string
   }
@@ -32,7 +32,7 @@ export interface OpenSeaEvent {
     address: string
   }
   payment?: {
-    quantity: string
+    quantity: string // big integer string (wei-like)
     token_address?: string
     decimals?: number
     symbol?: string

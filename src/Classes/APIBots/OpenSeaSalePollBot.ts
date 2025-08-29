@@ -47,20 +47,18 @@ export class OpenSeaSalePollBot extends OpenSeaEventsPollBot {
    * Convert Events API event to Stream API format
    */
   private convertToStreamFormat(event: OpenSeaEvent): any | null {
-    if (!event.nft?.identifier || !event.payment) {
+    if (!event.nft?.identifier || !event.nft.contract || !event.payment) {
       return null
     }
 
-    const nftInfo = this.parseNftIdentifier(event.nft.identifier)
-    if (!nftInfo) {
-      return null
-    }
+    // Build stream nft_id from Events API fields: "chain/contract/tokenId"
+    const nftId = `${event.chain}/${event.nft.contract}/${event.nft.identifier}`
 
     // Convert to stream event format that OpenSeaSaleBot expects
     return {
       payload: {
         item: {
-          nft_id: event.nft.identifier,
+          nft_id: nftId,
         },
         sale_price: event.payment.quantity, // Already in wei from Events API
         payment_token: {
