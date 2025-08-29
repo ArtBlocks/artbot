@@ -30,10 +30,6 @@ export class OpenSeaListBot {
   } = {}
   private listColor = '#407FDB'
 
-  // Track processed events for missed event detection
-  private static processedEvents: Set<string> = new Set()
-  private static readonly MAX_PROCESSED_EVENTS = 10000 // Prevent memory leaks
-
   constructor(bot: Client) {
     this.bot = bot
 
@@ -58,39 +54,12 @@ export class OpenSeaListBot {
   /**
    * Main handler for OpenSea listing events
    * @param event - OpenSea stream event data
-   * @param source - Source of the event ('stream' or 'poll')
-   * @returns true if this was a missed event recovered by polling
    */
-  async handleListingEvent(
-    event: ItemListedEvent,
-    source: 'stream' | 'poll' = 'stream'
-  ): Promise<boolean> {
-    let missedByStream = false
+  async handleListingEvent(event: ItemListedEvent) {
     try {
-      // Generate unique event ID for tracking
-      const eventId = this.generateEventId(event.payload)
-
-      if (source === 'stream') {
-        // Track stream events
-        this.trackProcessedEvent(eventId)
-      } else if (source === 'poll') {
-        // Check if this was already processed by stream
-        if (OpenSeaListBot.processedEvents.has(eventId)) {
-          // Event was already processed by stream, skip sending and not missed
-          return false
-        } else {
-          // This is a missed event caught by polling!
-          missedByStream = true
-          console.log(`🔍 OpenSea LISTING poll caught missed event: ${eventId}`)
-          this.trackProcessedEvent(eventId)
-        }
-      }
-
       await this.buildDiscordMessage(event.payload)
-      return missedByStream
     } catch (err) {
       console.error('Error processing OpenSea listing event:', err)
-      return false
     }
   }
 
@@ -252,43 +221,6 @@ export class OpenSeaListBot {
     } catch (error) {
       console.error('Error building OpenSea listing message:', error)
     }
-  }
-
-  /**
-   * Generate unique event ID for tracking duplicates
-   */
-  private generateEventId(payload: ItemListedEvent['payload']): string {
-    // Use contract, token, price, and maker as unique identifier
-    const contract = payload.item.nft_id.split('/')[1] || ''
-    const tokenId = payload.item.nft_id.split('/')[2] || ''
-    const price = payload.payment_token.eth_price
-    const maker = payload.maker.address
-    return `listing:${contract}:${tokenId}:${price}:${maker}`
-  }
-
-  /**
-   * Track processed event and manage memory
-   */
-  private trackProcessedEvent(eventId: string) {
-    OpenSeaListBot.processedEvents.add(eventId)
-
-    // Prevent memory leaks by trimming old events
-    if (
-      OpenSeaListBot.processedEvents.size > OpenSeaListBot.MAX_PROCESSED_EVENTS
-    ) {
-      const eventsArray = Array.from(OpenSeaListBot.processedEvents)
-      const toKeep = eventsArray.slice(
-        -Math.floor(OpenSeaListBot.MAX_PROCESSED_EVENTS * 0.8)
-      )
-      OpenSeaListBot.processedEvents = new Set(toKeep)
-    }
-  }
-
-  /**
-   * Get count of tracked events (for monitoring)
-   */
-  static getTrackedEventCount(): number {
-    return OpenSeaListBot.processedEvents.size
   }
 
   /**
