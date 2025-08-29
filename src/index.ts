@@ -33,6 +33,12 @@ import { WebSocket } from 'ws'
 import { LocalStorage } from 'node-localstorage'
 import { OpenSeaListBot } from './Classes/APIBots/OpenSeaListBot'
 import { OpenSeaSaleBot } from './Classes/APIBots/OpenSeaSaleBot'
+import { OpenSeaListPollBot } from './Classes/APIBots/OpenSeaListPollBot'
+import { OpenSeaSalePollBot } from './Classes/APIBots/OpenSeaSalePollBot'
+import {
+  waitForStudioContracts,
+  waitForEngineContracts,
+} from './Classes/APIBots/utils'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
@@ -403,11 +409,15 @@ const openseaStreamClient = new OpenSeaStreamClient({
   },
 })
 
-// Initialize OpenSea Bots
+// Initialize OpenSea Stream Bots
 const openSeaListBot = new OpenSeaListBot(discordClient)
 const openSeaSaleBot = new OpenSeaSaleBot(discordClient, abTwitterBot)
 botsToCleanup.push(openSeaListBot)
 botsToCleanup.push(openSeaSaleBot)
+
+// Initialize OpenSea Polling Bots (backup for missed stream events)
+let openSeaListPollBot: OpenSeaListPollBot | undefined
+let openSeaSalePollBot: OpenSeaSalePollBot | undefined
 
 // Helper function to check if an OpenSea NFT ID contains any of our tracked contracts
 const isTrackedContract = (
@@ -482,6 +492,48 @@ openseaStreamClient.onItemSold('*', async (event) => {
   }
 })
 
+// Function to initialize OpenSea polling bots once contracts are loaded
+const initOpenSeaPollingBots = async () => {
+  try {
+    // Wait for all contract arrays to be populated
+    await Promise.all([waitForStudioContracts(), waitForEngineContracts()])
+
+    // Get all tracked contracts
+    const allContracts = Object.values(CORE_CONTRACTS)
+      .concat(Object.values(COLLAB_CONTRACTS))
+      .concat(Object.values(EXPLORATIONS_CONTRACTS))
+      .concat(STUDIO_CONTRACTS)
+      .concat(ENGINE_CONTRACTS)
+      .concat(ARBITRUM_CONTRACTS)
+
+    console.log(
+      `Initializing OpenSea polling bots for ${allContracts.length} contracts`
+    )
+
+    // Initialize polling bots
+    openSeaListPollBot = new OpenSeaListPollBot(discordClient, allContracts)
+    openSeaSalePollBot = new OpenSeaSalePollBot(
+      discordClient,
+      allContracts,
+      abTwitterBot
+    )
+
+    // Add to cleanup list
+    botsToCleanup.push(openSeaListPollBot)
+    botsToCleanup.push(openSeaSalePollBot)
+
+    console.log('OpenSea polling bots initialized successfully')
+    console.log(
+      '📈 Missed event monitoring active - polling every 15 seconds for backup coverage'
+    )
+    console.log(
+      '📊 Statistics will be logged every 10 minutes to track stream reliability'
+    )
+  } catch (error) {
+    console.error('Error initializing OpenSea polling bots:', error)
+  }
+}
+
 // 8/28/2025 NOTE: We are migrating to OS API off of Reservoir
 // Keeping these around for now in case we need to revert, but these will be deleted soon
 // Instantiate API Pollers (if not in test mode)
@@ -491,6 +543,10 @@ openseaStreamClient.onItemSold('*', async (event) => {
 
 if (PRODUCTION_MODE) {
   attemptDiscordLogin()
+  // Initialize polling bots after a short delay to ensure Discord is connected
+  setTimeout(() => {
+    initOpenSeaPollingBots()
+  }, 5000)
 }
 
 // Handle application shutdown
