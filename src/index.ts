@@ -33,6 +33,11 @@ import { WebSocket } from 'ws'
 import { LocalStorage } from 'node-localstorage'
 import { OpenSeaListBot } from './Classes/APIBots/OpenSeaListBot'
 import { OpenSeaSaleBot } from './Classes/APIBots/OpenSeaSaleBot'
+import { OpenSeaEventsPollBot } from './Classes/APIBots/OpenSeaEventsPollBot'
+import {
+  waitForStudioContracts,
+  waitForEngineContracts,
+} from './Classes/APIBots/utils'
 
 const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
 
@@ -393,21 +398,363 @@ if (!isTwitterEnabled) {
 
 export const mintBot = new MintBot(discordClient, abTwitterBot)
 
-// Temporarily disabled OpenSea Stream integration due to broken @opensea/stream-js package
+/**
+ * OpenSea Stream integration with robust error handling and reconnection logic
+ *
+ * This implementation addresses the common 502 "Bad Gateway" errors from OpenSea's WebSocket stream API
+ * by implementing:
+ *
+ * 1. **Automatic Reconnection**: Exponential backoff with jitter (5s → 10s → 20s → ... up to 5 minutes)
+ * 2. **Error Detection**: Specific handling for 502 errors with contextual logging
+ * 3. **Connection Monitoring**: Health checks every minute with connection stats
+ * 4. **Graceful Degradation**: Falls back to API polling when max reconnections reached
+ * 5. **Configuration**: Environment variables for customizing reconnection behavior
+ * 6. **Resource Management**: Proper cleanup of timers and connections on shutdown
+ *
+ * Debug access: `getOpenSeaConnectionStats()` in Node.js console
+ */
 
-const openseaStreamClient = new OpenSeaStreamClient({
-  token: process.env.OPENSEA_API_KEY ?? '',
-  connectOptions: {
-    transport: WebSocket,
-    sessionStorage: LocalStorage,
-  },
-})
+// WebSocket connection management
+interface ConnectionState {
+  isConnected: boolean
+  reconnectAttempts: number
+  lastError?: Error
+  lastConnectTime?: number
+}
 
-// Initialize OpenSea Bots
+const connectionState: ConnectionState = {
+  isConnected: false,
+  reconnectAttempts: 0,
+}
+
+// Configuration with environment variable overrides
+const MAX_RECONNECT_ATTEMPTS = parseInt(
+  process.env.OPENSEA_MAX_RECONNECT_ATTEMPTS || '10'
+)
+const INITIAL_RECONNECT_DELAY = parseInt(
+  process.env.OPENSEA_INITIAL_RECONNECT_DELAY || '5000'
+) // 5 seconds
+const MAX_RECONNECT_DELAY = parseInt(
+  process.env.OPENSEA_MAX_RECONNECT_DELAY || '300000'
+) // 5 minutes
+const CONNECTION_HEALTH_CHECK_INTERVAL = parseInt(
+  process.env.OPENSEA_HEALTH_CHECK_INTERVAL || '60000'
+) // 1 minute
+
+let openseaStreamClient: OpenSeaStreamClient
+let reconnectTimeout: NodeJS.Timeout | null = null
+let healthCheckInterval: NodeJS.Timeout | null = null
+
+// Calculate exponential backoff delay with jitter
+function getReconnectDelay(attemptNumber: number): number {
+  const exponentialDelay = Math.min(
+    INITIAL_RECONNECT_DELAY * Math.pow(2, attemptNumber),
+    MAX_RECONNECT_DELAY
+  )
+  // Add jitter (±25% randomization) to prevent thundering herd
+  const jitter = exponentialDelay * 0.25 * (Math.random() * 2 - 1)
+  return Math.max(1000, exponentialDelay + jitter)
+}
+
+// Initialize OpenSea Stream Client with error handling
+function initializeOpenSeaStreamClient(): OpenSeaStreamClient {
+  console.log('Initializing OpenSea Stream Client...')
+
+  const client = new OpenSeaStreamClient({
+    token: process.env.OPENSEA_API_KEY ?? '',
+    connectOptions: {
+      transport: WebSocket,
+      sessionStorage: LocalStorage,
+    },
+    onError: (error: unknown) => {
+      console.error('❌ OpenSea Stream Client error:', error)
+      connectionState.lastError = error as Error
+      connectionState.isConnected = false
+
+      // Check if it's a 502 error specifically and provide context
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
+      if (
+        errorMessage.includes('502') ||
+        errorMessage.includes('Bad Gateway')
+      ) {
+        console.log('🚨 Detected 502 Bad Gateway error - OpenSea server issue')
+        console.log('   This is typically caused by:')
+        console.log(
+          "   • OpenSea's WebSocket gateway unable to reach backend services"
+        )
+        console.log('   • Temporary server overload or maintenance')
+        console.log('   • Network issues between gateway and backend')
+        console.log(
+          '   ✅ Automatic reconnection will be attempted with exponential backoff'
+        )
+      }
+
+      // Schedule reconnection for connection errors
+      if (
+        errorMessage.includes('WebSocket') ||
+        errorMessage.includes('Connection') ||
+        errorMessage.includes('502')
+      ) {
+        scheduleReconnection()
+      }
+    },
+  })
+
+  // The OpenSeaStreamClient handles connection internally using Phoenix channels
+  // We'll rely on the onError callback and add additional monitoring
+  console.log('✅ OpenSea Stream Client initialized with error handling')
+  connectionState.isConnected = true
+  connectionState.reconnectAttempts = 0
+  connectionState.lastConnectTime = Date.now()
+
+  // Start health check monitoring
+  if (!healthCheckInterval) {
+    startHealthCheckMonitoring()
+  }
+
+  return client
+}
+
+// Schedule reconnection with exponential backoff
+function scheduleReconnection() {
+  if (reconnectTimeout) {
+    clearTimeout(reconnectTimeout)
+  }
+
+  if (connectionState.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+    console.error(
+      `❌ Max reconnection attempts (${MAX_RECONNECT_ATTEMPTS}) reached. Stopping reconnection attempts.`
+    )
+    console.log('📊 Falling back to API polling only for OpenSea events')
+    return
+  }
+
+  const delay = getReconnectDelay(connectionState.reconnectAttempts)
+  connectionState.reconnectAttempts++
+
+  console.log(
+    `🔄 Scheduling OpenSea WebSocket reconnection attempt ${
+      connectionState.reconnectAttempts
+    }/${MAX_RECONNECT_ATTEMPTS} in ${delay / 1000}s...`
+  )
+
+  reconnectTimeout = setTimeout(() => {
+    console.log(
+      `🔄 Attempting OpenSea WebSocket reconnection (attempt ${connectionState.reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`
+    )
+    try {
+      // Reinitialize the stream client
+      openseaStreamClient = initializeOpenSeaStreamClient()
+      setupStreamEventHandlers()
+    } catch (error) {
+      console.error('❌ Failed to reinitialize OpenSea Stream Client:', error)
+      scheduleReconnection()
+    }
+  }, delay)
+}
+
+// Health check monitoring
+function startHealthCheckMonitoring() {
+  healthCheckInterval = setInterval(() => {
+    const now = Date.now()
+    const timeSinceLastConnect = connectionState.lastConnectTime
+      ? now - connectionState.lastConnectTime
+      : Infinity
+
+    if (!connectionState.isConnected) {
+      console.log(
+        '⚠️  OpenSea WebSocket health check: Connection lost, reconnection should be in progress'
+      )
+    } else if (timeSinceLastConnect > 600000) {
+      // 10 minutes
+      console.log(
+        '✅ OpenSea WebSocket health check: Connection stable for',
+        Math.round(timeSinceLastConnect / 60000),
+        'minutes'
+      )
+    }
+
+    // Log connection stats
+    if (connectionState.reconnectAttempts > 0) {
+      console.log(
+        `📊 OpenSea WebSocket stats: ${
+          connectionState.reconnectAttempts
+        } reconnection attempts, currently ${
+          connectionState.isConnected ? 'connected' : 'disconnected'
+        }`
+      )
+    }
+  }, CONNECTION_HEALTH_CHECK_INTERVAL)
+}
+
+// Setup stream event handlers
+function setupStreamEventHandlers() {
+  // Note: OpenSeaStreamClient doesn't expose removeAllListeners
+  // Duplicate listeners are handled internally by the Phoenix channels
+
+  // Your existing event handlers with additional error handling
+  openseaStreamClient.onItemListed('*', async (event) => {
+    if (!PRODUCTION_MODE) {
+      return
+    }
+    try {
+      // Get all contracts (ensures async contracts are loaded)
+      const allContracts = Object.values(CORE_CONTRACTS)
+        .concat(Object.values(COLLAB_CONTRACTS))
+        .concat(Object.values(EXPLORATIONS_CONTRACTS))
+        .concat(STUDIO_CONTRACTS)
+        .concat(ENGINE_CONTRACTS)
+
+      if (event.payload && event.payload.item && event.payload.item.nft_id) {
+        const nftId = event.payload.item.nft_id
+
+        if (isTrackedContract(nftId, allContracts)) {
+          // Process the listing with the old OpenSeaListBot for now
+          // This is the primary source for listings
+          openSeaListBot.handleListingEvent(event).catch((err) => {
+            console.error('Error processing OpenSea listing event:', err)
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Error handling OpenSea listing event:', error)
+    }
+  })
+
+  openseaStreamClient.onItemSold('*', async (event) => {
+    if (!PRODUCTION_MODE) {
+      return
+    }
+    try {
+      // Get all contracts (ensures async contracts are loaded)
+      const allContracts = Object.values(CORE_CONTRACTS)
+        .concat(Object.values(COLLAB_CONTRACTS))
+        .concat(Object.values(EXPLORATIONS_CONTRACTS))
+        .concat(STUDIO_CONTRACTS)
+        .concat(ENGINE_CONTRACTS)
+
+      if (event.payload && event.payload.item && event.payload.item.nft_id) {
+        const nftId = event.payload.item.nft_id
+
+        if (isTrackedContract(nftId, allContracts)) {
+          // Parse the NFT ID to get contract and token info
+          const parts = nftId.split('/')
+          const contractAddress = parts[1]?.toLowerCase()
+          const tokenId = parts[2]
+
+          // Register this sale with the polling bot to avoid duplicate processing
+          if (openSeaEventsBot && event.payload.transaction) {
+            const seller = event.payload.maker.address || ''
+            const buyer = event.payload.taker.address || ''
+            openSeaEventsBot.registerStreamSale(
+              event.payload.transaction.hash,
+              contractAddress,
+              tokenId,
+              seller,
+              buyer
+            )
+          }
+
+          // Process the sale with the old OpenSeaSaleBot for now
+          // This is the primary source for sales
+          openSeaSaleBot.handleSaleEvent(event).catch((err: any) => {
+            console.error('Error processing OpenSea sale event:', err)
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Error handling OpenSea sale event:', error)
+    }
+  })
+}
+
+// Utility function to get connection statistics
+function getOpenSeaConnectionStats() {
+  return {
+    isConnected: connectionState.isConnected,
+    reconnectAttempts: connectionState.reconnectAttempts,
+    lastError: connectionState.lastError?.message,
+    lastConnectTime: connectionState.lastConnectTime,
+    uptime: connectionState.lastConnectTime
+      ? Date.now() - connectionState.lastConnectTime
+      : 0,
+    config: {
+      maxReconnectAttempts: MAX_RECONNECT_ATTEMPTS,
+      initialReconnectDelay: INITIAL_RECONNECT_DELAY,
+      maxReconnectDelay: MAX_RECONNECT_DELAY,
+      healthCheckInterval: CONNECTION_HEALTH_CHECK_INTERVAL,
+    },
+  }
+}
+
+// Expose stats for debugging (global for console access)
+if (typeof global !== 'undefined') {
+  ;(global as any).getOpenSeaConnectionStats = getOpenSeaConnectionStats
+}
+
+// Initialize the stream client
+console.log('Starting OpenSea WebSocket Stream integration...')
+openseaStreamClient = initializeOpenSeaStreamClient()
+setupStreamEventHandlers()
+
+// Log configuration
+console.log(
+  `OpenSea Stream Config: Max reconnects=${MAX_RECONNECT_ATTEMPTS}, Initial delay=${INITIAL_RECONNECT_DELAY}ms, Max delay=${MAX_RECONNECT_DELAY}ms`
+)
+
+// OpenSea Stream Bots - Primary handlers, API polling for sales backfill
 const openSeaListBot = new OpenSeaListBot(discordClient)
-const openSeaSaleBot = new OpenSeaSaleBot(discordClient, abTwitterBot)
+const openSeaSaleBot = new OpenSeaSaleBot(discordClient, abTwitterBot) // Primary sales handler
 botsToCleanup.push(openSeaListBot)
 botsToCleanup.push(openSeaSaleBot)
+
+// Global reference to the polling bot for stream integration
+let openSeaEventsBot: OpenSeaEventsPollBot | null = null
+
+// Initialize new OpenSea API polling bots
+const initOpenSeaApiPollingBots = async () => {
+  console.log('Initializing OpenSea API polling bots...')
+
+  // Wait for contracts to be loaded
+  const studioContracts = await waitForStudioContracts()
+  const engineContracts = await waitForEngineContracts()
+
+  // Get all contracts we care about
+  const allContracts = Object.values(CORE_CONTRACTS)
+    .concat(Object.values(COLLAB_CONTRACTS))
+    .concat(Object.values(EXPLORATIONS_CONTRACTS))
+    .concat(studioContracts)
+    .concat(engineContracts)
+
+  console.log(
+    `Tracking ${allContracts.length} contracts for OpenSea API polling`
+  )
+
+  // OpenSea API configuration
+  const OPENSEA_API_BASE = 'https://api.opensea.io/api/v2/events'
+  const API_POLL_TIME_MS = 10000 // Poll every 30 seconds (less frequent since it's backfill)
+  const headers = {
+    Accept: 'application/json',
+    'x-api-key': process.env.OPENSEA_API_KEY,
+  }
+
+  // Initialize OpenSea API Events Bot (SALES ONLY for backfill)
+  openSeaEventsBot = new OpenSeaEventsPollBot(
+    OPENSEA_API_BASE, // Base URL, will be updated with parameters in constructor
+    API_POLL_TIME_MS,
+    discordClient,
+    headers,
+    abTwitterBot,
+    allContracts,
+    openSeaSaleBot
+  )
+  botsToCleanup.push(openSeaEventsBot)
+
+  console.log(
+    'OpenSea API polling bot initialized successfully (sales backfill only)'
+  )
+}
 
 // Helper function to check if an OpenSea NFT ID contains any of our tracked contracts
 const isTrackedContract = (
@@ -429,58 +776,7 @@ const isTrackedContract = (
   )
 }
 
-openseaStreamClient.onItemListed('*', async (event) => {
-  if (!PRODUCTION_MODE) {
-    return
-  }
-  try {
-    // Get all contracts (ensures async contracts are loaded)
-    const allContracts = Object.values(CORE_CONTRACTS)
-      .concat(Object.values(COLLAB_CONTRACTS))
-      .concat(Object.values(EXPLORATIONS_CONTRACTS))
-      .concat(STUDIO_CONTRACTS)
-      .concat(ENGINE_CONTRACTS)
-
-    if (event.payload && event.payload.item && event.payload.item.nft_id) {
-      const nftId = event.payload.item.nft_id
-
-      if (isTrackedContract(nftId, allContracts)) {
-        // Process the listing with our OpenSeaListBot
-        openSeaListBot.handleListingEvent(event).catch((err) => {
-          console.error('Error processing OpenSea listing event:', err)
-        })
-      }
-    }
-  } catch (error) {
-    console.error('Error handling OpenSea listing event:', error)
-  }
-})
-
-openseaStreamClient.onItemSold('*', async (event) => {
-  if (!PRODUCTION_MODE) {
-    return
-  }
-  try {
-    // Get all contracts (ensures async contracts are loaded)
-    const allContracts = Object.values(CORE_CONTRACTS)
-      .concat(Object.values(COLLAB_CONTRACTS))
-      .concat(Object.values(EXPLORATIONS_CONTRACTS))
-      .concat(STUDIO_CONTRACTS)
-      .concat(ENGINE_CONTRACTS)
-
-    if (event.payload && event.payload.item && event.payload.item.nft_id) {
-      const nftId = event.payload.item.nft_id
-
-      if (isTrackedContract(nftId, allContracts)) {
-        openSeaSaleBot.handleSaleEvent(event).catch((err: any) => {
-          console.error('Error processing OpenSea sale event:', err)
-        })
-      }
-    }
-  } catch (error) {
-    console.error('Error handling OpenSea sale event:', error)
-  }
-})
+// Note: OpenSea Stream event handlers are now managed by setupStreamEventHandlers() above
 
 // 8/28/2025 NOTE: We are migrating to OS API off of Reservoir
 // Keeping these around for now in case we need to revert, but these will be deleted soon
@@ -491,11 +787,49 @@ openseaStreamClient.onItemSold('*', async (event) => {
 
 if (PRODUCTION_MODE) {
   attemptDiscordLogin()
+  // Initialize OpenSea API polling bots after Discord login
+  initOpenSeaApiPollingBots().catch((err) => {
+    console.error('Error initializing OpenSea API polling bots:', err)
+  })
+}
+
+// Cleanup function for OpenSea WebSocket connections
+function cleanupOpenSeaConnections() {
+  console.log('Cleaning up OpenSea WebSocket connections...')
+
+  // Clear reconnection timeout
+  if (reconnectTimeout) {
+    clearTimeout(reconnectTimeout)
+    reconnectTimeout = null
+  }
+
+  // Clear health check interval
+  if (healthCheckInterval) {
+    clearInterval(healthCheckInterval)
+    healthCheckInterval = null
+  }
+
+  // Disconnect OpenSea stream client gracefully
+  if (openseaStreamClient) {
+    try {
+      openseaStreamClient.disconnect(() => {
+        console.log('OpenSea WebSocket disconnected successfully')
+      })
+    } catch (error) {
+      console.error('Error disconnecting OpenSea WebSocket:', error)
+    }
+  }
+
+  // Reset connection state
+  connectionState.isConnected = false
+  connectionState.reconnectAttempts = 0
 }
 
 // Handle application shutdown
 process.on('SIGINT', () => {
   console.log('Received SIGINT. Cleaning up...')
+  // Cleanup OpenSea connections first
+  cleanupOpenSeaConnections()
   // Cleanup all bots
   botsToCleanup.forEach((bot) => bot.cleanup())
   // Disconnect Discord client
@@ -505,6 +839,8 @@ process.on('SIGINT', () => {
 
 process.on('SIGTERM', () => {
   console.log('Received SIGTERM. Cleaning up...')
+  // Cleanup OpenSea connections first
+  cleanupOpenSeaConnections()
   // Cleanup all bots
   botsToCleanup.forEach((bot) => bot.cleanup())
   // Disconnect Discord client

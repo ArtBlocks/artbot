@@ -80,16 +80,76 @@ export class APIPollBot {
    */
   async pollApi() {
     try {
-      const response = await axios.get(this.apiEndpoint, {
-        headers: this.headers,
-      })
+      const response = await this.getWithRetry(
+        this.apiEndpoint,
+        {
+          headers: this.headers,
+          timeout: 15000,
+          validateStatus: (status: number) => status >= 200 && status < 500,
+        },
+        3
+      )
+      if (response.status >= 400) {
+        console.warn(
+          `API poll non-2xx response (${response.status}) for ${this.apiEndpoint}`
+        )
+        return
+      }
       await this.handleAPIResponse(response.data)
     } catch (err) {
-      console.log(err)
+      const error = err as any
+      const status = error?.response?.status
+      const statusText = error?.response?.statusText
+      const message = error?.message
       console.warn(
-        `Error encountered when polling endpoint: ${this.apiEndpoint}`
+        `Error polling ${this.apiEndpoint} - status: ${status} ${statusText} message: ${message}`
       )
     }
+  }
+
+  /**
+   * Helper to GET with retries and backoff for transient network/server errors
+   */
+  protected async getWithRetry(
+    url: string,
+    config: any,
+    retries = 3,
+    initialDelayMs = 1000
+  ): Promise<any> {
+    let attempt = 0
+    let lastError: any
+    while (attempt <= retries) {
+      try {
+        return await axios.get(url, config)
+      } catch (err: any) {
+        lastError = err
+        const code = err?.code || err?.response?.status
+        const isTimeout =
+          err?.code === 'ECONNABORTED' || /timeout/i.test(err?.message || '')
+        const isReset = err?.code === 'ECONNRESET'
+        const status = err?.response?.status
+        const shouldRetry =
+          isTimeout ||
+          isReset ||
+          (typeof status === 'number' && status >= 500 && status < 600)
+
+        if (!shouldRetry || attempt === retries) {
+          break
+        }
+
+        const delay = Math.min(initialDelayMs * Math.pow(2, attempt), 10000)
+        const jitter = Math.floor(delay * 0.25 * (Math.random() * 2 - 1))
+        const sleepMs = Math.max(250, delay + jitter)
+        console.warn(
+          `GET retry ${attempt + 1}/${retries} for ${url} after error (${
+            code || status
+          }): ${err?.message || 'unknown'} - waiting ${sleepMs}ms`
+        )
+        await new Promise((res) => setTimeout(res, sleepMs))
+        attempt++
+      }
+    }
+    throw lastError
   }
 
   /**

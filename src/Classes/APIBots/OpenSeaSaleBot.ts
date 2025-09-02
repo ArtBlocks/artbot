@@ -24,9 +24,21 @@ import { artIndexerBot } from '../..'
 const IDENTICAL_TOLERANCE = 0.0001
 const SALE_TTL_MS = 24 * 60 * 60 * 1000 // 24 hours
 
+export interface NormalizedOpenSeaSale {
+  source: 'stream' | 'api'
+  osAssetId: string
+  contractAddress: string
+  tokenId: string
+  price: number
+  currency: string
+  usdPrice?: number
+  seller: string
+  buyer: string
+  platformUrl?: string
+}
+
 /**
- * Bot for handling OpenSea stream sale events
- * Similar to ReservoirSaleBot but for OpenSea stream data
+ * Bot for handling OpenSea sale events (Stream primary, API backfill)
  */
 export class OpenSeaSaleBot {
   private bot: Client
@@ -58,12 +70,35 @@ export class OpenSeaSaleBot {
   }
 
   /**
-   * Main handler for OpenSea sale events
+   * Main handler for OpenSea sale events (Stream)
    * @param event - OpenSea stream event data
    */
   async handleSaleEvent(event: ItemSoldEvent) {
     try {
-      await this.buildDiscordMessage(event.payload)
+      const nftInfo = this.parseNftId(event.payload.item.nft_id)
+      if (!nftInfo) {
+        console.warn('Could not parse NFT ID:', event.payload.item.nft_id)
+        return
+      }
+
+      const normalizedSale: NormalizedOpenSeaSale = {
+        source: 'stream',
+        osAssetId: event.payload.item.nft_id.toLowerCase(),
+        contractAddress: nftInfo.contractAddress,
+        tokenId: nftInfo.tokenId,
+        price: parseFloat(
+          parseFloat(formatEther(BigInt(event.payload.sale_price))).toFixed(4)
+        ),
+        currency: event.payload.payment_token.symbol,
+        usdPrice: parseFloat(
+          parseFloat(event.payload.payment_token.usd_price).toFixed(2)
+        ),
+        seller: event.payload.maker.address,
+        buyer: event.payload.taker.address,
+        platformUrl: undefined,
+      }
+
+      await this.handleNormalizedSale(normalizedSale)
     } catch (err) {
       console.error('Error processing OpenSea sale event:', err)
     }
@@ -116,43 +151,35 @@ export class OpenSeaSaleBot {
   }
 
   /**
-   * Builds and sends Discord embed message for OpenSea sale
-   * @param payload - OpenSea stream payload
+   * Unified handler for OpenSea sales from either Stream or API
    */
-  async buildDiscordMessage(payload: ItemSoldEvent['payload']) {
+  async handleNormalizedSale(sale: NormalizedOpenSeaSale) {
     const embed = new EmbedBuilder()
-
-    // Parse the NFT ID to get contract and token info
-    const nftInfo = this.parseNftId(payload.item.nft_id)
-    if (!nftInfo) {
-      console.warn('Could not parse NFT ID:', payload.item.nft_id)
-      return
-    }
-
-    const { contractAddress, tokenId } = nftInfo
+    const { contractAddress, tokenId } = sale
     const priceText = 'Sale Price'
-
-    // Convert sale_price from wei to ETH using viem
-    const priceInEth = formatEther(BigInt(payload.sale_price))
-    const price = parseFloat(parseFloat(priceInEth).toFixed(4))
-
-    const usdPrice = parseFloat(
-      parseFloat(payload.payment_token.usd_price).toFixed(2)
-    )
-    const currency = payload.payment_token.symbol
-    const seller = payload.maker.address
-    const buyer = payload.taker.address
+    const price = sale.price
+    const usdPrice = sale.usdPrice ?? 0
+    const currency = sale.currency
+    const seller = sale.seller
+    const buyer = sale.buyer
     let platform = 'OpenSea'
 
-    // Check for duplicate sales (same token, similar price)
+    // Check for duplicate sales using composite key (contract-token-seller-buyer)
+    const compositeKey = buildCompositeSaleId(
+      contractAddress,
+      tokenId,
+      seller,
+      buyer
+    )
     if (
-      this.recentSales[tokenId] &&
-      Math.abs(this.recentSales[tokenId].price - price) <= IDENTICAL_TOLERANCE
+      this.recentSales[compositeKey] &&
+      Math.abs(this.recentSales[compositeKey].price - price) <=
+        IDENTICAL_TOLERANCE
     ) {
-      console.log(`Skipping identical OpenSea resale for ${tokenId}`)
+      console.log(`Skipping identical OpenSea resale for ${compositeKey}`)
       return
     }
-    this.recentSales[tokenId] = { price, timestamp: Date.now() }
+    this.recentSales[compositeKey] = { price, timestamp: Date.now() }
 
     embed.setColor(this.saleColor)
     platform = 'OpenSea'
@@ -177,12 +204,9 @@ export class OpenSeaSaleBot {
 
       let sellerText = await ensOrAddress(seller)
       let buyerText = await ensOrAddress(buyer)
-      const platformUrl = this.getPlatformUrl(
-        platform,
-        contractAddress,
-        tokenId,
-        tokenUrl
-      )
+      const platformUrl = sale.platformUrl
+        ? sale.platformUrl
+        : this.getPlatformUrl(platform, contractAddress, tokenId, tokenUrl)
 
       // Add OpenSea usernames if available (same logic as ReservoirSaleBot)
       if (!sellerText.includes('.eth')) {
@@ -276,7 +300,10 @@ export class OpenSeaSaleBot {
       }
 
       // Post to Twitter if TwitterBot is available and sale meets criteria
-      if (this.twitterBot && this.shouldTweetSale(payload, artBlocksData)) {
+      if (
+        this.twitterBot &&
+        this.shouldTweetNormalizedSale(sale, artBlocksData)
+      ) {
         try {
           await this.twitterBot.tweetSale({
             tokenName: artBlocksData.name,
@@ -304,14 +331,11 @@ export class OpenSeaSaleBot {
    * Determines whether a sale should be posted to Twitter
    * Similar logic to ReservoirSaleBot but adapted for OpenSea events
    */
-  private shouldTweetSale(
-    payload: ItemSoldEvent['payload'],
+  private shouldTweetNormalizedSale(
+    sale: NormalizedOpenSeaSale,
     artBlocksData: any
   ): boolean {
-    const nftInfo = this.parseNftId(payload.item.nft_id)
-    if (!nftInfo) return false
-
-    const projectId = `${nftInfo.contractAddress.toLowerCase()}-${
+    const projectId = `${sale.contractAddress.toLowerCase()}-${
       artBlocksData.project_id
     }`
     const isAB500 = artIndexerBot.isAB500(projectId)
@@ -321,15 +345,11 @@ export class OpenSeaSaleBot {
       return false
     }
 
-    // Convert sale_price from wei to ETH for price threshold check
-    const priceInEth = formatEther(BigInt(payload.sale_price))
-    const price = parseFloat(priceInEth)
-
-    if (price < 0.1 && payload.payment_token.symbol.includes('ETH')) {
+    if (sale.price < 0.1 && sale.currency.includes('ETH')) {
       console.log(
         'Skipping twitter sale for low-value OpenSea sale',
-        price,
-        payload.payment_token.symbol
+        sale.price,
+        sale.currency
       )
       return false
     }
@@ -343,4 +363,18 @@ export class OpenSeaSaleBot {
   cleanup() {
     this.recentSales = {}
   }
+}
+
+/**
+ * Build a composite sale ID as contract-tokenId-seller-buyer
+ */
+export const buildCompositeSaleId = (
+  contractAddress: string,
+  tokenId: string,
+  seller: string,
+  buyer: string
+): string => {
+  return `${contractAddress.toLowerCase()}-${tokenId}-${(
+    seller || ''
+  ).toLowerCase()}-${(buyer || '').toLowerCase()}`
 }
