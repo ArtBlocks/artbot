@@ -641,13 +641,13 @@ export class TwitterBot {
         tweetMessage += `\nacquired by ${collectorDisplayName}`
         tweetMessage += `\nfor ${saleData.salePrice} ${displayCurrency}`
         // Don't show USD price if currency is already USDC
-        if (displayCurrency !== 'USDC') {
+        if (displayCurrency !== 'USDC' && usdPrice !== 0) {
           tweetMessage += ` ($${formatNumberWithCommas(usdPrice)})`
         }
       } else {
         tweetMessage += `\nacquired for ${saleData.salePrice} ${displayCurrency}`
         // Don't show USD price if currency is already USDC
-        if (displayCurrency !== 'USDC') {
+        if (displayCurrency !== 'USDC' && usdPrice !== 0) {
           tweetMessage += ` ($${formatNumberWithCommas(usdPrice)})`
         }
       }
