@@ -137,7 +137,9 @@ export class OpenSeaSaleBot {
     const price = parseFloat(parseFloat(priceInEth).toFixed(4))
 
     const usdPrice = parseFloat(
-      parseFloat(payload.payment_token.usd_price).toFixed(2)
+      (
+        parseFloat(payload.payment_token.usd_price) * parseFloat(priceInEth)
+      ).toFixed(2)
     )
     const currency = payload.payment_token.symbol
     const seller = payload.maker.address
