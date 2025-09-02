@@ -233,7 +233,10 @@ export function getProjectUrl(contractAddr: string, projectId: string): string {
   return `https://www.artblocks.io/collections/${contractAddr}-${projectId}`
 }
 
-function buildArtBlocksTokenURL(contractAddr: string, tokenId: string): string {
+export function buildArtBlocksTokenURL(
+  contractAddr: string,
+  tokenId: string
+): string {
   return `https://www.artblocks.io/token/${contractAddr}/${tokenId}`
 }
 

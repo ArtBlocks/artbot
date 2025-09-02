@@ -16,6 +16,7 @@ import {
   getTokenUrl,
   isStudioContract,
   getOSName,
+  buildArtBlocksTokenURL,
 } from './utils'
 import { ItemSoldEvent } from '@opensea/stream-js'
 import { TwitterBot } from '../TwitterBot'
@@ -81,17 +82,20 @@ export class OpenSeaSaleBot {
         return
       }
 
+      const ethPrice = parseFloat(
+        parseFloat(formatEther(BigInt(event.payload.sale_price))).toFixed(4)
+      )
       const normalizedSale: NormalizedOpenSeaSale = {
         source: 'stream',
         osAssetId: event.payload.item.nft_id.toLowerCase(),
         contractAddress: nftInfo.contractAddress,
         tokenId: nftInfo.tokenId,
-        price: parseFloat(
-          parseFloat(formatEther(BigInt(event.payload.sale_price))).toFixed(4)
-        ),
+        price: ethPrice,
         currency: event.payload.payment_token.symbol,
         usdPrice: parseFloat(
-          parseFloat(event.payload.payment_token.usd_price).toFixed(2)
+          (
+            parseFloat(event.payload.payment_token.usd_price) * ethPrice
+          ).toFixed(2)
         ),
         seller: event.payload.maker.address,
         buyer: event.payload.taker.address,
@@ -204,9 +208,7 @@ export class OpenSeaSaleBot {
 
       let sellerText = await ensOrAddress(seller)
       let buyerText = await ensOrAddress(buyer)
-      const platformUrl = sale.platformUrl
-        ? sale.platformUrl
-        : this.getPlatformUrl(platform, contractAddress, tokenId, tokenUrl)
+      const platformUrl = buildArtBlocksTokenURL(contractAddress, tokenId)
 
       // Add OpenSea usernames if available (same logic as ReservoirSaleBot)
       if (!sellerText.includes('.eth')) {
