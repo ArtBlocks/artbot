@@ -36,6 +36,7 @@ export interface NormalizedOpenSeaSale {
   seller: string
   buyer: string
   platformUrl?: string
+  timestamp: number
 }
 
 /**
@@ -82,6 +83,12 @@ export class OpenSeaSaleBot {
         return
       }
 
+      console.log(
+        'New stream sale event:',
+        event.payload.item.metadata.name,
+        new Date(event.payload.event_timestamp).toISOString()
+      )
+
       const ethPrice = parseFloat(
         parseFloat(formatEther(BigInt(event.payload.sale_price))).toFixed(4)
       )
@@ -100,6 +107,7 @@ export class OpenSeaSaleBot {
         seller: event.payload.maker.address,
         buyer: event.payload.taker.address,
         platformUrl: undefined,
+        timestamp: parseInt(event.payload.event_timestamp ?? '0'),
       }
 
       await this.handleNormalizedSale(normalizedSale)
@@ -167,6 +175,16 @@ export class OpenSeaSaleBot {
     const seller = sale.seller
     const buyer = sale.buyer
     let platform = 'OpenSea'
+
+    const timestamp = sale.timestamp
+    const now = Date.now()
+    const timeDiff = now - timestamp
+    if (timeDiff > 1000 * 60 * 60 * 24) {
+      console.log(
+        `Skipping OpenSea sale from more than 24 hours ago: ${timestamp}`
+      )
+      return
+    }
 
     // Check for duplicate sales using composite key (contract-token-seller-buyer)
     const compositeKey = buildCompositeSaleId(
