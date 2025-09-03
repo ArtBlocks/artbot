@@ -86,7 +86,10 @@ export class OpenSeaSaleBot {
       console.log(
         'New stream sale event:',
         event.payload.item.metadata.name,
-        new Date(event.payload.event_timestamp).toISOString()
+        'timestamp:',
+        new Date(event.payload.event_timestamp).toISOString(),
+        'sent at:',
+        event.sent_at
       )
 
       const ethPrice = parseFloat(
@@ -179,9 +182,9 @@ export class OpenSeaSaleBot {
     const timestamp = sale.timestamp
     const now = Date.now()
     const timeDiff = now - timestamp
-    if (timeDiff > 1000 * 60 * 60 * 24) {
+    if (timeDiff > 1000 * 60 * 60 * 4) {
       console.log(
-        `Skipping OpenSea sale from more than 24 hours ago: ${timestamp}`
+        `Skipping OpenSea sale from more than 4 hours ago: ${timestamp}`
       )
       return
     }
