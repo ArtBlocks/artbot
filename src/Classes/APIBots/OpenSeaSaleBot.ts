@@ -36,7 +36,7 @@ export interface NormalizedOpenSeaSale {
   seller: string
   buyer: string
   platformUrl?: string
-  timestamp: number
+  timestamp: string
 }
 
 /**
@@ -110,7 +110,7 @@ export class OpenSeaSaleBot {
         seller: event.payload.maker.address,
         buyer: event.payload.taker.address,
         platformUrl: undefined,
-        timestamp: parseInt(event.payload.event_timestamp ?? '0'),
+        timestamp: event.payload.event_timestamp,
       }
 
       await this.handleNormalizedSale(normalizedSale)
@@ -179,7 +179,7 @@ export class OpenSeaSaleBot {
     const buyer = sale.buyer
     let platform = 'OpenSea'
 
-    const timestamp = sale.timestamp
+    const timestamp = new Date(sale.timestamp).getTime()
     const now = Date.now()
     const timeDiff = now - timestamp
     if (timeDiff > 1000 * 60 * 60 * 4) {

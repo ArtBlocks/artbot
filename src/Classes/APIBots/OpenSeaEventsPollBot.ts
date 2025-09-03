@@ -357,7 +357,7 @@ export class OpenSeaEventsPollBot extends APIPollBot {
       seller,
       buyer,
       platformUrl: asset.opensea_url,
-      timestamp: saleEvent.event_timestamp,
+      timestamp: saleEvent.event_timestamp.toString(),
     }
 
     // Leave duplicate suppression to the sale bot
