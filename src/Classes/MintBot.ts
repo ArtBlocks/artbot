@@ -183,11 +183,6 @@ export class MintBot {
     console.log('NEW MINT', contractAddress, tokenID, owner)
     const id = `${contractAddress}-${tokenID}`
 
-    if (parseInt(tokenID) % 1e6 === 0) {
-      console.log('Skipping mint #0')
-      return
-    }
-
     if (!this.contractToChannel[contractAddress]) {
       console.log('Skipping mint for contract not in config')
       return
