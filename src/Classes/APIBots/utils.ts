@@ -8,15 +8,24 @@ import {
 } from '../../index'
 import { CollectionType } from '../MintBot'
 import { AxiosError } from 'axios'
+import { createPublicClient, http, fallback } from 'viem'
+import { mainnet } from 'viem/chains'
 dotenv.config()
 
 const axios = require('axios')
-const ethers = require('ethers')
 
-const provider = new ethers.providers.EtherscanProvider(
-  'homestead',
-  process.env.ETHERSCAN_API_KEY
-)
+// Configure viem with multiple RPC providers for reliability
+const publicClient = createPublicClient({
+  chain: mainnet,
+  transport: fallback([
+    // Primary: Cloudflare's public Ethereum RPC (reliable and fast)
+    http('https://cloudflare-eth.com'),
+    // Fallback 1: Ankr public RPC
+    http('https://rpc.ankr.com/eth'),
+    // Fallback 2: Public default
+    http(),
+  ]),
+})
 
 const STAGING_CONTRACTS = require('../../ProjectConfig/stagingContracts.json')
 const EXPLORATIONS_CONTRACTS = require('../../ProjectConfig/explorationsContracts.json')
@@ -45,11 +54,16 @@ async function getENSName(address: string): Promise<string> {
   if (ensAddressMap[address]) {
     name = ensAddressMap[address]
   } else {
-    let ens = ''
+    let ens: string | null = null
     let retries = 0
-    while (ens === '' && retries < MAX_ENS_RETRIES) {
+    while (ens === null && retries < MAX_ENS_RETRIES) {
       try {
-        ens = await provider.lookupAddress(address)
+        ens = await publicClient.getEnsName({
+          address: address as `0x${string}`,
+        })
+        if (ens === null) {
+          retries++
+        }
       } catch (err) {
         retries++
         console.warn(`ENS lookup error on ${address}`, err)
@@ -58,7 +72,9 @@ async function getENSName(address: string): Promise<string> {
 
     name = ens ?? ''
     ensAddressMap[address] = name
-    ensResolvedMap[name] = address
+    if (name !== '') {
+      ensResolvedMap[name] = address
+    }
   }
   return name
 }
@@ -68,17 +84,24 @@ export async function resolveEnsName(ensName: string): Promise<string> {
   if (ensResolvedMap[ensName]) {
     wallet = ensResolvedMap[ensName]
   } else {
+    let resolvedAddress: string | null = null
     let retries = 0
 
-    while (wallet === '' && retries < MAX_ENS_RETRIES) {
+    while (resolvedAddress === null && retries < MAX_ENS_RETRIES) {
       try {
-        wallet = await provider.resolveName(ensName)
+        resolvedAddress = await publicClient.getEnsAddress({
+          name: ensName,
+        })
+        if (resolvedAddress === null) {
+          retries++
+        }
       } catch (err) {
         retries++
         console.warn(`ENS resolve error on ${ensName}`, err)
       }
     }
 
+    wallet = resolvedAddress ?? ''
     if (wallet !== '') {
       ensResolvedMap[ensName] = wallet
     }
