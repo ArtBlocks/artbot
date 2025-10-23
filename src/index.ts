@@ -90,11 +90,6 @@ const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat']
 
 const CHANNEL_ARTBOT_TESTING = projectConfig.chIdByName['artbot-test-channel']
 
-// Rate (in ms) to poll API endpoints
-// const API_POLL_TIME_MS = 10000
-// const reservoirListLimit = 50
-// const reservoirSaleLimit = 100
-
 // Note: Please set PRODUCTION_MODE to true if testing locally
 const PRODUCTION_MODE =
   process.env.PRODUCTION_MODE &&
@@ -315,69 +310,6 @@ discordClient.on(Events.MessageCreate, async (msg) => {
     }
   })
 })
-
-// const initReservoirBots = async () => {
-//   const studioContracts = await waitForStudioContracts()
-//   const engineContracts = await waitForEngineContracts()
-
-//   const allContracts = Object.values(CORE_CONTRACTS)
-//     .concat(Object.values(COLLAB_CONTRACTS))
-//     .concat(Object.values(EXPLORATIONS_CONTRACTS))
-//     .concat(studioContracts ?? [])
-//     .concat(engineContracts ?? [])
-
-//   type ReservoirContractSetResponse =
-//     paths['/contracts-sets/v1']['post']['responses']['200']['schema']
-
-//   const response = await axios.request<ReservoirContractSetResponse>({
-//     method: 'POST',
-//     url: 'https://api.reservoir.tools/contracts-sets/v1',
-//     headers: {
-//       accept: '*/*',
-//       'content-type': 'application/json',
-//       'x-api-key': process.env.RESERVOIR_API_KEY,
-//     },
-//     data: { contracts: allContracts },
-//   })
-
-//   // const contractSetID = response.data.contractsSetId
-
-//   // List endpoint lets you use contractSet param which is very nice
-//   // const listBot = new ReservoirListBot(
-//   //   `https://api.reservoir.tools/orders/asks/v5?contractsSetId=${contractSetID}&sortBy=createdAt&limit=${reservoirListLimit}&normalizeRoyalties=true`,
-//   //   API_POLL_TIME_MS,
-//   //   discordClient,
-//   //   {
-//   //     Accept: 'application/json',
-//   //     'x-api-key': process.env.RESERVOIR_API_KEY,
-//   //   }
-//   // )
-//   // botsToCleanup.push(listBot)
-
-//   // Sadly sales endpoint does not support contractSet param yet - need to batch by 20 contracts
-//   const RESERVOIR_CONTRACT_LIMIT = 20
-//   const numBotInstances = Math.ceil(
-//     allContracts.length / RESERVOIR_CONTRACT_LIMIT
-//   )
-//   for (let i = 0; i < numBotInstances; i++) {
-//     const start = i * RESERVOIR_CONTRACT_LIMIT
-//     const end = start + RESERVOIR_CONTRACT_LIMIT
-//     const saleParams =
-//       'contract=' + allContracts.slice(start, end).join('&contract=')
-
-//     // const saleBot = new ReservoirSaleBot(
-//     //   `https://api.reservoir.tools/sales/v4?${saleParams}&limit=${reservoirSaleLimit}`,
-//     //   API_POLL_TIME_MS + i * 3000,
-//     //   discordClient,
-//     //   {
-//     //     Accept: 'application/json',
-//     //     'x-api-key': process.env.RESERVOIR_API_KEY,
-//     //   },
-//     //   abTwitterBot
-//     // )
-//     // botsToCleanup.push(saleBot)
-//   }
-// }
 
 // Only instantiate TwitterBot if TWITTER_ENABLED is true
 const isTwitterEnabled = process.env.TWITTER_ENABLED?.toLowerCase() === 'true'
@@ -775,15 +707,6 @@ const isTrackedContract = (
     (contract) => contract.toLowerCase() === contractAddress
   )
 }
-
-// Note: OpenSea Stream event handlers are now managed by setupStreamEventHandlers() above
-
-// 8/28/2025 NOTE: We are migrating to OS API off of Reservoir
-// Keeping these around for now in case we need to revert, but these will be deleted soon
-// Instantiate API Pollers (if not in test mode)
-// if (PRODUCTION_MODE) {
-//   initReservoirBots()
-// }
 
 if (PRODUCTION_MODE) {
   attemptDiscordLogin()

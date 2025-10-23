@@ -33,6 +33,7 @@ import {
   GetAllSetsDocument,
   GetSetByNameDocument,
   SetDataFragment,
+  GetLowestPricedTokenByProjectDocument,
 } from '../../generated/graphql'
 import {
   isArbitrumContract,
@@ -686,4 +687,22 @@ export async function getSetByName(
   }
 
   return data.sets[0]
+}
+
+export async function getLowestPricedTokenByProject(
+  projectId: string
+): Promise<{ id: string; invocation: number } | null> {
+  const hasuraClient = getClientForContract(projectId.split('-')[0])
+
+  const { data } = await hasuraClient
+    .query(GetLowestPricedTokenByProjectDocument, {
+      project_id: projectId,
+    })
+    .toPromise()
+
+  if (!data || !data.tokens_metadata || data.tokens_metadata.length === 0) {
+    return null
+  }
+
+  return data.tokens_metadata[0]
 }

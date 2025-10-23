@@ -40,6 +40,8 @@ fragment TokenDetail on tokens_metadata {
     public_address
   }
   is_flagged
+  list_price
+  list_currency_symbol
 }
 
 fragment ProjectTokenDetail on tokens_metadata {
@@ -320,5 +322,16 @@ fragment SetData on sets {
 query GetSetByName($set_name: String!) {
   sets(where: { name: { _eq: $set_name } }) {
     ...SetData
+  }
+}
+
+query GetLowestPricedTokenByProject($project_id: String!) {
+  tokens_metadata(
+    where: { project_id: { _eq: $project_id } }
+    order_by: { list_price: asc_nulls_last }
+    limit: 1
+  ) {
+    id
+    invocation
   }
 }

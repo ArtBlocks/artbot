@@ -22,21 +22,15 @@ import {
   getProjectInvocations,
   getRandomOobForProject,
   getToken,
+  getLowestPricedTokenByProject,
 } from '../Data/queryGraphQL'
 import { CHANNEL_BLOCK_TALK, discordClient, triviaBot } from '..'
 import { ProjectConfig } from '../ProjectConfig/projectConfig'
 import { ProjectHandlerHelper } from './ProjectHandlerHelper'
 import { UpcomingProjectDetailFragment } from '../../generated/graphql'
 import { getDayName, getMonthName, getDayOfMonth } from '../Utils/common'
-import { paths } from '@reservoir0x/reservoir-sdk'
 
 const ONE_MILLION = 1e6
-
-type ReservoirTokenResponse =
-  paths['/tokens/v7']['get']['responses']['200']['schema']
-
-type ReservoirCollectionResponse =
-  paths['/collections/v5']['get']['responses']['200']['schema']
 
 /**
  * Bot for handling projects
@@ -155,25 +149,10 @@ export class ProjectBot {
 
     if (content.toLowerCase().includes('#entry')) {
       try {
-        // Reservoir API collections are indexed like: 78000000:78999999
-        const entryResponse = await axios.request<ReservoirCollectionResponse>({
-          method: 'GET',
-          url: `https://api.reservoir.tools/collections/v5?useNonFlaggedFloorAsk=true&id=${
-            this.coreContract
-          }%3A${this.projectNumber * ONE_MILLION}%3A${
-            (this.projectNumber + 1) * ONE_MILLION - 1
-          }`,
-          headers: {
-            accept: '*/*',
-            'x-api-key': process.env.RESERVOIR_API_KEY,
-          },
-          timeout: 3000,
-        })
-        const entryToken =
-          entryResponse.data.collections?.[0]?.floorAsk?.token?.tokenId ?? ''
+        const entryToken = await getLowestPricedTokenByProject(this.id)
 
         if (entryToken) {
-          content = `#${parseInt(entryToken) % ONE_MILLION}`
+          content = `#${entryToken.invocation}`
         } else {
           msg.channel.send(
             `Sorry, looks like no ${this.projectName} tokens are for sale!`
@@ -358,36 +337,17 @@ export class ProjectBot {
       inline: true,
     })
 
-    try {
-      const response = await axios.request<ReservoirTokenResponse>({
-        method: 'GET',
-        url: `https://api.reservoir.tools/tokens/v7?tokens=${this.coreContract}%3A${tokenID}`,
-        headers: { accept: '*/*', 'x-api-key': process.env.RESERVOIR_API_KEY },
-        timeout: 3000,
+    const listPrice = tokenMetadata.list_price
+    const listCurrencySymbol = tokenMetadata.list_currency_symbol
+    if (listPrice && listCurrencySymbol) {
+      embedContent.addFields({
+        name: 'Buy Now',
+        value: `[${listPrice} ${listCurrencySymbol} on Art Blocks Marketplace](${
+          tokenUrl + PROJECTBOT_BUY_UTM
+        })`,
       })
-
-      if (
-        response.data &&
-        response.data.tokens &&
-        response.data.tokens.length > 0
-      ) {
-        const price =
-          response.data.tokens[0].market?.floorAsk?.price?.amount?.native
-        const symbol =
-          response.data.tokens[0].market?.floorAsk?.price?.currency?.symbol
-
-        if (price && symbol) {
-          embedContent.addFields({
-            name: 'Buy Now',
-            value: `[${price} ${symbol} on Art Blocks Marketplace](${
-              tokenUrl + PROJECTBOT_BUY_UTM
-            })`,
-          })
-        }
-      }
-    } catch (e) {
-      console.error('Error getting price info for token:', tokenID, e)
     }
+
     msg.channel.send({ embeds: [embedContent] })
   }
 
