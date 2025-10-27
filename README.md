@@ -99,7 +99,7 @@ Here are the currently valid contract names.
           - (optional) key: `"tokenIdTriggers"`:
             - value: object:
               - key: [Bot ID](#bot-id)
-                - value: length-2 array defining range of token IDs that trigger artbot to use the project bot. e.g. [555, null] means all tokens >= 555 should use the project bot defined in key. [100, 200] means all tokens from 100 to 200 should use the project bot bot defined in key.
+                - value: length-2 array defining range of token IDs that trigger artbot to use the project bot. e.g. [555, null] means all tokens >= 555 should use the project bot defined in key. [100, 200] means all tokens from 100 to 200 should use the project bot defined in key.
 
 ### Optional Configuration
 
