@@ -154,7 +154,7 @@ export class ProjectConfig {
     const projectBots: { [key: string]: ProjectBot } = {}
 
     // Loops over channelsJson and adds all project IDs to a set of bots that
-    // need to be instatiated.
+    // need to be instantiated.
     const botsToInstatiate = new Set<string>()
     Object.keys(channelsJson).forEach((channel) => {
       const projectBotHandlers = channelsJson[channel].projectBotHandlers
@@ -178,7 +178,7 @@ export class ProjectConfig {
       })
     })
 
-    // This loops through all bots that need to be instatiated asynchronously,
+    // This loops through all bots that need to be instantiated asynchronously,
     // gets the relevant configuration from projectBotsJson, calls the subgraph
     // to get project information, and then initializes the project bot.
     console.log(
