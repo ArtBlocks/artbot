@@ -242,9 +242,9 @@ export function getTokenUrl(
   contractAddr: string,
   tokenId: string
 ): string {
-  if (external_url && !external_url.includes('generator.artblocks.io')) {
-    return external_url
-  }
+  // if (external_url && !external_url.includes('generator.artblocks.io')) {
+  //   return external_url
+  // }
   return buildArtBlocksTokenURL(contractAddr, tokenId)
 }
 
