@@ -301,7 +301,6 @@ export async function smartBotResponse(
     projectConfig.chIdByName['for-sale-listings']
   const CHANNEL_TRADE_SWAPS: string = projectConfig.chIdByName['trade-swaps']
   const CHANNEL_BLOCK_TALK: string = projectConfig.chIdByName['block-talk']
-  const CHANNEL_GENERAL: string = projectConfig.chIdByName['general']
 
   if (msgContentLowercase === 'gm') {
     const reactionEmoji = msg.guild?.emojis.cache.find(
@@ -402,7 +401,6 @@ export async function smartBotResponse(
         .setDescription(msg)
     )
   }
-
 
   if (
     (channelID == CHANNEL_FOR_SALE_LISTINGS ||
