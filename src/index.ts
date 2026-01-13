@@ -22,7 +22,6 @@ import {
   getStudioContracts,
   getArtistsTwitterHandles,
 } from './Data/queryGraphQL'
-import { InsightsBot } from './Classes/InsightsBot'
 import { TriviaBot } from './Classes/TriviaBot'
 import { ScheduleBot } from './Classes/SchedulerBot'
 import { verifyTwitter } from './Utils/twitterUtils'
@@ -245,7 +244,6 @@ discordClient.on('disconnect', () => {
 })
 
 export const triviaBot = new TriviaBot(discordClient)
-export const insightsBot = new InsightsBot()
 
 new ScheduleBot(discordClient.channels.cache, projectConfig)
 
