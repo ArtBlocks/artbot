@@ -1,6 +1,6 @@
 import { EmbedBuilder, ColorResolvable, Message } from 'discord.js'
 import * as dotenv from 'dotenv'
-import { artIndexerBot, projectConfig, triviaBot, insightsBot } from '..'
+import { artIndexerBot, projectConfig, triviaBot } from '..'
 dotenv.config()
 const fetch = require('node-fetch')
 
@@ -162,7 +162,6 @@ const HELP_MESSAGE = new EmbedBuilder()
     **staysafe?**: Tips on avoiding scams
     **aliases?**: A handy list of aliases that can be used in \`#\` commands.
     **hashtag?**: A handy list of all \`#\` functionalities
-    **artBot**: Ask about Art Blocks artists and projects by tagging @artbot at the start of your question. This AI-powered feature is in beta.
     `
   )
 // Custom message shown when someone asks about ArtBlocks
@@ -302,7 +301,6 @@ export async function smartBotResponse(
     projectConfig.chIdByName['for-sale-listings']
   const CHANNEL_TRADE_SWAPS: string = projectConfig.chIdByName['trade-swaps']
   const CHANNEL_BLOCK_TALK: string = projectConfig.chIdByName['block-talk']
-  const CHANNEL_GENERAL: string = projectConfig.chIdByName['general']
 
   if (msgContentLowercase === 'gm') {
     const reactionEmoji = msg.guild?.emojis.cache.find(
@@ -402,15 +400,6 @@ export async function smartBotResponse(
         // Set the main content of the embed
         .setDescription(msg)
     )
-  }
-
-  if (
-    (channelID == CHANNEL_BLOCK_TALK || channelID == CHANNEL_GENERAL) &&
-    containsQuestion &&
-    mentionedArtBot
-  ) {
-    // Handle messages to the Insights API for AI responses
-    return insightsBot.getInsightsApiResponse(msg)
   }
 
   if (
