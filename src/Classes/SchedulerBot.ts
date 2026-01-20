@@ -29,15 +29,8 @@ export class ScheduleBot {
       { timezone: 'America/Chicago', name: 'Bday' },
       () => {
         console.log('Birthday Time!')
-        const now = new Date()
-        const hour = now.toLocaleString('en-US', {
-          timeZone: 'America/Chicago',
-          hour: 'numeric',
-        })
         artIndexerBot.checkBirthdays(
           this.channels,
-          this.projectConfig,
-          hour.includes('9') // Only post in artist channels at 9am runtime
         )
       }
     )

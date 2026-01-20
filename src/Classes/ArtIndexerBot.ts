@@ -31,7 +31,6 @@ import {
   getProjectUrl,
   getProjectSlugUrl,
 } from './APIBots/utils'
-import { ProjectConfig } from '../ProjectConfig/projectConfig'
 import { randomColor } from '../Utils/smartBotResponse'
 dotenv.config()
 
@@ -730,8 +729,6 @@ export class ArtIndexerBot {
 
   async checkBirthdays(
     channels: Collection<string, Channel>,
-    projectConfig: ProjectConfig,
-    artistChannel: boolean
   ) {
     const now = new Date()
     const [year, month, day] = now.toISOString().split('T')[0].split('-')
@@ -744,7 +741,7 @@ export class ArtIndexerBot {
           projBot.startTime.getFullYear().toString() !== year &&
           !sentMessages[projBot.id]
         ) {
-          projBot.sendBirthdayMessage(channels, projectConfig, artistChannel)
+          projBot.sendBirthdayMessage(channels)
           sentMessages[projBot.id] = true
         }
       })

@@ -14,7 +14,6 @@ import {
   getProjectUrl,
   getTokenApiUrl,
   getTokenUrl,
-  isCoreContract,
 } from './APIBots/utils'
 
 import { ensOrAddress, replaceVideoWithGIF } from './APIBots/utils'
@@ -25,7 +24,6 @@ import {
   getLowestPricedTokenByProject,
 } from '../Data/queryGraphQL'
 import { CHANNEL_BLOCK_TALK, discordClient, triviaBot } from '..'
-import { ProjectConfig } from '../ProjectConfig/projectConfig'
 import { ProjectHandlerHelper } from './ProjectHandlerHelper'
 import { UpcomingProjectDetailFragment } from '../../generated/graphql'
 import { getDayName, getMonthName, getDayOfMonth } from '../Utils/common'
@@ -353,8 +351,6 @@ export class ProjectBot {
 
   async sendBirthdayMessage(
     channels: Collection<string, Channel>,
-    projectConfig: ProjectConfig,
-    artistChannel: boolean
   ) {
     try {
       console.log('sending birthday message(s) for:', this.projectName)
@@ -398,20 +394,9 @@ export class ProjectBot {
         })
 
       // Send all birthdays to #block-talk
-      let channel = channels.get(CHANNEL_BLOCK_TALK) as TextChannel
+      const channel = channels.get(CHANNEL_BLOCK_TALK) as TextChannel
       channel?.send({ embeds: [embedContent] })
 
-      if (
-        artistChannel &&
-        isCoreContract(this.coreContract) &&
-        projectConfig.projectToChannel[this.projectNumber]
-      ) {
-        // Send in artist channel if one exists
-        channel = channels.get(
-          projectConfig.projectToChannel[this.projectNumber]
-        ) as TextChannel
-        channel.send({ embeds: [embedContent] })
-      }
     } catch (err) {
       console.error(
         'Error sending birthday message for:',
