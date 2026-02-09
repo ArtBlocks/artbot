@@ -18,11 +18,12 @@ const axios = require('axios')
 const publicClient = createPublicClient({
   chain: mainnet,
   transport: fallback([
-    // Primary: Cloudflare's public Ethereum RPC (reliable and fast)
     http('https://cloudflare-eth.com'),
-    // Fallback 1: Ankr public RPC
     http('https://rpc.ankr.com/eth'),
-    // Fallback 2: Public default
+    http('https://ethereum-rpc.publicnode.com'),
+    http('https://1rpc.io/eth'),
+    http('https://eth.llamarpc.com'),
+    // Default public RPC as last resort
     http(),
   ]),
 })
@@ -31,9 +32,14 @@ const STAGING_CONTRACTS = require('../../ProjectConfig/stagingContracts.json')
 const EXPLORATIONS_CONTRACTS = require('../../ProjectConfig/explorationsContracts.json')
 
 const CORE_CONTRACTS = require('../../ProjectConfig/coreContracts.json')
-// Runtime ENS cache just to limit queries
+
+// ENS cache: stores resolved names ('' means no ENS name exists)
 const ensAddressMap: { [id: string]: string } = {}
 const ensResolvedMap: { [id: string]: string } = {}
+// Tracks when a failed ENS lookup was cached so we can retry after TTL
+const ensFailureTimestamps: { [id: string]: number } = {}
+const ENS_FAILURE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+
 const osAddressMap: { [id: string]: string } = {}
 const MAX_ENS_RETRIES = 3
 
@@ -50,63 +56,97 @@ export const PROJECTBOT_EXPLORE_UTM = `${DISCORD_UTM}&utm_campaign=projectbot_ex
 export const TWITTER_PROJECTBOT_UTM = `${TWITTER_UTM}&utm_campaign=projectbot`
 
 async function getENSName(address: string): Promise<string> {
-  let name = ''
-  if (ensAddressMap[address]) {
-    name = ensAddressMap[address]
-  } else {
-    let ens: string | null = null
-    let retries = 0
-    while (ens === null && retries < MAX_ENS_RETRIES) {
-      try {
-        ens = await publicClient.getEnsName({
-          address: address as `0x${string}`,
-        })
-        if (ens === null) {
-          retries++
-        }
-      } catch (err) {
-        retries++
-        console.warn(`ENS lookup error on ${address}`, err)
+  // Check cache — but if it was a failed lookup, respect the TTL
+  if (address in ensAddressMap) {
+    const cachedValue = ensAddressMap[address]
+    if (cachedValue !== '') {
+      // Successful lookup — always use cache
+      return cachedValue
+    }
+    // Failed lookup — check if TTL has expired
+    const failedAt = ensFailureTimestamps[address]
+    if (failedAt && Date.now() - failedAt < ENS_FAILURE_TTL_MS) {
+      return ''
+    }
+    // TTL expired, fall through to retry
+  }
+
+  let retries = 0
+  while (retries < MAX_ENS_RETRIES) {
+    try {
+      const ens = await publicClient.getEnsName({
+        address: address as `0x${string}`,
+      })
+      // null means no ENS name — that's a valid result, not an error
+      const name = ens ?? ''
+      ensAddressMap[address] = name
+      if (name !== '') {
+        ensResolvedMap[name] = address
+      }
+      // Clear any previous failure timestamp on success
+      delete ensFailureTimestamps[address]
+      return name
+    } catch (err) {
+      retries++
+      console.warn(
+        `ENS lookup error on ${address} (attempt ${retries}/${MAX_ENS_RETRIES})`,
+        err
+      )
+      if (retries < MAX_ENS_RETRIES) {
+        // Exponential backoff: 1s, 2s, 4s
+        await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, retries - 1)))
       }
     }
-
-    name = ens ?? ''
-    ensAddressMap[address] = name
-    if (name !== '') {
-      ensResolvedMap[name] = address
-    }
   }
-  return name
+
+  // All retries exhausted — cache failure with a TTL so we don't keep hammering
+  ensAddressMap[address] = ''
+  ensFailureTimestamps[address] = Date.now()
+  return ''
 }
 
 export async function resolveEnsName(ensName: string): Promise<string> {
-  let wallet = ''
-  if (ensResolvedMap[ensName]) {
-    wallet = ensResolvedMap[ensName]
-  } else {
-    let resolvedAddress: string | null = null
-    let retries = 0
-
-    while (resolvedAddress === null && retries < MAX_ENS_RETRIES) {
-      try {
-        resolvedAddress = await publicClient.getEnsAddress({
-          name: ensName,
-        })
-        if (resolvedAddress === null) {
-          retries++
-        }
-      } catch (err) {
-        retries++
-        console.warn(`ENS resolve error on ${ensName}`, err)
-      }
+  // Check cache — but if it was a failed lookup, respect the TTL
+  if (ensName in ensResolvedMap) {
+    const cachedValue = ensResolvedMap[ensName]
+    if (cachedValue !== '') {
+      return cachedValue
     }
-
-    wallet = resolvedAddress ?? ''
-    if (wallet !== '') {
-      ensResolvedMap[ensName] = wallet
+    const failedAt = ensFailureTimestamps[ensName]
+    if (failedAt && Date.now() - failedAt < ENS_FAILURE_TTL_MS) {
+      return ''
     }
   }
-  return wallet
+
+  let retries = 0
+  while (retries < MAX_ENS_RETRIES) {
+    try {
+      const resolvedAddress = await publicClient.getEnsAddress({
+        name: ensName,
+      })
+      // null means name doesn't resolve — valid result, not an error
+      const wallet = resolvedAddress ?? ''
+      if (wallet !== '') {
+        ensResolvedMap[ensName] = wallet
+      }
+      delete ensFailureTimestamps[ensName]
+      return wallet
+    } catch (err) {
+      retries++
+      console.warn(
+        `ENS resolve error on ${ensName} (attempt ${retries}/${MAX_ENS_RETRIES})`,
+        err
+      )
+      if (retries < MAX_ENS_RETRIES) {
+        await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, retries - 1)))
+      }
+    }
+  }
+
+  // All retries exhausted — cache failure with TTL
+  ensResolvedMap[ensName] = ''
+  ensFailureTimestamps[ensName] = Date.now()
+  return ''
 }
 
 export async function ensOrAddress(address: string): Promise<string> {

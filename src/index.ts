@@ -663,7 +663,7 @@ const initOpenSeaApiPollingBots = async () => {
 
   // OpenSea API configuration
   const OPENSEA_API_BASE = 'https://api.opensea.io/api/v2/events'
-  const API_POLL_TIME_MS = 10000 // Poll every 30 seconds (less frequent since it's backfill)
+  const API_POLL_TIME_MS = 30000 // Poll every 30 seconds (less frequent since it's backfill)
   const headers = {
     Accept: 'application/json',
     'x-api-key': process.env.OPENSEA_API_KEY,

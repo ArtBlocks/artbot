@@ -78,6 +78,7 @@ export interface OpenSeaCriteria {
 
 const EVENT_TTL_MS = 24 * 60 * 60 * 1000 // 24 hours
 const MAX_PAGINATION_PAGES = 30 // Safety limit to prevent infinite pagination loops
+const PAGINATION_DELAY_MS = 1500 // Delay between paginated requests to avoid 429s
 
 /** Single API Poller for OpenSea Events API - handles SALES ONLY for backfilling missed stream events */
 export class OpenSeaEventsPollBot extends APIPollBot {
@@ -236,6 +237,8 @@ export class OpenSeaEventsPollBot extends APIPollBot {
         return
       } else {
         try {
+          // Delay between pages to stay under OpenSea rate limits
+          await new Promise((res) => setTimeout(res, PAGINATION_DELAY_MS))
           const nextPageResponse = await this.fetchNextPage(responseData.next)
           await this.processEventPage(
             nextPageResponse,

@@ -11,6 +11,7 @@ const axios = require('axios')
 export class APIPollBot {
   apiEndpoint: string
   refreshRateMs: number
+  baseRefreshRateMs: number
   bot: Client
   headers: any
   listColor: ColorResolvable
@@ -20,6 +21,8 @@ export class APIPollBot {
   artblocksListColor: ColorResolvable
   lastUpdatedTime: number
   intervalId?: NodeJS.Timeout
+  private consecutiveRateLimits = 0
+  private isPolling = false
 
   /**
    * Constructor
@@ -36,6 +39,7 @@ export class APIPollBot {
   ) {
     this.apiEndpoint = apiEndpoint
     this.refreshRateMs = refreshRateMs
+    this.baseRefreshRateMs = refreshRateMs
     this.bot = bot
     this.headers = headers
     this.listColor = '#407FDB'
@@ -76,9 +80,15 @@ export class APIPollBot {
   }
 
   /**
-   * Polls provided apiEndpoint with provided headers
+   * Polls provided apiEndpoint with provided headers.
+   * Skips if a previous poll is still in-flight (e.g. paginating).
    */
   async pollApi() {
+    if (this.isPolling) {
+      console.log('Skipping poll — previous poll still in-flight')
+      return
+    }
+    this.isPolling = true
     try {
       const response = await this.getWithRetry(
         this.apiEndpoint,
@@ -89,26 +99,83 @@ export class APIPollBot {
         },
         3
       )
+      if (response.status === 429) {
+        this.handleRateLimit()
+        return
+      }
       if (response.status >= 400) {
         console.warn(
           `API poll non-2xx response (${response.status}) for ${this.apiEndpoint}`
         )
         return
       }
+      // Successful response — gradually recover polling rate
+      this.recoverPollingRate()
       await this.handleAPIResponse(response.data)
     } catch (err) {
       const error = err as any
       const status = error?.response?.status
       const statusText = error?.response?.statusText
       const message = error?.message
+      if (status === 429) {
+        this.handleRateLimit()
+        return
+      }
       console.warn(
         `Error polling ${this.apiEndpoint} - status: ${status} ${statusText} message: ${message}`
       )
+    } finally {
+      this.isPolling = false
     }
   }
 
   /**
+   * Called when a 429 rate limit is encountered — slows down polling
+   */
+  private handleRateLimit() {
+    this.consecutiveRateLimits++
+    // Double the interval on each consecutive 429, up to 5 minutes
+    const backoffMultiplier = Math.pow(2, this.consecutiveRateLimits)
+    const newRate = Math.min(
+      this.baseRefreshRateMs * backoffMultiplier,
+      5 * 60 * 1000
+    )
+    if (newRate !== this.refreshRateMs) {
+      console.warn(
+        `Rate limited (429) — slowing polling from ${this.refreshRateMs}ms to ${newRate}ms (${this.consecutiveRateLimits} consecutive 429s)`
+      )
+      this.refreshRateMs = newRate
+      this.restartPolling()
+    }
+  }
+
+  /**
+   * Gradually recover polling rate after successful responses
+   */
+  private recoverPollingRate() {
+    if (this.consecutiveRateLimits > 0) {
+      this.consecutiveRateLimits = 0
+      if (this.refreshRateMs !== this.baseRefreshRateMs) {
+        console.log(
+          `Rate limit cleared — restoring polling rate to ${this.baseRefreshRateMs}ms`
+        )
+        this.refreshRateMs = this.baseRefreshRateMs
+        this.restartPolling()
+      }
+    }
+  }
+
+  /**
+   * Restart polling with the current refreshRateMs
+   */
+  private restartPolling() {
+    this.stopPolling()
+    this.startPolling()
+  }
+
+  /**
    * Helper to GET with retries and backoff for transient network/server errors
+   * Also handles 429 rate-limit responses with Retry-After header support
    */
   protected async getWithRetry(
     url: string,
@@ -120,7 +187,25 @@ export class APIPollBot {
     let lastError: any
     while (attempt <= retries) {
       try {
-        return await axios.get(url, config)
+        const response = await axios.get(url, config)
+
+        // Handle 429 returned as a non-throwing response (validateStatus)
+        if (response.status === 429) {
+          if (attempt === retries) return response
+          const retryAfter = this.parseRetryAfter(response.headers)
+          const delay =
+            retryAfter ?? Math.min(initialDelayMs * Math.pow(2, attempt), 30000)
+          console.warn(
+            `GET retry ${
+              attempt + 1
+            }/${retries} for ${url} - rate limited (429), waiting ${delay}ms`
+          )
+          await new Promise((res) => setTimeout(res, delay))
+          attempt++
+          continue
+        }
+
+        return response
       } catch (err: any) {
         lastError = err
         const code = err?.code || err?.response?.status
@@ -128,16 +213,27 @@ export class APIPollBot {
           err?.code === 'ECONNABORTED' || /timeout/i.test(err?.message || '')
         const isReset = err?.code === 'ECONNRESET'
         const status = err?.response?.status
+        const isRateLimited = status === 429
         const shouldRetry =
           isTimeout ||
           isReset ||
+          isRateLimited ||
           (typeof status === 'number' && status >= 500 && status < 600)
 
         if (!shouldRetry || attempt === retries) {
           break
         }
 
-        const delay = Math.min(initialDelayMs * Math.pow(2, attempt), 10000)
+        let delay: number
+        if (isRateLimited) {
+          // Use Retry-After header if available, otherwise longer backoff for 429s
+          const retryAfter = this.parseRetryAfter(err?.response?.headers)
+          delay =
+            retryAfter ??
+            Math.min(initialDelayMs * Math.pow(2, attempt + 1), 30000)
+        } else {
+          delay = Math.min(initialDelayMs * Math.pow(2, attempt), 10000)
+        }
         const jitter = Math.floor(delay * 0.25 * (Math.random() * 2 - 1))
         const sleepMs = Math.max(250, delay + jitter)
         console.warn(
@@ -150,6 +246,28 @@ export class APIPollBot {
       }
     }
     throw lastError
+  }
+
+  /**
+   * Parse the Retry-After header value into milliseconds
+   * Supports both seconds (integer) and HTTP-date formats
+   */
+  private parseRetryAfter(headers: any): number | null {
+    const retryAfter = headers?.['retry-after']
+    if (!retryAfter) return null
+
+    const seconds = parseInt(retryAfter, 10)
+    if (!isNaN(seconds)) {
+      return seconds * 1000
+    }
+
+    // Try parsing as HTTP-date
+    const date = new Date(retryAfter)
+    if (!isNaN(date.getTime())) {
+      return Math.max(0, date.getTime() - Date.now())
+    }
+
+    return null
   }
 
   /**

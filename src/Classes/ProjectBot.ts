@@ -217,7 +217,7 @@ export class ProjectBot {
 
     const tokenID = pieceNumber + this.projectNumber * 1e6
 
-    this.sendMetaDataMessage(msg, tokenID.toString())
+    await this.sendMetaDataMessage(msg, tokenID.toString())
   }
 
   async handleTweet(tweetText: string): Promise<string> {
@@ -349,9 +349,7 @@ export class ProjectBot {
     msg.channel.send({ embeds: [embedContent] })
   }
 
-  async sendBirthdayMessage(
-    channels: Collection<string, Channel>,
-  ) {
+  async sendBirthdayMessage(channels: Collection<string, Channel>) {
     try {
       console.log('sending birthday message(s) for:', this.projectName)
 
@@ -396,7 +394,6 @@ export class ProjectBot {
       // Send all birthdays to #block-talk
       const channel = channels.get(CHANNEL_BLOCK_TALK) as TextChannel
       channel?.send({ embeds: [embedContent] })
-
     } catch (err) {
       console.error(
         'Error sending birthday message for:',

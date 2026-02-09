@@ -491,7 +491,7 @@ export class ArtIndexerBot {
       triviaBot.tally(msg)
     }
 
-    projectBot.handleNumberMessage(msg)
+    await projectBot.handleNumberMessage(msg)
   }
 
   async handleNumberTweet(tweet: string): Promise<ProjectBotAndToken> {
@@ -727,9 +727,7 @@ export class ArtIndexerBot {
     return chosenToken
   }
 
-  async checkBirthdays(
-    channels: Collection<string, Channel>,
-  ) {
+  async checkBirthdays(channels: Collection<string, Channel>) {
     const now = new Date()
     const [year, month, day] = now.toISOString().split('T')[0].split('-')
     const sentMessages: { [id: string]: boolean } = {}
