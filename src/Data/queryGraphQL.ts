@@ -60,6 +60,18 @@ const BLOCKED_ENGINE_CONTRACTS: {
   [id: string]: string
 } = require('../ProjectConfig/blockedEngineContracts.json')
 
+/**
+ * Get the combined list of non-engine contracts (core + collab + explorations + blocked).
+ * Extracted to avoid duplicating this concatenation across multiple functions.
+ */
+function getNonEngineContracts(extraContracts: string[] = []): string[] {
+  return Object.values(CORE_CONTRACTS)
+    .concat(Object.values(COLLAB_CONTRACTS))
+    .concat(Object.values(EXPLORATION_CONTRACTS))
+    .concat(Object.values(BLOCKED_ENGINE_CONTRACTS))
+    .concat(extraContracts)
+}
+
 const client = createClient({
   url: PUBLIC_HASURA_ENDPOINT,
   fetch: fetch,
@@ -93,7 +105,7 @@ export async function getAllProjectsForClient(
   hasuraClient: Client
 ): Promise<ProjectDetailFragment[]> {
   try {
-    const allProjects: any[] = []
+    const allProjects: ProjectDetailFragment[] = []
     let loop = true
     while (loop) {
       const { data } = await hasuraClient
@@ -113,7 +125,7 @@ export async function getAllProjectsForClient(
     }
     return allProjects
   } catch (err) {
-    console.error(err)
+    console.error('Error in getAllProjectsForClient:', err)
     return []
   }
 }
@@ -124,16 +136,13 @@ export async function getAllProjects(): Promise<ProjectDetailFragment[]> {
     const arb = await getAllProjectsForClient(arbitrumClient)
     return mainnet.concat(arb)
   } catch (err) {
-    console.error(err)
+    console.error('Error in getAllProjects:', err)
     return []
   }
 }
 
 export async function getArbitrumContracts() {
-  const nonPBABContracts: string[] = Object.values(CORE_CONTRACTS)
-    .concat(Object.values(COLLAB_CONTRACTS))
-    .concat(Object.values(EXPLORATION_CONTRACTS))
-    .concat(Object.values(BLOCKED_ENGINE_CONTRACTS))
+  const nonPBABContracts = getNonEngineContracts()
   try {
     const { data: arbData } = await arbitrumClient
       .query(GetEngineContractsDocument, {
@@ -147,7 +156,7 @@ export async function getArbitrumContracts() {
 
     return arbData.contracts_metadata.map(({ address }) => address)
   } catch (err) {
-    console.error(err)
+    console.error('Error in getArbitrumContracts:', err)
     return undefined
   }
 }
@@ -166,18 +175,14 @@ export async function getStudioContracts() {
 
     return allContracts
   } catch (err) {
-    console.error(err)
+    console.error('Error in getStudioContracts:', err)
     return undefined
   }
 }
 
 export async function getEngineContracts() {
   const studioContracts = await waitForStudioContracts()
-  const nonPBABContracts: string[] = Object.values(CORE_CONTRACTS)
-    .concat(Object.values(COLLAB_CONTRACTS))
-    .concat(Object.values(EXPLORATION_CONTRACTS))
-    .concat(Object.values(BLOCKED_ENGINE_CONTRACTS))
-    .concat(studioContracts ?? [])
+  const nonPBABContracts = getNonEngineContracts(studioContracts ?? [])
   try {
     const { data } = await client
       .query(GetEngineContractsDocument, {
@@ -197,7 +202,7 @@ export async function getEngineContracts() {
 
     return allContracts
   } catch (err) {
-    console.error(err)
+    console.error('Error in getEngineContracts:', err)
     return undefined
   }
 }
@@ -230,7 +235,10 @@ async function getAllWalletTokensClient(
     }
     return allTokens
   } catch (err) {
-    console.error(err)
+    console.error(
+      `Error in getAllWalletTokensClient for wallet ${wallet}:`,
+      err
+    )
     return []
   }
 }
@@ -289,7 +297,7 @@ export async function getArtblocksOpenProjects(): Promise<
 
     return projects
   } catch (err) {
-    console.error(err)
+    console.error('Error in getArtblocksOpenProjects:', err)
     return []
   }
 }
@@ -403,7 +411,9 @@ async function getContractsProjects(
     ])
     return allArrays.flat()
   } catch (err) {
-    throw new Error(err)
+    throw err instanceof Error
+      ? err
+      : new Error(`Error in getContractsProjects: ${err}`)
   }
 }
 
@@ -423,7 +433,7 @@ export async function getProjectInvocations(projectId: string) {
       ? data.projects_metadata[0].invocations
       : null
   } catch (err) {
-    console.error(err)
+    console.error(`Error in getProjectInvocations for ${projectId}:`, err)
     return undefined
   }
 }
@@ -616,7 +626,7 @@ export async function lookupUserByAddress(
 export interface EntryProject {
   id: string
   name?: string | null | undefined
-  lowest_listing?: any
+  lowest_listing?: number | string | null
   artist_name?: string | null | undefined
   contract_address: string
   project_id: string

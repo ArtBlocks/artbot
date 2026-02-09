@@ -6,14 +6,14 @@ import {
   getOSName,
 } from './utils'
 
-const axios = require('axios')
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 /** Abstract parent class for all API Poll Bots */
 export class APIPollBot {
   apiEndpoint: string
   refreshRateMs: number
   baseRefreshRateMs: number
   bot: Client
-  headers: any
+  headers: Record<string, string>
   listColor: ColorResolvable
   saleColor: ColorResolvable
   sweepColor: ColorResolvable
@@ -113,7 +113,10 @@ export class APIPollBot {
       this.recoverPollingRate()
       await this.handleAPIResponse(response.data)
     } catch (err) {
-      const error = err as any
+      const error = err as {
+        response?: { status?: number; statusText?: string }
+        message?: string
+      }
       const status = error?.response?.status
       const statusText = error?.response?.statusText
       const message = error?.message
@@ -179,12 +182,12 @@ export class APIPollBot {
    */
   protected async getWithRetry(
     url: string,
-    config: any,
+    config: AxiosRequestConfig,
     retries = 3,
     initialDelayMs = 1000
-  ): Promise<any> {
+  ): Promise<AxiosResponse> {
     let attempt = 0
-    let lastError: any
+    let lastError: unknown
     while (attempt <= retries) {
       try {
         const response = await axios.get(url, config)
@@ -206,13 +209,19 @@ export class APIPollBot {
         }
 
         return response
-      } catch (err: any) {
+      } catch (err: unknown) {
         lastError = err
-        const code = err?.code || err?.response?.status
+        const axiosErr = err as {
+          code?: string
+          response?: { status?: number; headers?: Record<string, string> }
+          message?: string
+        }
+        const code = axiosErr?.code || axiosErr?.response?.status
         const isTimeout =
-          err?.code === 'ECONNABORTED' || /timeout/i.test(err?.message || '')
-        const isReset = err?.code === 'ECONNRESET'
-        const status = err?.response?.status
+          axiosErr?.code === 'ECONNABORTED' ||
+          /timeout/i.test(axiosErr?.message || '')
+        const isReset = axiosErr?.code === 'ECONNRESET'
+        const status = axiosErr?.response?.status
         const isRateLimited = status === 429
         const shouldRetry =
           isTimeout ||
@@ -227,7 +236,7 @@ export class APIPollBot {
         let delay: number
         if (isRateLimited) {
           // Use Retry-After header if available, otherwise longer backoff for 429s
-          const retryAfter = this.parseRetryAfter(err?.response?.headers)
+          const retryAfter = this.parseRetryAfter(axiosErr?.response?.headers)
           delay =
             retryAfter ??
             Math.min(initialDelayMs * Math.pow(2, attempt + 1), 30000)
@@ -239,22 +248,22 @@ export class APIPollBot {
         console.warn(
           `GET retry ${attempt + 1}/${retries} for ${url} after error (${
             code || status
-          }): ${err?.message || 'unknown'} - waiting ${sleepMs}ms`
+          }): ${axiosErr?.message || 'unknown'} - waiting ${sleepMs}ms`
         )
         await new Promise((res) => setTimeout(res, sleepMs))
         attempt++
       }
     }
-    throw lastError
+    throw lastError as Error
   }
 
   /**
    * Parse the Retry-After header value into milliseconds
    * Supports both seconds (integer) and HTTP-date formats
    */
-  private parseRetryAfter(headers: any): number | null {
+  private parseRetryAfter(headers?: Record<string, unknown>): number | null {
     const retryAfter = headers?.['retry-after']
-    if (!retryAfter) return null
+    if (!retryAfter || typeof retryAfter !== 'string') return null
 
     const seconds = parseInt(retryAfter, 10)
     if (!isNaN(seconds)) {
@@ -275,16 +284,16 @@ export class APIPollBot {
    * Parses endpoint response
    * @param {*} responseData - Dict parsed from API request json
    */
-  async handleAPIResponse(responseData: any) {
+  async handleAPIResponse(responseData: unknown) {
     console.warn('handleAPIResponse function not implemented!', responseData)
   }
 
   /**
-   * "Abstact" function each ApiBot must implement
+   * "Abstract" function each ApiBot must implement
    * Builds and sends any Discord messages
-   * @param {*} msg - Event info dict
+   * @param msg - Event info dict
    */
-  async buildDiscordMessage(msg: any) {
+  async buildDiscordMessage(msg: unknown) {
     console.warn('buildDiscordMessage function not implemented!', msg)
   }
 

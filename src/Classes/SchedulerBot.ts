@@ -12,6 +12,8 @@ const INIT_DELAY = 8000
 export class ScheduleBot {
   channels: Collection<string, Channel>
   projectConfig: ProjectConfig
+  private cronJobs: Cron[] = []
+
   constructor(
     channels: Collection<string, Channel>,
     projectConfig: ProjectConfig
@@ -22,40 +24,54 @@ export class ScheduleBot {
   }
 
   async initialize() {
-    await delay(INIT_DELAY)
-    console.log('Starting Scheduler...')
-    Cron(
-      '00 1,9,17 * * *',
-      { timezone: 'America/Chicago', name: 'Bday' },
-      () => {
-        console.log('Birthday Time!')
-        artIndexerBot.checkBirthdays(
-          this.channels,
-        )
-      }
-    )
-
-    const triviaCadence = parseInt(process.env.TRIVIA_CADENCE ?? '0')
-
-    if (triviaCadence > 0) {
-      Cron(
-        `0 */${triviaCadence} * * *`,
-        { timezone: 'America/Chicago', name: 'Trivia' },
-        async () => {
-          const wait = Math.random() * 1000 * 60 * 60 * triviaCadence
-          console.log(`Waiting ${wait / 60000} mins for trivia`)
-          await delay(wait)
-
-          if (isTriviaBlackoutTime()) {
-            console.log('Skipping Trivia during blackout times :(')
-            return
-          }
-
-          console.log('Trivia Time!')
-          artIndexerBot.askRandomTriviaQuestion()
+    try {
+      await delay(INIT_DELAY)
+      console.log('Starting Scheduler...')
+      const bdayCron = Cron(
+        '00 1,9,17 * * *',
+        { timezone: 'America/Chicago', name: 'Bday' },
+        () => {
+          console.log('Birthday Time!')
+          artIndexerBot.checkBirthdays(this.channels)
         }
       )
+      this.cronJobs.push(bdayCron)
+
+      const triviaCadence = parseInt(process.env.TRIVIA_CADENCE ?? '0')
+
+      if (triviaCadence > 0) {
+        const triviaCron = Cron(
+          `0 */${triviaCadence} * * *`,
+          { timezone: 'America/Chicago', name: 'Trivia' },
+          async () => {
+            const wait = Math.random() * 1000 * 60 * 60 * triviaCadence
+            console.log(`Waiting ${wait / 60000} mins for trivia`)
+            await delay(wait)
+
+            if (isTriviaBlackoutTime()) {
+              console.log('Skipping Trivia during blackout times :(')
+              return
+            }
+
+            console.log('Trivia Time!')
+            artIndexerBot.askRandomTriviaQuestion()
+          }
+        )
+        this.cronJobs.push(triviaCron)
+      }
+    } catch (err) {
+      console.error('Error initializing ScheduleBot:', err)
     }
+  }
+
+  /**
+   * Cleanup method to stop all cron jobs
+   */
+  cleanup() {
+    for (const job of this.cronJobs) {
+      job.stop()
+    }
+    this.cronJobs = []
   }
 }
 

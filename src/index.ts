@@ -38,7 +38,7 @@ import {
   waitForEngineContracts,
 } from './Classes/APIBots/utils'
 
-const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
+import { smartBotResponse } from './Utils/smartBotResponse'
 
 // Misc. server configuration info.
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN
@@ -101,27 +101,45 @@ const app = express()
 
 app.use(bodyParser.json())
 
-app.post('/update', function (req: any, res: any) {
-  console.log(
-    'received update with body:\n',
-    JSON.stringify(req.body, null, 2),
-    '\n'
-  )
+app.post(
+  '/update',
+  function (
+    req: { body: unknown },
+    res: {
+      setHeader: (key: string, value: string) => void
+      json: (data: unknown) => void
+    }
+  ) {
+    console.log(
+      'received update with body:\n',
+      JSON.stringify(req.body, null, 2),
+      '\n'
+    )
 
-  res.setHeader('Content-Type', 'application/json')
-  res.json({
-    success: true,
-  })
-})
+    res.setHeader('Content-Type', 'application/json')
+    res.json({
+      success: true,
+    })
+  }
+)
 
-app.get('/update', function (req: any, res: any) {
-  console.log('received get with body:\n', req.body, '\n')
+app.get(
+  '/update',
+  function (
+    req: { body: unknown },
+    res: {
+      setHeader: (key: string, value: string) => void
+      json: (data: unknown) => void
+    }
+  ) {
+    console.log('received get with body:\n', req.body, '\n')
 
-  res.setHeader('Content-Type', 'application/json')
-  res.json({
-    success: true,
-  })
-})
+    res.setHeader('Content-Type', 'application/json')
+    res.json({
+      success: true,
+    })
+  }
+)
 
 type MintEvent = {
   event: {
@@ -139,40 +157,58 @@ type MintEvent = {
   }
 }
 
-app.post('/new-mint', function (req: any, res: any) {
-  const mintEvent = req.body as MintEvent
-  const mintData = mintEvent.event.data.new
+app.post(
+  '/new-mint',
+  function (
+    req: { body: MintEvent; headers: Record<string, string | undefined> },
+    res: {
+      setHeader: (key: string, value: string) => void
+      json: (data: unknown) => void
+      status: (code: number) => { json: (data: unknown) => void }
+    }
+  ) {
+    const mintEvent = req.body
+    const mintData = mintEvent.event.data.new
 
-  if (req.headers.webhook_secret !== process.env.MINT_WEBHOOK_SECRET) {
-    console.log('Invalid mint webhook secret')
-    res.status(401).json({ status: 'unauthorized' })
-    return
+    if (req.headers.webhook_secret !== process.env.MINT_WEBHOOK_SECRET) {
+      console.log('Invalid mint webhook secret')
+      res.status(401).json({ status: 'unauthorized' })
+      return
+    }
+
+    mintBot.addMint(
+      mintData.contract_address,
+      mintData.token_id,
+      mintData.owner_address,
+      mintData.invocation,
+      mintData.project_id
+    )
+    res.setHeader('Content-Type', 'application/json')
+    res.json({
+      success: true,
+    })
   }
-
-  mintBot.addMint(
-    mintData.contract_address,
-    mintData.token_id,
-    mintData.owner_address,
-    mintData.invocation,
-    mintData.project_id
-  )
-  res.setHeader('Content-Type', 'application/json')
-  res.json({
-    success: true,
-  })
-})
+)
 
 app.listen(PORT, '0.0.0.0', function () {
   console.log('Server is listening on port', PORT)
 })
 
-app.get('/callback', (req: any, res: any) => {
+app.get('/callback', (req: unknown, res: unknown) => {
   // Used for Twitter OAuth
   verifyTwitter(res, req)
 })
 
 // Store references to all bots that need cleanup
 const botsToCleanup: { cleanup: () => void }[] = []
+
+// Register ArtIndexerBot instances for cleanup on shutdown
+botsToCleanup.push(
+  artIndexerBot,
+  pbabIndexerBot,
+  abXpaceIndexerBot,
+  abXbmIndexerBot
+)
 
 // Bot setup.
 export const discordClient = new Client({
@@ -245,7 +281,8 @@ discordClient.on('disconnect', () => {
 
 export const triviaBot = new TriviaBot(discordClient)
 
-new ScheduleBot(discordClient.channels.cache, projectConfig)
+const scheduleBot = new ScheduleBot(discordClient.channels.cache, projectConfig)
+botsToCleanup.push(scheduleBot)
 
 discordClient.on(Events.MessageCreate, async (msg) => {
   const msgAuthor = msg.author.username
@@ -290,7 +327,7 @@ discordClient.on(Events.MessageCreate, async (msg) => {
     console.error('Error handling number message: ', e)
   }
   // Handle special info questions that ArtBot knows how to answer.
-  const artBotID = discordClient.user?.id
+  const artBotID = discordClient.user?.id ?? ''
   // TODO: refactor smartbotresponse to be less irritating / have fewer args
   smartBotResponse(
     msgContentLowercase,
@@ -298,7 +335,7 @@ discordClient.on(Events.MessageCreate, async (msg) => {
     artBotID,
     channelID,
     msg
-  ).then((smartResponse: string) => {
+  ).then((smartResponse) => {
     if (smartResponse !== null && smartResponse !== undefined) {
       if (typeof smartResponse === 'string') {
         msg.reply(smartResponse)
@@ -588,7 +625,7 @@ function setupStreamEventHandlers() {
 
           // Process the sale with the old OpenSeaSaleBot for now
           // This is the primary source for sales
-          openSeaSaleBot.handleSaleEvent(event).catch((err: any) => {
+          openSeaSaleBot.handleSaleEvent(event).catch((err: unknown) => {
             console.error('Error processing OpenSea sale event:', err)
           })
         }
@@ -620,7 +657,9 @@ function getOpenSeaConnectionStats() {
 
 // Expose stats for debugging (global for console access)
 if (typeof global !== 'undefined') {
-  ;(global as any).getOpenSeaConnectionStats = getOpenSeaConnectionStats
+  ;(
+    global as { getOpenSeaConnectionStats?: typeof getOpenSeaConnectionStats }
+  ).getOpenSeaConnectionStats = getOpenSeaConnectionStats
 }
 
 // Initialize the stream client

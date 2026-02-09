@@ -18,7 +18,7 @@ export interface OpenSeaEventResponse {
 export interface OpenSeaEvent {
   event_type: 'order' | 'sale' | 'transfer' | 'cancel' | 'redemption'
   order_hash?: string
-  order_type?: any
+  order_type?: string
   protocol_address?: string
   start_date?: number
   expiration_date?: number
@@ -100,7 +100,7 @@ export class OpenSeaEventsPollBot extends APIPollBot {
     apiEndpoint: string,
     refreshRateMs: number,
     bot: Client,
-    headers: any,
+    headers: Record<string, string | undefined>,
     twitterBot: TwitterBot | undefined,
     trackedContracts: string[] = [],
     saleBot: OpenSeaSaleBot

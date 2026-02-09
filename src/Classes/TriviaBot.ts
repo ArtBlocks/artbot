@@ -11,6 +11,8 @@ import { getAllTriviaScores, updateTriviaScore } from '../Data/supabase'
 
 export const CURRENT_SEASON = 'season_three'
 
+const MAX_PREVIOUS_ANSWERS = 200
+
 export class TriviaBot {
   bot: Client
   model?: OpenAI
@@ -110,6 +112,10 @@ Next question:`
     }
 
     this.previousAnswers.push(this.currentTriviaAnswer)
+    // Cap the previous answers array to prevent unbounded growth
+    if (this.previousAnswers.length > MAX_PREVIOUS_ANSWERS) {
+      this.previousAnswers = this.previousAnswers.slice(-MAX_PREVIOUS_ANSWERS)
+    }
 
     this.channel = this.bot.channels?.cache?.get(
       CHANNEL_BLOCK_TALK
