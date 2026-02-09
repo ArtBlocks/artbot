@@ -250,25 +250,34 @@ const OTC_MESSAGE = new EmbedBuilder()
 let grantThanks = 0
 
 // Returns a message containing information about the current gas prices.
-async function generateGasPriceMessage() {
-  const gasResponse = await fetch(
-    `https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${process.env.ETHERSCAN_API_KEY}`
-  )
-  const gasData = await gasResponse.json()
+async function generateGasPriceMessage(): Promise<EmbedBuilder> {
+  try {
+    const gasResponse = await fetch(
+      `https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${process.env.ETHERSCAN_API_KEY}`
+    )
+    const gasData = await gasResponse.json()
 
-  return (
-    new EmbedBuilder()
-      // Set the title of the field
+    if (!gasData?.result?.FastGasPrice) {
+      throw new Error('Invalid gas price response from Etherscan')
+    }
+
+    return new EmbedBuilder()
       .setTitle(`:fuelpump: Gas Prices :fuelpump:`)
-      // Set the color of the embed
       .setColor(ARTBOT_GREEN)
-      // Set the main content of the embed
       .setDescription(
         `:rocket: Fast: ${gasData.result.FastGasPrice}
          :airplane: Standard: ${gasData.result.ProposeGasPrice}
          :turtle: Slow: ${gasData.result.SafeGasPrice}`
       )
-  )
+  } catch (err) {
+    console.error('Error fetching gas prices:', err)
+    return new EmbedBuilder()
+      .setTitle(`:fuelpump: Gas Prices :fuelpump:`)
+      .setColor(ARTBOT_WARNING)
+      .setDescription(
+        'Sorry, I had trouble fetching gas prices. Please try again later!'
+      )
+  }
 }
 
 /**

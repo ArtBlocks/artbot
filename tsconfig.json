@@ -15,9 +15,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noImplicitAny": true,
-    "useUnknownInCatchVariables": false,
-    "outDir": "./build"
+    "useUnknownInCatchVariables": false
   },
-  "include": ["./**/*", "src/**/*.ts", "src/**/*.js"],
+  "include": ["src/**/*.ts", "src/**/*.js"],
   "exclude": ["generated", "node_modules"]
 }

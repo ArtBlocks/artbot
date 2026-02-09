@@ -144,7 +144,9 @@ export class TwitterBot {
   }
 
   async search() {
-    let artbotTweets: any
+    let artbotTweets:
+      | Awaited<ReturnType<TwitterApi['v2']['search']>>
+      | undefined
     try {
       // Query breakdown:
       // to:${ARTBOT_TWITTER_HANDLE} = Original tweets that start with @artbotartbot or direct replies to @artbotartbot tweets
@@ -156,7 +158,7 @@ export class TwitterBot {
         query: prod ? query : devQuery,
         since_id: this.lastTweetId,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (
         error instanceof ApiResponseError &&
         error.rateLimitError &&
@@ -166,12 +168,16 @@ export class TwitterBot {
           `Search rate limit hit! Limit will reset at timestamp ${error.rateLimit.reset}`
         )
       } else if (
-        error?.code === 400 &&
-        error.errors[0] &&
-        error.errors[0]?.message &&
-        error.errors[0]?.message.includes('since_id')
+        error instanceof ApiResponseError &&
+        error.code === 400 &&
+        error.errors?.[0] &&
+        'message' in error.errors[0] &&
+        typeof (error.errors[0] as { message?: string }).message === 'string' &&
+        (error.errors[0] as { message: string }).message.includes('since_id')
       ) {
-        const messageSplit = error.errors[0]?.message.split(' ')
+        const messageSplit = (
+          error.errors[0] as { message: string }
+        ).message.split(' ')
         const lastId = BigInt(messageSplit[messageSplit.length - 1])
         const adjustedLastId = (lastId + BigInt('100000000000')).toString()
         console.log(
@@ -182,6 +188,11 @@ export class TwitterBot {
       } else {
         console.error('Error searching Twitter:', error)
       }
+      return
+    }
+
+    if (!artbotTweets) {
+      console.log('No response from Twitter search')
       return
     }
 
@@ -199,7 +210,9 @@ export class TwitterBot {
         console.error(`Error responding to ${tweet.text}:`, e)
       }
     }
-    this.updateLastTweetId(artbotTweets.meta.newest_id)
+    if (artbotTweets.meta.newest_id) {
+      this.updateLastTweetId(artbotTweets.meta.newest_id)
+    }
   }
 
   async updateLastTweetId(tweetId: string) {

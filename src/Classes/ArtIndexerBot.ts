@@ -34,15 +34,18 @@ import {
 import { randomColor } from '../Utils/smartBotResponse'
 dotenv.config()
 
-const deburr = require('lodash.deburr')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const deburr = require('lodash.deburr') as (s: string) => string
+import { isWallet } from './APIBots/utils'
 
-const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
+const PROJECT_ALIASES: Record<
+  string,
+  string
+> = require('../ProjectConfig/project_aliases.json')
 const CONTRACT_ALIASES: {
   aliases: string[]
   named_contracts: string[]
 }[] = require('../ProjectConfig/contract_aliases.json')
-
-const { isWallet } = require('./APIBots/utils')
 
 const METADATA_REFRESH_INTERVAL_MINUTES =
   process.env.METADATA_REFRESH_INTERVAL_MINUTES ?? '480' // 8 hours
@@ -79,12 +82,18 @@ export class ArtIndexerBot {
   tags: { [id: string]: ProjectBot[] } = {}
   projectsById: { [id: string]: ProjectBot } = {}
   contracts: { [id: string]: ContractDetailFragment } = {}
-  walletTokens: { [id: string]: TokenDetailFragment[] } = {}
+  walletTokens: {
+    [id: string]: { tokens: TokenDetailFragment[]; cachedAt: number }
+  } = {}
   sets: { [id: string]: string } = {}
   initialized = false
 
   platforms: { [id: string]: ProjectBot[] } = {}
   flagship: { [id: string]: ProjectBot } = {}
+
+  private refreshIntervalId?: NodeJS.Timeout
+  private static readonly WALLET_CACHE_TTL_MS = 10 * 60 * 1000 // 10 minutes
+  private static readonly MAX_WALLET_CACHE_SIZE = 500
 
   constructor(projectFetch = getAllProjects) {
     this.projectFetch = projectFetch
@@ -102,8 +111,9 @@ export class ArtIndexerBot {
       await this.buildSets()
       projectConfig.initializeProjectBots()
     }
-    setInterval(async () => {
+    this.refreshIntervalId = setInterval(async () => {
       this.logDictionarySizes()
+      this.evictStaleWalletCaches()
       await this.buildProjectBots()
       if (this.projectFetch === getAllProjects) {
         projectConfig.initializeProjectBots()
@@ -275,6 +285,43 @@ export class ArtIndexerBot {
       })
     } catch (err) {
       console.error(`Error while initializing ArtIndexerBots\n${err}`)
+    }
+  }
+
+  /**
+   * Cleanup method to stop timers when the bot is being destroyed
+   */
+  cleanup() {
+    if (this.refreshIntervalId) {
+      clearInterval(this.refreshIntervalId)
+      this.refreshIntervalId = undefined
+    }
+  }
+
+  /**
+   * Evict stale wallet token caches to prevent unbounded memory growth
+   */
+  private evictStaleWalletCaches() {
+    const now = Date.now()
+    const keys = Object.keys(this.walletTokens)
+
+    // Evict expired entries
+    for (const key of keys) {
+      if (
+        now - this.walletTokens[key].cachedAt >
+        ArtIndexerBot.WALLET_CACHE_TTL_MS
+      ) {
+        delete this.walletTokens[key]
+      }
+    }
+
+    // If still over max size, evict oldest entries
+    const remaining = Object.entries(this.walletTokens)
+    if (remaining.length > ArtIndexerBot.MAX_WALLET_CACHE_SIZE) {
+      remaining
+        .sort((a, b) => a[1].cachedAt - b[1].cachedAt)
+        .slice(0, remaining.length - ArtIndexerBot.MAX_WALLET_CACHE_SIZE)
+        .forEach(([key]) => delete this.walletTokens[key])
     }
   }
 
@@ -491,7 +538,7 @@ export class ArtIndexerBot {
       triviaBot.tally(msg)
     }
 
-    projectBot.handleNumberMessage(msg)
+    await projectBot.handleNumberMessage(msg)
   }
 
   async handleNumberTweet(tweet: string): Promise<ProjectBotAndToken> {
@@ -662,12 +709,16 @@ export class ArtIndexerBot {
 
     wallet = wallet.toLowerCase()
 
-    let tokens = []
-    if (this.walletTokens[wallet]) {
-      tokens = this.walletTokens[wallet]
+    let tokens: TokenDetailFragment[] = []
+    const cached = this.walletTokens[wallet]
+    if (
+      cached &&
+      Date.now() - cached.cachedAt < ArtIndexerBot.WALLET_CACHE_TTL_MS
+    ) {
+      tokens = cached.tokens
     } else {
       tokens = (await getAllTokensInWallet(wallet)) ?? []
-      this.walletTokens[wallet] = tokens
+      this.walletTokens[wallet] = { tokens, cachedAt: Date.now() }
     }
 
     if (tokens.length === 0) {
@@ -727,9 +778,7 @@ export class ArtIndexerBot {
     return chosenToken
   }
 
-  async checkBirthdays(
-    channels: Collection<string, Channel>,
-  ) {
+  async checkBirthdays(channels: Collection<string, Channel>) {
     const now = new Date()
     const [year, month, day] = now.toISOString().split('T')[0].split('-')
     const sentMessages: { [id: string]: boolean } = {}

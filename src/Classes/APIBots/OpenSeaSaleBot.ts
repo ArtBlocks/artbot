@@ -7,23 +7,25 @@ import {
 } from '../../Utils/activityTriager'
 import {
   getTokenApiUrl,
-  isExplorationsContract,
-  isEngineContract,
   getCollectionType,
   SALE_UTM,
   ensOrAddress,
   replaceVideoWithGIF,
   getTokenUrl,
-  isStudioContract,
   getOSName,
   buildArtBlocksTokenURL,
+  parseNftId,
+  getCurationStatus,
+  buildEmbedTitle,
+  cleanupTimestampCache,
+  IDENTICAL_TOLERANCE,
+  EVENT_DEDUP_TTL_MS,
+  CLEANUP_INTERVAL_MS,
+  ArtBlocksTokenData,
 } from './utils'
 import { ItemSoldEvent } from '@opensea/stream-js'
 import { TwitterBot } from '../TwitterBot'
 import { artIndexerBot } from '../..'
-
-const IDENTICAL_TOLERANCE = 0.0001
-const SALE_TTL_MS = 24 * 60 * 60 * 1000 // 24 hours
 
 export interface NormalizedOpenSeaSale {
   source: 'stream' | 'api'
@@ -48,27 +50,23 @@ export class OpenSeaSaleBot {
   private recentSales: { [key: string]: { price: number; timestamp: number } } =
     {}
   private saleColor = 0x27ae60 // Green color for OpenSea sales (different from Reservoir)
+  private cleanupIntervalId?: NodeJS.Timeout
 
   constructor(bot: Client, twitterBot?: TwitterBot) {
     this.bot = bot
     this.twitterBot = twitterBot
 
     // Setup cleanup interval for old sales
-    setInterval(() => {
+    this.cleanupIntervalId = setInterval(() => {
       this.cleanupOldSales()
-    }, 60 * 60 * 1000) // Clean up every hour
+    }, CLEANUP_INTERVAL_MS)
   }
 
   /**
    * Cleanup sales older than TTL
    */
   private cleanupOldSales() {
-    const now = Date.now()
-    Object.entries(this.recentSales).forEach(([key, value]) => {
-      if (now - value.timestamp > SALE_TTL_MS) {
-        delete this.recentSales[key]
-      }
-    })
+    cleanupTimestampCache(this.recentSales, EVENT_DEDUP_TTL_MS)
   }
 
   /**
@@ -77,7 +75,7 @@ export class OpenSeaSaleBot {
    */
   async handleSaleEvent(event: ItemSoldEvent) {
     try {
-      const nftInfo = this.parseNftId(event.payload.item.nft_id)
+      const nftInfo = parseNftId(event.payload.item.nft_id)
       if (!nftInfo) {
         console.warn('Could not parse NFT ID:', event.payload.item.nft_id)
         return
@@ -117,38 +115,6 @@ export class OpenSeaSaleBot {
     } catch (err) {
       console.error('Error processing OpenSea sale event:', err)
     }
-  }
-
-  /**
-   * Parses OpenSea NFT ID and extracts contract address and token ID
-   * @param nftId - Format: "ethereum/0x2308742aa28cc460522ff855d24a365f99deba7b/7111"
-   * @returns {contractAddress, tokenId} or null if invalid format
-   */
-  private parseNftId(
-    nftId: string
-  ): { contractAddress: string; tokenId: string } | null {
-    const parts = nftId.split('/')
-    if (parts.length !== 3) {
-      console.warn('Invalid NFT ID format:', nftId)
-      return null
-    }
-
-    if (parts[0] !== 'ethereum') {
-      console.warn('Invalid NFT ID format:', nftId)
-      return null
-    }
-
-    return {
-      contractAddress: parts[1].toLowerCase(),
-      tokenId: parts[2],
-    }
-  }
-
-  /**
-   * Get OpenSea name for an address (similar to ReservoirSaleBot)
-   */
-  private async osName(address: string): Promise<string> {
-    return await getOSName(address)
   }
 
   /**
@@ -219,10 +185,10 @@ export class OpenSeaSaleBot {
       // Get Art Blocks metadata response for the item (same as ReservoirSaleBot)
       const tokenApiUrl = getTokenApiUrl(contractAddress, tokenId)
       const artBlocksResponse = await axios.get(tokenApiUrl)
-      const artBlocksData = artBlocksResponse?.data
+      const artBlocksData = artBlocksResponse?.data as ArtBlocksTokenData
 
       const tokenUrl = getTokenUrl(
-        artBlocksData.external_url,
+        artBlocksData.external_url ?? '',
         contractAddress,
         tokenId
       )
@@ -233,12 +199,12 @@ export class OpenSeaSaleBot {
 
       // Add OpenSea usernames if available (same logic as ReservoirSaleBot)
       if (!sellerText.includes('.eth')) {
-        const sellerOS = await this.osName(seller)
+        const sellerOS = await getOSName(seller)
         sellerText =
           sellerOS === '' ? sellerText : `${sellerText} (OS: ${sellerOS})`
       }
       if (!buyerText.includes('.eth')) {
-        const buyerOS = await this.osName(buyer)
+        const buyerOS = await getOSName(buyer)
         buyerText = buyerOS === '' ? buyerText : `${buyerText} (OS: ${buyerOS})`
       }
 
@@ -262,27 +228,8 @@ export class OpenSeaSaleBot {
         }
       )
 
-      let title = `${artBlocksData.name} - ${artBlocksData.artist}`
-
-      let curationStatus = artBlocksData?.curation_status
-        ? artBlocksData.curation_status[0].toUpperCase() +
-          artBlocksData.curation_status.slice(1).toLowerCase()
-        : ''
-
-      if (artBlocksData?.platform?.includes('Art Blocks x Pace')) {
-        curationStatus = 'AB x Pace'
-      } else if (artBlocksData?.platform === 'Art Blocks × Bright Moments') {
-        curationStatus = 'AB x Bright Moments'
-      } else if (isExplorationsContract(contractAddress)) {
-        curationStatus = 'Explorations'
-      } else if (isStudioContract(contractAddress)) {
-        curationStatus = 'Studio'
-      } else if (isEngineContract(contractAddress)) {
-        curationStatus = 'Engine'
-        if (artBlocksData?.platform) {
-          title = `${artBlocksData.platform} - ${title}`
-        }
-      }
+      const title = buildEmbedTitle(artBlocksData, contractAddress)
+      const curationStatus = getCurationStatus(artBlocksData, contractAddress)
 
       // Update thumbnail image to use larger variant from Art Blocks API.
       let assetUrl = artBlocksData?.preview_asset_url
@@ -330,14 +277,14 @@ export class OpenSeaSaleBot {
         try {
           await this.twitterBot.tweetSale({
             tokenName: artBlocksData.name,
-            projectName: artBlocksData.collection_name,
+            projectName: artBlocksData.collection_name ?? '',
             artist: artBlocksData.artist,
             salePrice: price,
             usdPrice: usdPrice,
             currency: currency,
             buyer: buyer,
             seller: seller,
-            assetUrl: assetUrl || artBlocksData.preview_asset_url,
+            assetUrl: assetUrl || artBlocksData.preview_asset_url || '',
             tokenUrl: tokenUrl,
             platform: platform,
           })
@@ -356,7 +303,7 @@ export class OpenSeaSaleBot {
    */
   private shouldTweetNormalizedSale(
     sale: NormalizedOpenSeaSale,
-    artBlocksData: any
+    artBlocksData: ArtBlocksTokenData
   ): boolean {
     const projectId = `${sale.contractAddress.toLowerCase()}-${
       artBlocksData.project_id
@@ -384,6 +331,10 @@ export class OpenSeaSaleBot {
    * Cleanup method to be called when the bot is being destroyed
    */
   cleanup() {
+    if (this.cleanupIntervalId) {
+      clearInterval(this.cleanupIntervalId)
+      this.cleanupIntervalId = undefined
+    }
     this.recentSales = {}
   }
 }

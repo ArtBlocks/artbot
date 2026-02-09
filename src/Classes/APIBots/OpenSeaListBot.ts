@@ -11,13 +11,16 @@ import {
   getTokenApiUrl,
   getTokenUrl,
   replaceVideoWithGIF,
-  isEngineContract,
-  isExplorationsContract,
+  parseNftId,
+  getCurationStatus,
+  buildEmbedTitle,
+  cleanupTimestampCache,
+  IDENTICAL_TOLERANCE,
+  EVENT_DEDUP_TTL_MS,
+  CLEANUP_INTERVAL_MS,
+  ArtBlocksTokenData,
 } from './utils'
 import { ItemListedEvent } from '@opensea/stream-js'
-
-const IDENTICAL_TOLERANCE = 0.0001
-const LISTING_TTL_MS = 24 * 60 * 60 * 1000 // 24 hours
 
 /**
  * Bot for handling OpenSea stream listing events
@@ -29,26 +32,22 @@ export class OpenSeaListBot {
     [key: string]: { price: number; timestamp: number }
   } = {}
   private listColor = '#407FDB'
+  private cleanupIntervalId?: NodeJS.Timeout
 
   constructor(bot: Client) {
     this.bot = bot
 
     // Setup cleanup interval for old listings
-    setInterval(() => {
+    this.cleanupIntervalId = setInterval(() => {
       this.cleanupOldListings()
-    }, 60 * 60 * 1000) // Clean up every hour
+    }, CLEANUP_INTERVAL_MS)
   }
 
   /**
    * Cleanup listings older than TTL
    */
   private cleanupOldListings() {
-    const now = Date.now()
-    Object.entries(this.recentListings).forEach(([key, value]) => {
-      if (now - value.timestamp > LISTING_TTL_MS) {
-        delete this.recentListings[key]
-      }
-    })
+    cleanupTimestampCache(this.recentListings, EVENT_DEDUP_TTL_MS)
   }
 
   /**
@@ -64,31 +63,6 @@ export class OpenSeaListBot {
   }
 
   /**
-   * Parses OpenSea NFT ID and extracts contract address and token ID
-   * @param nftId - Format: "ethereum/0x2308742aa28cc460522ff855d24a365f99deba7b/7111"
-   * @returns {contractAddress, tokenId} or null if invalid format
-   */
-  private parseNftId(
-    nftId: string
-  ): { contractAddress: string; tokenId: string } | null {
-    const parts = nftId.split('/')
-    if (parts.length !== 3) {
-      console.warn('Invalid NFT ID format:', nftId)
-      return null
-    }
-
-    if (parts[0] !== 'ethereum') {
-      console.warn('Invalid NFT ID format:', nftId)
-      return null
-    }
-
-    return {
-      contractAddress: parts[1].toLowerCase(),
-      tokenId: parts[2],
-    }
-  }
-
-  /**
    * Builds and sends Discord embed message for OpenSea listing
    * @param payload - OpenSea stream payload
    */
@@ -96,7 +70,7 @@ export class OpenSeaListBot {
     const embed = new EmbedBuilder()
 
     // Parse the NFT ID to get contract and token info
-    const nftInfo = this.parseNftId(payload.item.nft_id)
+    const nftInfo = parseNftId(payload.item.nft_id)
     if (!nftInfo) {
       console.warn('Could not parse NFT ID:', payload.item.nft_id)
       return
@@ -135,9 +109,9 @@ export class OpenSeaListBot {
       // Get Art Blocks metadata response for the item (same as ReservoirListBot)
       const tokenApiUrl = getTokenApiUrl(contractAddress, tokenId)
       const artBlocksResponse = await axios.get(tokenApiUrl)
-      const artBlocksData = artBlocksResponse?.data
+      const artBlocksData = artBlocksResponse?.data as ArtBlocksTokenData
       const tokenUrl = getTokenUrl(
-        artBlocksData.external_url,
+        artBlocksData.external_url ?? '',
         contractAddress,
         tokenId
       )
@@ -158,25 +132,8 @@ export class OpenSeaListBot {
         }
       )
 
-      let curationStatus = artBlocksData?.curation_status
-        ? artBlocksData.curation_status[0].toUpperCase() +
-          artBlocksData.curation_status.slice(1).toLowerCase()
-        : ''
-
-      let title = `${artBlocksData.name} - ${artBlocksData.artist}`
-
-      if (artBlocksData?.platform?.includes('Art Blocks x Pace')) {
-        curationStatus = 'AB x Pace'
-      } else if (artBlocksData?.platform === 'Art Blocks × Bright Moments') {
-        curationStatus = 'AB x Bright Moments'
-      } else if (isExplorationsContract(contractAddress)) {
-        curationStatus = 'Explorations'
-      } else if (isEngineContract(contractAddress)) {
-        curationStatus = 'Engine'
-        if (artBlocksData?.platform) {
-          title = `${artBlocksData.platform} - ${title}`
-        }
-      }
+      const curationStatus = getCurationStatus(artBlocksData, contractAddress)
+      const title = buildEmbedTitle(artBlocksData, contractAddress)
 
       // Update thumbnail image to use larger variant from Art Blocks API.
       let assetUrl = artBlocksData?.preview_asset_url
@@ -227,6 +184,10 @@ export class OpenSeaListBot {
    * Cleanup method to be called when the bot is being destroyed
    */
   cleanup() {
+    if (this.cleanupIntervalId) {
+      clearInterval(this.cleanupIntervalId)
+      this.cleanupIntervalId = undefined
+    }
     this.recentListings = {}
   }
 }
