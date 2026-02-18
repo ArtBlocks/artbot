@@ -1,7 +1,6 @@
 import * as dotenv from 'dotenv'
 
 import {
-  ARBITRUM_CONTRACTS,
   COLLAB_CONTRACTS,
   ENGINE_CONTRACTS,
   STUDIO_CONTRACTS,
@@ -28,7 +27,6 @@ const publicClient = createPublicClient({
   ]),
 })
 
-const STAGING_CONTRACTS = require('../../ProjectConfig/stagingContracts.json')
 const EXPLORATIONS_CONTRACTS = require('../../ProjectConfig/explorationsContracts.json')
 
 const CORE_CONTRACTS = require('../../ProjectConfig/coreContracts.json')
@@ -260,22 +258,12 @@ export function getVerticalName(msg: string): string {
 }
 
 export function getTokenApiUrl(
+  chainId: number,
   contractAddress: string,
   tokenId: string
 ): string {
   contractAddress = contractAddress.toLowerCase()
-  if (
-    Object.values(CORE_CONTRACTS).includes(contractAddress) ||
-    contractAddress === ''
-  ) {
-    return `https://token.artblocks.io/${tokenId}`
-  } else if (Object.values(STAGING_CONTRACTS).includes(contractAddress)) {
-    return `https://token.staging.artblocks.io/${contractAddress}/${tokenId}`
-  } else if (isArbitrumContract(contractAddress)) {
-    return `https://token.arbitrum.artblocks.io/${contractAddress}/${tokenId}`
-  } else {
-    return `https://token.artblocks.io/${contractAddress}/${tokenId}`
-  }
+  return `https://token.artblocks.io/${chainId}/${contractAddress}/${tokenId}`
 }
 
 export function isExplorationsContract(contractAddress: string): boolean {
@@ -290,10 +278,6 @@ export function isStudioContract(contractAddress: string): boolean {
 
 export function isEngineContract(contractAddress: string): boolean {
   return ENGINE_CONTRACTS.includes(contractAddress.toLowerCase())
-}
-
-export function isArbitrumContract(contractAddress: string): boolean {
-  return ARBITRUM_CONTRACTS.includes(contractAddress.toLowerCase())
 }
 
 export function isCoreContract(contractAddress: string): boolean {
@@ -324,28 +308,50 @@ export async function getCollectionType(
 
 export function getTokenUrl(
   external_url: string,
+  chainId: number,
   contractAddr: string,
   tokenId: string
 ): string {
   if (external_url && !external_url.includes('generator.artblocks.io')) {
     return external_url
   }
-  return buildArtBlocksTokenURL(contractAddr, tokenId)
+  return buildArtBlocksTokenURL(chainId, contractAddr, tokenId)
 }
 
 export function getProjectSlugUrl(slug: string): string {
   return `https://www.artblocks.io/collection/${slug}`
 }
 
-export function getProjectUrl(contractAddr: string, projectId: string): string {
-  return `https://www.artblocks.io/collection/${contractAddr}-${projectId}`
-}
-
 export function buildArtBlocksTokenURL(
+  chainId: number,
   contractAddr: string,
   tokenId: string
 ): string {
-  return `https://www.artblocks.io/token/${contractAddr}/${tokenId}`
+  return `https://www.artblocks.io/token/${chainId}/${contractAddr}/${tokenId}`
+}
+
+/**
+ * Build generator (live script) URL from chain + contract + token.
+ */
+export function buildGeneratorUrl(
+  chainId: number,
+  contractAddress: string,
+  tokenId: string
+): string {
+  contractAddress = contractAddress.toLowerCase()
+  return `https://generator.artblocks.io/${chainId}/${contractAddress}/${tokenId}`
+}
+
+/**
+ * Build media/preview image URL from chain + contract + token.
+ */
+export function buildMediaUrl(
+  chainId: number,
+  contractAddress: string,
+  tokenId: string
+): string {
+  contractAddress = contractAddress.toLowerCase()
+  return `https://media-proxy.artblocks.io/${chainId}/${contractAddress}/${tokenId}.png`
 }
 
 export function buildOpenseaURL(contractAddr: string, tokenId: string): string {
@@ -439,16 +445,29 @@ export const CLEANUP_INTERVAL_MS = 60 * 60 * 1000
  * @param nftId - Format: "ethereum/0x2308742aa28cc460522ff855d24a365f99deba7b/7111"
  * @returns {contractAddress, tokenId} or null if invalid format
  */
+const CHAIN_NAME_TO_ID: Record<string, number> = {
+  ethereum: 1,
+  arbitrum: 42161,
+  base: 8453,
+}
+
 export function parseNftId(
   nftId: string
-): { contractAddress: string; tokenId: string } | null {
+): { chainId: number; contractAddress: string; tokenId: string } | null {
   const parts = nftId.split('/')
-  if (parts.length !== 3 || parts[0] !== 'ethereum') {
+  if (parts.length !== 3) {
     console.warn('Invalid NFT ID format:', nftId)
     return null
   }
 
+  const chainId = CHAIN_NAME_TO_ID[parts[0]]
+  if (chainId === undefined) {
+    console.warn('Unknown chain in NFT ID:', parts[0], nftId)
+    return null
+  }
+
   return {
+    chainId,
     contractAddress: parts[1].toLowerCase(),
     tokenId: parts[2],
   }

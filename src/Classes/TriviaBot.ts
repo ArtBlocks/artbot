@@ -181,7 +181,7 @@ Next question:`
       project.projectNumber * 1e6
 
     const artBlocksResponse = await axios.get(
-      getTokenApiUrl(project.coreContract, `${tokenNumber}`)
+      getTokenApiUrl(project.chainId, project.coreContract, `${tokenNumber}`)
     )
     const artBlocksData = artBlocksResponse.data
     const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url)
@@ -202,7 +202,7 @@ Next question:`
       project.projectNumber * 1e6
 
     const artBlocksResponse = await axios.get(
-      getTokenApiUrl(project.coreContract, `${tokenNumber}`)
+      getTokenApiUrl(project.chainId, project.coreContract, `${tokenNumber}`)
     )
     const artBlocksData = artBlocksResponse.data
     const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url)

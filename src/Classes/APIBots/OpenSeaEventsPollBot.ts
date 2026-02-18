@@ -349,8 +349,10 @@ export class OpenSeaEventsPollBot extends APIPollBot {
     const seller = saleEvent.seller || ''
     const buyer = saleEvent.buyer || ''
 
+    // API poll bot currently only queries Ethereum mainnet contracts
     const normalized: NormalizedOpenSeaSale = {
       source: 'api',
+      chainId: 1,
       osAssetId: `ethereum/${contractAddress}/${tokenId}`,
       contractAddress,
       tokenId,

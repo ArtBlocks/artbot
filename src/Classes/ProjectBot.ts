@@ -11,7 +11,7 @@ import {
   PROJECTBOT_EXPLORE_UTM,
   PROJECTBOT_UTM,
   ethFromWeiString,
-  getProjectUrl,
+  getProjectSlugUrl,
   getTokenApiUrl,
   getTokenUrl,
 } from './APIBots/utils'
@@ -35,8 +35,10 @@ const ONE_MILLION = 1e6
  */
 export class ProjectBot {
   id: string
+  chainId: number
   projectNumber: number
   coreContract: string
+  slug: string
   editionSize: number
   maxEditionSize: number
   projectName: string
@@ -50,8 +52,10 @@ export class ProjectBot {
 
   constructor({
     id,
+    chainId,
     projectNumber,
     coreContract,
+    slug,
     editionSize,
     maxEditionSize,
     projectName,
@@ -63,8 +67,10 @@ export class ProjectBot {
     description,
   }: {
     id: string
+    chainId: number
     projectNumber: number
     coreContract: string
+    slug: string
     editionSize: number
     maxEditionSize: number
     projectName: string
@@ -76,8 +82,10 @@ export class ProjectBot {
     description?: string
   }) {
     this.id = id
+    this.chainId = chainId
     this.projectNumber = projectNumber
     this.coreContract = coreContract
+    this.slug = slug
     this.editionSize = editionSize
     this.maxEditionSize = maxEditionSize
     this.projectName = projectName
@@ -277,7 +285,7 @@ export class ProjectBot {
     if (tokenMetadata.contract?.name === 'Art Blocks x Pace') {
       external_url = ''
     }
-    const tokenUrl = getTokenUrl(external_url, this.coreContract, tokenID)
+    const tokenUrl = getTokenUrl(external_url, this.chainId, this.coreContract, tokenID)
     const titleLink = tokenUrl + PROJECTBOT_UTM
 
     let title = `${tokenMetadata.project.name} #${tokenMetadata.invocation} - ${tokenMetadata.project.artist_name}`
@@ -354,7 +362,11 @@ export class ProjectBot {
       console.log('sending birthday message(s) for:', this.projectName)
 
       const artBlocksResponse = await axios.get(
-        getTokenApiUrl(this.coreContract, `${this.projectNumber * ONE_MILLION}`)
+        getTokenApiUrl(
+          this.chainId,
+          this.coreContract,
+          `${this.projectNumber * ONE_MILLION}`
+        )
       )
       const artBlocksData = await artBlocksResponse.data
       let assetUrl = artBlocksData?.preview_asset_url
@@ -382,8 +394,7 @@ export class ProjectBot {
         What are your favorite outputs from ${this.projectName}?
 
         [Explore the full project here](${
-          getProjectUrl(this.coreContract, this.projectNumber.toString()) +
-          PROJECTBOT_UTM
+          getProjectSlugUrl(this.slug) + PROJECTBOT_UTM
         })
         `
         )
@@ -410,7 +421,11 @@ export class ProjectBot {
     ) as TextChannel
 
     const artBlocksResponse = await axios.get(
-      getTokenApiUrl(this.coreContract, `${this.projectNumber * ONE_MILLION}`)
+      getTokenApiUrl(
+        this.chainId,
+        this.coreContract,
+        `${this.projectNumber * ONE_MILLION}`
+      )
     )
     const artBlocksData = await artBlocksResponse.data
     const assetUrl = artBlocksData?.preview_asset_url
@@ -418,8 +433,7 @@ export class ProjectBot {
     // Send congratulations message
     const title = `:tada: ${this.projectName} has minted out! Congratulations ${this.artistName}!  :tada:`
     const description = `Check out the whole collection [here](${
-      getProjectUrl(this.coreContract, this.projectNumber.toString()) +
-      PROJECTBOT_UTM
+      getProjectSlugUrl(this.slug) + PROJECTBOT_UTM
     })`
     const embedContent = new EmbedBuilder()
       .setColor('#9370DB')
@@ -442,10 +456,7 @@ export class ProjectBot {
       upcomingDetails.auction_start_time || upcomingDetails.start_datetime
     )
 
-    const projectUrl = getProjectUrl(
-      this.coreContract,
-      this.projectNumber.toString()
-    )
+    const projectUrl = getProjectSlugUrl(this.slug)
     const title = `${upcomingDetails.name} by ${upcomingDetails.artist_name}`
 
     const assetUrl = await replaceVideoWithGIF(
@@ -528,10 +539,7 @@ export class ProjectBot {
     if (!msg.channel.isSendable()) {
       return
     }
-    const projectUrl = getProjectUrl(
-      this.coreContract,
-      this.projectNumber.toString()
-    )
+    const projectUrl = getProjectSlugUrl(this.slug)
     const titleLink = projectUrl + PROJECTBOT_EXPLORE_UTM
     const title = `${this.projectName} by ${this.artistName}`
 

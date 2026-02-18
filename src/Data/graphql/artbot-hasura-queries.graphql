@@ -1,6 +1,8 @@
 fragment ProjectDetail on projects_metadata {
   id
   project_id
+  slug
+  chain_id
   name
   description
   invocations
@@ -21,11 +23,15 @@ fragment ProjectDetail on projects_metadata {
   }
   contract {
     name
+    partner {
+      name
+    }
   }
 }
 
 fragment TokenDetail on tokens_metadata {
   invocation
+  chain_id
   project {
     name
     artist_name
@@ -48,11 +54,16 @@ fragment ProjectTokenDetail on tokens_metadata {
   id
   project_id
   invocation
+  chain_id
 }
 
 fragment ContractDetail on contracts_metadata {
   address
   name
+  chain_id
+  partner {
+    name
+  }
 }
 
 query getAllProjects($first: Int!, $skip: Int, $blocked_addresses: [String!]) {
