@@ -138,19 +138,11 @@ export class ArtIndexerBot {
 
   async buildContracts() {
     try {
-      const arbContractsArr = await getAllContracts(true)
-      for (let i = 0; i < arbContractsArr.length; i++) {
-        const name = arbContractsArr[i].name
+      const contractsArr = await getAllContracts()
+      for (let i = 0; i < contractsArr.length; i++) {
+        const name = contractsArr[i].name
         if (typeof name === 'string') {
-          this.contracts[name.toLowerCase()] = arbContractsArr[i]
-        }
-      }
-
-      const ethContractsArr = await getAllContracts(false)
-      for (let i = 0; i < ethContractsArr.length; i++) {
-        const name = ethContractsArr[i].name
-        if (typeof name === 'string') {
-          this.contracts[name.toLowerCase()] = ethContractsArr[i]
+          this.contracts[name.toLowerCase()] = contractsArr[i]
         }
       }
     } catch (e) {
@@ -199,6 +191,7 @@ export class ArtIndexerBot {
         )
         const newBot = new ProjectBot({
           id: project.id,
+          chainId: project.chain_id,
           projectNumber: parseInt(project.project_id),
           coreContract: project.contract_address,
           editionSize: project.invocations,

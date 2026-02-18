@@ -35,6 +35,7 @@ const ONE_MILLION = 1e6
  */
 export class ProjectBot {
   id: string
+  chainId: number
   projectNumber: number
   coreContract: string
   editionSize: number
@@ -50,6 +51,7 @@ export class ProjectBot {
 
   constructor({
     id,
+    chainId,
     projectNumber,
     coreContract,
     editionSize,
@@ -63,6 +65,7 @@ export class ProjectBot {
     description,
   }: {
     id: string
+    chainId: number
     projectNumber: number
     coreContract: string
     editionSize: number
@@ -76,6 +79,7 @@ export class ProjectBot {
     description?: string
   }) {
     this.id = id
+    this.chainId = chainId
     this.projectNumber = projectNumber
     this.coreContract = coreContract
     this.editionSize = editionSize
@@ -277,7 +281,7 @@ export class ProjectBot {
     if (tokenMetadata.contract?.name === 'Art Blocks x Pace') {
       external_url = ''
     }
-    const tokenUrl = getTokenUrl(external_url, this.coreContract, tokenID)
+    const tokenUrl = getTokenUrl(external_url, this.chainId, this.coreContract, tokenID)
     const titleLink = tokenUrl + PROJECTBOT_UTM
 
     let title = `${tokenMetadata.project.name} #${tokenMetadata.invocation} - ${tokenMetadata.project.artist_name}`
@@ -354,7 +358,11 @@ export class ProjectBot {
       console.log('sending birthday message(s) for:', this.projectName)
 
       const artBlocksResponse = await axios.get(
-        getTokenApiUrl(this.coreContract, `${this.projectNumber * ONE_MILLION}`)
+        getTokenApiUrl(
+          this.chainId,
+          this.coreContract,
+          `${this.projectNumber * ONE_MILLION}`
+        )
       )
       const artBlocksData = await artBlocksResponse.data
       let assetUrl = artBlocksData?.preview_asset_url
@@ -410,7 +418,11 @@ export class ProjectBot {
     ) as TextChannel
 
     const artBlocksResponse = await axios.get(
-      getTokenApiUrl(this.coreContract, `${this.projectNumber * ONE_MILLION}`)
+      getTokenApiUrl(
+        this.chainId,
+        this.coreContract,
+        `${this.projectNumber * ONE_MILLION}`
+      )
     )
     const artBlocksData = await artBlocksResponse.data
     const assetUrl = artBlocksData?.preview_asset_url

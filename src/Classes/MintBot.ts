@@ -3,15 +3,22 @@ import { artIndexerBot, mintBot, projectConfig } from '../index'
 import axios from 'axios'
 import {
   MINT_UTM,
+  buildArtBlocksTokenURL,
+  buildGeneratorUrl,
+  buildMediaUrl,
   getCollectionType,
-  getTokenApiUrl,
-  getTokenUrl,
   replaceToPNG,
   waitForEngineContracts,
   waitForStudioContracts,
 } from './APIBots/utils'
 import { ensOrAddress } from './APIBots/utils'
 import { TwitterBot } from './TwitterBot'
+
+// When true, only post mints from mainnet (chain ID 1). Non-mainnet mints are skipped.
+// Set to false in a couple weeks to enable L2/other chain mints.
+const HIDE_NON_MAINNET_MINTS = true
+
+const MAINNET_CHAIN_ID = 1
 
 const MINT_CONFIG: {
   [id: string]: string[]
@@ -95,9 +102,8 @@ export class MintBot {
     this.contractToChannel = contractToChannel
   }
 
-  // Go through all mints in the queue and make sure the image exists
-  // If it does, report to discord and remove from the queue
-  // If it doesn't, add it back in the queue to check again later
+  // Go through all mints in the queue and make sure the media image exists.
+  // Uses event data only (no token API call). Polls media URL until available, then posts.
   async checkAndPostMints() {
     if (Object.keys(this.mintsToPost).length === 0) {
       return
@@ -107,17 +113,9 @@ export class MintBot {
       await Promise.all(
         Object.entries(this.mintsToPost).map(async ([id, mint]) => {
           try {
-            const tokenUrl = getTokenApiUrl(mint.contractAddress, mint.tokenId)
-            const artBlocksResponse = await axios.get(tokenUrl)
-
-            const artBlocksData = artBlocksResponse.data
-            let assetUrl = artBlocksData?.preview_asset_url
-            if (!assetUrl) {
-              console.log(`No preview asset URL for mint ${id}`)
-              return
-            }
-
-            assetUrl = replaceToPNG(assetUrl)
+            const assetUrl = replaceToPNG(
+              buildMediaUrl(mint.chainId, mint.contractAddress, mint.tokenId)
+            )
 
             // Validate URL format
             try {
@@ -143,14 +141,18 @@ export class MintBot {
                 return
               }
 
-              // If we get here, the image is valid
+              // If we get here, the image is valid - build embed from event data
               delete this.mintsToPost[id]
               mint.image = assetUrl
-              mint.generatorLink = artBlocksData.generator_url
-              mint.tokenName = artBlocksData.name
-              mint.artistName = artBlocksData.artist
-              mint.artblocksUrl = getTokenUrl(
-                artBlocksData.external_url,
+              mint.generatorLink = buildGeneratorUrl(
+                mint.chainId,
+                mint.contractAddress,
+                mint.tokenId
+              )
+              mint.tokenName = `${mint.projectName} #${mint.invocation}`
+              mint.artistName = '' // Not in mint event; omit from display
+              mint.artblocksUrl = buildArtBlocksTokenURL(
+                mint.chainId,
                 mint.contractAddress,
                 mint.tokenId
               )
@@ -178,9 +180,18 @@ export class MintBot {
     tokenID: string,
     owner: string,
     invocation: string,
-    projectId: string
+    projectId: string,
+    projectName: string,
+    chainId: number
   ) {
-    console.log('NEW MINT', contractAddress, tokenID, owner)
+    console.log(
+      'NEW MINT',
+      contractAddress,
+      tokenID,
+      owner,
+      'chainId:',
+      chainId
+    )
     const id = `${contractAddress}-${tokenID}`
 
     if (!this.contractToChannel[contractAddress]) {
@@ -188,9 +199,24 @@ export class MintBot {
       return
     }
 
+    if (HIDE_NON_MAINNET_MINTS && chainId !== MAINNET_CHAIN_ID) {
+      console.log(
+        `Skipping mint for non-mainnet chain ${chainId} (HIDE_NON_MAINNET_MINTS=true)`
+      )
+      return
+    }
+
     artIndexerBot.checkMintedOut(projectId, invocation)
 
-    this.mintsToPost[id] = new Mint(this.bot, contractAddress, tokenID, owner)
+    this.mintsToPost[id] = new Mint(
+      this.bot,
+      contractAddress,
+      tokenID,
+      owner,
+      chainId,
+      projectName,
+      invocation
+    )
   }
 
   // Routine that runs every MINT_REFRESH_TIME_SECONDS seconds and
@@ -236,6 +262,9 @@ export class Mint {
   contractAddress: string
   tokenId: string
   owner: string
+  chainId: number
+  projectName: string
+  invocation: string
   image: string
   generatorLink: string
   tokenName: string
@@ -245,12 +274,18 @@ export class Mint {
     bot: Client,
     contractAddress: string,
     tokenId: string,
-    owner: string
+    owner: string,
+    chainId: number,
+    projectName: string,
+    invocation: string
   ) {
     this.bot = bot
     this.contractAddress = contractAddress
     this.tokenId = tokenId
     this.owner = owner
+    this.chainId = chainId
+    this.projectName = projectName
+    this.invocation = invocation
     this.image = ''
     this.generatorLink = ''
     this.tokenName = ''
@@ -266,7 +301,7 @@ export class Mint {
     const baseABProfile = 'https://www.artblocks.io/user/'
     const ownerProfile = baseABProfile + this.owner + MINT_UTM
 
-    embed.setTitle(`Minted: ${this.tokenName} - ${this.artistName}`)
+    embed.setTitle(`Minted: ${this.tokenName}`)
     if (this.artblocksUrl) {
       embed.setURL(this.artblocksUrl + MINT_UTM)
     }

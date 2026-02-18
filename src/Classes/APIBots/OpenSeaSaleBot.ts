@@ -29,6 +29,7 @@ import { artIndexerBot } from '../..'
 
 export interface NormalizedOpenSeaSale {
   source: 'stream' | 'api'
+  chainId: number
   osAssetId: string
   contractAddress: string
   tokenId: string
@@ -95,6 +96,7 @@ export class OpenSeaSaleBot {
       )
       const normalizedSale: NormalizedOpenSeaSale = {
         source: 'stream',
+        chainId: nftInfo.chainId,
         osAssetId: event.payload.item.nft_id.toLowerCase(),
         contractAddress: nftInfo.contractAddress,
         tokenId: nftInfo.tokenId,
@@ -183,19 +185,20 @@ export class OpenSeaSaleBot {
 
     try {
       // Get Art Blocks metadata response for the item (same as ReservoirSaleBot)
-      const tokenApiUrl = getTokenApiUrl(contractAddress, tokenId)
+      const tokenApiUrl = getTokenApiUrl(sale.chainId, contractAddress, tokenId)
       const artBlocksResponse = await axios.get(tokenApiUrl)
       const artBlocksData = artBlocksResponse?.data as ArtBlocksTokenData
 
       const tokenUrl = getTokenUrl(
         artBlocksData.external_url ?? '',
+        sale.chainId,
         contractAddress,
         tokenId
       )
 
       let sellerText = await ensOrAddress(seller)
       let buyerText = await ensOrAddress(buyer)
-      const platformUrl = buildArtBlocksTokenURL(contractAddress, tokenId)
+      const platformUrl = buildArtBlocksTokenURL(sale.chainId, contractAddress, tokenId)
 
       // Add OpenSea usernames if available (same logic as ReservoirSaleBot)
       if (!sellerText.includes('.eth')) {

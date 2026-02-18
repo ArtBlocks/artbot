@@ -6,7 +6,6 @@ const bodyParser = require('body-parser')
 import { ProjectConfig } from './ProjectConfig/projectConfig'
 export let STUDIO_CONTRACTS: string[] = []
 export let ENGINE_CONTRACTS: string[] = []
-export let ARBITRUM_CONTRACTS: string[] = []
 export let ARTIST_TWITTER_HANDLES: Map<string, string> = new Map()
 export const projectConfig = new ProjectConfig()
 
@@ -14,7 +13,6 @@ import { ArtIndexerBot } from './Classes/ArtIndexerBot'
 import { MintBot } from './Classes/MintBot'
 
 import {
-  getArbitrumContracts,
   getArtBlocksXBMProjects,
   getArtBlocksXPaceProjects,
   getEngineContracts,
@@ -58,9 +56,6 @@ getStudioContracts().then((contracts) => {
 })
 getEngineContracts().then((contracts) => {
   ENGINE_CONTRACTS = contracts ?? []
-})
-getArbitrumContracts().then((contracts) => {
-  ARBITRUM_CONTRACTS = contracts ?? []
 })
 getArtistsTwitterHandles().then((handles) => {
   ARTIST_TWITTER_HANDLES = handles
@@ -141,17 +136,19 @@ app.get(
   }
 )
 
-type MintEvent = {
+// Hasura event trigger payload format (tokens_metadata_image_id_update)
+type MintEventPayload = {
   event: {
     data: {
       new: {
+        chain_id: number
         contract_address: string
         owner_address: string
         project_name: string
-        token_id: string
-        minted_at: string
-        invocation: string
         project_id: string
+        token_id: string
+        invocation: number
+        minted_at: string
       }
     }
   }
@@ -160,15 +157,14 @@ type MintEvent = {
 app.post(
   '/new-mint',
   function (
-    req: { body: MintEvent; headers: Record<string, string | undefined> },
+    req: { body: MintEventPayload; headers: Record<string, string | undefined> },
     res: {
       setHeader: (key: string, value: string) => void
       json: (data: unknown) => void
       status: (code: number) => { json: (data: unknown) => void }
     }
   ) {
-    const mintEvent = req.body
-    const mintData = mintEvent.event.data.new
+    const mintData = req.body.event.data.new
 
     if (req.headers.webhook_secret !== process.env.MINT_WEBHOOK_SECRET) {
       console.log('Invalid mint webhook secret')
@@ -178,10 +174,12 @@ app.post(
 
     mintBot.addMint(
       mintData.contract_address,
-      mintData.token_id,
+      String(mintData.token_id),
       mintData.owner_address,
-      mintData.invocation,
-      mintData.project_id
+      String(mintData.invocation),
+      mintData.project_id,
+      mintData.project_name,
+      mintData.chain_id
     )
     res.setHeader('Content-Type', 'application/json')
     res.json({

@@ -247,7 +247,7 @@ export class TwitterBot {
     }
 
     const { data: artBlocksData } = await axios.get(
-      getTokenApiUrl(projectBot.coreContract, tokenId)
+      getTokenApiUrl(projectBot.chainId, projectBot.coreContract, tokenId)
     )
 
     const assetUrl = artBlocksData.preview_asset_url
@@ -263,6 +263,7 @@ export class TwitterBot {
     const tokenUrl =
       getTokenUrl(
         artBlocksData.external_url,
+        projectBot.chainId,
         projectBot.coreContract,
         tokenId
       ) + TWITTER_PROJECTBOT_UTM
