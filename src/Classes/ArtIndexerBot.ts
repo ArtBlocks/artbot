@@ -28,7 +28,6 @@ import {
   getVerticalName,
   isVerticalName,
   resolveEnsName,
-  getProjectUrl,
   getProjectSlugUrl,
 } from './APIBots/utils'
 import { randomColor } from '../Utils/smartBotResponse'
@@ -194,6 +193,7 @@ export class ArtIndexerBot {
           chainId: project.chain_id,
           projectNumber: parseInt(project.project_id),
           coreContract: project.contract_address,
+          slug: project.slug,
           editionSize: project.invocations,
           maxEditionSize: project.max_invocations,
           projectName: project.name ?? 'unknown',
@@ -990,22 +990,16 @@ export class ArtIndexerBot {
       const projectPrices: {
         price: number
         name: string
-        contractAddress: string
-        projectId: string
-        slug?: string
+        slug: string
       }[] = []
       const projectsWithoutListings: {
         name: string
-        contractAddress: string
-        projectId: string
-        slug?: string
+        slug: string
       }[] = []
 
       for (const bucket of validBuckets) {
         if (bucket.project) {
           const projectName = bucket.project.name || 'Unknown Project'
-          const contractAddress = bucket.project.contract_address
-          const projectId = bucket.project.project_id
           const slug = bucket.project.slug
 
           if (bucket.project.lowest_listing) {
@@ -1015,16 +1009,11 @@ export class ArtIndexerBot {
             projectPrices.push({
               price,
               name: projectName,
-              contractAddress,
-              projectId,
               slug,
             })
           } else {
-            // Project exists but has no listings
             projectsWithoutListings.push({
               name: projectName,
-              contractAddress,
-              projectId,
               slug,
             })
           }
@@ -1102,23 +1091,19 @@ export class ArtIndexerBot {
         // Top 3 cheapest (already sorted ascending)
         const top3Cheapest = sortedProjectPrices.slice(0, 3)
         const cheapestText = top3Cheapest
-          .map((p) => {
-            const projectUrl = p.slug
-              ? getProjectSlugUrl(p.slug)
-              : getProjectUrl(p.contractAddress, p.projectId)
-            return `— [${p.name}](${projectUrl}) • ${formatPrice(p.price)} Ξ`
-          })
+          .map(
+            (p) =>
+              `— [${p.name}](${getProjectSlugUrl(p.slug)}) • ${formatPrice(p.price)} Ξ`
+          )
           .join('\n')
 
         // Top 3 priciest (reverse order - most expensive first)
         const top3Priciest = sortedProjectPrices.slice(-3).reverse()
         const priciestText = top3Priciest
-          .map((p) => {
-            const projectUrl = p.slug
-              ? getProjectSlugUrl(p.slug)
-              : getProjectUrl(p.contractAddress, p.projectId)
-            return `— [${p.name}](${projectUrl}) • ${formatPrice(p.price)} Ξ`
-          })
+          .map(
+            (p) =>
+              `— [${p.name}](${getProjectSlugUrl(p.slug)}) • ${formatPrice(p.price)} Ξ`
+          )
           .join('\n')
 
         embedContent.addFields({
@@ -1137,12 +1122,7 @@ export class ArtIndexerBot {
         const firstFive = projectsWithoutListings.slice(0, 5)
         const noListingsText =
           firstFive
-            .map((p) => {
-              const projectUrl = p.slug
-                ? getProjectSlugUrl(p.slug)
-                : getProjectUrl(p.contractAddress, p.projectId)
-              return `[${p.name}](${projectUrl})`
-            })
+            .map((p) => `[${p.name}](${getProjectSlugUrl(p.slug)})`)
             .join(' • ') +
           (projectsWithoutListings.length > 5
             ? ` and ${projectsWithoutListings.length - 5} more`

@@ -1,6 +1,7 @@
 fragment ProjectDetail on projects_metadata {
   id
   project_id
+  slug
   chain_id
   name
   description

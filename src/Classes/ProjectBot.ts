@@ -11,7 +11,7 @@ import {
   PROJECTBOT_EXPLORE_UTM,
   PROJECTBOT_UTM,
   ethFromWeiString,
-  getProjectUrl,
+  getProjectSlugUrl,
   getTokenApiUrl,
   getTokenUrl,
 } from './APIBots/utils'
@@ -38,6 +38,7 @@ export class ProjectBot {
   chainId: number
   projectNumber: number
   coreContract: string
+  slug: string
   editionSize: number
   maxEditionSize: number
   projectName: string
@@ -54,6 +55,7 @@ export class ProjectBot {
     chainId,
     projectNumber,
     coreContract,
+    slug,
     editionSize,
     maxEditionSize,
     projectName,
@@ -68,6 +70,7 @@ export class ProjectBot {
     chainId: number
     projectNumber: number
     coreContract: string
+    slug: string
     editionSize: number
     maxEditionSize: number
     projectName: string
@@ -82,6 +85,7 @@ export class ProjectBot {
     this.chainId = chainId
     this.projectNumber = projectNumber
     this.coreContract = coreContract
+    this.slug = slug
     this.editionSize = editionSize
     this.maxEditionSize = maxEditionSize
     this.projectName = projectName
@@ -390,8 +394,7 @@ export class ProjectBot {
         What are your favorite outputs from ${this.projectName}?
 
         [Explore the full project here](${
-          getProjectUrl(this.coreContract, this.projectNumber.toString()) +
-          PROJECTBOT_UTM
+          getProjectSlugUrl(this.slug) + PROJECTBOT_UTM
         })
         `
         )
@@ -430,8 +433,7 @@ export class ProjectBot {
     // Send congratulations message
     const title = `:tada: ${this.projectName} has minted out! Congratulations ${this.artistName}!  :tada:`
     const description = `Check out the whole collection [here](${
-      getProjectUrl(this.coreContract, this.projectNumber.toString()) +
-      PROJECTBOT_UTM
+      getProjectSlugUrl(this.slug) + PROJECTBOT_UTM
     })`
     const embedContent = new EmbedBuilder()
       .setColor('#9370DB')
@@ -454,10 +456,7 @@ export class ProjectBot {
       upcomingDetails.auction_start_time || upcomingDetails.start_datetime
     )
 
-    const projectUrl = getProjectUrl(
-      this.coreContract,
-      this.projectNumber.toString()
-    )
+    const projectUrl = getProjectSlugUrl(this.slug)
     const title = `${upcomingDetails.name} by ${upcomingDetails.artist_name}`
 
     const assetUrl = await replaceVideoWithGIF(
@@ -540,10 +539,7 @@ export class ProjectBot {
     if (!msg.channel.isSendable()) {
       return
     }
-    const projectUrl = getProjectUrl(
-      this.coreContract,
-      this.projectNumber.toString()
-    )
+    const projectUrl = getProjectSlugUrl(this.slug)
     const titleLink = projectUrl + PROJECTBOT_EXPLORE_UTM
     const title = `${this.projectName} by ${this.artistName}`
 
