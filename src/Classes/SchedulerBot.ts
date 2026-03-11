@@ -4,6 +4,7 @@ import { Channel, Collection } from 'discord.js'
 import { ProjectConfig } from '../ProjectConfig/projectConfig'
 import { artIndexerBot } from '..'
 import { delay } from './APIBots/utils'
+import { logger } from '../logger'
 
 import { Cron } from 'croner'
 
@@ -26,12 +27,12 @@ export class ScheduleBot {
   async initialize() {
     try {
       await delay(INIT_DELAY)
-      console.log('Starting Scheduler...')
+      logger.info('Starting Scheduler')
       const bdayCron = Cron(
         '00 1,9,17 * * *',
         { timezone: 'America/Chicago', name: 'Bday' },
         () => {
-          console.log('Birthday Time!')
+          logger.info('Birthday Time')
           artIndexerBot.checkBirthdays(this.channels)
         }
       )
@@ -45,22 +46,22 @@ export class ScheduleBot {
           { timezone: 'America/Chicago', name: 'Trivia' },
           async () => {
             const wait = Math.random() * 1000 * 60 * 60 * triviaCadence
-            console.log(`Waiting ${wait / 60000} mins for trivia`)
+            logger.info({ waitMins: wait / 60000 }, 'Waiting for trivia')
             await delay(wait)
 
             if (isTriviaBlackoutTime()) {
-              console.log('Skipping Trivia during blackout times :(')
+              logger.info('Skipping Trivia during blackout times')
               return
             }
 
-            console.log('Trivia Time!')
+            logger.info('Trivia Time')
             artIndexerBot.askRandomTriviaQuestion()
           }
         )
         this.cronJobs.push(triviaCron)
       }
     } catch (err) {
-      console.error('Error initializing ScheduleBot:', err)
+      logger.error({ err }, 'Error initializing ScheduleBot')
     }
   }
 

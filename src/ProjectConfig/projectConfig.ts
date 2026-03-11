@@ -1,11 +1,12 @@
 import { Message } from 'discord.js'
 import * as dotenv from 'dotenv'
 dotenv.config()
+import { logger } from '../logger'
 
 const ARTBOT_IS_PROD =
   process.env.ARTBOT_IS_PROD &&
   process.env.ARTBOT_IS_PROD.toLowerCase() == 'true'
-console.log('ARTBOT_IS_PROD: ', ARTBOT_IS_PROD)
+logger.info({ ARTBOT_IS_PROD }, 'ARTBOT_IS_PROD')
 const CHANNELS = ARTBOT_IS_PROD
   ? require('./channels.json')
   : require('./channels_dev.json')
@@ -137,7 +138,7 @@ export class ProjectConfig {
     try {
       this.projectBots = await this.buildProjectBots(CHANNELS, PROJECT_BOTS)
     } catch (err) {
-      console.error(`Error while initializing ProjectBots: ${err}`)
+      logger.error({ err }, 'Error while initializing ProjectBots')
     }
   }
 
@@ -181,8 +182,9 @@ export class ProjectConfig {
     // This loops through all bots that need to be instantiated asynchronously,
     // gets the relevant configuration from projectBotsJson, calls the subgraph
     // to get project information, and then initializes the project bot.
-    console.log(
-      `ProjectConfig: Initializing ${botsToInstatiate.size} project bots...`
+    logger.info(
+      { count: botsToInstatiate.size },
+      'ProjectConfig: Initializing project bots'
     )
     const promises = Array.from(botsToInstatiate).map(async (botId: string) => {
       const [projectId, contractName] = botId.split('-')
@@ -193,8 +195,9 @@ export class ProjectConfig {
         COLLAB_CONTRACTS[contractName]
 
       if (contractName && !configContract) {
-        console.warn(
-          `Bot ${botId} had a contractName, but there was no matching contract in partnerContracts.json. Has it been defined?`
+        logger.warn(
+          { botId },
+          'Bot had a contractName, but there was no matching contract in partnerContracts.json'
         )
         return
       }
@@ -265,7 +268,7 @@ export class ProjectConfig {
     )
     if (!botName) {
       // only occurs when # messages are sent in observed channels without project bots
-      console.error(`Channel ID: ${channelID} does not have a ProjectBot`)
+      logger.error({ channelID }, 'Channel does not have a ProjectBot')
       return
     }
     this.projectBots[botName].handleNumberMessage(msg)

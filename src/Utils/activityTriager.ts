@@ -2,6 +2,7 @@ import { Client, EmbedBuilder, TextChannel } from 'discord.js'
 import * as dotenv from 'dotenv'
 import { CollectionType } from '../Classes/MintBot'
 import { projectConfig } from '..'
+import { logger } from '../logger'
 dotenv.config()
 
 // Trade activity Discord channel IDs.
@@ -120,7 +121,7 @@ function sendEmbedToChannel(
 ) {
   const channel = bot.channels?.cache?.get(channelId) as TextChannel
   if (!channel) {
-    console.log('Channel not found', channelId)
+    logger.info({ channelId }, 'Channel not found')
     return
   }
   channel
@@ -128,9 +129,9 @@ function sendEmbedToChannel(
       embeds: [embed],
     })
     .catch((err) => {
-      console.log(
-        `Error posting message in channel ${projectConfig.channels[channelId].name} (id: ${channelId})`,
-        err.message
+      logger.info(
+        { channelName: projectConfig.channels[channelId].name, channelId, errMessage: err.message },
+        'Error posting message in channel'
       )
     })
 }
@@ -223,7 +224,7 @@ export function sendEmbedToSaleChannels(
       sendEmbedToChannel(bot, embed, PROOF)
     }
   } catch (e) {
-    console.warn(e)
+    logger.warn({ err: e }, 'Error sending embed to sale channels')
   }
 }
 
@@ -271,6 +272,6 @@ export function sendEmbedToListChannels(
       sendEmbedToChannel(bot, embed, HODLERS_LISTINGS)
     }
   } catch (e) {
-    console.warn(e)
+    logger.warn({ err: e }, 'Error sending embed to listing channels')
   }
 }

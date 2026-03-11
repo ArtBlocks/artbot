@@ -8,6 +8,7 @@ import { randomColor } from '../Utils/smartBotResponse'
 import axios from 'axios'
 import { getTokenApiUrl, replaceVideoWithGIF } from './APIBots/utils'
 import { getAllTriviaScores, updateTriviaScore } from '../Data/supabase'
+import { logger } from '../logger'
 
 export const CURRENT_SEASON = 'season_three'
 
@@ -86,7 +87,7 @@ Next question:`
         text: 'Answer by using the #? command',
       })
     const questionType = Math.floor(Math.random() * 3)
-    console.log(`Asking trivia question for ${project.projectName}`)
+    logger.info({ projectName: project.projectName }, 'Asking trivia question')
 
     try {
       switch (questionType) {
@@ -107,7 +108,7 @@ Next question:`
           break
       }
     } catch (err) {
-      console.log('ERROR asking trivia question', err)
+      logger.error({ err }, 'Error asking trivia question')
       return
     }
 
@@ -127,9 +128,9 @@ Next question:`
           embeds: [embed],
         })
         .catch((err) => {
-          console.log(
-            `Error posting message in channel ${projectConfig.channels[CHANNEL_BLOCK_TALK].name} (id: ${CHANNEL_BLOCK_TALK})`,
-            err.message
+          logger.info(
+            { channelName: projectConfig.channels[CHANNEL_BLOCK_TALK].name, channelId: CHANNEL_BLOCK_TALK, errMessage: err.message },
+            'Error posting message in channel'
           )
         })) ?? undefined
   }
@@ -139,7 +140,7 @@ Next question:`
     embed: EmbedBuilder
   ): Promise<EmbedBuilder> {
     if (!this.model) {
-      console.log("Can't ask trivia question - no OpenAI API key")
+      logger.warn("Can't ask trivia question - no OpenAI API key")
       throw new Error("Can't ask trivia question - no OpenAI API key")
     }
 
@@ -220,7 +221,7 @@ Next question:`
       try {
         score = await updateTriviaScore(msg.author.username)
       } catch (err) {
-        console.log('ERROR updating score', err)
+        logger.error({ err }, 'Error updating score')
         msg.reply(
           `Hmmm, you got it right but it seems there was an error updating your score. Pester Grant until he fixes it`
         )
@@ -255,7 +256,7 @@ Next question:`
       this.previousQuestionEmbed = undefined
       this.previousQuestion = undefined
     } catch (err) {
-      console.log('ERROR tallying', err)
+      logger.error({ err }, 'Error tallying')
       msg.reply('Oh no, looks like there was an unexpected error!')
     }
   }
@@ -265,7 +266,7 @@ Next question:`
     try {
       scoreData = await getAllTriviaScores()
     } catch (err) {
-      console.log('ERROR getting leaderboard', err)
+      logger.error({ err }, 'Error getting leaderboard')
       msg.reply(
         'Alas, looks like there was an unexpected error fetching the leaderboard!'
       )

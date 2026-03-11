@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { CURRENT_SEASON } from '../Classes/TriviaBot'
+import { logger } from '../logger'
 
 const supabaseClient =
   process.env.SUPABASE_URL && process.env.SUPABASE_API_KEY
@@ -32,7 +33,7 @@ export const updateTriviaScore = async (username: string): Promise<number> => {
     })
 
   if (error) {
-    console.error('Error updating trivia score', error)
+    logger.error({ err: error }, 'Error updating trivia score')
     throw new Error(error.message)
   }
 

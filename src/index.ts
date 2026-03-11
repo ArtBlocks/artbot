@@ -37,6 +37,9 @@ import {
 } from './Classes/APIBots/utils'
 
 import { smartBotResponse } from './Utils/smartBotResponse'
+import { logContext } from './Utils/logger'
+import { randomUUID } from 'crypto'
+import { logger } from './logger'
 
 // Misc. server configuration info.
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN
@@ -89,7 +92,7 @@ const PRODUCTION_MODE =
   process.env.PRODUCTION_MODE &&
   process.env.PRODUCTION_MODE.toLowerCase() === 'true'
 
-console.log('PRODUCTION_MODE: ', PRODUCTION_MODE)
+logger.info({ PRODUCTION_MODE }, 'PRODUCTION_MODE')
 
 // App setup.
 const app = express()
@@ -105,11 +108,7 @@ app.post(
       json: (data: unknown) => void
     }
   ) {
-    console.log(
-      'received update with body:\n',
-      JSON.stringify(req.body, null, 2),
-      '\n'
-    )
+    logger.info({ body: req.body }, 'received update with body')
 
     res.setHeader('Content-Type', 'application/json')
     res.json({
@@ -127,7 +126,7 @@ app.get(
       json: (data: unknown) => void
     }
   ) {
-    console.log('received get with body:\n', req.body, '\n')
+    logger.info({ body: req.body }, 'received get with body')
 
     res.setHeader('Content-Type', 'application/json')
     res.json({
@@ -167,20 +166,22 @@ app.post(
     const mintData = req.body.event.data.new
 
     if (req.headers.webhook_secret !== process.env.MINT_WEBHOOK_SECRET) {
-      console.log('Invalid mint webhook secret')
+      logger.warn('Invalid mint webhook secret')
       res.status(401).json({ status: 'unauthorized' })
       return
     }
 
-    mintBot.addMint(
-      mintData.contract_address,
-      String(mintData.token_id),
-      mintData.owner_address,
-      String(mintData.invocation),
-      mintData.project_id,
-      mintData.project_name,
-      mintData.chain_id
-    )
+    logContext({ requestId: randomUUID() }, () => {
+      mintBot.addMint(
+        mintData.contract_address,
+        String(mintData.token_id),
+        mintData.owner_address,
+        String(mintData.invocation),
+        mintData.project_id,
+        mintData.project_name,
+        mintData.chain_id
+      )
+    })
     res.setHeader('Content-Type', 'application/json')
     res.json({
       success: true,
@@ -189,7 +190,7 @@ app.post(
 )
 
 app.listen(PORT, '0.0.0.0', function () {
-  console.log('Server is listening on port', PORT)
+  logger.info({ PORT }, 'Server is listening on port')
 })
 
 app.get('/callback', (req: unknown, res: unknown) => {
@@ -217,16 +218,16 @@ export const discordClient = new Client({
   ],
 })
 
-console.log('Discord client created')
-console.log('PRODUCTION_MODE:', PRODUCTION_MODE)
-console.log('DISCORD_TOKEN exists:', !!DISCORD_TOKEN)
+logger.info('Discord client created')
+logger.info({ PRODUCTION_MODE }, 'PRODUCTION_MODE')
+logger.info({ discordTokenExists: !!DISCORD_TOKEN }, 'DISCORD_TOKEN exists')
 
 const DISCORD_LOGIN_TIMEOUT = 30000 // 30 seconds
 const MAX_LOGIN_RETRIES = 5
 let loginRetryCount = 0
 
 async function attemptDiscordLogin() {
-  console.log('Attempting Discord login...')
+  logger.info('Attempting Discord login')
 
   try {
     const loginPromise = discordClient.login(DISCORD_TOKEN)
@@ -238,10 +239,10 @@ async function attemptDiscordLogin() {
     })
 
     await Promise.race([loginPromise, timeoutPromise])
-    console.log('Discord login attempt successful')
+    logger.info('Discord login attempt successful')
     loginRetryCount = 0
   } catch (error) {
-    console.error('Discord login failed:', error)
+    logger.error({ err: error }, 'Discord login failed')
 
     if (loginRetryCount < MAX_LOGIN_RETRIES) {
       loginRetryCount++
@@ -250,29 +251,28 @@ async function attemptDiscordLogin() {
         5000 * Math.pow(2, loginRetryCount - 1),
         80000
       )
-      console.log(
-        `Retrying login attempt ${loginRetryCount}/${MAX_LOGIN_RETRIES} in ${
-          backoffTime / 1000
-        }s...`
+      logger.info(
+        { loginRetryCount, MAX_LOGIN_RETRIES, backoffSeconds: backoffTime / 1000 },
+        'Retrying Discord login attempt'
       )
       setTimeout(attemptDiscordLogin, backoffTime)
     } else {
-      console.error('Max login retries reached. Giving up.')
+      logger.error('Max login retries reached. Giving up.')
       process.exit(1)
     }
   }
 }
 
 discordClient.on('ready', () => {
-  console.log(`Logged in as ${discordClient.user?.tag}!`)
+  logger.info({ tag: discordClient.user?.tag }, 'Logged in to Discord')
 })
 
 discordClient.on('error', (error) => {
-  console.error('Discord client error:', error)
+  logger.error({ err: error }, 'Discord client error')
 })
 
 discordClient.on('disconnect', () => {
-  console.log('Discord client disconnected')
+  logger.info('Discord client disconnected')
   // Cleanup all bots
   botsToCleanup.forEach((bot) => bot.cleanup())
 })
@@ -322,7 +322,7 @@ discordClient.on(Events.MessageCreate, async (msg) => {
       return
     }
   } catch (e) {
-    console.error('Error handling number message: ', e)
+    logger.error({ err: e }, 'Error handling number message')
   }
   // Handle special info questions that ArtBot knows how to answer.
   const artBotID = discordClient.user?.id ?? ''
@@ -346,7 +346,7 @@ discordClient.on(Events.MessageCreate, async (msg) => {
 
 // Only instantiate TwitterBot if TWITTER_ENABLED is true
 const isTwitterEnabled = process.env.TWITTER_ENABLED?.toLowerCase() === 'true'
-console.log('Twitter functionality enabled:', isTwitterEnabled)
+logger.info({ isTwitterEnabled }, 'Twitter functionality enabled')
 
 const abTwitterBot = isTwitterEnabled
   ? new TwitterBot({
@@ -358,7 +358,7 @@ const abTwitterBot = isTwitterEnabled
   : undefined
 
 if (!isTwitterEnabled) {
-  console.log('TwitterBot disabled via TWITTER_ENABLED environment variable')
+  logger.info('TwitterBot disabled via TWITTER_ENABLED environment variable')
 }
 
 export const mintBot = new MintBot(discordClient, abTwitterBot)
@@ -423,7 +423,7 @@ function getReconnectDelay(attemptNumber: number): number {
 
 // Initialize OpenSea Stream Client with error handling
 function initializeOpenSeaStreamClient(): OpenSeaStreamClient {
-  console.log('Initializing OpenSea Stream Client...')
+  logger.info('Initializing OpenSea Stream Client')
 
   const client = new OpenSeaStreamClient({
     token: process.env.OPENSEA_API_KEY ?? '',
@@ -432,7 +432,7 @@ function initializeOpenSeaStreamClient(): OpenSeaStreamClient {
       sessionStorage: LocalStorage,
     },
     onError: (error: unknown) => {
-      console.error('❌ OpenSea Stream Client error:', error)
+      logger.error({ err: error }, 'OpenSea Stream Client error')
       connectionState.lastError = error as Error
       connectionState.isConnected = false
 
@@ -443,16 +443,7 @@ function initializeOpenSeaStreamClient(): OpenSeaStreamClient {
         errorMessage.includes('502') ||
         errorMessage.includes('Bad Gateway')
       ) {
-        console.log('🚨 Detected 502 Bad Gateway error - OpenSea server issue')
-        console.log('   This is typically caused by:')
-        console.log(
-          "   • OpenSea's WebSocket gateway unable to reach backend services"
-        )
-        console.log('   • Temporary server overload or maintenance')
-        console.log('   • Network issues between gateway and backend')
-        console.log(
-          '   ✅ Automatic reconnection will be attempted with exponential backoff'
-        )
+        logger.warn('Detected 502 Bad Gateway error - OpenSea server issue. Automatic reconnection will be attempted with exponential backoff.')
       }
 
       // Schedule reconnection for connection errors
@@ -468,7 +459,7 @@ function initializeOpenSeaStreamClient(): OpenSeaStreamClient {
 
   // The OpenSeaStreamClient handles connection internally using Phoenix channels
   // We'll rely on the onError callback and add additional monitoring
-  console.log('✅ OpenSea Stream Client initialized with error handling')
+  logger.info('OpenSea Stream Client initialized with error handling')
   connectionState.isConnected = true
   connectionState.reconnectAttempts = 0
   connectionState.lastConnectTime = Date.now()
@@ -488,32 +479,29 @@ function scheduleReconnection() {
   }
 
   if (connectionState.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-    console.error(
-      `❌ Max reconnection attempts (${MAX_RECONNECT_ATTEMPTS}) reached. Stopping reconnection attempts.`
-    )
-    console.log('📊 Falling back to API polling only for OpenSea events')
+    logger.error({ MAX_RECONNECT_ATTEMPTS }, 'Max reconnection attempts reached. Stopping reconnection attempts. Falling back to API polling only for OpenSea events.')
     return
   }
 
   const delay = getReconnectDelay(connectionState.reconnectAttempts)
   connectionState.reconnectAttempts++
 
-  console.log(
-    `🔄 Scheduling OpenSea WebSocket reconnection attempt ${
-      connectionState.reconnectAttempts
-    }/${MAX_RECONNECT_ATTEMPTS} in ${delay / 1000}s...`
+  logger.info(
+    { attempt: connectionState.reconnectAttempts, maxAttempts: MAX_RECONNECT_ATTEMPTS, delaySeconds: delay / 1000 },
+    'Scheduling OpenSea WebSocket reconnection attempt'
   )
 
   reconnectTimeout = setTimeout(() => {
-    console.log(
-      `🔄 Attempting OpenSea WebSocket reconnection (attempt ${connectionState.reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`
+    logger.info(
+      { attempt: connectionState.reconnectAttempts, maxAttempts: MAX_RECONNECT_ATTEMPTS },
+      'Attempting OpenSea WebSocket reconnection'
     )
     try {
       // Reinitialize the stream client
       openseaStreamClient = initializeOpenSeaStreamClient()
       setupStreamEventHandlers()
     } catch (error) {
-      console.error('❌ Failed to reinitialize OpenSea Stream Client:', error)
+      logger.error({ err: error }, 'Failed to reinitialize OpenSea Stream Client')
       scheduleReconnection()
     }
   }, delay)
@@ -528,26 +516,20 @@ function startHealthCheckMonitoring() {
       : Infinity
 
     if (!connectionState.isConnected) {
-      console.log(
-        '⚠️  OpenSea WebSocket health check: Connection lost, reconnection should be in progress'
-      )
+      logger.warn('OpenSea WebSocket health check: Connection lost, reconnection should be in progress')
     } else if (timeSinceLastConnect > 600000) {
       // 10 minutes
-      console.log(
-        '✅ OpenSea WebSocket health check: Connection stable for',
-        Math.round(timeSinceLastConnect / 60000),
-        'minutes'
+      logger.info(
+        { stableMinutes: Math.round(timeSinceLastConnect / 60000) },
+        'OpenSea WebSocket health check: Connection stable'
       )
     }
 
     // Log connection stats
     if (connectionState.reconnectAttempts > 0) {
-      console.log(
-        `📊 OpenSea WebSocket stats: ${
-          connectionState.reconnectAttempts
-        } reconnection attempts, currently ${
-          connectionState.isConnected ? 'connected' : 'disconnected'
-        }`
+      logger.info(
+        { reconnectAttempts: connectionState.reconnectAttempts, isConnected: connectionState.isConnected },
+        'OpenSea WebSocket stats'
       )
     }
   }, CONNECTION_HEALTH_CHECK_INTERVAL)
@@ -578,12 +560,12 @@ function setupStreamEventHandlers() {
           // Process the listing with the old OpenSeaListBot for now
           // This is the primary source for listings
           openSeaListBot.handleListingEvent(event).catch((err) => {
-            console.error('Error processing OpenSea listing event:', err)
+            logger.error({ err }, 'Error processing OpenSea listing event')
           })
         }
       }
     } catch (error) {
-      console.error('Error handling OpenSea listing event:', error)
+      logger.error({ err: error }, 'Error handling OpenSea listing event')
     }
   })
 
@@ -624,12 +606,12 @@ function setupStreamEventHandlers() {
           // Process the sale with the old OpenSeaSaleBot for now
           // This is the primary source for sales
           openSeaSaleBot.handleSaleEvent(event).catch((err: unknown) => {
-            console.error('Error processing OpenSea sale event:', err)
+            logger.error({ err }, 'Error processing OpenSea sale event')
           })
         }
       }
     } catch (error) {
-      console.error('Error handling OpenSea sale event:', error)
+      logger.error({ err: error }, 'Error handling OpenSea sale event')
     }
   })
 }
@@ -661,13 +643,13 @@ if (typeof global !== 'undefined') {
 }
 
 // Initialize the stream client
-console.log('Starting OpenSea WebSocket Stream integration...')
+logger.info('Starting OpenSea WebSocket Stream integration')
 openseaStreamClient = initializeOpenSeaStreamClient()
 setupStreamEventHandlers()
 
-// Log configuration
-console.log(
-  `OpenSea Stream Config: Max reconnects=${MAX_RECONNECT_ATTEMPTS}, Initial delay=${INITIAL_RECONNECT_DELAY}ms, Max delay=${MAX_RECONNECT_DELAY}ms`
+logger.info(
+  { MAX_RECONNECT_ATTEMPTS, INITIAL_RECONNECT_DELAY, MAX_RECONNECT_DELAY },
+  'OpenSea Stream Config'
 )
 
 // OpenSea Stream Bots - Primary handlers, API polling for sales backfill
@@ -681,7 +663,7 @@ let openSeaEventsBot: OpenSeaEventsPollBot | null = null
 
 // Initialize new OpenSea API polling bots
 const initOpenSeaApiPollingBots = async () => {
-  console.log('Initializing OpenSea API polling bots...')
+  logger.info('Initializing OpenSea API polling bots')
 
   // Wait for contracts to be loaded
   const studioContracts = await waitForStudioContracts()
@@ -694,9 +676,7 @@ const initOpenSeaApiPollingBots = async () => {
     .concat(studioContracts)
     .concat(engineContracts)
 
-  console.log(
-    `Tracking ${allContracts.length} contracts for OpenSea API polling`
-  )
+  logger.info({ count: allContracts.length }, 'Tracking contracts for OpenSea API polling')
 
   // OpenSea API configuration
   const OPENSEA_API_BASE = 'https://api.opensea.io/api/v2/events'
@@ -718,9 +698,7 @@ const initOpenSeaApiPollingBots = async () => {
   )
   botsToCleanup.push(openSeaEventsBot)
 
-  console.log(
-    'OpenSea API polling bot initialized successfully (sales backfill only)'
-  )
+  logger.info('OpenSea API polling bot initialized successfully (sales backfill only)')
 }
 
 // Helper function to check if an OpenSea NFT ID contains any of our tracked contracts
@@ -747,13 +725,13 @@ if (PRODUCTION_MODE) {
   attemptDiscordLogin()
   // Initialize OpenSea API polling bots after Discord login
   initOpenSeaApiPollingBots().catch((err) => {
-    console.error('Error initializing OpenSea API polling bots:', err)
+    logger.error({ err }, 'Error initializing OpenSea API polling bots')
   })
 }
 
 // Cleanup function for OpenSea WebSocket connections
 function cleanupOpenSeaConnections() {
-  console.log('Cleaning up OpenSea WebSocket connections...')
+  logger.info('Cleaning up OpenSea WebSocket connections')
 
   // Clear reconnection timeout
   if (reconnectTimeout) {
@@ -771,10 +749,10 @@ function cleanupOpenSeaConnections() {
   if (openseaStreamClient) {
     try {
       openseaStreamClient.disconnect(() => {
-        console.log('OpenSea WebSocket disconnected successfully')
+        logger.info('OpenSea WebSocket disconnected successfully')
       })
     } catch (error) {
-      console.error('Error disconnecting OpenSea WebSocket:', error)
+      logger.error({ err: error }, 'Error disconnecting OpenSea WebSocket')
     }
   }
 
@@ -785,7 +763,7 @@ function cleanupOpenSeaConnections() {
 
 // Handle application shutdown
 process.on('SIGINT', () => {
-  console.log('Received SIGINT. Cleaning up...')
+  logger.info('Received SIGINT. Cleaning up.')
   // Cleanup OpenSea connections first
   cleanupOpenSeaConnections()
   // Cleanup all bots
@@ -796,7 +774,7 @@ process.on('SIGINT', () => {
 })
 
 process.on('SIGTERM', () => {
-  console.log('Received SIGTERM. Cleaning up...')
+  logger.info('Received SIGTERM. Cleaning up.')
   // Cleanup OpenSea connections first
   cleanupOpenSeaConnections()
   // Cleanup all bots

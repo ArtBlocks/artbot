@@ -18,5 +18,8 @@
     "useUnknownInCatchVariables": false
   },
   "include": ["src/**/*.ts", "src/**/*.js"],
-  "exclude": ["generated", "node_modules"]
+  "exclude": ["generated", "node_modules"],
+  "ts-node": {
+    "transpileOnly": true
+  }
 }
