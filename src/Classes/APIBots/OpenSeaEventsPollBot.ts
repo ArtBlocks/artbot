@@ -7,6 +7,7 @@ import {
   NormalizedOpenSeaSale,
 } from './OpenSeaSaleBot'
 // No utils needed here; SaleBot handles embed/tweet logic
+import { logger } from '../../logger'
 
 // OpenSea Events API Types based on the provided payload examples
 export interface OpenSeaEventResponse {
@@ -148,7 +149,7 @@ export class OpenSeaEventsPollBot extends APIPollBot {
     let eventsNewerThanTimestamp = 0
 
     if (!responseData.asset_events || responseData.asset_events.length === 0) {
-      console.log(`OpenSea API: No events in ${pageInfo} page`)
+      logger.info({ pageInfo }, 'OpenSea API: No events in page')
       return
     }
 
@@ -184,7 +185,7 @@ export class OpenSeaEventsPollBot extends APIPollBot {
       // Filter by tracked contracts first
       const asset = event.event_type === 'sale' ? event.nft : event.asset
       if (!asset) {
-        console.warn(`${event.event_type} event missing asset data:`, event)
+        logger.warn({ eventType: event.event_type }, 'Event missing asset data')
         continue
       }
 
@@ -203,34 +204,36 @@ export class OpenSeaEventsPollBot extends APIPollBot {
       const saleId = event.transaction || compositeId
       if (this.streamSaleIds.has(saleId)) {
         // Sale already processed by stream - skip
-        console.log(`Skipping ${saleId} event`)
+        logger.info({ saleId }, 'Skipping event already processed by stream')
         continue
       }
 
       // This is a missed sale! Log it and process
-      console.log(
-        `🚨 OpenSea API: Found MISSED SALE - ${asset.name} (#${asset.identifier}) from contract ${contractAddress}`
+      logger.info(
+        { name: asset.name, identifier: asset.identifier, contractAddress },
+        'OpenSea API: Found MISSED SALE'
       )
 
       try {
         await this.handleSaleEvent(event)
         processedEventsCount++
       } catch (err) {
-        console.error(`Error sending OpenSea API sale message`, err)
+        logger.error({ err }, 'Error sending OpenSea API sale message')
       }
     }
 
     // Log summary for important events or debugging
-
-    console.log(
-      `OpenSea API: Page ${pageNumber} - Processed: ${processedEventsCount} events, Total: ${totalEventsInPage}`
+    logger.info(
+      { pageNumber, processedEventsCount, totalEventsInPage },
+      'OpenSea API page summary'
     )
 
     // Handle pagination - continue until we've processed all available sales
     if (responseData.next) {
       if (pageNumber >= MAX_PAGINATION_PAGES) {
-        console.warn(
-          `OpenSea API: Reached maximum pagination limit (${MAX_PAGINATION_PAGES} pages), stopping pagination`
+        logger.warn(
+          { maxPages: MAX_PAGINATION_PAGES },
+          'OpenSea API: Reached maximum pagination limit, stopping pagination'
         )
       } else if (eventsNewerThanTimestamp === 0 && pageNumber > 1) {
         // Stop pagination when we reach events older than our timestamp
@@ -246,7 +249,7 @@ export class OpenSeaEventsPollBot extends APIPollBot {
             pageNumber + 1
           )
         } catch (err) {
-          console.error('Error fetching paginated events:', err)
+          logger.error({ err }, 'Error fetching paginated events')
         }
       }
     }
@@ -289,7 +292,7 @@ export class OpenSeaEventsPollBot extends APIPollBot {
 
       return response.data
     } catch (error) {
-      console.error('Error fetching next page of OpenSea events:', error)
+      logger.error({ err: error }, 'Error fetching next page of OpenSea events')
       throw error
     }
   }
@@ -334,7 +337,7 @@ export class OpenSeaEventsPollBot extends APIPollBot {
    */
   async handleSaleEvent(saleEvent: OpenSeaEvent) {
     if (!saleEvent.nft) {
-      console.warn('Sale event missing nft data')
+      logger.warn('Sale event missing nft data')
       return
     }
 

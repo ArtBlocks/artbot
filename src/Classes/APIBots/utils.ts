@@ -12,6 +12,7 @@ import { mainnet } from 'viem/chains'
 dotenv.config()
 
 import axios from 'axios'
+import { logger } from '../../logger'
 
 // Configure viem with multiple RPC providers for reliability
 const publicClient = createPublicClient({
@@ -89,9 +90,9 @@ async function getENSName(address: string): Promise<string> {
       return name
     } catch (err) {
       retries++
-      console.warn(
-        `ENS lookup error on ${address} (attempt ${retries}/${MAX_ENS_RETRIES})`,
-        err
+      logger.warn(
+        { err, address, attempt: retries, maxRetries: MAX_ENS_RETRIES },
+        'ENS lookup error'
       )
       if (retries < MAX_ENS_RETRIES) {
         // Exponential backoff: 1s, 2s, 4s
@@ -134,9 +135,9 @@ export async function resolveEnsName(ensName: string): Promise<string> {
       return wallet
     } catch (err) {
       retries++
-      console.warn(
-        `ENS resolve error on ${ensName} (attempt ${retries}/${MAX_ENS_RETRIES})`,
-        err
+      logger.warn(
+        { err, ensName, attempt: retries, maxRetries: MAX_ENS_RETRIES },
+        'ENS resolve error'
       )
       if (retries < MAX_ENS_RETRIES) {
         await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, retries - 1)))
@@ -181,7 +182,7 @@ export async function getOSName(address: string): Promise<string> {
     } catch (err) {
       // Probably rate limited - return empty string but don't cache
       name = ''
-      console.warn("Error getting user's OpenSea name:", (err as Error).message)
+      logger.warn({ err }, "Error getting user's OpenSea name")
     }
   }
 
@@ -394,9 +395,9 @@ export async function replaceVideoWithGIF(url: string) {
       }
     } catch (e: unknown) {
       if (e instanceof AxiosError && e.response?.status === 404) {
-        console.log('GIF not found, returning PNG')
+        logger.info('GIF not found, returning PNG')
       } else {
-        console.log(`Error on fetching token API for ${gifURL}`, e)
+        logger.info({ err: e, gifURL }, 'Error on fetching token API for GIF')
       }
       return url.replace('mp4', 'png')
     }
@@ -410,14 +411,14 @@ export async function replaceVideoWithGIF(url: string) {
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
 export const waitForStudioContracts = async (): Promise<string[]> => {
   while (STUDIO_CONTRACTS.length === 0) {
-    console.log('Waiting for studio contracts to load...')
+    logger.info('Waiting for studio contracts to load')
     await delay(4000)
   }
   return STUDIO_CONTRACTS
 }
 export const waitForEngineContracts = async (): Promise<string[]> => {
   while (ENGINE_CONTRACTS.length === 0) {
-    console.log('Waiting for engine contracts to load...')
+    logger.info('Waiting for engine contracts to load')
     await delay(5000)
   }
   return ENGINE_CONTRACTS
@@ -456,13 +457,13 @@ export function parseNftId(
 ): { chainId: number; contractAddress: string; tokenId: string } | null {
   const parts = nftId.split('/')
   if (parts.length !== 3) {
-    console.warn('Invalid NFT ID format:', nftId)
+    logger.warn({ nftId }, 'Invalid NFT ID format')
     return null
   }
 
   const chainId = CHAIN_NAME_TO_ID[parts[0]]
   if (chainId === undefined) {
-    console.warn('Unknown chain in NFT ID:', parts[0], nftId)
+    logger.warn({ chain: parts[0], nftId }, 'Unknown chain in NFT ID')
     return null
   }
 

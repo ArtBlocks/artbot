@@ -1,6 +1,7 @@
 import { EmbedBuilder, ColorResolvable, Message } from 'discord.js'
 import * as dotenv from 'dotenv'
 import { artIndexerBot, projectConfig, triviaBot } from '..'
+import { logger } from '../logger'
 dotenv.config()
 const fetch = require('node-fetch')
 
@@ -270,7 +271,7 @@ async function generateGasPriceMessage(): Promise<EmbedBuilder> {
          :turtle: Slow: ${gasData.result.SafeGasPrice}`
       )
   } catch (err) {
-    console.error('Error fetching gas prices:', err)
+    logger.error({ err }, 'Error fetching gas prices')
     return new EmbedBuilder()
       .setTitle(`:fuelpump: Gas Prices :fuelpump:`)
       .setColor(ARTBOT_WARNING)

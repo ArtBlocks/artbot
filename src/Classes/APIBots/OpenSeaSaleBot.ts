@@ -26,6 +26,7 @@ import {
 import { ItemSoldEvent } from '@opensea/stream-js'
 import { TwitterBot } from '../TwitterBot'
 import { artIndexerBot } from '../..'
+import { logger } from '../../logger'
 
 export interface NormalizedOpenSeaSale {
   source: 'stream' | 'api'
@@ -78,17 +79,17 @@ export class OpenSeaSaleBot {
     try {
       const nftInfo = parseNftId(event.payload.item.nft_id)
       if (!nftInfo) {
-        console.warn('Could not parse NFT ID:', event.payload.item.nft_id)
+        logger.warn({ nftId: event.payload.item.nft_id }, 'Could not parse NFT ID')
         return
       }
 
-      console.log(
-        'New stream sale event:',
-        event.payload.item.metadata.name,
-        'timestamp:',
-        new Date(event.payload.event_timestamp).toISOString(),
-        'sent at:',
-        event.sent_at
+      logger.info(
+        {
+          name: event.payload.item.metadata.name,
+          timestamp: new Date(event.payload.event_timestamp).toISOString(),
+          sentAt: event.sent_at,
+        },
+        'New stream sale event'
       )
 
       const ethPrice = parseFloat(
@@ -115,7 +116,7 @@ export class OpenSeaSaleBot {
 
       await this.handleNormalizedSale(normalizedSale)
     } catch (err) {
-      console.error('Error processing OpenSea sale event:', err)
+      logger.error({ err }, 'Error processing OpenSea sale event')
     }
   }
 
@@ -151,9 +152,7 @@ export class OpenSeaSaleBot {
     const now = Date.now()
     const timeDiff = now - timestamp
     if (timeDiff > 1000 * 60 * 60 * 4) {
-      console.log(
-        `Skipping OpenSea sale from more than 4 hours ago: ${timestamp}`
-      )
+      logger.info({ timestamp }, 'Skipping OpenSea sale from more than 4 hours ago')
       return
     }
 
@@ -169,7 +168,7 @@ export class OpenSeaSaleBot {
       Math.abs(this.recentSales[compositeKey].price - price) <=
         IDENTICAL_TOLERANCE
     ) {
-      console.log(`Skipping identical OpenSea resale for ${compositeKey}`)
+      logger.info({ compositeKey }, 'Skipping identical OpenSea resale')
       return
     }
     this.recentSales[compositeKey] = { price, timestamp: Date.now() }
@@ -179,7 +178,7 @@ export class OpenSeaSaleBot {
 
     // Skip banned addresses
     if (BAN_ADDRESSES.has(seller)) {
-      console.log(`Skipping OpenSea sale from banned address: ${seller}`)
+      logger.info({ seller }, 'Skipping OpenSea sale from banned address')
       return
     }
 
@@ -263,7 +262,7 @@ export class OpenSeaSaleBot {
       }
 
       if (artBlocksData.collection_name) {
-        console.log(artBlocksData.name + ' OpenSea SALE')
+        logger.info({ name: artBlocksData.name }, 'OpenSea SALE')
         sendEmbedToSaleChannels(
           this.bot,
           embed,
@@ -292,11 +291,11 @@ export class OpenSeaSaleBot {
             platform: platform,
           })
         } catch (error) {
-          console.error('Error posting OpenSea sale to Twitter:', error)
+          logger.error({ err: error }, 'Error posting OpenSea sale to Twitter')
         }
       }
     } catch (error) {
-      console.error('Error building OpenSea sale message:', error)
+      logger.error({ err: error }, 'Error building OpenSea sale message')
     }
   }
 
@@ -314,16 +313,12 @@ export class OpenSeaSaleBot {
     const isAB500 = artIndexerBot.isAB500(projectId)
 
     if (!isAB500) {
-      console.log('Skipping twitter sale for non-AB500 project', projectId)
+      logger.info({ projectId }, 'Skipping twitter sale for non-AB500 project')
       return false
     }
 
     if (sale.price < 0.1 && sale.currency.includes('ETH')) {
-      console.log(
-        'Skipping twitter sale for low-value OpenSea sale',
-        sale.price,
-        sale.currency
-      )
+      logger.info({ price: sale.price, currency: sale.currency }, 'Skipping twitter sale for low-value OpenSea sale')
       return false
     }
 

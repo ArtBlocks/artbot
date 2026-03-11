@@ -13,6 +13,7 @@ import {
 } from './APIBots/utils'
 import { ensOrAddress } from './APIBots/utils'
 import { TwitterBot } from './TwitterBot'
+import { logger } from '../logger'
 
 // When true, only post mints from mainnet (chain ID 1). Non-mainnet mints are skipped.
 // Set to false in a couple weeks to enable L2/other chain mints.
@@ -121,7 +122,7 @@ export class MintBot {
             try {
               new URL(assetUrl)
             } catch (e) {
-              console.log(`Invalid asset URL for mint ${id}: ${assetUrl}`)
+              logger.info({ id, assetUrl }, 'Invalid asset URL for mint')
               return
             }
 
@@ -135,9 +136,7 @@ export class MintBot {
 
               const contentType = imageRes.headers['content-type']
               if (!contentType?.startsWith('image/')) {
-                console.log(
-                  `Invalid content type for mint ${id}: ${contentType}`
-                )
+                logger.info({ id, contentType }, 'Invalid content type for mint')
                 return
               }
 
@@ -159,18 +158,18 @@ export class MintBot {
               await mint.postToDiscord()
               await this.postToTwitter(mint)
             } catch (e) {
-              console.log(`Error fetching image for mint ${id}:`, e)
+              logger.info({ err: e, id }, 'Error fetching image for mint')
               // Keep in queue to retry later
               return
             }
           } catch (e) {
-            console.log(`Error processing mint ${id}:`, e)
+            logger.info({ err: e, id }, 'Error processing mint')
             return
           }
         })
       )
     } catch (e) {
-      console.error('Error in checkAndPostMints:', e)
+      logger.error({ err: e }, 'Error in checkAndPostMints')
     }
   }
 
@@ -184,25 +183,16 @@ export class MintBot {
     projectName: string,
     chainId: number
   ) {
-    console.log(
-      'NEW MINT',
-      contractAddress,
-      tokenID,
-      owner,
-      'chainId:',
-      chainId
-    )
+    logger.info({ contractAddress, tokenID, owner, chainId }, 'NEW MINT')
     const id = `${contractAddress}-${tokenID}`
 
     if (!this.contractToChannel[contractAddress]) {
-      console.log('Skipping mint for contract not in config')
+      logger.info('Skipping mint for contract not in config')
       return
     }
 
     if (HIDE_NON_MAINNET_MINTS && chainId !== MAINNET_CHAIN_ID) {
-      console.log(
-        `Skipping mint for non-mainnet chain ${chainId} (HIDE_NON_MAINNET_MINTS=true)`
-      )
+      logger.info({ chainId }, 'Skipping mint for non-mainnet chain (HIDE_NON_MAINNET_MINTS=true)')
       return
     }
 
@@ -224,7 +214,7 @@ export class MintBot {
   startRoutine() {
     this.intervalId = setInterval(async () => {
       if (Object.keys(this.mintsToPost).length > 0) {
-        console.log(`${Object.keys(this.mintsToPost).length} mints to post`)
+        logger.info({ count: Object.keys(this.mintsToPost).length }, 'mints to post')
       }
       await this.checkAndPostMints()
     }, parseInt(MINT_REFRESH_TIME_SECONDS) * 1000)

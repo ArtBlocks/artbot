@@ -7,6 +7,7 @@ import {
 } from './utils'
 
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import { logger } from '../../logger'
 /** Abstract parent class for all API Poll Bots */
 export class APIPollBot {
   apiEndpoint: string
@@ -85,7 +86,7 @@ export class APIPollBot {
    */
   async pollApi() {
     if (this.isPolling) {
-      console.log('Skipping poll — previous poll still in-flight')
+      logger.info('Skipping poll - previous poll still in-flight')
       return
     }
     this.isPolling = true
@@ -104,8 +105,9 @@ export class APIPollBot {
         return
       }
       if (response.status >= 400) {
-        console.warn(
-          `API poll non-2xx response (${response.status}) for ${this.apiEndpoint}`
+        logger.warn(
+          { status: response.status, endpoint: this.apiEndpoint },
+          'API poll non-2xx response'
         )
         return
       }
@@ -124,8 +126,9 @@ export class APIPollBot {
         this.handleRateLimit()
         return
       }
-      console.warn(
-        `Error polling ${this.apiEndpoint} - status: ${status} ${statusText} message: ${message}`
+      logger.warn(
+        { endpoint: this.apiEndpoint, status, statusText, message },
+        'Error polling endpoint'
       )
     } finally {
       this.isPolling = false
@@ -144,8 +147,9 @@ export class APIPollBot {
       5 * 60 * 1000
     )
     if (newRate !== this.refreshRateMs) {
-      console.warn(
-        `Rate limited (429) — slowing polling from ${this.refreshRateMs}ms to ${newRate}ms (${this.consecutiveRateLimits} consecutive 429s)`
+      logger.warn(
+        { fromMs: this.refreshRateMs, toMs: newRate, consecutiveRateLimits: this.consecutiveRateLimits },
+        'Rate limited (429) - slowing polling'
       )
       this.refreshRateMs = newRate
       this.restartPolling()
@@ -159,8 +163,9 @@ export class APIPollBot {
     if (this.consecutiveRateLimits > 0) {
       this.consecutiveRateLimits = 0
       if (this.refreshRateMs !== this.baseRefreshRateMs) {
-        console.log(
-          `Rate limit cleared — restoring polling rate to ${this.baseRefreshRateMs}ms`
+        logger.info(
+          { baseRefreshRateMs: this.baseRefreshRateMs },
+          'Rate limit cleared - restoring polling rate'
         )
         this.refreshRateMs = this.baseRefreshRateMs
         this.restartPolling()
@@ -198,10 +203,9 @@ export class APIPollBot {
           const retryAfter = this.parseRetryAfter(response.headers)
           const delay =
             retryAfter ?? Math.min(initialDelayMs * Math.pow(2, attempt), 30000)
-          console.warn(
-            `GET retry ${
-              attempt + 1
-            }/${retries} for ${url} - rate limited (429), waiting ${delay}ms`
+          logger.warn(
+            { attempt: attempt + 1, retries, url, delayMs: delay },
+            'GET retry - rate limited (429)'
           )
           await new Promise((res) => setTimeout(res, delay))
           attempt++
@@ -245,10 +249,9 @@ export class APIPollBot {
         }
         const jitter = Math.floor(delay * 0.25 * (Math.random() * 2 - 1))
         const sleepMs = Math.max(250, delay + jitter)
-        console.warn(
-          `GET retry ${attempt + 1}/${retries} for ${url} after error (${
-            code || status
-          }): ${axiosErr?.message || 'unknown'} - waiting ${sleepMs}ms`
+        logger.warn(
+          { attempt: attempt + 1, retries, url, code: code || status, errMessage: axiosErr?.message || 'unknown', sleepMs },
+          'GET retry after error'
         )
         await new Promise((res) => setTimeout(res, sleepMs))
         attempt++
@@ -285,7 +288,7 @@ export class APIPollBot {
    * @param {*} responseData - Dict parsed from API request json
    */
   async handleAPIResponse(responseData: unknown) {
-    console.warn('handleAPIResponse function not implemented!', responseData)
+    logger.warn({ responseData }, 'handleAPIResponse function not implemented')
   }
 
   /**
@@ -294,7 +297,7 @@ export class APIPollBot {
    * @param msg - Event info dict
    */
   async buildDiscordMessage(msg: unknown) {
-    console.warn('buildDiscordMessage function not implemented!', msg)
+    logger.warn({ msg }, 'buildDiscordMessage function not implemented')
   }
 
   async osName(address: string): Promise<string> {

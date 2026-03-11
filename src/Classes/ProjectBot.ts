@@ -27,6 +27,7 @@ import { CHANNEL_BLOCK_TALK, discordClient, triviaBot } from '..'
 import { ProjectHandlerHelper } from './ProjectHandlerHelper'
 import { UpcomingProjectDetailFragment } from '../../generated/graphql'
 import { getDayName, getMonthName, getDayOfMonth } from '../Utils/common'
+import { logger } from '../logger'
 
 const ONE_MILLION = 1e6
 
@@ -166,7 +167,7 @@ export class ProjectBot {
           return
         }
       } catch (e) {
-        console.error('Error getting entry token for:', this.projectName, e)
+        logger.error({ err: e, projectName: this.projectName }, 'Error getting entry token')
         msg.channel.send(
           `Sorry, looks like there was an error retrieving the entry token for ${this.projectName}. Try again in a bit!`
         )
@@ -183,7 +184,7 @@ export class ProjectBot {
         try {
           this.sendRandomOob(msg)
         } catch (e) {
-          console.error('Error sending random OOB:', e)
+          logger.error({ err: e }, 'Error sending random OOB')
           msg.channel.send(
             `Huh, looks like there was an error getting a random sample from ${this.projectName}. Try again in a bit!`
           )
@@ -273,9 +274,9 @@ export class ProjectBot {
     try {
       tokenMetadata = await getToken(`${this.coreContract}-${tokenID}`)
     } catch (e) {
-      console.log(
-        `Error getting token metadata for ${msg.content}: ${this.coreContract}-${tokenID}`,
-        e
+      logger.info(
+        { err: e, msgContent: msg.content, tokenId: `${this.coreContract}-${tokenID}` },
+        'Error getting token metadata'
       )
       return
     }
@@ -359,7 +360,7 @@ export class ProjectBot {
 
   async sendBirthdayMessage(channels: Collection<string, Channel>) {
     try {
-      console.log('sending birthday message(s) for:', this.projectName)
+      logger.info({ projectName: this.projectName }, 'sending birthday message')
 
       const artBlocksResponse = await axios.get(
         getTokenApiUrl(
@@ -406,10 +407,9 @@ export class ProjectBot {
       const channel = channels.get(CHANNEL_BLOCK_TALK) as TextChannel
       channel?.send({ embeds: [embedContent] })
     } catch (err) {
-      console.error(
-        'Error sending birthday message for:',
-        this.projectName,
-        err
+      logger.error(
+        { err, projectName: this.projectName },
+        'Error sending birthday message'
       )
     }
     return

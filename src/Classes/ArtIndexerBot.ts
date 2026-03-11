@@ -31,6 +31,7 @@ import {
   getProjectSlugUrl,
 } from './APIBots/utils'
 import { randomColor } from '../Utils/smartBotResponse'
+import { logger } from '../logger'
 dotenv.config()
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -121,18 +122,19 @@ export class ArtIndexerBot {
   }
 
   private logDictionarySizes() {
-    console.log('ArtIndexerBot Dictionary Sizes:')
-    console.log(`projects: ${Object.keys(this.projects).length}`)
-    console.log(`artists: ${Object.keys(this.artists).length}`)
-    console.log(`birthdays: ${Object.keys(this.birthdays).length}`)
-    console.log(`collections: ${Object.keys(this.collections).length}`)
-    console.log(`tags: ${Object.keys(this.tags).length}`)
-    console.log(`projectsById: ${Object.keys(this.projectsById).length}`)
-    console.log(`contracts: ${Object.keys(this.contracts).length}`)
-    console.log(`walletTokens: ${Object.keys(this.walletTokens).length}`)
-    console.log(`sets: ${Object.keys(this.sets).length}`)
-    console.log(`platforms: ${Object.keys(this.platforms).length}`)
-    console.log(`flagship: ${Object.keys(this.flagship).length}`)
+    logger.info({
+      projects: Object.keys(this.projects).length,
+      artists: Object.keys(this.artists).length,
+      birthdays: Object.keys(this.birthdays).length,
+      collections: Object.keys(this.collections).length,
+      tags: Object.keys(this.tags).length,
+      projectsById: Object.keys(this.projectsById).length,
+      contracts: Object.keys(this.contracts).length,
+      walletTokens: Object.keys(this.walletTokens).length,
+      sets: Object.keys(this.sets).length,
+      platforms: Object.keys(this.platforms).length,
+      flagship: Object.keys(this.flagship).length,
+    }, 'ArtIndexerBot Dictionary Sizes')
   }
 
   async buildContracts() {
@@ -145,7 +147,7 @@ export class ArtIndexerBot {
         }
       }
     } catch (e) {
-      console.error('Error in buildContracts', e)
+      logger.error({ err: e }, 'Error in buildContracts')
     }
   }
 
@@ -153,7 +155,7 @@ export class ArtIndexerBot {
     try {
       this.sets = {}
       const setsArr = await getAllSets()
-      console.log(`ArtIndexerBot: Building ${setsArr.length} sets`)
+      logger.info({ count: setsArr.length }, 'ArtIndexerBot: Building sets')
       for (let i = 0; i < setsArr.length; i++) {
         const setName = setsArr[i].name
         if (typeof setName === 'string') {
@@ -163,7 +165,7 @@ export class ArtIndexerBot {
       }
       this.sets['ab500'] = 'Art Blocks 500'
     } catch (e) {
-      console.error('Error in buildSets', e)
+      logger.error({ err: e }, 'Error in buildSets')
     }
   }
 
@@ -171,8 +173,9 @@ export class ArtIndexerBot {
     try {
       this.clearDictionaries()
       const projects = await this.projectFetch()
-      console.log(
-        `ArtIndexerBot: Building ${projects.length} ProjectBots using: ${this.projectFetch.name}`
+      logger.info(
+        { count: projects.length, fetchName: this.projectFetch.name },
+        'ArtIndexerBot: Building ProjectBots'
       )
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i]
@@ -277,7 +280,7 @@ export class ArtIndexerBot {
         })
       })
     } catch (err) {
-      console.error(`Error while initializing ArtIndexerBots\n${err}`)
+      logger.error({ err }, 'Error while initializing ArtIndexerBots')
     }
   }
 
@@ -418,7 +421,7 @@ export class ArtIndexerBot {
       return
     }
 
-    console.log('Handling message', content)
+    logger.info({ content }, 'Handling message')
 
     if (content.toLowerCase().startsWith('#floor')) {
       msg.channel.send(
@@ -433,7 +436,7 @@ export class ArtIndexerBot {
         await this.handleEntryMessage(msg)
       } catch (error) {
         msg.channel.send(`Sorry, I had trouble understanding that: ${content}`)
-        console.error('Error handling #entry message', error)
+        logger.error({ err: error }, 'Error handling #entry message')
         return
       }
       return
@@ -445,7 +448,7 @@ export class ArtIndexerBot {
         await this.handleSetMessage(msg)
       } catch (error) {
         msg.channel.send(`Sorry, I had trouble understanding that: ${content}`)
-        console.error('Error handling #set message', error)
+        logger.error({ err: error }, 'Error handling #set message')
         return
       }
       return
@@ -497,7 +500,7 @@ export class ArtIndexerBot {
         // use flagship contract
         token = await getMostRecentMintedFlagshipToken()
       } else if (!token) {
-        console.error('Bad value specified for recent', afterTheHash)
+        logger.error({ afterTheHash }, 'Bad value specified for recent')
         msg.channel.send('Sorry, I was not able to understand that.')
         return
       }
@@ -513,14 +516,14 @@ export class ArtIndexerBot {
         projectBot.handleUpcomingMessage(msg, upcomingProjectDetails)
         return
       } catch (error) {
-        console.warn(error)
+        logger.warn({ err: error }, 'Error getting upcoming project')
       }
     } else {
       projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
     }
 
     if (!projectBot) {
-      console.log("Wasn't able to parse message", content)
+      logger.info({ content }, "Wasn't able to parse message")
       return
     }
 
@@ -634,7 +637,7 @@ export class ArtIndexerBot {
       const token = await getMostRecentMintedTokenByContracts(contracts)
       return token
     } catch (e) {
-      console.error('Error in getContractTokenForKey', e)
+      logger.error({ err: e }, 'Error in getContractTokenForKey')
       return null
     }
   }
@@ -684,11 +687,7 @@ export class ArtIndexerBot {
     wallet: string,
     projectKey = ''
   ): Promise<TokenDetailFragment> {
-    console.log(
-      `Getting random token${
-        projectKey ? ` from ${projectKey}` : ''
-      } in wallet ${wallet}`
-    )
+    logger.info({ projectKey, wallet }, 'Getting random token from wallet')
     // Resolve ENS name if ends in .eth
     if (wallet.toLowerCase().endsWith('.eth')) {
       const ensName = wallet
@@ -775,7 +774,7 @@ export class ArtIndexerBot {
     const now = new Date()
     const [year, month, day] = now.toISOString().split('T')[0].split('-')
     const sentMessages: { [id: string]: boolean } = {}
-    console.log(`${this.birthdays[`${month}-${day}`]?.length} birthdays today!`)
+    logger.info({ count: this.birthdays[`${month}-${day}`]?.length }, 'birthdays today')
     if (this.birthdays[`${month}-${day}`]) {
       this.birthdays[`${month}-${day}`].forEach((projBot) => {
         if (
@@ -826,8 +825,9 @@ export class ArtIndexerBot {
     ) {
       return
     }
-    console.log(
-      `Sending minted out message for ${projectBot.projectName} with ${projectBot.maxEditionSize} tokens. Invocation: ${invocation}`
+    logger.info(
+      { projectName: projectBot.projectName, maxEditionSize: projectBot.maxEditionSize, invocation },
+      'Sending minted out message'
     )
 
     projectBot.sendMintedOutMessage()
@@ -1136,7 +1136,7 @@ export class ArtIndexerBot {
 
       msg.channel.send({ embeds: [embedContent] })
     } catch (error) {
-      console.error('Error in handleSetMessage:', error)
+      logger.error({ err: error }, 'Error in handleSetMessage')
       msg.channel.send(
         `Sorry, there was an error retrieving data for the set "${setName}". Please try again later.`
       )

@@ -21,6 +21,7 @@ import {
   ArtBlocksTokenData,
 } from './utils'
 import { ItemListedEvent } from '@opensea/stream-js'
+import { logger } from '../../logger'
 
 /**
  * Bot for handling OpenSea stream listing events
@@ -58,7 +59,7 @@ export class OpenSeaListBot {
     try {
       await this.buildDiscordMessage(event.payload)
     } catch (err) {
-      console.error('Error processing OpenSea listing event:', err)
+      logger.error({ err }, 'Error processing OpenSea listing event')
     }
   }
 
@@ -72,7 +73,7 @@ export class OpenSeaListBot {
     // Parse the NFT ID to get contract and token info
     const nftInfo = parseNftId(payload.item.nft_id)
     if (!nftInfo) {
-      console.warn('Could not parse NFT ID:', payload.item.nft_id)
+      logger.warn({ nftId: payload.item.nft_id }, 'Could not parse NFT ID')
       return
     }
 
@@ -91,7 +92,7 @@ export class OpenSeaListBot {
       Math.abs(this.recentListings[tokenId].price - price) <=
         IDENTICAL_TOLERANCE
     ) {
-      console.log(`Skipping identical OpenSea relisting for ${tokenId}`)
+      logger.info({ tokenId }, 'Skipping identical OpenSea relisting')
       return
     }
     this.recentListings[tokenId] = { price, timestamp: Date.now() }
@@ -101,7 +102,7 @@ export class OpenSeaListBot {
 
     // Skip banned addresses
     if (BAN_ADDRESSES.has(owner)) {
-      console.log(`Skipping OpenSea listing from banned address: ${owner}`)
+      logger.info({ owner }, 'Skipping OpenSea listing from banned address')
       return
     }
 
@@ -168,7 +169,7 @@ export class OpenSeaListBot {
         embed.setURL(platformUrl + LISTING_UTM)
       }
       if (artBlocksData.collection_name) {
-        console.log(artBlocksData.name + ' OpenSea LIST')
+        logger.info({ name: artBlocksData.name }, 'OpenSea LIST')
         sendEmbedToListChannels(
           this.bot,
           embed,
@@ -177,7 +178,7 @@ export class OpenSeaListBot {
         )
       }
     } catch (error) {
-      console.error('Error building OpenSea listing message:', error)
+      logger.error({ err: error }, 'Error building OpenSea listing message')
     }
   }
 
