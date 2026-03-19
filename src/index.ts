@@ -1,6 +1,8 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
-import { Client, Events, GatewayIntentBits } from 'discord.js'
+import { Client, Events, GatewayIntentBits, Status } from 'discord.js'
+import * as dns from 'dns'
+import * as https from 'https'
 const express = require('express')
 const bodyParser = require('body-parser')
 import { ProjectConfig } from './ProjectConfig/projectConfig'
@@ -226,22 +228,107 @@ const DISCORD_LOGIN_TIMEOUT = 30000 // 30 seconds
 const MAX_LOGIN_RETRIES = 5
 let loginRetryCount = 0
 
+/** Resolve a hostname via DNS and log the result for connectivity diagnostics. */
+async function checkDnsResolution(hostname: string): Promise<void> {
+  return new Promise((resolve) => {
+    dns.lookup(hostname, (err, address, family) => {
+      if (err) {
+        logger.warn({ hostname, err }, 'DNS lookup failed for Discord host')
+      } else {
+        logger.info({ hostname, address, family }, 'DNS lookup succeeded')
+      }
+      resolve()
+    })
+  })
+}
+
+/** Make a lightweight HTTPS HEAD request and log status/latency. */
+async function checkHttpsConnectivity(url: string): Promise<void> {
+  return new Promise((resolve) => {
+    const startMs = Date.now()
+    const req = https.request(url, { method: 'HEAD', timeout: 10000 }, (res) => {
+      logger.info(
+        { url, statusCode: res.statusCode, latencyMs: Date.now() - startMs },
+        'HTTPS connectivity check succeeded'
+      )
+      res.resume()
+      resolve()
+    })
+    req.on('error', (err) => {
+      logger.warn(
+        { url, latencyMs: Date.now() - startMs, err },
+        'HTTPS connectivity check failed'
+      )
+      resolve()
+    })
+    req.on('timeout', () => {
+      logger.warn({ url }, 'HTTPS connectivity check timed out')
+      req.destroy()
+      resolve()
+    })
+    req.end()
+  })
+}
+
+async function runPreLoginDiagnostics(): Promise<void> {
+  logger.info(
+    {
+      nodeVersion: process.version,
+      platform: process.platform,
+      arch: process.arch,
+      env: process.env.NODE_ENV,
+      httpProxy: process.env.HTTP_PROXY ?? process.env.http_proxy ?? 'none',
+      httpsProxy: process.env.HTTPS_PROXY ?? process.env.https_proxy ?? 'none',
+    },
+    'Pre-login environment info'
+  )
+  await checkDnsResolution('discord.com')
+  await checkDnsResolution('gateway.discord.gg')
+  await checkHttpsConnectivity('https://discord.com/api/v10/gateway')
+}
+
 async function attemptDiscordLogin() {
-  logger.info('Attempting Discord login')
+  logger.info({ attempt: loginRetryCount + 1, MAX_LOGIN_RETRIES }, 'Attempting Discord login')
+
+  await runPreLoginDiagnostics()
+
+  // Capture Discord.js internal debug output during the login window so we can
+  // see exactly where the handshake stalls if it times out.
+  const debugLogs: string[] = []
+  const debugListener = (msg: string) => {
+    debugLogs.push(msg)
+    logger.debug({ discordInternalDebug: msg }, 'Discord.js debug')
+  }
+  discordClient.on('debug', debugListener)
+
+  let timeoutHandle: NodeJS.Timeout | undefined
 
   try {
+    const loginStartMs = Date.now()
     const loginPromise = discordClient.login(DISCORD_TOKEN)
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(
-        () => reject(new Error('Discord login timed out')),
-        DISCORD_LOGIN_TIMEOUT
-      )
+      timeoutHandle = setTimeout(() => {
+        const elapsedMs = Date.now() - loginStartMs
+        logger.error(
+          {
+            elapsedMs,
+            wsStatus: discordClient.ws.status,
+            wsStatusName: Status[discordClient.ws.status] ?? 'unknown',
+            shardCount: discordClient.ws.shards.size,
+            recentDebugLogs: debugLogs.slice(-20),
+          },
+          'Discord login timed out — WebSocket state at timeout'
+        )
+        reject(new Error('Discord login timed out'))
+      }, DISCORD_LOGIN_TIMEOUT)
     })
 
     await Promise.race([loginPromise, timeoutPromise])
-    logger.info('Discord login attempt successful')
+    clearTimeout(timeoutHandle)
+    logger.info({ elapsedMs: Date.now() - loginStartMs }, 'Discord login attempt successful')
     loginRetryCount = 0
   } catch (error) {
+    clearTimeout(timeoutHandle)
     logger.error({ err: error }, 'Discord login failed')
 
     if (loginRetryCount < MAX_LOGIN_RETRIES) {
@@ -260,6 +347,8 @@ async function attemptDiscordLogin() {
       logger.error('Max login retries reached. Giving up.')
       process.exit(1)
     }
+  } finally {
+    discordClient.off('debug', debugListener)
   }
 }
 
@@ -269,6 +358,21 @@ discordClient.on('ready', () => {
 
 discordClient.on('error', (error) => {
   logger.error({ err: error }, 'Discord client error')
+})
+
+discordClient.on('shardError', (error, shardId) => {
+  logger.error({ err: error, shardId }, 'Discord shard error')
+})
+
+discordClient.on('shardDisconnect', (closeEvent, shardId) => {
+  logger.warn(
+    { shardId, code: closeEvent.code, reason: closeEvent.reason, wasClean: closeEvent.wasClean },
+    'Discord shard disconnected'
+  )
+})
+
+discordClient.on('shardReconnecting', (shardId) => {
+  logger.info({ shardId }, 'Discord shard reconnecting')
 })
 
 discordClient.on('disconnect', () => {
