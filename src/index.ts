@@ -224,7 +224,6 @@ logger.info('Discord client created')
 logger.info({ PRODUCTION_MODE }, 'PRODUCTION_MODE')
 logger.info({ discordTokenExists: !!DISCORD_TOKEN }, 'DISCORD_TOKEN exists')
 
-const DISCORD_LOGIN_TIMEOUT = 30000 // 30 seconds
 const MAX_LOGIN_RETRIES = 5
 let loginRetryCount = 0
 
@@ -242,29 +241,63 @@ async function checkDnsResolution(hostname: string): Promise<void> {
   })
 }
 
-/** Make a lightweight HTTPS HEAD request and log status/latency. */
-async function checkHttpsConnectivity(url: string): Promise<void> {
+const DISCORD_GATEWAY_URL = 'https://discord.com/api/v10/gateway'
+// Extended timeout to allow Discord.js to wait out rate-limit Retry-After delays.
+// Render.com's shared IPs often get 429'd by Discord; Discord.js will back off
+// internally but needs more than 30s to do so.
+const DISCORD_LOGIN_TIMEOUT = 5 * 60 * 1000 // 5 minutes
+
+/**
+ * Make a GET request to the Discord gateway endpoint, read the Retry-After
+ * header if rate-limited, and wait out the backoff before returning.
+ * Returns true if the gateway is reachable (any non-429 response or no error).
+ */
+async function waitForDiscordGateway(): Promise<boolean> {
   return new Promise((resolve) => {
     const startMs = Date.now()
-    const req = https.request(url, { method: 'HEAD', timeout: 10000 }, (res) => {
-      logger.info(
-        { url, statusCode: res.statusCode, latencyMs: Date.now() - startMs },
-        'HTTPS connectivity check succeeded'
-      )
-      res.resume()
-      resolve()
-    })
+    const req = https.request(
+      DISCORD_GATEWAY_URL,
+      { method: 'GET', timeout: 15000 },
+      (res) => {
+        const latencyMs = Date.now() - startMs
+        const retryAfterHeader = res.headers['retry-after']
+        const retryAfterSec = retryAfterHeader ? parseFloat(String(retryAfterHeader)) : null
+
+        if (res.statusCode === 429) {
+          const waitMs = retryAfterSec != null ? retryAfterSec * 1000 : 60_000
+          logger.warn(
+            {
+              url: DISCORD_GATEWAY_URL,
+              statusCode: 429,
+              latencyMs,
+              retryAfterSec,
+              waitMs,
+            },
+            'Discord gateway rate-limited (429) — waiting before login attempt'
+          )
+          res.resume()
+          setTimeout(() => resolve(false), waitMs)
+        } else {
+          logger.info(
+            { url: DISCORD_GATEWAY_URL, statusCode: res.statusCode, latencyMs },
+            'Discord gateway reachable'
+          )
+          res.resume()
+          resolve(true)
+        }
+      }
+    )
     req.on('error', (err) => {
       logger.warn(
-        { url, latencyMs: Date.now() - startMs, err },
-        'HTTPS connectivity check failed'
+        { url: DISCORD_GATEWAY_URL, latencyMs: Date.now() - startMs, err },
+        'Discord gateway connectivity check failed'
       )
-      resolve()
+      resolve(true) // proceed anyway; the error may be transient
     })
     req.on('timeout', () => {
-      logger.warn({ url }, 'HTTPS connectivity check timed out')
+      logger.warn({ url: DISCORD_GATEWAY_URL }, 'Discord gateway connectivity check timed out')
       req.destroy()
-      resolve()
+      resolve(true)
     })
     req.end()
   })
@@ -284,7 +317,11 @@ async function runPreLoginDiagnostics(): Promise<void> {
   )
   await checkDnsResolution('discord.com')
   await checkDnsResolution('gateway.discord.gg')
-  await checkHttpsConnectivity('https://discord.com/api/v10/gateway')
+  // Wait out any active rate limit before handing off to Discord.js
+  let gatewayReady = false
+  while (!gatewayReady) {
+    gatewayReady = await waitForDiscordGateway()
+  }
 }
 
 async function attemptDiscordLogin() {
