@@ -6,8 +6,28 @@ import {
   getOSName,
 } from './utils'
 
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import { logger } from '../../logger'
+
+interface FetchConfig {
+  headers?: Record<string, string>
+  timeout?: number
+  validateStatus?: (status: number) => boolean
+}
+
+interface ApiResponse<T = unknown> {
+  status: number
+  headers: Headers
+  data: T
+}
+
+class HttpStatusError extends Error {
+  response: { status: number; statusText: string; headers: Headers }
+  constructor(status: number, statusText: string, headers: Headers) {
+    super(`Request failed with status code ${status}`)
+    this.name = 'HttpStatusError'
+    this.response = { status, statusText, headers }
+  }
+}
 /** Abstract parent class for all API Poll Bots */
 export class APIPollBot {
   apiEndpoint: string
@@ -187,19 +207,39 @@ export class APIPollBot {
    */
   protected async getWithRetry(
     url: string,
-    config: AxiosRequestConfig,
+    config: FetchConfig,
     retries = 3,
     initialDelayMs = 1000
-  ): Promise<AxiosResponse> {
+  ): Promise<ApiResponse> {
     let attempt = 0
     let lastError: unknown
     while (attempt <= retries) {
+      const controller = new AbortController()
+      const timeoutId = config.timeout
+        ? setTimeout(() => controller.abort(), config.timeout)
+        : undefined
       try {
-        const response = await axios.get(url, config)
+        const response = await fetch(url, {
+          headers: config.headers,
+          signal: controller.signal,
+        })
+        if (timeoutId !== undefined) clearTimeout(timeoutId)
 
-        // Handle 429 returned as a non-throwing response (validateStatus)
+        const validateStatus =
+          config.validateStatus ?? ((s) => s >= 200 && s < 300)
+        if (!validateStatus(response.status)) {
+          throw new HttpStatusError(
+            response.status,
+            response.statusText,
+            response.headers
+          )
+        }
+
+        // Handle 429 returned as a non-throwing response (validateStatus allows it)
         if (response.status === 429) {
-          if (attempt === retries) return response
+          if (attempt === retries) {
+            return { status: response.status, headers: response.headers, data: null }
+          }
           const retryAfter = this.parseRetryAfter(response.headers)
           const delay =
             retryAfter ?? Math.min(initialDelayMs * Math.pow(2, attempt), 30000)
@@ -212,24 +252,19 @@ export class APIPollBot {
           continue
         }
 
-        return response
+        const data = await response.json()
+        return { status: response.status, headers: response.headers, data }
       } catch (err: unknown) {
+        if (timeoutId !== undefined) clearTimeout(timeoutId)
         lastError = err
-        const axiosErr = err as {
-          code?: string
-          response?: { status?: number; headers?: Record<string, string> }
-          message?: string
-        }
-        const code = axiosErr?.code || axiosErr?.response?.status
-        const isTimeout =
-          axiosErr?.code === 'ECONNABORTED' ||
-          /timeout/i.test(axiosErr?.message || '')
-        const isReset = axiosErr?.code === 'ECONNRESET'
-        const status = axiosErr?.response?.status
+        const isTimeout = err instanceof Error && err.name === 'AbortError'
+        const isNetworkError = err instanceof TypeError
+        const httpErr = err instanceof HttpStatusError ? err : null
+        const status = httpErr?.response?.status
         const isRateLimited = status === 429
         const shouldRetry =
           isTimeout ||
-          isReset ||
+          isNetworkError ||
           isRateLimited ||
           (typeof status === 'number' && status >= 500 && status < 600)
 
@@ -240,7 +275,7 @@ export class APIPollBot {
         let delay: number
         if (isRateLimited) {
           // Use Retry-After header if available, otherwise longer backoff for 429s
-          const retryAfter = this.parseRetryAfter(axiosErr?.response?.headers)
+          const retryAfter = this.parseRetryAfter(httpErr?.response?.headers)
           delay =
             retryAfter ??
             Math.min(initialDelayMs * Math.pow(2, attempt + 1), 30000)
@@ -249,8 +284,12 @@ export class APIPollBot {
         }
         const jitter = Math.floor(delay * 0.25 * (Math.random() * 2 - 1))
         const sleepMs = Math.max(250, delay + jitter)
+        const errCode =
+          status ??
+          (isTimeout ? 'TIMEOUT' : isNetworkError ? 'NETWORK_ERROR' : 'UNKNOWN')
+        const errMessage = err instanceof Error ? err.message : 'unknown'
         logger.warn(
-          { attempt: attempt + 1, retries, url, code: code || status, errMessage: axiosErr?.message || 'unknown', sleepMs },
+          { attempt: attempt + 1, retries, url, code: errCode, errMessage, sleepMs },
           'GET retry after error'
         )
         await new Promise((res) => setTimeout(res, sleepMs))
@@ -264,9 +303,9 @@ export class APIPollBot {
    * Parse the Retry-After header value into milliseconds
    * Supports both seconds (integer) and HTTP-date formats
    */
-  private parseRetryAfter(headers?: Record<string, unknown>): number | null {
-    const retryAfter = headers?.['retry-after']
-    if (!retryAfter || typeof retryAfter !== 'string') return null
+  private parseRetryAfter(headers?: Headers): number | null {
+    const retryAfter = headers?.get('retry-after')
+    if (!retryAfter) return null
 
     const seconds = parseInt(retryAfter, 10)
     if (!isNaN(seconds)) {

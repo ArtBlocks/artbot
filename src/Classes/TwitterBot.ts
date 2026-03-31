@@ -8,6 +8,7 @@ import {
 } from 'twitter-api-v2'
 import { Mint } from './MintBot'
 import {
+  ArtBlocksTokenData,
   TWITTER_PROJECTBOT_UTM,
   delay,
   ensOrAddress,
@@ -15,7 +16,6 @@ import {
   getTokenUrl,
 } from './APIBots/utils'
 import { lookupUserByAddress } from '../Data/queryGraphQL'
-import axios from 'axios'
 import { artIndexerBot, ARTIST_TWITTER_HANDLES } from '..'
 import sharp from 'sharp'
 import { formatNumberWithCommas } from '../Utils/common'
@@ -236,11 +236,11 @@ export class TwitterBot {
       return
     }
 
-    const { data: artBlocksData } = await axios.get(
+    const artBlocksData = await fetch(
       getTokenApiUrl(projectBot.chainId, projectBot.coreContract, tokenId)
-    )
+    ).then((r) => r.json()) as ArtBlocksTokenData
 
-    const assetUrl = artBlocksData.preview_asset_url
+    const assetUrl = artBlocksData.preview_asset_url ?? ''
 
     let media_id: string
     try {
@@ -252,7 +252,7 @@ export class TwitterBot {
 
     const tokenUrl =
       getTokenUrl(
-        artBlocksData.external_url,
+        artBlocksData.external_url ?? '',
         projectBot.chainId,
         projectBot.coreContract,
         tokenId
@@ -313,13 +313,8 @@ export class TwitterBot {
   }
 
   async uploadMedia(assetUrl: string): Promise<string> {
-    const downStream = await axios({
-      method: 'GET',
-      responseType: 'arraybuffer',
-      url: assetUrl,
-    })
-
-    let buff = downStream.data as Buffer
+    const res = await fetch(assetUrl)
+    let buff = Buffer.from(await res.arrayBuffer() as ArrayBuffer)
 
     while (buff.length > TWITTER_MEDIA_BYTE_LIMIT) {
       if (assetUrl.includes('.mp4')) {
@@ -464,10 +459,10 @@ export class TwitterBot {
    * Throws an error if the API call fails
    */
   private async getEthToUsdRate(): Promise<number> {
-    const response = await axios.get(
+    const data = await fetch(
       'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'
-    )
-    return response.data.ethereum.usd
+    ).then((r) => r.json()) as { ethereum: { usd: number } }
+    return data.ethereum.usd
   }
 
   /**

@@ -1,6 +1,5 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js'
 import { artIndexerBot, mintBot, projectConfig } from '../index'
-import axios from 'axios'
 import {
   MINT_UTM,
   buildArtBlocksTokenURL,
@@ -128,13 +127,22 @@ export class MintBot {
 
             // Check image with timeout and content-type validation
             try {
-              const imageRes = await axios.get(assetUrl, {
-                timeout: 10000, // 10 second timeout
-                validateStatus: (status) => status === 200,
-                headers: { Accept: 'image/*' },
-              })
+              const controller = new AbortController()
+              const timeoutId = setTimeout(() => controller.abort(), 10000)
+              let imageRes: Response
+              try {
+                imageRes = await fetch(assetUrl, {
+                  headers: { Accept: 'image/*' },
+                  signal: controller.signal,
+                })
+              } finally {
+                clearTimeout(timeoutId)
+              }
+              if (imageRes.status !== 200) {
+                throw new Error(`Unexpected status ${imageRes.status}`)
+              }
 
-              const contentType = imageRes.headers['content-type']
+              const contentType = imageRes.headers.get('content-type')
               if (!contentType?.startsWith('image/')) {
                 logger.info({ id, contentType }, 'Invalid content type for mint')
                 return
