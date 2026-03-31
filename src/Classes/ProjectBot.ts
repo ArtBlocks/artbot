@@ -1,4 +1,3 @@
-import axios from 'axios'
 import {
   Channel,
   Collection,
@@ -7,6 +6,7 @@ import {
   TextChannel,
 } from 'discord.js'
 import {
+  ArtBlocksTokenData,
   PROJECTBOT_BUY_UTM,
   PROJECTBOT_EXPLORE_UTM,
   PROJECTBOT_UTM,
@@ -362,14 +362,13 @@ export class ProjectBot {
     try {
       logger.info({ projectName: this.projectName }, 'sending birthday message')
 
-      const artBlocksResponse = await axios.get(
+      const artBlocksData = await fetch(
         getTokenApiUrl(
           this.chainId,
           this.coreContract,
           `${this.projectNumber * ONE_MILLION}`
         )
-      )
-      const artBlocksData = await artBlocksResponse.data
+      ).then((r) => r.json()) as ArtBlocksTokenData
       let assetUrl = artBlocksData?.preview_asset_url
       if (
         !artBlocksData ||
@@ -420,14 +419,13 @@ export class ProjectBot {
       CHANNEL_BLOCK_TALK
     ) as TextChannel
 
-    const artBlocksResponse = await axios.get(
+    const artBlocksData = await fetch(
       getTokenApiUrl(
         this.chainId,
         this.coreContract,
         `${this.projectNumber * ONE_MILLION}`
       )
-    )
-    const artBlocksData = await artBlocksResponse.data
+    ).then((r) => r.json()) as ArtBlocksTokenData
     const assetUrl = artBlocksData?.preview_asset_url
 
     // Send congratulations message
@@ -438,7 +436,7 @@ export class ProjectBot {
     const embedContent = new EmbedBuilder()
       .setColor('#9370DB')
       .setTitle(title)
-      .setImage(assetUrl)
+      .setImage(assetUrl ?? null)
       .setDescription(description)
     if (blockTalk) {
       blockTalk.send({ embeds: [embedContent] })

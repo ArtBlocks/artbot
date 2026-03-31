@@ -6,12 +6,10 @@ import {
   STUDIO_CONTRACTS,
 } from '../../index'
 import { CollectionType } from '../MintBot'
-import { AxiosError } from 'axios'
 import { createPublicClient, http, fallback } from 'viem'
 import { mainnet } from 'viem/chains'
 dotenv.config()
 
-import axios from 'axios'
 import { logger } from '../../logger'
 
 // Configure viem with multiple RPC providers for reliability
@@ -163,16 +161,16 @@ export async function getOSName(address: string): Promise<string> {
     name = cached.name
   } else {
     try {
-      const response = await axios.get(
+      const res = await fetch(
         `https://api.opensea.io/api/v2/accounts/${address}`,
         {
           headers: {
             Accept: 'application/json',
-            'x-api-key': process.env.OPENSEA_API_KEY,
+            'x-api-key': process.env.OPENSEA_API_KEY ?? '',
           },
         }
       )
-      const responseBody = response?.data
+      const responseBody = await res.json() as { detail?: string; username?: string }
       if (responseBody?.detail) {
         throw new Error(responseBody.detail)
       }
@@ -388,17 +386,22 @@ export async function replaceVideoWithGIF(url: string) {
 
     // some GIFs are not available, so we fallback to PNG
     try {
-      const resp = await axios.get(gifURL)
+      const resp = await fetch(gifURL)
 
-      if (resp.headers['content-length'] === '0') {
+      if (!resp.ok) {
+        if (resp.status === 404) {
+          logger.info('GIF not found, returning PNG')
+        } else {
+          logger.info({ status: resp.status, gifURL }, 'Error on fetching token API for GIF')
+        }
+        return url.replace('mp4', 'png')
+      }
+
+      if (resp.headers.get('content-length') === '0') {
         throw new Error('GIF size 0 for ' + gifURL)
       }
     } catch (e: unknown) {
-      if (e instanceof AxiosError && e.response?.status === 404) {
-        logger.info('GIF not found, returning PNG')
-      } else {
-        logger.info({ err: e, gifURL }, 'Error on fetching token API for GIF')
-      }
+      logger.info({ err: e, gifURL }, 'Error on fetching token API for GIF')
       return url.replace('mp4', 'png')
     }
 

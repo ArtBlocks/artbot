@@ -1,4 +1,3 @@
-import axios from 'axios'
 import { Client, ColorResolvable, EmbedBuilder } from 'discord.js'
 import {
   BAN_ADDRESSES,
@@ -109,8 +108,9 @@ export class OpenSeaListBot {
     try {
       // Get Art Blocks metadata response for the item (same as ReservoirListBot)
       const tokenApiUrl = getTokenApiUrl(nftInfo.chainId, contractAddress, tokenId)
-      const artBlocksResponse = await axios.get(tokenApiUrl)
-      const artBlocksData = artBlocksResponse?.data as ArtBlocksTokenData
+      const artBlocksData = (await fetch(tokenApiUrl).then((r) =>
+        r.json()
+      )) as ArtBlocksTokenData
       const tokenUrl = getTokenUrl(
         artBlocksData.external_url ?? '',
         nftInfo.chainId,

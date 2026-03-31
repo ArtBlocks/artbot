@@ -5,8 +5,7 @@ import { ProjectBot } from './ProjectBot'
 import { Client, EmbedBuilder, Message, TextChannel } from 'discord.js'
 import { projectConfig } from '..'
 import { randomColor } from '../Utils/smartBotResponse'
-import axios from 'axios'
-import { getTokenApiUrl, replaceVideoWithGIF } from './APIBots/utils'
+import { ArtBlocksTokenData, getTokenApiUrl, replaceVideoWithGIF } from './APIBots/utils'
 import { getAllTriviaScores, updateTriviaScore } from '../Data/supabase'
 import { logger } from '../logger'
 
@@ -181,11 +180,10 @@ Next question:`
       Math.floor(Math.random() * project.editionSize) +
       project.projectNumber * 1e6
 
-    const artBlocksResponse = await axios.get(
+    const artBlocksData = await fetch(
       getTokenApiUrl(project.chainId, project.coreContract, `${tokenNumber}`)
-    )
-    const artBlocksData = artBlocksResponse.data
-    const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url)
+    ).then((r) => r.json()) as ArtBlocksTokenData
+    const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url ?? '')
 
     embed.setDescription(question)
     embed.setImage(assetUrl)
@@ -202,11 +200,10 @@ Next question:`
       Math.floor(Math.random() * project.editionSize) +
       project.projectNumber * 1e6
 
-    const artBlocksResponse = await axios.get(
+    const artBlocksData = await fetch(
       getTokenApiUrl(project.chainId, project.coreContract, `${tokenNumber}`)
-    )
-    const artBlocksData = artBlocksResponse.data
-    const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url)
+    ).then((r) => r.json()) as ArtBlocksTokenData
+    const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url ?? '')
 
     embed.setDescription(question)
     embed.setImage(assetUrl)
