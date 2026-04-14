@@ -247,15 +247,24 @@
   },
   "1238135049874833438": {
     "name": "proof-all"
-  }
- },
- "1493062132495941663": {
-  "name": "🌼classical-revival",
-  "projectBotHandlers": {
-    "default": "0-CLASSICAL_REVIVAL",
-    "stringTriggers": {
-      "0-CLASSICAL_REVIVAL": ["classical revival", "cr", "digital edition", "digital"],
-      "1-CLASSICAL_REVIVAL": ["interactive object", "interactive objects", "io"]
+  },
+  "1493062132495941663": {
+    "name": "🌼classical-revival",
+    "projectBotHandlers": {
+      "default": "0-CLASSICAL_REVIVAL",
+      "stringTriggers": {
+        "0-CLASSICAL_REVIVAL": [
+          "classical revival",
+          "cr",
+          "digital edition",
+          "digital"
+        ],
+        "1-CLASSICAL_REVIVAL": [
+          "interactive object",
+          "interactive objects",
+          "io"
+        ]
+      }
     }
   }
 }
