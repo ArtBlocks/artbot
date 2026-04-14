@@ -1023,4 +1023,15 @@
 "291": ["apex", "apx"],
   }
  }
+},
+
+"1493062132495941663": {
+  "name": "🌼classical-revival",
+  "projectBotHandlers": {
+    "default": "0-CLASSICAL_REVIVAL",
+    "stringTriggers": {
+      "0-CLASSICAL_REVIVAL": ["classical revival", "cr", "digital edition", "digital"],
+      "1-CLASSICAL_REVIVAL": ["interactive object", "interactive objects", "io"]
+    }
+  }
 }
