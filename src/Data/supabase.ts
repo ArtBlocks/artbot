@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { CURRENT_SEASON } from '../Classes/TriviaBot'
+import { logger } from '../logger'
 
 const supabaseClient =
   process.env.SUPABASE_URL && process.env.SUPABASE_API_KEY
@@ -23,13 +24,16 @@ export const updateTriviaScore = async (username: string): Promise<number> => {
     seasonScore = parseInt(data[0][CURRENT_SEASON] ?? 0) + 1
   }
 
-  // NOTE: When changing seasons, we have to manually change the upsert column here. Super annoying I know.
   const { error } = await supabaseClient
     .from(process.env.TRIVIA_TABLE ?? '')
-    .upsert({ user: `${username}`, score: totalScore, season_two: seasonScore })
+    .upsert({
+      user: `${username}`,
+      score: totalScore,
+      [CURRENT_SEASON]: seasonScore,
+    })
 
   if (error) {
-    console.error('Error updating trivia score', error)
+    logger.error({ err: error }, 'Error updating trivia score')
     throw new Error(error.message)
   }
 

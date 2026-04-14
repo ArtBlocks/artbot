@@ -1,6 +1,7 @@
 import { EmbedBuilder, ColorResolvable, Message } from 'discord.js'
 import * as dotenv from 'dotenv'
 import { artIndexerBot, projectConfig, triviaBot } from '..'
+import { logger } from '../logger'
 dotenv.config()
 const fetch = require('node-fetch')
 
@@ -15,7 +16,8 @@ const ARTBOT_WARNING = 0xffff00
 
 // Returns a random color
 export function randomColor(): ColorResolvable {
-  return `#${Math.floor(Math.random() * 16777215).toString(16)}`
+  // Generate random hex color value between 0x000000 and 0xFFFFFF
+  return Math.floor(Math.random() * 0xffffff) as ColorResolvable
 }
 
 // Thank you message for people asking the artbot how it is.
@@ -216,6 +218,9 @@ const HASHTAG_MESSAGE = new EmbedBuilder()
     `\`#?\` = Random project, random token
     \`#? [project name]\` = Random token from project
     \`#[token number] [project name]\` = Specific token from project
+    \`#entry [project name]\` = Show entry-level (lowest priced) token from project
+    \`#entry [grouping]\` = Show entry-level price for grouping (e.g. AB500, Curated, Series 1-8, etc)
+    \`#set [set name]\` = Show a data snapshot for a particular set
     \`#explore [project name]\` = Out of bounds sample from upcoming/open project
     \`#? [artist name]\` = Random token from artist
     \`#? [vertical]\` = Random token from vertical (e.g. Curated, Explorations, Presents, Engine, Collaborations, etc)
@@ -246,25 +251,34 @@ const OTC_MESSAGE = new EmbedBuilder()
 let grantThanks = 0
 
 // Returns a message containing information about the current gas prices.
-async function generateGasPriceMessage() {
-  const gasResponse = await fetch(
-    `https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${process.env.ETHERSCAN_API_KEY}`
-  )
-  const gasData = await gasResponse.json()
+async function generateGasPriceMessage(): Promise<EmbedBuilder> {
+  try {
+    const gasResponse = await fetch(
+      `https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${process.env.ETHERSCAN_API_KEY}`
+    )
+    const gasData = await gasResponse.json()
 
-  return (
-    new EmbedBuilder()
-      // Set the title of the field
+    if (!gasData?.result?.FastGasPrice) {
+      throw new Error('Invalid gas price response from Etherscan')
+    }
+
+    return new EmbedBuilder()
       .setTitle(`:fuelpump: Gas Prices :fuelpump:`)
-      // Set the color of the embed
       .setColor(ARTBOT_GREEN)
-      // Set the main content of the embed
       .setDescription(
         `:rocket: Fast: ${gasData.result.FastGasPrice}
          :airplane: Standard: ${gasData.result.ProposeGasPrice}
          :turtle: Slow: ${gasData.result.SafeGasPrice}`
       )
-  )
+  } catch (err) {
+    logger.error({ err }, 'Error fetching gas prices')
+    return new EmbedBuilder()
+      .setTitle(`:fuelpump: Gas Prices :fuelpump:`)
+      .setColor(ARTBOT_WARNING)
+      .setDescription(
+        'Sorry, I had trouble fetching gas prices. Please try again later!'
+      )
+  }
 }
 
 /**
@@ -307,6 +321,7 @@ export async function smartBotResponse(
     }
     return null
   }
+
   // Some shared helper variables.
   const inHelpChannel: boolean = channelID == CHANNEL_HELP
   const mentionedArtBot: boolean =

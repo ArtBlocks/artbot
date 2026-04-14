@@ -1,41 +1,31 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
-import { OpenAIChat } from 'langchain/llms/openai'
+import { OpenAI } from 'openai'
 import { ProjectBot } from './ProjectBot'
 import { Client, EmbedBuilder, Message, TextChannel } from 'discord.js'
 import { projectConfig } from '..'
 import { randomColor } from '../Utils/smartBotResponse'
-import axios from 'axios'
-import { getTokenApiUrl, replaceVideoWithGIF } from './APIBots/utils'
+import { ArtBlocksTokenData, getTokenApiUrl, replaceVideoWithGIF } from './APIBots/utils'
 import { getAllTriviaScores, updateTriviaScore } from '../Data/supabase'
+import { logger } from '../logger'
 
-// NOTE: if you change this, you'll need to manually update the supabase upsert query in updateTriviaScore
-export const CURRENT_SEASON = 'season_two'
+export const CURRENT_SEASON = 'season_three'
+
+const MAX_PREVIOUS_ANSWERS = 200
 
 export class TriviaBot {
   bot: Client
-  model?: OpenAIChat
+  model?: OpenAI
   channel?: TextChannel
   previousQuestion?: Message
   previousQuestionEmbed?: EmbedBuilder
-
   previousAnswers: string[] = []
   currentTriviaAnswer: string
   constructor(bot: Client) {
     this.bot = bot
     this.model = process.env.OPENAI_API_KEY
-      ? new OpenAIChat({
-          modelName: 'gpt-3.5-turbo', // With valid API keys can also use 'gpt-4'
-          temperature: 0,
-          prefixMessages: [
-            {
-              role: 'system',
-              content: `
-          You are a bot that thinks of trivia questions with art projects as the answers. I will provide the title of the project and the project description.
-         DO NOT include the answer in your response.
-          `,
-            },
-          ],
+      ? new OpenAI({
+          apiKey: process.env.OPENAI_API_KEY, // This is the default and can be omitted
         })
       : undefined
 
@@ -96,7 +86,7 @@ Next question:`
         text: 'Answer by using the #? command',
       })
     const questionType = Math.floor(Math.random() * 3)
-    console.log(`Asking trivia question for ${project.projectName}`)
+    logger.info({ projectName: project.projectName }, 'Asking trivia question')
 
     try {
       switch (questionType) {
@@ -117,11 +107,15 @@ Next question:`
           break
       }
     } catch (err) {
-      console.log('ERROR asking trivia question', err)
+      logger.error({ err }, 'Error asking trivia question')
       return
     }
 
     this.previousAnswers.push(this.currentTriviaAnswer)
+    // Cap the previous answers array to prevent unbounded growth
+    if (this.previousAnswers.length > MAX_PREVIOUS_ANSWERS) {
+      this.previousAnswers = this.previousAnswers.slice(-MAX_PREVIOUS_ANSWERS)
+    }
 
     this.channel = this.bot.channels?.cache?.get(
       CHANNEL_BLOCK_TALK
@@ -133,9 +127,9 @@ Next question:`
           embeds: [embed],
         })
         .catch((err) => {
-          console.log(
-            `Error posting message in channel ${projectConfig.channels[CHANNEL_BLOCK_TALK].name} (id: ${CHANNEL_BLOCK_TALK})`,
-            err.message
+          logger.info(
+            { channelName: projectConfig.channels[CHANNEL_BLOCK_TALK].name, channelId: CHANNEL_BLOCK_TALK, errMessage: err.message },
+            'Error posting message in channel'
           )
         })) ?? undefined
   }
@@ -145,18 +139,34 @@ Next question:`
     embed: EmbedBuilder
   ): Promise<EmbedBuilder> {
     if (!this.model) {
-      console.log("Can't ask trivia question - no OpenAI API key")
+      logger.warn("Can't ask trivia question - no OpenAI API key")
       throw new Error("Can't ask trivia question - no OpenAI API key")
     }
 
-    let question = await this.model.call(
-      `Generate a short, cryptic, poetic, vague, difficult riddle that has the answer: "${project.projectName}". It is VERY important that you DO NOT include the answer in your response. The project description is: "${project.description}"`
-    )
+    const completion = await this.model.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are a trivia bot that generates trivia questions about generative art projects. The most important rule is NEVER to state the answer in your response',
+        },
+        {
+          role: 'user',
+          content: `Generate a short, cryptic, poetic, vague, difficult riddle that has the answer: "${project.projectName}". It is VERY important that you DO NOT include the answer in your response. The project description is: "${project.description}"`,
+        },
+      ],
+    })
 
+    let answer = completion.choices[0].message.content ?? ''
     const regex = new RegExp(project.projectName, 'gi')
-    question = question.replaceAll(regex, '_____')
+    answer = answer.replaceAll(regex, '_____')
 
-    embed.setDescription(question)
+    if (!answer.length) {
+      throw new Error('No answer from GPT')
+    }
+
+    embed.setDescription(answer)
 
     return embed
   }
@@ -170,11 +180,10 @@ Next question:`
       Math.floor(Math.random() * project.editionSize) +
       project.projectNumber * 1e6
 
-    const artBlocksResponse = await axios.get(
-      getTokenApiUrl(project.coreContract, `${tokenNumber}`)
-    )
-    const artBlocksData = artBlocksResponse.data
-    const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url)
+    const artBlocksData = await fetch(
+      getTokenApiUrl(project.chainId, project.coreContract, `${tokenNumber}`)
+    ).then((r) => r.json()) as ArtBlocksTokenData
+    const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url ?? '')
 
     embed.setDescription(question)
     embed.setImage(assetUrl)
@@ -191,11 +200,10 @@ Next question:`
       Math.floor(Math.random() * project.editionSize) +
       project.projectNumber * 1e6
 
-    const artBlocksResponse = await axios.get(
-      getTokenApiUrl(project.coreContract, `${tokenNumber}`)
-    )
-    const artBlocksData = artBlocksResponse.data
-    const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url)
+    const artBlocksData = await fetch(
+      getTokenApiUrl(project.chainId, project.coreContract, `${tokenNumber}`)
+    ).then((r) => r.json()) as ArtBlocksTokenData
+    const assetUrl = await replaceVideoWithGIF(artBlocksData.preview_asset_url ?? '')
 
     embed.setDescription(question)
     embed.setImage(assetUrl)
@@ -210,7 +218,7 @@ Next question:`
       try {
         score = await updateTriviaScore(msg.author.username)
       } catch (err) {
-        console.log('ERROR updating score', err)
+        logger.error({ err }, 'Error updating score')
         msg.reply(
           `Hmmm, you got it right but it seems there was an error updating your score. Pester Grant until he fixes it`
         )
@@ -245,7 +253,7 @@ Next question:`
       this.previousQuestionEmbed = undefined
       this.previousQuestion = undefined
     } catch (err) {
-      console.log('ERROR tallying', err)
+      logger.error({ err }, 'Error tallying')
       msg.reply('Oh no, looks like there was an unexpected error!')
     }
   }
@@ -255,7 +263,7 @@ Next question:`
     try {
       scoreData = await getAllTriviaScores()
     } catch (err) {
-      console.log('ERROR getting leaderboard', err)
+      logger.error({ err }, 'Error getting leaderboard')
       msg.reply(
         'Alas, looks like there was an unexpected error fetching the leaderboard!'
       )

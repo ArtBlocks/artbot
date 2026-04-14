@@ -1,4 +1,3 @@
-import axios from 'axios'
 import {
   Channel,
   Collection,
@@ -7,28 +6,28 @@ import {
   TextChannel,
 } from 'discord.js'
 import {
+  ArtBlocksTokenData,
   PROJECTBOT_BUY_UTM,
   PROJECTBOT_EXPLORE_UTM,
   PROJECTBOT_UTM,
   ethFromWeiString,
-  getProjectUrl,
+  getProjectSlugUrl,
   getTokenApiUrl,
   getTokenUrl,
-  isCoreContract,
 } from './APIBots/utils'
 
 import { ensOrAddress, replaceVideoWithGIF } from './APIBots/utils'
 import {
-  getProjectFloor,
   getProjectInvocations,
   getRandomOobForProject,
   getToken,
+  getLowestPricedTokenByProject,
 } from '../Data/queryGraphQL'
-import { triviaBot } from '..'
-import { ProjectConfig } from '../ProjectConfig/projectConfig'
+import { CHANNEL_BLOCK_TALK, discordClient, triviaBot } from '..'
 import { ProjectHandlerHelper } from './ProjectHandlerHelper'
 import { UpcomingProjectDetailFragment } from '../../generated/graphql'
 import { getDayName, getMonthName, getDayOfMonth } from '../Utils/common'
+import { logger } from '../logger'
 
 const ONE_MILLION = 1e6
 
@@ -37,8 +36,10 @@ const ONE_MILLION = 1e6
  */
 export class ProjectBot {
   id: string
+  chainId: number
   projectNumber: number
   coreContract: string
+  slug: string
   editionSize: number
   maxEditionSize: number
   projectName: string
@@ -52,8 +53,10 @@ export class ProjectBot {
 
   constructor({
     id,
+    chainId,
     projectNumber,
     coreContract,
+    slug,
     editionSize,
     maxEditionSize,
     projectName,
@@ -65,8 +68,10 @@ export class ProjectBot {
     description,
   }: {
     id: string
+    chainId: number
     projectNumber: number
     coreContract: string
+    slug: string
     editionSize: number
     maxEditionSize: number
     projectName: string
@@ -78,8 +83,10 @@ export class ProjectBot {
     description?: string
   }) {
     this.id = id
+    this.chainId = chainId
     this.projectNumber = projectNumber
     this.coreContract = coreContract
+    this.slug = slug
     this.editionSize = editionSize
     this.maxEditionSize = maxEditionSize
     this.projectName = projectName
@@ -111,6 +118,9 @@ export class ProjectBot {
 
   async handleNumberMessage(msg: Message) {
     let content = msg.content
+    if (!msg.channel.isSendable()) {
+      return
+    }
     if (content.length <= 1) {
       msg.channel.send(
         `Invalid format, enter # followed by the piece number of interest.`
@@ -144,13 +154,22 @@ export class ProjectBot {
       return
     }
 
-    if (content.toLowerCase().includes('#floor')) {
-      const floorToken = await getProjectFloor(this.id)
-      if (floorToken && floorToken.list_eth_price) {
-        content = `#${floorToken.invocation}`
-      } else {
+    if (content.toLowerCase().includes('#entry')) {
+      try {
+        const entryToken = await getLowestPricedTokenByProject(this.id)
+
+        if (entryToken) {
+          content = `#${entryToken.invocation}`
+        } else {
+          msg.channel.send(
+            `Sorry, looks like no ${this.projectName} tokens are for sale!`
+          )
+          return
+        }
+      } catch (e) {
+        logger.error({ err: e, projectName: this.projectName }, 'Error getting entry token')
         msg.channel.send(
-          `Sorry, looks like no ${this.projectName} tokens are for sale!`
+          `Sorry, looks like there was an error retrieving the entry token for ${this.projectName}. Try again in a bit!`
         )
         return
       }
@@ -165,7 +184,7 @@ export class ProjectBot {
         try {
           this.sendRandomOob(msg)
         } catch (e) {
-          console.error('Error sending random OOB:', e)
+          logger.error({ err: e }, 'Error sending random OOB')
           msg.channel.send(
             `Huh, looks like there was an error getting a random sample from ${this.projectName}. Try again in a bit!`
           )
@@ -207,7 +226,7 @@ export class ProjectBot {
 
     const tokenID = pieceNumber + this.projectNumber * 1e6
 
-    this.sendMetaDataMessage(msg, tokenID.toString())
+    await this.sendMetaDataMessage(msg, tokenID.toString())
   }
 
   async handleTweet(tweetText: string): Promise<string> {
@@ -249,12 +268,15 @@ export class ProjectBot {
    */
   async sendMetaDataMessage(msg: Message, tokenID: string) {
     let tokenMetadata
+    if (!msg.channel.isSendable()) {
+      return
+    }
     try {
       tokenMetadata = await getToken(`${this.coreContract}-${tokenID}`)
     } catch (e) {
-      console.log(
-        `Error getting token metadata for ${msg.content}: ${this.coreContract}-${tokenID}`,
-        e
+      logger.info(
+        { err: e, msgContent: msg.content, tokenId: `${this.coreContract}-${tokenID}` },
+        'Error getting token metadata'
       )
       return
     }
@@ -264,7 +286,7 @@ export class ProjectBot {
     if (tokenMetadata.contract?.name === 'Art Blocks x Pace') {
       external_url = ''
     }
-    const tokenUrl = getTokenUrl(external_url, this.coreContract, tokenID)
+    const tokenUrl = getTokenUrl(external_url, this.chainId, this.coreContract, tokenID)
     const titleLink = tokenUrl + PROJECTBOT_UTM
 
     let title = `${tokenMetadata.project.name} #${tokenMetadata.invocation} - ${tokenMetadata.project.artist_name}`
@@ -272,7 +294,8 @@ export class ProjectBot {
     // If Engine project, add Engine platform name to front
     if (
       tokenMetadata.contract?.name &&
-      !tokenMetadata.contract?.name.includes('Art Blocks')
+      !tokenMetadata.contract?.name.includes('Art Blocks') &&
+      !tokenMetadata.contract?.name.includes('artblocks')
     ) {
       let platform = tokenMetadata.contract?.name
       if (platform === 'MOMENT') {
@@ -321,29 +344,31 @@ export class ProjectBot {
       inline: true,
     })
 
-    if (tokenMetadata.list_price && !tokenMetadata.is_flagged) {
+    const listPrice = tokenMetadata.list_price
+    const listCurrencySymbol = tokenMetadata.list_currency_symbol
+    if (listPrice && listCurrencySymbol) {
       embedContent.addFields({
         name: 'Buy Now',
-        value: `[${tokenMetadata.list_price} ${
-          tokenMetadata.list_currency_symbol
-        } on Art Blocks Marketplace](${tokenUrl + PROJECTBOT_BUY_UTM})`,
+        value: `[${listPrice} ${listCurrencySymbol} on Art Blocks Marketplace](${
+          tokenUrl + PROJECTBOT_BUY_UTM
+        })`,
       })
     }
+
     msg.channel.send({ embeds: [embedContent] })
   }
 
-  async sendBirthdayMessage(
-    channels: Collection<string, Channel>,
-    projectConfig: ProjectConfig,
-    artistChannel: boolean
-  ) {
+  async sendBirthdayMessage(channels: Collection<string, Channel>) {
     try {
-      console.log('sending birthday message(s) for:', this.projectName)
+      logger.info({ projectName: this.projectName }, 'sending birthday message')
 
-      const artBlocksResponse = await axios.get(
-        getTokenApiUrl(this.coreContract, `${this.projectNumber * ONE_MILLION}`)
-      )
-      const artBlocksData = await artBlocksResponse.data
+      const artBlocksData = await fetch(
+        getTokenApiUrl(
+          this.chainId,
+          this.coreContract,
+          `${this.projectNumber * ONE_MILLION}`
+        )
+      ).then((r) => r.json()) as ArtBlocksTokenData
       let assetUrl = artBlocksData?.preview_asset_url
       if (
         !artBlocksData ||
@@ -369,8 +394,7 @@ export class ProjectBot {
         What are your favorite outputs from ${this.projectName}?
 
         [Explore the full project here](${
-          getProjectUrl(this.coreContract, this.projectNumber.toString()) +
-          PROJECTBOT_UTM
+          getProjectSlugUrl(this.slug) + PROJECTBOT_UTM
         })
         `
         )
@@ -379,44 +403,58 @@ export class ProjectBot {
         })
 
       // Send all birthdays to #block-talk
-      let channel = channels.get(
-        projectConfig.chIdByName['block-talk']
-      ) as TextChannel
+      const channel = channels.get(CHANNEL_BLOCK_TALK) as TextChannel
       channel?.send({ embeds: [embedContent] })
-
-      if (
-        artistChannel &&
-        isCoreContract(this.coreContract) &&
-        projectConfig.projectToChannel[this.projectNumber]
-      ) {
-        // Send in artist channel if one exists
-        channel = channels.get(
-          projectConfig.projectToChannel[this.projectNumber]
-        ) as TextChannel
-        channel.send({ embeds: [embedContent] })
-      }
     } catch (err) {
-      console.error(
-        'Error sending birthday message for:',
-        this.projectName,
-        err
+      logger.error(
+        { err, projectName: this.projectName },
+        'Error sending birthday message'
       )
     }
     return
+  }
+
+  async sendMintedOutMessage() {
+    const blockTalk = discordClient.channels.cache.get(
+      CHANNEL_BLOCK_TALK
+    ) as TextChannel
+
+    const artBlocksData = await fetch(
+      getTokenApiUrl(
+        this.chainId,
+        this.coreContract,
+        `${this.projectNumber * ONE_MILLION}`
+      )
+    ).then((r) => r.json()) as ArtBlocksTokenData
+    const assetUrl = artBlocksData?.preview_asset_url
+
+    // Send congratulations message
+    const title = `:tada: ${this.projectName} has minted out! Congratulations ${this.artistName}!  :tada:`
+    const description = `Check out the whole collection [here](${
+      getProjectSlugUrl(this.slug) + PROJECTBOT_UTM
+    })`
+    const embedContent = new EmbedBuilder()
+      .setColor('#9370DB')
+      .setTitle(title)
+      .setImage(assetUrl ?? null)
+      .setDescription(description)
+    if (blockTalk) {
+      blockTalk.send({ embeds: [embedContent] })
+    }
   }
 
   async handleUpcomingMessage(
     msg: Message,
     upcomingDetails: UpcomingProjectDetailFragment
   ) {
+    if (!msg.channel.isSendable()) {
+      return
+    }
     const startTime = new Date(
       upcomingDetails.auction_start_time || upcomingDetails.start_datetime
     )
 
-    const projectUrl = getProjectUrl(
-      this.coreContract,
-      this.projectNumber.toString()
-    )
+    const projectUrl = getProjectSlugUrl(this.slug)
     const title = `${upcomingDetails.name} by ${upcomingDetails.artist_name}`
 
     const assetUrl = await replaceVideoWithGIF(
@@ -496,10 +534,10 @@ export class ProjectBot {
   }
 
   async sendRandomOob(msg: Message) {
-    const projectUrl = getProjectUrl(
-      this.coreContract,
-      this.projectNumber.toString()
-    )
+    if (!msg.channel.isSendable()) {
+      return
+    }
+    const projectUrl = getProjectSlugUrl(this.slug)
     const titleLink = projectUrl + PROJECTBOT_EXPLORE_UTM
     const title = `${this.projectName} by ${this.artistName}`
 

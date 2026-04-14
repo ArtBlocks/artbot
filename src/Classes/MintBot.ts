@@ -1,17 +1,24 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js'
-import { mintBot, projectConfig } from '../index'
-import axios, { AxiosError } from 'axios'
+import { artIndexerBot, mintBot, projectConfig } from '../index'
 import {
   MINT_UTM,
+  buildArtBlocksTokenURL,
+  buildGeneratorUrl,
+  buildMediaUrl,
   getCollectionType,
-  getTokenApiUrl,
-  getTokenUrl,
-  replaceVideoWithGIF,
+  replaceToPNG,
   waitForEngineContracts,
   waitForStudioContracts,
 } from './APIBots/utils'
 import { ensOrAddress } from './APIBots/utils'
 import { TwitterBot } from './TwitterBot'
+import { logger } from '../logger'
+
+// When true, only post mints from mainnet (chain ID 1). Non-mainnet mints are skipped.
+// Set to false in a couple weeks to enable L2/other chain mints.
+const HIDE_NON_MAINNET_MINTS = true
+
+const MAINNET_CHAIN_ID = 1
 
 const MINT_CONFIG: {
   [id: string]: string[]
@@ -38,42 +45,15 @@ export class MintBot {
   bot: Client
   abTwitterBot?: TwitterBot
   newMints: { [id: string]: Mint } = {}
+  intervalId?: NodeJS.Timeout
   mintsToPost: { [id: string]: Mint } = {}
   contractToChannel: { [id: string]: string[] } = {}
   contractToTwitterBot: { [id: string]: TwitterBot } = {}
-  constructor(bot: Client) {
+  constructor(bot: Client, abTwitterBot?: TwitterBot) {
     this.bot = bot
+    this.abTwitterBot = abTwitterBot
     this.buildContractToChannel()
     this.startRoutine()
-
-    if (process.env.PRODUCTION_MODE) {
-      if (process.env.AB_TWITTER_API_KEY) {
-        this.abTwitterBot = new TwitterBot({
-          appKey: process.env.AB_TWITTER_API_KEY ?? '',
-          appSecret: process.env.AB_TWITTER_API_SECRET ?? '',
-          accessToken: process.env.AB_TWITTER_OAUTH_TOKEN ?? '',
-          accessSecret: process.env.AB_TWITTER_OAUTH_SECRET ?? '',
-          listener: true,
-        })
-      }
-      if (process.env.HODLERS_TWITTER_API_KEY) {
-        const hodlerBot = new TwitterBot({
-          appKey: process.env.HODLERS_TWITTER_API_KEY ?? '',
-          appSecret: process.env.HODLERS_TWITTER_API_SECRET ?? '',
-          accessToken: process.env.HODLERS_TWITTER_OAUTH_TOKEN ?? '',
-          accessSecret: process.env.HODLERS_TWITTER_OAUTH_SECRET ?? '',
-        })
-        const holderContracts: string[] = []
-        holderContracts.push(
-          PARTNER_CONTRACTS['HODLERS'],
-          PARTNER_CONTRACTS['HODLERS-PASS']
-        )
-
-        holderContracts.forEach((contract: string) => {
-          this.contractToTwitterBot[contract] = hodlerBot
-        })
-      }
-    }
   }
 
   async buildContractToChannel() {
@@ -122,83 +102,127 @@ export class MintBot {
     this.contractToChannel = contractToChannel
   }
 
-  // Go through all mints in the queue and make sure the image exists
-  // If it does, report to discord and remove from the queue
-  // If it doesn't, add it back in the queue to check again later
+  // Go through all mints in the queue and make sure the media image exists.
+  // Uses event data only (no token API call). Polls media URL until available, then posts.
   async checkAndPostMints() {
-    await Promise.all(
-      Object.entries(this.mintsToPost).map(async ([id, mint]) => {
-        const tokenUrl = getTokenApiUrl(mint.contractAddress, mint.tokenId)
+    if (Object.keys(this.mintsToPost).length === 0) {
+      return
+    }
 
-        let artBlocksResponse
-        try {
-          artBlocksResponse = await axios.get(tokenUrl)
-        } catch (e) {
-          const axiosError = e as AxiosError
-          if (axiosError && e.response?.status === 404) {
-            console.log('Mint for inactive project')
-            delete this.mintsToPost[id]
-            return
-          }
-          console.log(`Error on fetching token API for ${id}`, e)
-          return
-        }
+    try {
+      await Promise.all(
+        Object.entries(this.mintsToPost).map(async ([id, mint]) => {
+          try {
+            const assetUrl = replaceToPNG(
+              buildMediaUrl(mint.chainId, mint.contractAddress, mint.tokenId)
+            )
 
-        try {
-          const artBlocksData = artBlocksResponse.data
-          let assetUrl = artBlocksData?.preview_asset_url
-          if (assetUrl) {
-            assetUrl = await replaceVideoWithGIF(assetUrl)
+            // Validate URL format
+            try {
+              new URL(assetUrl)
+            } catch (e) {
+              logger.info({ id, assetUrl }, 'Invalid asset URL for mint')
+              return
+            }
 
-            const imageRes = await axios.get(assetUrl)
-            // Double check to ensure image/gif is available
-            if (imageRes.status === 200) {
+            // Check image with timeout and content-type validation
+            try {
+              const controller = new AbortController()
+              const timeoutId = setTimeout(() => controller.abort(), 10000)
+              let imageRes: Response
+              try {
+                imageRes = await fetch(assetUrl, {
+                  headers: { Accept: 'image/*' },
+                  signal: controller.signal,
+                })
+              } finally {
+                clearTimeout(timeoutId)
+              }
+              if (imageRes.status !== 200) {
+                throw new Error(`Unexpected status ${imageRes.status}`)
+              }
+
+              const contentType = imageRes.headers.get('content-type')
+              if (!contentType?.startsWith('image/')) {
+                logger.info({ id, contentType }, 'Invalid content type for mint')
+                return
+              }
+
+              // If we get here, the image is valid - build embed from event data
               delete this.mintsToPost[id]
               mint.image = assetUrl
-              mint.generatorLink = artBlocksData.generator_url
-              mint.tokenName = artBlocksData.name
-              mint.artistName = artBlocksData.artist
-              mint.artblocksUrl = getTokenUrl(
-                artBlocksData.external_url,
+              mint.generatorLink = buildGeneratorUrl(
+                mint.chainId,
                 mint.contractAddress,
                 mint.tokenId
               )
-              mint.postToDiscord()
-              this.postToTwitter(mint)
+              mint.tokenName = `${mint.projectName} #${mint.invocation}`
+              mint.artistName = '' // Not in mint event; omit from display
+              mint.artblocksUrl = buildArtBlocksTokenURL(
+                mint.chainId,
+                mint.contractAddress,
+                mint.tokenId
+              )
+              await mint.postToDiscord()
+              await this.postToTwitter(mint)
+            } catch (e) {
+              logger.info({ err: e, id }, 'Error fetching image for mint')
+              // Keep in queue to retry later
+              return
             }
+          } catch (e) {
+            logger.info({ err: e, id }, 'Error processing mint')
+            return
           }
-        } catch (e) {
-          console.log(`Error getting mint ${id}:`, e)
-          return
-        }
-      })
-    )
+        })
+      )
+    } catch (e) {
+      logger.error({ err: e }, 'Error in checkAndPostMints')
+    }
   }
 
   // Function to add a new mint to the queue!
-  addMint(contractAddress: string, tokenID: string, owner: string) {
-    console.log('NEW MINT', contractAddress, tokenID, owner)
+  addMint(
+    contractAddress: string,
+    tokenID: string,
+    owner: string,
+    invocation: string,
+    projectId: string,
+    projectName: string,
+    chainId: number
+  ) {
+    logger.info({ contractAddress, tokenID, owner, chainId }, 'NEW MINT')
     const id = `${contractAddress}-${tokenID}`
 
-    if (parseInt(tokenID) % 1e6 === 0) {
-      console.log('Skipping mint #0')
-      return
-    }
-
     if (!this.contractToChannel[contractAddress]) {
-      console.log('Skipping mint for contract not in config')
+      logger.info('Skipping mint for contract not in config')
       return
     }
 
-    this.mintsToPost[id] = new Mint(this.bot, contractAddress, tokenID, owner)
+    if (HIDE_NON_MAINNET_MINTS && chainId !== MAINNET_CHAIN_ID) {
+      logger.info({ chainId }, 'Skipping mint for non-mainnet chain (HIDE_NON_MAINNET_MINTS=true)')
+      return
+    }
+
+    artIndexerBot.checkMintedOut(projectId, invocation)
+
+    this.mintsToPost[id] = new Mint(
+      this.bot,
+      contractAddress,
+      tokenID,
+      owner,
+      chainId,
+      projectName,
+      invocation
+    )
   }
 
   // Routine that runs every MINT_REFRESH_TIME_SECONDS seconds and
   // tries to report any new mints to the discord!
   startRoutine() {
-    setInterval(async () => {
+    this.intervalId = setInterval(async () => {
       if (Object.keys(this.mintsToPost).length > 0) {
-        console.log(`${Object.keys(this.mintsToPost).length} mints to post`)
+        logger.info({ count: Object.keys(this.mintsToPost).length }, 'mints to post')
       }
       await this.checkAndPostMints()
     }, parseInt(MINT_REFRESH_TIME_SECONDS) * 1000)
@@ -214,8 +238,20 @@ export class MintBot {
       // this.abTwitterBot?.sendToTwitter(mint)
     }
     if (this.contractToTwitterBot[mint.contractAddress]) {
-      this.contractToTwitterBot[mint.contractAddress].sendToTwitter(mint)
+      this.contractToTwitterBot[mint.contractAddress].tweetMint(mint)
     }
+  }
+
+  /**
+   * Cleanup method to be called when the bot is being destroyed
+   */
+  cleanup() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+      this.intervalId = undefined
+    }
+    // Clear any pending mints
+    this.mintsToPost = {}
   }
 }
 
@@ -224,6 +260,9 @@ export class Mint {
   contractAddress: string
   tokenId: string
   owner: string
+  chainId: number
+  projectName: string
+  invocation: string
   image: string
   generatorLink: string
   tokenName: string
@@ -233,12 +272,18 @@ export class Mint {
     bot: Client,
     contractAddress: string,
     tokenId: string,
-    owner: string
+    owner: string,
+    chainId: number,
+    projectName: string,
+    invocation: string
   ) {
     this.bot = bot
     this.contractAddress = contractAddress
     this.tokenId = tokenId
     this.owner = owner
+    this.chainId = chainId
+    this.projectName = projectName
+    this.invocation = invocation
     this.image = ''
     this.generatorLink = ''
     this.tokenName = ''
@@ -254,7 +299,7 @@ export class Mint {
     const baseABProfile = 'https://www.artblocks.io/user/'
     const ownerProfile = baseABProfile + this.owner + MINT_UTM
 
-    embed.setTitle(`Minted: ${this.tokenName} - ${this.artistName}`)
+    embed.setTitle(`Minted: ${this.tokenName}`)
     if (this.artblocksUrl) {
       embed.setURL(this.artblocksUrl + MINT_UTM)
     }

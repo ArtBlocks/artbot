@@ -1,5 +1,8 @@
 import * as dotenv from 'dotenv'
-import { Client, createClient } from 'urql/core'
+import { createClient } from 'urql/core'
+import * as fs from 'fs'
+import * as path from 'path'
+import { sanitizeTwitterHandle } from '../Utils/twitterUtils'
 import {
   ProjectDetailFragment,
   GetAllProjectsDocument,
@@ -10,7 +13,6 @@ import {
   GetContractProjectsDocument,
   GetProjectInvocationsDocument,
   GetProjectInContractsDocument,
-  GetProjectFloorDocument,
   TokenDetailFragment,
   ProjectTokenDetailFragment,
   GetMostRecentMintedTokenByContractDocument,
@@ -23,19 +25,23 @@ import {
   GetProjectRandomOobDocument,
   OobTokenDetailFragment,
   GetStudioContractsDocument,
+  GetArtistsTwitterHandlesDocument,
+  UserProfileNamingDetailsFragment,
+  LookupUserByAddressDocument,
+  GetEntryByTagDocument,
+  GetEntryByVerticalDocument,
+  GetAllSetsDocument,
+  GetSetByNameDocument,
+  SetDataFragment,
+  GetLowestPricedTokenByProjectDocument,
 } from '../../generated/graphql'
-import {
-  isArbitrumContract,
-  waitForStudioContracts,
-} from '../Classes/APIBots/utils'
-import { ARBITRUM_CONTRACTS, ENGINE_CONTRACTS } from '..'
+import { waitForStudioContracts } from '../Classes/APIBots/utils'
+import { ENGINE_CONTRACTS } from '..'
 
 dotenv.config()
 const fetch = require('node-fetch')
 
 export const PUBLIC_HASURA_ENDPOINT = 'https://data.artblocks.io/v1/graphql'
-export const PUBLIC_ARB_HASURA_ENDPOINT =
-  'https://ab-prod-arbitrum.hasura.app/v1/graphql'
 const CORE_CONTRACTS: {
   [id: string]: string
 } = require('../ProjectConfig/coreContracts.json')
@@ -48,6 +54,18 @@ const EXPLORATION_CONTRACTS: {
 const BLOCKED_ENGINE_CONTRACTS: {
   [id: string]: string
 } = require('../ProjectConfig/blockedEngineContracts.json')
+
+/**
+ * Get the combined list of non-engine contracts (core + collab + explorations + blocked).
+ * Extracted to avoid duplicating this concatenation across multiple functions.
+ */
+function getNonEngineContracts(extraContracts: string[] = []): string[] {
+  return Object.values(CORE_CONTRACTS)
+    .concat(Object.values(COLLAB_CONTRACTS))
+    .concat(Object.values(EXPLORATION_CONTRACTS))
+    .concat(Object.values(BLOCKED_ENGINE_CONTRACTS))
+    .concat(extraContracts)
+}
 
 const client = createClient({
   url: PUBLIC_HASURA_ENDPOINT,
@@ -63,29 +81,14 @@ const client = createClient({
   requestPolicy: 'network-only',
 })
 
-const arbitrumClient = createClient({
-  url: PUBLIC_ARB_HASURA_ENDPOINT,
-  fetch: fetch,
-  requestPolicy: 'network-only',
-})
-
-const getClientForContract = (contract: string) => {
-  if (isArbitrumContract(contract)) {
-    return arbitrumClient
-  }
-  return client
-}
-
 const maxProjectsPerQuery = 1000
 
-export async function getAllProjectsForClient(
-  hasuraClient: Client
-): Promise<ProjectDetailFragment[]> {
+export async function getAllProjects(): Promise<ProjectDetailFragment[]> {
   try {
-    const allProjects: any[] = []
+    const allProjects: ProjectDetailFragment[] = []
     let loop = true
     while (loop) {
-      const { data } = await hasuraClient
+      const { data } = await client
         .query(GetAllProjectsDocument, {
           first: maxProjectsPerQuery,
           skip: allProjects.length,
@@ -102,42 +105,8 @@ export async function getAllProjectsForClient(
     }
     return allProjects
   } catch (err) {
-    console.error(err)
+    console.error('Error in getAllProjects:', err)
     return []
-  }
-}
-
-export async function getAllProjects(): Promise<ProjectDetailFragment[]> {
-  try {
-    const mainnet = await getAllProjectsForClient(client)
-    const arb = await getAllProjectsForClient(arbitrumClient)
-    return mainnet.concat(arb)
-  } catch (err) {
-    console.error(err)
-    return []
-  }
-}
-
-export async function getArbitrumContracts() {
-  const nonPBABContracts: string[] = Object.values(CORE_CONTRACTS)
-    .concat(Object.values(COLLAB_CONTRACTS))
-    .concat(Object.values(EXPLORATION_CONTRACTS))
-    .concat(Object.values(BLOCKED_ENGINE_CONTRACTS))
-  try {
-    const { data: arbData } = await arbitrumClient
-      .query(GetEngineContractsDocument, {
-        ids: nonPBABContracts,
-      })
-      .toPromise()
-
-    if (!arbData) {
-      throw Error('No data returned from getEngineContracts arbitrum query')
-    }
-
-    return arbData.contracts_metadata.map(({ address }) => address)
-  } catch (err) {
-    console.error(err)
-    return undefined
   }
 }
 
@@ -155,18 +124,14 @@ export async function getStudioContracts() {
 
     return allContracts
   } catch (err) {
-    console.error(err)
+    console.error('Error in getStudioContracts:', err)
     return undefined
   }
 }
 
 export async function getEngineContracts() {
   const studioContracts = await waitForStudioContracts()
-  const nonPBABContracts: string[] = Object.values(CORE_CONTRACTS)
-    .concat(Object.values(COLLAB_CONTRACTS))
-    .concat(Object.values(EXPLORATION_CONTRACTS))
-    .concat(Object.values(BLOCKED_ENGINE_CONTRACTS))
-    .concat(studioContracts ?? [])
+  const nonPBABContracts = getNonEngineContracts(studioContracts ?? [])
   try {
     const { data } = await client
       .query(GetEngineContractsDocument, {
@@ -178,33 +143,28 @@ export async function getEngineContracts() {
       throw Error('No data returned from getEngineContracts Hasura query')
     }
 
-    const arbContracts = await getArbitrumContracts()
-
-    const allContracts = data.contracts_metadata
-      .map(({ address }) => address)
-      .concat(arbContracts ?? [])
-
-    return allContracts
+    return data.contracts_metadata.map(({ address }) => address)
   } catch (err) {
-    console.error(err)
+    console.error('Error in getEngineContracts:', err)
     return undefined
   }
 }
 
-async function getAllWalletTokensClient(
-  hasuraClient: Client,
-  wallet: string,
-  contracts: string[]
-) {
+export async function getAllTokensInWallet(walletAddress: string) {
+  const addresses = Object.values(CORE_CONTRACTS)
+    .concat(Object.values(COLLAB_CONTRACTS))
+    .concat(Object.values(EXPLORATION_CONTRACTS))
+    .concat(Object.values(ENGINE_CONTRACTS))
+
   const maxTokensPerQuery = 1000
   try {
     const allTokens: TokenDetailFragment[] = []
     let loop = true
     while (loop) {
-      const { data } = await hasuraClient
+      const { data } = await client
         .query(GetWalletTokensDocument, {
-          wallet,
-          contracts,
+          wallet: walletAddress,
+          contracts: addresses,
           first: maxTokensPerQuery,
           skip: allTokens.length,
         })
@@ -219,32 +179,12 @@ async function getAllWalletTokensClient(
     }
     return allTokens
   } catch (err) {
-    console.error(err)
+    console.error(
+      `Error in getAllTokensInWallet for wallet ${walletAddress}:`,
+      err
+    )
     return []
   }
-}
-
-export async function getAllTokensInWallet(walletAddress: string) {
-  const engineContracts = ENGINE_CONTRACTS
-  const arbContracts = ARBITRUM_CONTRACTS
-  const addresses = Object.values(CORE_CONTRACTS)
-    .concat(Object.values(COLLAB_CONTRACTS))
-    .concat(Object.values(EXPLORATION_CONTRACTS))
-    .concat(Object.values(engineContracts))
-    .concat(Object.values(arbContracts))
-
-  const mainnetTokens = await getAllWalletTokensClient(
-    client,
-    walletAddress,
-    addresses
-  )
-  const arbTokens = await getAllWalletTokensClient(
-    arbitrumClient,
-    walletAddress,
-    addresses
-  )
-
-  return mainnetTokens.concat(arbTokens)
 }
 
 export async function getArtblocksOpenProjects(): Promise<
@@ -278,7 +218,7 @@ export async function getArtblocksOpenProjects(): Promise<
 
     return projects
   } catch (err) {
-    console.error(err)
+    console.error('Error in getArtblocksOpenProjects:', err)
     return []
   }
 }
@@ -305,8 +245,7 @@ export async function getContractProject(
   projectId: number,
   contractAddress: string
 ): Promise<ProjectDetailFragment> {
-  const hasuraClient = getClientForContract(contractAddress)
-  const { data } = await hasuraClient
+  const { data } = await client
     .query(GetProjectDocument, {
       id: `${contractAddress}-${projectId}`,
     })
@@ -358,12 +297,11 @@ export async function getProject(
 async function getContractProjects(
   contractAddress: string
 ): Promise<ProjectDetailFragment[]> {
-  const hasuraClient = getClientForContract(contractAddress)
   const maxTokensPerQuery = 1000
   const allProjects: ProjectDetailFragment[] = []
   let loop = true
   while (loop) {
-    const { data } = await hasuraClient
+    const { data } = await client
       .query(GetContractProjectsDocument, {
         contract: contractAddress,
         first: maxTokensPerQuery,
@@ -392,14 +330,15 @@ async function getContractsProjects(
     ])
     return allArrays.flat()
   } catch (err) {
-    throw new Error(err)
+    throw err instanceof Error
+      ? err
+      : new Error(`Error in getContractsProjects: ${err}`)
   }
 }
 
 export async function getProjectInvocations(projectId: string) {
-  const hasuraClient = getClientForContract(projectId.split('-')[0])
   try {
-    const { data } = await hasuraClient
+    const { data } = await client
       .query(GetProjectInvocationsDocument, {
         id: projectId,
       })
@@ -412,34 +351,13 @@ export async function getProjectInvocations(projectId: string) {
       ? data.projects_metadata[0].invocations
       : null
   } catch (err) {
-    console.error(err)
-    return undefined
-  }
-}
-
-export async function getProjectFloor(projectId: string) {
-  const hasuraClient = getClientForContract(projectId.split('-')[0])
-  try {
-    const { data } = await hasuraClient
-      .query(GetProjectFloorDocument, {
-        id: projectId,
-      })
-      .toPromise()
-
-    if (!data) {
-      throw Error('No data returned from getProjectFloor Hasura query')
-    }
-    return data.projects_metadata[0].tokens.find((token) => !token.is_flagged)
-  } catch (err) {
-    console.error(err)
+    console.error(`Error in getProjectInvocations for ${projectId}:`, err)
     return undefined
   }
 }
 
 export async function getToken(tokenId: string): Promise<TokenDetailFragment> {
-  const hasuraClient = getClientForContract(tokenId.split('-')[0])
-
-  const { data, error } = await hasuraClient
+  const { data, error } = await client
     .query(GetTokenDocument, {
       token_id: tokenId,
     })
@@ -459,9 +377,7 @@ export async function getToken(tokenId: string): Promise<TokenDetailFragment> {
 export async function getMostRecentMintedTokenByContracts(
   contracts: string[]
 ): Promise<ProjectTokenDetailFragment> {
-  const isArb = contracts.length > 0 && isArbitrumContract(contracts[0])
-  const c = isArb ? arbitrumClient : client
-  const { data } = await c
+  const { data } = await client
     .query(GetMostRecentMintedTokenByContractDocument, {
       contracts: contracts,
     })
@@ -489,11 +405,8 @@ export async function getMostRecentMintedFlagshipToken(): Promise<ProjectTokenDe
   return data.tokens_metadata[0]
 }
 
-export async function getAllContracts(
-  isArb: boolean
-): Promise<ContractDetailFragment[]> {
-  const c = isArb ? arbitrumClient : client
-  const { data } = await c.query(GetAllContractsDocument, {}).toPromise()
+export async function getAllContracts(): Promise<ContractDetailFragment[]> {
+  const { data } = await client.query(GetAllContractsDocument, {}).toPromise()
 
   if (!data || !data.contracts_metadata.length) {
     throw Error('No data returned from getAllContracts Hasura query')
@@ -536,4 +449,179 @@ export async function getRandomOobForProject(
   }
 
   return data.projects_metadata[0].random_oob_token[0]
+}
+
+export async function getArtistsTwitterHandles(): Promise<Map<string, string>> {
+  const artistTwitterMap = new Map<string, string>()
+
+  try {
+    // First, get data from Hasura
+    const { data } = await client
+      .query(GetArtistsTwitterHandlesDocument, {})
+      .toPromise()
+
+    if (data && data.artistEditorialPages?.data) {
+      // Process each artist and extract Twitter handle
+      data.artistEditorialPages.data.forEach((artist) => {
+        if (!artist?.attributes) return
+
+        const artistName = artist.attributes.artistName
+        const twitter = artist.attributes.twitter
+
+        if (artistName && twitter) {
+          const handle = sanitizeTwitterHandle(twitter)
+          if (handle) {
+            artistTwitterMap.set(artistName, handle)
+          } else {
+            console.warn(
+              `Could not extract Twitter handle from URL: ${twitter} for artist: ${artistName}`
+            )
+          }
+        }
+      })
+    } else {
+      console.warn('No data returned from GetArtistsTwitterHandles query')
+    }
+
+    // Then, supplement with local JSON file data
+    try {
+      const jsonFilePath = path.join(__dirname, 'artist-twitter.json')
+      const jsonData = fs.readFileSync(jsonFilePath, 'utf8')
+      const artistsData = JSON.parse(jsonData) as Array<{
+        name: string
+        walletAddress?: string
+        slug: string
+        twitterUsername: string
+      }>
+
+      artistsData.forEach((artist) => {
+        if (artist.name && artist.twitterUsername) {
+          // Clean up twitter username (remove @ if present and remove URL if it's a full URL)
+          const handle = sanitizeTwitterHandle(artist.twitterUsername)
+
+          if (handle) {
+            artistTwitterMap.set(artist.name, handle)
+          }
+        }
+      })
+    } catch (jsonError) {
+      console.warn('Error reading or parsing artist-twitter.json:', jsonError)
+    }
+
+    console.log(
+      `Successfully loaded ${artistTwitterMap.size} artist Twitter handles (Hasura + JSON supplement)`
+    )
+    return artistTwitterMap
+  } catch (error) {
+    console.error('Error fetching artists Twitter handles:', error)
+    return artistTwitterMap
+  }
+}
+
+export async function lookupUserByAddress(
+  address: string
+): Promise<UserProfileNamingDetailsFragment> {
+  const { data } = await client
+    .query(LookupUserByAddressDocument, {
+      address: address.toLowerCase(),
+    })
+    .toPromise()
+
+  if (!data || !data.user_profiles.length) {
+    throw Error('No data returned from LookupUserByAddress query')
+  }
+
+  return data.user_profiles[0]
+}
+
+export interface EntryProject {
+  id: string
+  name?: string | null | undefined
+  lowest_listing?: number | string | null
+  artist_name?: string | null | undefined
+  contract_address: string
+  project_id: string
+}
+
+export async function getEntryByTag(
+  tagName: string,
+  limit = 5
+): Promise<EntryProject[]> {
+  const { data } = await client
+    .query(GetEntryByTagDocument, {
+      tag_name: tagName,
+      limit: limit,
+    })
+    .toPromise()
+
+  if (!data || !data.projects_metadata) {
+    throw Error('No data returned from GetEntryByTag query')
+  }
+
+  return data.projects_metadata
+}
+
+export async function getEntryByVertical(
+  verticalName: string,
+  limit = 5
+): Promise<EntryProject[]> {
+  const { data } = await client
+    .query(GetEntryByVerticalDocument, {
+      vertical_name: verticalName,
+      limit: limit,
+    })
+    .toPromise()
+
+  if (!data || !data.projects_metadata) {
+    throw Error('No data returned from GetEntryByVertical query')
+  }
+
+  return data.projects_metadata
+}
+
+export interface SetListData {
+  __typename?: 'sets' | undefined
+  name: string
+}
+
+export async function getAllSets(): Promise<SetListData[]> {
+  const { data } = await client.query(GetAllSetsDocument, {}).toPromise()
+
+  if (!data || !data.sets) {
+    throw Error('No data returned from GetAllSets query')
+  }
+
+  return data.sets
+}
+
+export async function getSetByName(
+  setName: string
+): Promise<SetDataFragment | null> {
+  const { data } = await client
+    .query(GetSetByNameDocument, {
+      set_name: setName,
+    })
+    .toPromise()
+
+  if (!data || !data.sets || data.sets.length === 0) {
+    return null
+  }
+
+  return data.sets[0]
+}
+
+export async function getLowestPricedTokenByProject(
+  projectId: string
+): Promise<{ id: string; invocation: number } | null> {
+  const { data } = await client
+    .query(GetLowestPricedTokenByProjectDocument, {
+      project_id: projectId,
+    })
+    .toPromise()
+
+  if (!data || !data.tokens_metadata || data.tokens_metadata.length === 0) {
+    return null
+  }
+
+  return data.tokens_metadata[0]
 }

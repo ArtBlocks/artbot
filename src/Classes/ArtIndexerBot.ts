@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import { Channel, Collection, Message } from 'discord.js'
+import { Channel, Collection, EmbedBuilder, Message } from 'discord.js'
 import * as dotenv from 'dotenv'
 
 import { ProjectBot } from './ProjectBot'
@@ -11,6 +11,10 @@ import {
   getAllContracts,
   getMostRecentMintedFlagshipToken,
   getArtblocksNextUpcomingProject,
+  getEntryByTag,
+  getEntryByVertical,
+  getAllSets,
+  getSetByName,
 } from '../Data/queryGraphQL'
 import { projectConfig, triviaBot } from '..'
 import {
@@ -24,23 +28,27 @@ import {
   getVerticalName,
   isVerticalName,
   resolveEnsName,
+  getProjectSlugUrl,
 } from './APIBots/utils'
-import { ProjectConfig } from '../ProjectConfig/projectConfig'
+import { randomColor } from '../Utils/smartBotResponse'
+import { logger } from '../logger'
 dotenv.config()
 
-const deburr = require('lodash.deburr')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const deburr = require('lodash.deburr') as (s: string) => string
+import { isWallet } from './APIBots/utils'
 
-const PROJECT_ALIASES = require('../ProjectConfig/project_aliases.json')
+const PROJECT_ALIASES: Record<
+  string,
+  string
+> = require('../ProjectConfig/project_aliases.json')
 const CONTRACT_ALIASES: {
   aliases: string[]
   named_contracts: string[]
 }[] = require('../ProjectConfig/contract_aliases.json')
 
-const { isWallet } = require('./APIBots/utils')
-
-// Refresh takes around one minute, so recommend setting this to 60 minutes
 const METADATA_REFRESH_INTERVAL_MINUTES =
-  process.env.METADATA_REFRESH_INTERVAL_MINUTES ?? '60'
+  process.env.METADATA_REFRESH_INTERVAL_MINUTES ?? '480' // 8 hours
 const ONE_MINUTE_IN_MS = 60000
 
 export enum MessageTypes {
@@ -53,6 +61,8 @@ export enum MessageTypes {
   OPEN = 'open',
   WALLET = 'wallet',
   RECENT = 'recent',
+  ENTRY = 'entry',
+  SET = 'set',
   PLATFORM = 'platform',
   UPCOMING = 'upcoming',
   UNKNOWN = 'unknown',
@@ -72,11 +82,18 @@ export class ArtIndexerBot {
   tags: { [id: string]: ProjectBot[] } = {}
   projectsById: { [id: string]: ProjectBot } = {}
   contracts: { [id: string]: ContractDetailFragment } = {}
-  walletTokens: { [id: string]: TokenDetailFragment[] } = {}
+  walletTokens: {
+    [id: string]: { tokens: TokenDetailFragment[]; cachedAt: number }
+  } = {}
+  sets: { [id: string]: string } = {}
   initialized = false
 
   platforms: { [id: string]: ProjectBot[] } = {}
   flagship: { [id: string]: ProjectBot } = {}
+
+  private refreshIntervalId?: NodeJS.Timeout
+  private static readonly WALLET_CACHE_TTL_MS = 10 * 60 * 1000 // 10 minutes
+  private static readonly MAX_WALLET_CACHE_SIZE = 500
 
   constructor(projectFetch = getAllProjects) {
     this.projectFetch = projectFetch
@@ -91,9 +108,12 @@ export class ArtIndexerBot {
 
     if (this.projectFetch === getAllProjects) {
       await this.buildContracts()
+      await this.buildSets()
       projectConfig.initializeProjectBots()
     }
-    setInterval(async () => {
+    this.refreshIntervalId = setInterval(async () => {
+      this.logDictionarySizes()
+      this.evictStaleWalletCaches()
       await this.buildProjectBots()
       if (this.projectFetch === getAllProjects) {
         projectConfig.initializeProjectBots()
@@ -101,33 +121,61 @@ export class ArtIndexerBot {
     }, parseInt(METADATA_REFRESH_INTERVAL_MINUTES) * ONE_MINUTE_IN_MS)
   }
 
+  private logDictionarySizes() {
+    logger.info({
+      projects: Object.keys(this.projects).length,
+      artists: Object.keys(this.artists).length,
+      birthdays: Object.keys(this.birthdays).length,
+      collections: Object.keys(this.collections).length,
+      tags: Object.keys(this.tags).length,
+      projectsById: Object.keys(this.projectsById).length,
+      contracts: Object.keys(this.contracts).length,
+      walletTokens: Object.keys(this.walletTokens).length,
+      sets: Object.keys(this.sets).length,
+      platforms: Object.keys(this.platforms).length,
+      flagship: Object.keys(this.flagship).length,
+    }, 'ArtIndexerBot Dictionary Sizes')
+  }
+
   async buildContracts() {
     try {
-      const arbContractsArr = await getAllContracts(true)
-      for (let i = 0; i < arbContractsArr.length; i++) {
-        const name = arbContractsArr[i].name
+      const contractsArr = await getAllContracts()
+      for (let i = 0; i < contractsArr.length; i++) {
+        const name = contractsArr[i].name
         if (typeof name === 'string') {
-          this.contracts[name.toLowerCase()] = arbContractsArr[i]
-        }
-      }
-
-      const ethContractsArr = await getAllContracts(false)
-      for (let i = 0; i < ethContractsArr.length; i++) {
-        const name = ethContractsArr[i].name
-        if (typeof name === 'string') {
-          this.contracts[name.toLowerCase()] = ethContractsArr[i]
+          this.contracts[name.toLowerCase()] = contractsArr[i]
         }
       }
     } catch (e) {
-      console.error('Error in buildContracts', e)
+      logger.error({ err: e }, 'Error in buildContracts')
+    }
+  }
+
+  async buildSets() {
+    try {
+      this.sets = {}
+      const setsArr = await getAllSets()
+      logger.info({ count: setsArr.length }, 'ArtIndexerBot: Building sets')
+      for (let i = 0; i < setsArr.length; i++) {
+        const setName = setsArr[i].name
+        if (typeof setName === 'string') {
+          // Store lowercase key mapping to actual set name for case-insensitive lookup
+          this.sets[setName.toLowerCase()] = setName
+        }
+      }
+      this.sets['ab500'] = 'Art Blocks 500'
+    } catch (e) {
+      logger.error({ err: e }, 'Error in buildSets')
     }
   }
 
   async buildProjectBots() {
     try {
+      this.clearDictionaries()
       const projects = await this.projectFetch()
-      console.log(
-        `ArtIndexerBot: Building ${projects.length} ProjectBots using: ${this.projectFetch.name}`
+      logger.info(
+        { count: projects.length, fetchName: this.projectFetch.name },
+        'ArtIndexerBot: Building ProjectBots'
       )
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i]
@@ -145,8 +193,10 @@ export class ArtIndexerBot {
         )
         const newBot = new ProjectBot({
           id: project.id,
+          chainId: project.chain_id,
           projectNumber: parseInt(project.project_id),
           coreContract: project.contract_address,
+          slug: project.slug,
           editionSize: project.invocations,
           maxEditionSize: project.max_invocations,
           projectName: project.name ?? 'unknown',
@@ -230,8 +280,57 @@ export class ArtIndexerBot {
         })
       })
     } catch (err) {
-      console.error(`Error while initializing ArtIndexerBots\n${err}`)
+      logger.error({ err }, 'Error while initializing ArtIndexerBots')
     }
+  }
+
+  /**
+   * Cleanup method to stop timers when the bot is being destroyed
+   */
+  cleanup() {
+    if (this.refreshIntervalId) {
+      clearInterval(this.refreshIntervalId)
+      this.refreshIntervalId = undefined
+    }
+  }
+
+  /**
+   * Evict stale wallet token caches to prevent unbounded memory growth
+   */
+  private evictStaleWalletCaches() {
+    const now = Date.now()
+    const keys = Object.keys(this.walletTokens)
+
+    // Evict expired entries
+    for (const key of keys) {
+      if (
+        now - this.walletTokens[key].cachedAt >
+        ArtIndexerBot.WALLET_CACHE_TTL_MS
+      ) {
+        delete this.walletTokens[key]
+      }
+    }
+
+    // If still over max size, evict oldest entries
+    const remaining = Object.entries(this.walletTokens)
+    if (remaining.length > ArtIndexerBot.MAX_WALLET_CACHE_SIZE) {
+      remaining
+        .sort((a, b) => a[1].cachedAt - b[1].cachedAt)
+        .slice(0, remaining.length - ArtIndexerBot.MAX_WALLET_CACHE_SIZE)
+        .forEach(([key]) => delete this.walletTokens[key])
+    }
+  }
+
+  private clearDictionaries() {
+    this.projects = {}
+    this.artists = {}
+    this.birthdays = {}
+    this.collections = {}
+    this.tags = {}
+    this.projectsById = {}
+    this.platforms = {}
+    this.flagship = {}
+    // Don't clear contracts, walletTokens, or sets as they are managed separately
   }
 
   // Please update HASHTAG_MESSAGE in smartBotResponse.ts if you add more options here
@@ -248,6 +347,10 @@ export class ArtIndexerBot {
       return MessageTypes.UPCOMING
     } else if (messageContent?.startsWith('#recent')) {
       return MessageTypes.RECENT
+    } else if (messageContent?.startsWith('#entry')) {
+      return MessageTypes.ENTRY
+    } else if (messageContent?.startsWith('#set')) {
+      return MessageTypes.SET
     } else if (key === 'open') {
       return MessageTypes.OPEN
     } else if (isVerticalName(key)) {
@@ -306,6 +409,11 @@ export class ArtIndexerBot {
 
   async handleNumberMessage(msg: Message) {
     const content = msg.content
+
+    if (!msg.channel.isSendable()) {
+      return
+    }
+
     if (content.length <= 1) {
       msg.channel.send(
         `Invalid format, enter # followed by the piece number of interest.`
@@ -313,7 +421,38 @@ export class ArtIndexerBot {
       return
     }
 
-    console.log('Handling message', content)
+    logger.info({ content }, 'Handling message')
+
+    if (content.toLowerCase().startsWith('#floor')) {
+      msg.channel.send(
+        `The \`#floor\` command has changed to \`#entry\`. Please try using \`#entry\` instead!`
+      )
+      return
+    }
+
+    // Handle #entry commands for groupings
+    if (content.toLowerCase().startsWith('#entry')) {
+      try {
+        await this.handleEntryMessage(msg)
+      } catch (error) {
+        msg.channel.send(`Sorry, I had trouble understanding that: ${content}`)
+        logger.error({ err: error }, 'Error handling #entry message')
+        return
+      }
+      return
+    }
+
+    // Handle #set commands for set collections
+    if (content.toLowerCase().startsWith('#set')) {
+      try {
+        await this.handleSetMessage(msg)
+      } catch (error) {
+        msg.channel.send(`Sorry, I had trouble understanding that: ${content}`)
+        logger.error({ err: error }, 'Error handling #set message')
+        return
+      }
+      return
+    }
 
     let afterTheHash = content
       .substr(content.indexOf(' ') + 1)
@@ -361,7 +500,7 @@ export class ArtIndexerBot {
         // use flagship contract
         token = await getMostRecentMintedFlagshipToken()
       } else if (!token) {
-        console.error('Bad value specified for recent', afterTheHash)
+        logger.error({ afterTheHash }, 'Bad value specified for recent')
         msg.channel.send('Sorry, I was not able to understand that.')
         return
       }
@@ -377,14 +516,14 @@ export class ArtIndexerBot {
         projectBot.handleUpcomingMessage(msg, upcomingProjectDetails)
         return
       } catch (error) {
-        console.warn(error)
+        logger.warn({ err: error }, 'Error getting upcoming project')
       }
     } else {
       projectBot = await this.projectBotForMessage(projectKey, afterTheHash)
     }
 
     if (!projectBot) {
-      console.log("Wasn't able to parse message", content)
+      logger.info({ content }, "Wasn't able to parse message")
       return
     }
 
@@ -395,7 +534,7 @@ export class ArtIndexerBot {
       triviaBot.tally(msg)
     }
 
-    projectBot.handleNumberMessage(msg)
+    await projectBot.handleNumberMessage(msg)
   }
 
   async handleNumberTweet(tweet: string): Promise<ProjectBotAndToken> {
@@ -459,6 +598,9 @@ export class ArtIndexerBot {
   }
 
   getRandomizedProjectBot(projectBots: ProjectBot[]): ProjectBot | undefined {
+    if (!projectBots || projectBots.length === 0) {
+      return undefined
+    }
     let attempts = 0
     while (attempts < 10) {
       const projBot =
@@ -495,7 +637,7 @@ export class ArtIndexerBot {
       const token = await getMostRecentMintedTokenByContracts(contracts)
       return token
     } catch (e) {
-      console.error('Error in getContractTokenForKey', e)
+      logger.error({ err: e }, 'Error in getContractTokenForKey')
       return null
     }
   }
@@ -510,6 +652,10 @@ export class ArtIndexerBot {
 
       const project =
         openProjects[Math.floor(Math.random() * openProjects.length)]
+
+      if (!project) {
+        continue
+      }
 
       const projBot = this.projects[this.toProjectKey(project.name ?? '')]
       if (projBot && projBot.editionSize > 1 && projBot.projectActive) {
@@ -541,11 +687,7 @@ export class ArtIndexerBot {
     wallet: string,
     projectKey = ''
   ): Promise<TokenDetailFragment> {
-    console.log(
-      `Getting random token${
-        projectKey ? ` from ${projectKey}` : ''
-      } in wallet ${wallet}`
-    )
+    logger.info({ projectKey, wallet }, 'Getting random token from wallet')
     // Resolve ENS name if ends in .eth
     if (wallet.toLowerCase().endsWith('.eth')) {
       const ensName = wallet
@@ -559,12 +701,16 @@ export class ArtIndexerBot {
 
     wallet = wallet.toLowerCase()
 
-    let tokens = []
-    if (this.walletTokens[wallet]) {
-      tokens = this.walletTokens[wallet]
+    let tokens: TokenDetailFragment[] = []
+    const cached = this.walletTokens[wallet]
+    if (
+      cached &&
+      Date.now() - cached.cachedAt < ArtIndexerBot.WALLET_CACHE_TTL_MS
+    ) {
+      tokens = cached.tokens
     } else {
       tokens = (await getAllTokensInWallet(wallet)) ?? []
-      this.walletTokens[wallet] = tokens
+      this.walletTokens[wallet] = { tokens, cachedAt: Date.now() }
     }
 
     if (tokens.length === 0) {
@@ -624,15 +770,11 @@ export class ArtIndexerBot {
     return chosenToken
   }
 
-  async checkBirthdays(
-    channels: Collection<string, Channel>,
-    projectConfig: ProjectConfig,
-    artistChannel: boolean
-  ) {
+  async checkBirthdays(channels: Collection<string, Channel>) {
     const now = new Date()
     const [year, month, day] = now.toISOString().split('T')[0].split('-')
     const sentMessages: { [id: string]: boolean } = {}
-    console.log(`${this.birthdays[`${month}-${day}`]?.length} birthdays today!`)
+    logger.info({ count: this.birthdays[`${month}-${day}`]?.length }, 'birthdays today')
     if (this.birthdays[`${month}-${day}`]) {
       this.birthdays[`${month}-${day}`].forEach((projBot) => {
         if (
@@ -640,7 +782,7 @@ export class ArtIndexerBot {
           projBot.startTime.getFullYear().toString() !== year &&
           !sentMessages[projBot.id]
         ) {
-          projBot.sendBirthdayMessage(channels, projectConfig, artistChannel)
+          projBot.sendBirthdayMessage(channels)
           sentMessages[projBot.id] = true
         }
       })
@@ -671,5 +813,333 @@ export class ArtIndexerBot {
       return projBot.namedHandler?.hasNamed()
     })
     return projects
+  }
+
+  checkMintedOut(projectId: string, invocation: string) {
+    const projectBot = this.projectsById[projectId]
+    const invocationNumber = parseInt(invocation)
+    if (
+      !projectBot ||
+      !projectBot.maxEditionSize ||
+      projectBot.maxEditionSize - 1 !== invocationNumber
+    ) {
+      return
+    }
+    logger.info(
+      { projectName: projectBot.projectName, maxEditionSize: projectBot.maxEditionSize, invocation },
+      'Sending minted out message'
+    )
+
+    projectBot.sendMintedOutMessage()
+  }
+
+  /**
+   * Check if a project has the AB500 tag
+   * @param projectId The project ID to check
+   * @returns true if the project has the "ab500" tag, false otherwise
+   */
+  isAB500(projectId: string): boolean {
+    const ab500Projects = this.tags['ab500']
+    if (!ab500Projects) {
+      return false
+    }
+
+    return ab500Projects.some((projectBot) => projectBot.id === projectId)
+  }
+
+  /**
+   * Handle #entry commands for both projects and groupings (tags and verticals)
+   */
+  async handleEntryMessage(msg: Message) {
+    if (!msg.channel.isSendable()) {
+      return
+    }
+
+    const content = msg.content.trim()
+    const parts = content.split(' ')
+
+    if (parts.length < 2) {
+      msg.channel.send(
+        'Please specify a project or grouping. Format: `#entry [project/grouping]`\n' +
+          'Examples: `#entry Fidenza`, `#entry AB500`, `#entry Curated`, `#entry Curated Series 1`'
+      )
+      return
+    }
+
+    // Extract the target name (everything after "#entry")
+    const target = content.substring(6).trim() // Remove "#entry"
+    const targetKey = this.toProjectKey(target)
+
+    const messageType = this.getMessageType(targetKey, target)
+    let projectBot: ProjectBot | undefined
+
+    if (messageType === MessageTypes.PROJECT) {
+      projectBot = await this.projectBotForMessage(targetKey, target)
+    } else if (messageType === MessageTypes.COLLECTION) {
+      const vertical = getVerticalName(target.toLowerCase())
+      const entryProjects = await getEntryByVertical(vertical, 1)
+
+      if (entryProjects.length === 0) {
+        msg.channel.send(
+          `Sorry, I wasn't able to find any projects for sale with the vertical ${vertical}`
+        )
+        return
+      }
+
+      const projectKey = this.toProjectKey(entryProjects[0].name ?? '')
+      projectBot = await this.projectBotForMessage(
+        projectKey,
+        `#entry ${entryProjects[0].name}`
+      )
+    } else if (messageType === MessageTypes.TAG) {
+      const tag = target
+      const entryProjects = await getEntryByTag(tag.toLowerCase(), 1)
+
+      if (entryProjects.length === 0) {
+        msg.channel.send(
+          `Sorry, I wasn't able to find any projects for sale with the tag ${tag}`
+        )
+        return
+      }
+
+      const projectKey = this.toProjectKey(entryProjects[0].name ?? '')
+      projectBot = await this.projectBotForMessage(
+        projectKey,
+        `#entry ${entryProjects[0].name}`
+      )
+    }
+
+    if (!projectBot) {
+      msg.channel.send(
+        `Sorry, I wasn't able to find any projects for sale with the query ${target}`
+      )
+      return
+    }
+
+    await projectBot?.handleNumberMessage(msg)
+    return
+  }
+
+  /**
+   * Handle #set commands for set collections
+   */
+  async handleSetMessage(msg: Message) {
+    if (!msg.channel.isSendable()) {
+      return
+    }
+
+    const content = msg.content.trim()
+    const parts = content.split(' ')
+
+    if (parts.length < 2) {
+      msg.channel.send(
+        'Please specify a set name. Format: `#set [set name]`\n' +
+          'Example: `#set Curated`'
+      )
+      return
+    }
+
+    // Helper function for smart price formatting
+    const formatPrice = (price: number): string => {
+      if (price < 0.01) {
+        // For very small prices, use 5-6 decimals to show meaningful precision
+        return price < 0.001 ? price.toFixed(6) : price.toFixed(5)
+      } else if (price >= 10) {
+        // For larger numbers, trim trailing zeros
+        const formatted = price.toFixed(4)
+        return formatted.replace(/\.?0+$/, '')
+      } else {
+        // Standard 4 decimals for most cases
+        return price.toFixed(4)
+      }
+    }
+
+    // Extract the set name (everything after "#set")
+    const setName = content.substring(4).trim() // Remove "#set"
+    const setKey = setName.toLowerCase()
+
+    // Check if the set exists and get the correct case
+    const actualSetName = this.sets[setKey]
+    if (!actualSetName) {
+      msg.channel.send(
+        `Sorry, I wasn't able to find a set named "${setName}". Make sure the set name is spelled correctly. Some examples of valid set names are: \`Curated Series 4\`, \`AB500\`, \`Explorations\`, etc.`
+      )
+      return
+    }
+
+    try {
+      // Get the set data with all its buckets using the correct case
+      const setData = await getSetByName(actualSetName)
+
+      if (!setData || !setData.set_buckets) {
+        msg.channel.send(
+          `Sorry, I had trouble retrieving data for the set "${setName}". Try again later!`
+        )
+        return
+      }
+
+      // Filter out buckets that don't have valid projects
+      const validBuckets = setData.set_buckets.filter(
+        (bucket) => bucket.project
+      )
+
+      // Calculate total entry price and collect all prices for statistics
+      let totalPrice = 0
+      const totalProjects = validBuckets.length
+      let totalProjectsWithListings = 0
+      const projectPrices: {
+        price: number
+        name: string
+        slug: string
+      }[] = []
+      const projectsWithoutListings: {
+        name: string
+        slug: string
+      }[] = []
+
+      for (const bucket of validBuckets) {
+        if (bucket.project) {
+          const projectName = bucket.project.name || 'Unknown Project'
+          const slug = bucket.project.slug
+
+          if (bucket.project.lowest_listing) {
+            const price = Number(bucket.project.lowest_listing)
+            totalPrice += price
+            totalProjectsWithListings++
+            projectPrices.push({
+              price,
+              name: projectName,
+              slug,
+            })
+          } else {
+            projectsWithoutListings.push({
+              name: projectName,
+              slug,
+            })
+          }
+        }
+      }
+
+      // Calculate price statistics
+      let cheapestProject = 0
+      let mostExpensiveProject = 0
+      let medianProject = 0
+
+      if (projectPrices.length > 0) {
+        // Sort prices to find min, max, and median
+        const sortedProjectPrices = [...projectPrices].sort(
+          (a, b) => a.price - b.price
+        )
+
+        cheapestProject = sortedProjectPrices[0].price
+        mostExpensiveProject =
+          sortedProjectPrices[sortedProjectPrices.length - 1].price
+
+        // Calculate median
+        const prices = sortedProjectPrices.map((p) => p.price)
+        const midIndex = Math.floor(prices.length / 2)
+        if (prices.length % 2 === 0) {
+          // Even number of prices - average of two middle values
+          medianProject = (prices[midIndex - 1] + prices[midIndex]) / 2
+        } else {
+          // Odd number of prices - middle value
+          medianProject = prices[midIndex]
+        }
+      }
+
+      const embedContent = new EmbedBuilder()
+        // Set the title of the field.
+        .setTitle(`${setData.name} Set - Data Snapshot`)
+        .setDescription(
+          `Current Price for a **full ${setData.name} Set** is **${formatPrice(
+            totalPrice
+          )} ETH**`
+        )
+        // Add link to title.
+        .setURL(`https://www.artblocks.io/sets/${setData.slug}`)
+        .setColor(randomColor())
+
+      embedContent.addFields({
+        name: 'Availability',
+        value: `${totalProjectsWithListings}/${totalProjects} (${(
+          (totalProjectsWithListings / totalProjects) *
+          100
+        ).toFixed(2)}%)`,
+        inline: true,
+      })
+      embedContent.addFields({
+        name: 'Median Price',
+        value: `${formatPrice(medianProject)} Ξ`,
+        inline: true,
+      })
+
+      // Add price range and top 3 lists if we have projects with listings
+      if (totalProjectsWithListings > 0) {
+        embedContent.addFields({
+          name: 'Price Range',
+          value: `${formatPrice(cheapestProject)} Ξ - ${formatPrice(
+            mostExpensiveProject
+          )} Ξ`,
+          inline: true,
+        })
+
+        // Generate top 3 cheapest and priciest lists
+        const sortedProjectPrices = [...projectPrices].sort(
+          (a, b) => a.price - b.price
+        )
+
+        // Top 3 cheapest (already sorted ascending)
+        const top3Cheapest = sortedProjectPrices.slice(0, 3)
+        const cheapestText = top3Cheapest
+          .map(
+            (p) =>
+              `— [${p.name}](${getProjectSlugUrl(p.slug)}) • ${formatPrice(p.price)} Ξ`
+          )
+          .join('\n')
+
+        // Top 3 priciest (reverse order - most expensive first)
+        const top3Priciest = sortedProjectPrices.slice(-3).reverse()
+        const priciestText = top3Priciest
+          .map(
+            (p) =>
+              `— [${p.name}](${getProjectSlugUrl(p.slug)}) • ${formatPrice(p.price)} Ξ`
+          )
+          .join('\n')
+
+        embedContent.addFields({
+          name: 'Easiest Entries',
+          value: cheapestText,
+        })
+
+        embedContent.addFields({
+          name: 'Steepest Entries',
+          value: priciestText,
+        })
+      }
+
+      // Add projects without listings if any exist
+      if (projectsWithoutListings.length > 0) {
+        const firstFive = projectsWithoutListings.slice(0, 5)
+        const noListingsText =
+          firstFive
+            .map((p) => `[${p.name}](${getProjectSlugUrl(p.slug)})`)
+            .join(' • ') +
+          (projectsWithoutListings.length > 5
+            ? ` and ${projectsWithoutListings.length - 5} more`
+            : '')
+
+        embedContent.addFields({
+          name: 'Unavailable (No Current Listings)',
+          value: noListingsText,
+        })
+      }
+
+      msg.channel.send({ embeds: [embedContent] })
+    } catch (error) {
+      logger.error({ err: error }, 'Error in handleSetMessage')
+      msg.channel.send(
+        `Sorry, there was an error retrieving data for the set "${setName}". Please try again later.`
+      )
+    }
   }
 }

@@ -1,6 +1,8 @@
 fragment ProjectDetail on projects_metadata {
   id
   project_id
+  slug
+  chain_id
   name
   description
   invocations
@@ -21,11 +23,15 @@ fragment ProjectDetail on projects_metadata {
   }
   contract {
     name
+    partner {
+      name
+    }
   }
 }
 
 fragment TokenDetail on tokens_metadata {
   invocation
+  chain_id
   project {
     name
     artist_name
@@ -36,23 +42,28 @@ fragment TokenDetail on tokens_metadata {
   }
   preview_asset_url
   live_view_url
-  list_currency_symbol
-  list_price
   owner {
     public_address
   }
   is_flagged
+  list_price
+  list_currency_symbol
 }
 
 fragment ProjectTokenDetail on tokens_metadata {
   id
   project_id
   invocation
+  chain_id
 }
 
 fragment ContractDetail on contracts_metadata {
   address
   name
+  chain_id
+  partner {
+    name
+  }
 }
 
 query getAllProjects($first: Int!, $skip: Int, $blocked_addresses: [String!]) {
@@ -152,16 +163,6 @@ query getProjectInvocations($id: String!) {
   }
 }
 
-query getProjectFloor($id: String!) {
-  projects_metadata(where: { id: { _eq: $id } }) {
-    tokens(limit: 3, order_by: { list_eth_price: asc }) {
-      invocation
-      list_eth_price
-      is_flagged
-    }
-  }
-}
-
 query getAllContracts {
   contracts_metadata {
     ...ContractDetail
@@ -240,5 +241,108 @@ query GetProjectRandomOOB($project_id: String!, $seed: float8!) {
 query GetStudioContracts {
   contracts_metadata(where: { default_vertical: { name: { _eq: studio } } }) {
     ...ContractDetail
+  }
+}
+
+query GetArtistsTwitterHandles {
+  artistEditorialPages {
+    data {
+      attributes {
+        twitter
+        userProfileAddress
+        artistName
+      }
+    }
+  }
+}
+
+fragment UserProfileNamingDetails on user_profiles {
+  username
+  twitter_username
+  name
+}
+
+query LookupUserByAddress($address: String!) {
+  user_profiles(
+    where: { linked_accounts: { public_address: { _eq: $address } } }
+  ) {
+    ...UserProfileNamingDetails
+  }
+}
+
+query GetEntryByTag($tag_name: String!, $limit: Int!) {
+  projects_metadata(
+    where: {
+      tags: { tag_name: { _eq: $tag_name } }
+      active: { _eq: true }
+      lowest_listing: { _is_null: false }
+    }
+    order_by: { lowest_listing: asc_nulls_last }
+    limit: $limit
+  ) {
+    id
+    name
+    lowest_listing
+    artist_name
+    contract_address
+    project_id
+  }
+}
+
+query GetEntryByVertical($vertical_name: String!, $limit: Int!) {
+  projects_metadata(
+    where: {
+      vertical_name: { _eq: $vertical_name }
+      active: { _eq: true }
+      lowest_listing: { _is_null: false }
+    }
+    order_by: { lowest_listing: asc_nulls_last }
+    limit: $limit
+  ) {
+    id
+    name
+    lowest_listing
+    artist_name
+    contract_address
+    project_id
+  }
+}
+
+query GetAllSets {
+  sets(where: { is_public: { _eq: true } }) {
+    name
+  }
+}
+
+fragment SetData on sets {
+  name
+  slug
+  set_buckets {
+    project {
+      lowest_listing
+      slug
+      name
+      id
+      project_id
+      artist_name
+      contract_address
+    }
+  }
+}
+
+query GetSetByName($set_name: String!) {
+  sets(where: { name: { _eq: $set_name } }) {
+    ...SetData
+  }
+}
+
+query GetLowestPricedTokenByProject($project_id: String!) {
+  tokens_metadata(
+    where: { project_id: { _eq: $project_id } }
+    order_by: { list_price: asc_nulls_last }
+    limit: 1
+  ) {
+    id
+    invocation
   }
 }

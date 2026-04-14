@@ -2,10 +2,11 @@ import { Client, EmbedBuilder, TextChannel } from 'discord.js'
 import * as dotenv from 'dotenv'
 import { CollectionType } from '../Classes/MintBot'
 import { projectConfig } from '..'
+import { logger } from '../logger'
 dotenv.config()
 
 // Trade activity Discord channel IDs.
-const CHANNEL_SALES_CHAT = projectConfig.chIdByName['block-talk']
+const BLOCK_TALK = projectConfig.chIdByName['block-talk']
 const CHANNEL_SALES = projectConfig.chIdByName['sales-feed']
 const CHANNEL_LISTINGS = projectConfig.chIdByName['listing-feed']
 const ENGINE_SALES = projectConfig.chIdByName['engine-sales']
@@ -20,8 +21,11 @@ const CHANNEL_SQUIGGLE_LISTINGS = projectConfig.chIdByName['squiggle-listings']
 const STEVIE_P_SALES = projectConfig.chIdByName['stevie-p-sales']
 const STEVIE_P_LISTINGS = projectConfig.chIdByName['stevie-p-listings']
 const IXNAYOKAY_SALES = projectConfig.chIdByName['ixnayokay-sales']
+const EDG_SALES = projectConfig.chIdByName['edg-sales']
+const EDG_LISTINGS = projectConfig.chIdByName['edg-listings']
 const OWMO_SALES = projectConfig.chIdByName['owmo-sales']
 const JOSHBAGLEY_SALES = projectConfig.chIdByName['joshbagley-sales']
+const REMNYNT_SALES = projectConfig.chIdByName['remnynt-sales']
 
 // Engine Partner Servers
 const PLOTTABLES_SALES = projectConfig.chIdByName['plottables-sales']
@@ -30,6 +34,7 @@ const FLUTTER_SALES = projectConfig.chIdByName['flutter-sales']
 const TENDER_SALES = projectConfig.chIdByName['tender-sales']
 const HODLERS_SALES = projectConfig.chIdByName['hodlers-sales']
 const HODLERS_LISTINGS = projectConfig.chIdByName['hodlers-listings']
+const PROOF = projectConfig.chIdByName['proof-all']
 
 // Addresses which should be omitted entirely from event feeds.
 export const BAN_ADDRESSES = new Set([
@@ -115,14 +120,18 @@ function sendEmbedToChannel(
   channelId: string
 ) {
   const channel = bot.channels?.cache?.get(channelId) as TextChannel
+  if (!channel) {
+    logger.info({ channelId }, 'Channel not found')
+    return
+  }
   channel
     .send({
       embeds: [embed],
     })
     .catch((err) => {
-      console.log(
-        `Error posting message in channel ${projectConfig.channels[channelId].name} (id: ${channelId})`,
-        err.message
+      logger.info(
+        { channelName: projectConfig.channels[channelId].name, channelId, errMessage: err.message },
+        'Error posting message in channel'
       )
     })
 }
@@ -143,13 +152,13 @@ export function sendEmbedToSaleChannels(
         break
       case CollectionType.EXPLORATIONS:
         sendEmbedToChannel(bot, embed, EXPLORATIONS_SALES)
-        sendEmbedToChannel(bot, embed, CHANNEL_SALES_CHAT)
+        sendEmbedToChannel(bot, embed, BLOCK_TALK)
         break
       case CollectionType.COLLAB:
       case CollectionType.CORE:
       case CollectionType.STUDIO:
         sendEmbedToChannel(bot, embed, CHANNEL_SALES)
-        sendEmbedToChannel(bot, embed, CHANNEL_SALES_CHAT)
+        sendEmbedToChannel(bot, embed, BLOCK_TALK)
         break
       default:
         break
@@ -159,12 +168,22 @@ export function sendEmbedToSaleChannels(
       sendEmbedToChannel(bot, embed, CHANNEL_SQUIGGLE_SALES)
     }
 
+    if (
+      artBlocksData.artist.includes('Snowfro') &&
+      collectionType === CollectionType.ENGINE
+    ) {
+      sendEmbedToChannel(bot, embed, BLOCK_TALK)
+    }
+
     // Non-AB Discord servers
     if (artBlocksData.artist.includes('Steve Pikelny')) {
       sendEmbedToChannel(bot, embed, STEVIE_P_SALES)
     }
     if (artBlocksData.artist.includes('ixnayokay')) {
       sendEmbedToChannel(bot, embed, IXNAYOKAY_SALES)
+    }
+    if (artBlocksData.artist.includes('Eric De Giuli')) {
+      sendEmbedToChannel(bot, embed, EDG_SALES)
     }
     if (
       artBlocksData.artist.includes('Owen Moore') ||
@@ -174,6 +193,9 @@ export function sendEmbedToSaleChannels(
     }
     if (artBlocksData.artist.includes('Joshua Bagley')) {
       sendEmbedToChannel(bot, embed, JOSHBAGLEY_SALES)
+    }
+    if (artBlocksData.artist.includes('remnynt')) {
+      sendEmbedToChannel(bot, embed, REMNYNT_SALES)
     }
     if (artBlocksData.platform.includes('Plottables')) {
       sendEmbedToChannel(bot, embed, PLOTTABLES_SALES)
@@ -195,8 +217,14 @@ export function sendEmbedToSaleChannels(
     ) {
       sendEmbedToChannel(bot, embed, TENDER_SALES)
     }
+    if (
+      artBlocksData.platform.toLowerCase().includes('proof') ||
+      artBlocksData.platform.includes('Art Blocks')
+    ) {
+      sendEmbedToChannel(bot, embed, PROOF)
+    }
   } catch (e) {
-    console.warn(e)
+    logger.warn({ err: e }, 'Error sending embed to sale channels')
   }
 }
 
@@ -234,6 +262,9 @@ export function sendEmbedToListChannels(
     if (artBlocksData.artist.includes('Steve Pikelny')) {
       sendEmbedToChannel(bot, embed, STEVIE_P_LISTINGS)
     }
+    if (artBlocksData.artist.includes('Eric De Giuli')) {
+      sendEmbedToChannel(bot, embed, EDG_LISTINGS)
+    }
     if (artBlocksData.platform.includes('Plottables')) {
       sendEmbedToChannel(bot, embed, PLOTTABLES_LISTINGS)
     }
@@ -241,6 +272,6 @@ export function sendEmbedToListChannels(
       sendEmbedToChannel(bot, embed, HODLERS_LISTINGS)
     }
   } catch (e) {
-    console.warn(e)
+    logger.warn({ err: e }, 'Error sending embed to listing channels')
   }
 }

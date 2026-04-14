@@ -1,31 +1,46 @@
 import * as dotenv from 'dotenv'
 
 import {
-  ARBITRUM_CONTRACTS,
   COLLAB_CONTRACTS,
   ENGINE_CONTRACTS,
   STUDIO_CONTRACTS,
 } from '../../index'
 import { CollectionType } from '../MintBot'
-import { AxiosError } from 'axios'
+import { createPublicClient, http, fallback } from 'viem'
+import { mainnet } from 'viem/chains'
 dotenv.config()
 
-const axios = require('axios')
-const ethers = require('ethers')
+import { logger } from '../../logger'
 
-const provider = new ethers.providers.EtherscanProvider(
-  'homestead',
-  process.env.ETHERSCAN_API_KEY
-)
+// Configure viem with multiple RPC providers for reliability
+const publicClient = createPublicClient({
+  chain: mainnet,
+  transport: fallback([
+    http('https://cloudflare-eth.com'),
+    http('https://rpc.ankr.com/eth'),
+    http('https://ethereum-rpc.publicnode.com'),
+    http('https://1rpc.io/eth'),
+    http('https://eth.llamarpc.com'),
+    // Default public RPC as last resort
+    http(),
+  ]),
+})
 
-const STAGING_CONTRACTS = require('../../ProjectConfig/stagingContracts.json')
 const EXPLORATIONS_CONTRACTS = require('../../ProjectConfig/explorationsContracts.json')
 
 const CORE_CONTRACTS = require('../../ProjectConfig/coreContracts.json')
-// Runtime ENS cache just to limit queries
+
+// ENS cache: stores resolved names ('' means no ENS name exists)
 const ensAddressMap: { [id: string]: string } = {}
 const ensResolvedMap: { [id: string]: string } = {}
-const osAddressMap: { [id: string]: string } = {}
+// Tracks when a failed ENS lookup was cached so we can retry after TTL
+const ensFailureTimestamps: { [id: string]: number } = {}
+const ENS_FAILURE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+
+const osAddressMap: { [id: string]: { name: string; cachedAt: number } } = {}
+const OS_CACHE_TTL_MS = 30 * 60 * 1000 // 30 minutes
+const MAX_OS_CACHE_SIZE = 1000
+const MAX_ENS_CACHE_SIZE = 5000
 const MAX_ENS_RETRIES = 3
 
 // UTM for links so we can track traffic that comes through Artbot
@@ -41,49 +56,97 @@ export const PROJECTBOT_EXPLORE_UTM = `${DISCORD_UTM}&utm_campaign=projectbot_ex
 export const TWITTER_PROJECTBOT_UTM = `${TWITTER_UTM}&utm_campaign=projectbot`
 
 async function getENSName(address: string): Promise<string> {
-  let name = ''
-  if (ensAddressMap[address]) {
-    name = ensAddressMap[address]
-  } else {
-    let ens = ''
-    let retries = 0
-    while (ens === '' && retries < MAX_ENS_RETRIES) {
-      try {
-        ens = await provider.lookupAddress(address)
-      } catch (err) {
-        retries++
-        console.warn(`ENS lookup error on ${address}`, err)
+  // Check cache — but if it was a failed lookup, respect the TTL
+  if (address in ensAddressMap) {
+    const cachedValue = ensAddressMap[address]
+    if (cachedValue !== '') {
+      // Successful lookup — always use cache
+      return cachedValue
+    }
+    // Failed lookup — check if TTL has expired
+    const failedAt = ensFailureTimestamps[address]
+    if (failedAt && Date.now() - failedAt < ENS_FAILURE_TTL_MS) {
+      return ''
+    }
+    // TTL expired, fall through to retry
+  }
+
+  let retries = 0
+  while (retries < MAX_ENS_RETRIES) {
+    try {
+      const ens = await publicClient.getEnsName({
+        address: address as `0x${string}`,
+      })
+      // null means no ENS name — that's a valid result, not an error
+      const name = ens ?? ''
+      ensAddressMap[address] = name
+      if (name !== '') {
+        ensResolvedMap[name] = address
+      }
+      // Clear any previous failure timestamp on success
+      delete ensFailureTimestamps[address]
+      return name
+    } catch (err) {
+      retries++
+      logger.warn(
+        { err, address, attempt: retries, maxRetries: MAX_ENS_RETRIES },
+        'ENS lookup error'
+      )
+      if (retries < MAX_ENS_RETRIES) {
+        // Exponential backoff: 1s, 2s, 4s
+        await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, retries - 1)))
       }
     }
-
-    name = ens ?? ''
-    ensAddressMap[address] = name
-    ensResolvedMap[name] = address
   }
-  return name
+
+  // All retries exhausted — cache failure with a TTL so we don't keep hammering
+  ensAddressMap[address] = ''
+  ensFailureTimestamps[address] = Date.now()
+  return ''
 }
 
 export async function resolveEnsName(ensName: string): Promise<string> {
-  let wallet = ''
-  if (ensResolvedMap[ensName]) {
-    wallet = ensResolvedMap[ensName]
-  } else {
-    let retries = 0
-
-    while (wallet === '' && retries < MAX_ENS_RETRIES) {
-      try {
-        wallet = await provider.resolveName(ensName)
-      } catch (err) {
-        retries++
-        console.warn(`ENS resolve error on ${ensName}`, err)
-      }
+  // Check cache — but if it was a failed lookup, respect the TTL
+  if (ensName in ensResolvedMap) {
+    const cachedValue = ensResolvedMap[ensName]
+    if (cachedValue !== '') {
+      return cachedValue
     }
-
-    if (wallet !== '') {
-      ensResolvedMap[ensName] = wallet
+    const failedAt = ensFailureTimestamps[ensName]
+    if (failedAt && Date.now() - failedAt < ENS_FAILURE_TTL_MS) {
+      return ''
     }
   }
-  return wallet
+
+  let retries = 0
+  while (retries < MAX_ENS_RETRIES) {
+    try {
+      const resolvedAddress = await publicClient.getEnsAddress({
+        name: ensName,
+      })
+      // null means name doesn't resolve — valid result, not an error
+      const wallet = resolvedAddress ?? ''
+      if (wallet !== '') {
+        ensResolvedMap[ensName] = wallet
+      }
+      delete ensFailureTimestamps[ensName]
+      return wallet
+    } catch (err) {
+      retries++
+      logger.warn(
+        { err, ensName, attempt: retries, maxRetries: MAX_ENS_RETRIES },
+        'ENS resolve error'
+      )
+      if (retries < MAX_ENS_RETRIES) {
+        await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, retries - 1)))
+      }
+    }
+  }
+
+  // All retries exhausted — cache failure with TTL
+  ensResolvedMap[ensName] = ''
+  ensFailureTimestamps[ensName] = Date.now()
+  return ''
 }
 
 export async function ensOrAddress(address: string): Promise<string> {
@@ -93,35 +156,77 @@ export async function ensOrAddress(address: string): Promise<string> {
 
 export async function getOSName(address: string): Promise<string> {
   let name = ''
-  if (osAddressMap[address]) {
-    console.log('Cached!')
-    name = osAddressMap[address]
+  const cached = osAddressMap[address]
+  if (cached && Date.now() - cached.cachedAt < OS_CACHE_TTL_MS) {
+    name = cached.name
   } else {
     try {
-      const response = await axios.get(
+      const res = await fetch(
         `https://api.opensea.io/api/v2/accounts/${address}`,
         {
           headers: {
             Accept: 'application/json',
-            'X-API-KEY': process.env.OPENSEA_API_KEY,
+            'x-api-key': process.env.OPENSEA_API_KEY ?? '',
           },
         }
       )
-      const responseBody = response?.data
+      const responseBody = await res.json() as { detail?: string; username?: string }
       if (responseBody?.detail) {
         throw new Error(responseBody.detail)
       }
       name = responseBody?.username ?? ''
-      osAddressMap[address] = name
+      osAddressMap[address] = { name, cachedAt: Date.now() }
+      evictOldOSCacheEntries()
     } catch (err) {
-      // Probably rate limited - return empty sting but don't cache
+      // Probably rate limited - return empty string but don't cache
       name = ''
-      console.log(err)
-      console.log("Error getting user's OpenSea name")
+      logger.warn({ err }, "Error getting user's OpenSea name")
     }
   }
 
   return name
+}
+
+/**
+ * Evict oldest OS cache entries when exceeding max size
+ */
+function evictOldOSCacheEntries() {
+  const keys = Object.keys(osAddressMap)
+  if (keys.length > MAX_OS_CACHE_SIZE) {
+    const entries = Object.entries(osAddressMap)
+    entries
+      .sort((a, b) => a[1].cachedAt - b[1].cachedAt)
+      .slice(0, entries.length - MAX_OS_CACHE_SIZE)
+      .forEach(([key]) => delete osAddressMap[key])
+  }
+}
+
+/**
+ * Evict oldest ENS cache entries when exceeding max size.
+ * Called periodically to prevent unbounded growth of successful lookups.
+ */
+export function evictOldENSCacheEntries() {
+  const ensKeys = Object.keys(ensAddressMap)
+  if (ensKeys.length > MAX_ENS_CACHE_SIZE) {
+    // Remove oldest half of entries (simple approach since we don't track timestamps for successful lookups)
+    const toRemove = ensKeys.slice(0, ensKeys.length - MAX_ENS_CACHE_SIZE)
+    toRemove.forEach((key) => {
+      delete ensAddressMap[key]
+      delete ensFailureTimestamps[key]
+    })
+  }
+
+  const resolvedKeys = Object.keys(ensResolvedMap)
+  if (resolvedKeys.length > MAX_ENS_CACHE_SIZE) {
+    const toRemove = resolvedKeys.slice(
+      0,
+      resolvedKeys.length - MAX_ENS_CACHE_SIZE
+    )
+    toRemove.forEach((key) => {
+      delete ensResolvedMap[key]
+      delete ensFailureTimestamps[key]
+    })
+  }
 }
 
 export function isWallet(msg: string): boolean {
@@ -135,6 +240,9 @@ const acceptedVerticals = [
   'explorations',
   'engine',
   'presents',
+  'factory',
+  'playground',
+  'studio',
 ]
 export function isVerticalName(msg: string): boolean {
   return acceptedVerticals.includes(msg)
@@ -149,22 +257,12 @@ export function getVerticalName(msg: string): string {
 }
 
 export function getTokenApiUrl(
+  chainId: number,
   contractAddress: string,
   tokenId: string
 ): string {
   contractAddress = contractAddress.toLowerCase()
-  if (
-    Object.values(CORE_CONTRACTS).includes(contractAddress) ||
-    contractAddress === ''
-  ) {
-    return `https://token.artblocks.io/${tokenId}`
-  } else if (Object.values(STAGING_CONTRACTS).includes(contractAddress)) {
-    return `https://token.staging.artblocks.io/${contractAddress}/${tokenId}`
-  } else if (isArbitrumContract(contractAddress)) {
-    return `https://token.arbitrum.artblocks.io/${contractAddress}/${tokenId}`
-  } else {
-    return `https://token.artblocks.io/${contractAddress}/${tokenId}`
-  }
+  return `https://token.artblocks.io/${chainId}/${contractAddress}/${tokenId}`
 }
 
 export function isExplorationsContract(contractAddress: string): boolean {
@@ -179,10 +277,6 @@ export function isStudioContract(contractAddress: string): boolean {
 
 export function isEngineContract(contractAddress: string): boolean {
   return ENGINE_CONTRACTS.includes(contractAddress.toLowerCase())
-}
-
-export function isArbitrumContract(contractAddress: string): boolean {
-  return ARBITRUM_CONTRACTS.includes(contractAddress.toLowerCase())
 }
 
 export function isCoreContract(contractAddress: string): boolean {
@@ -213,22 +307,50 @@ export async function getCollectionType(
 
 export function getTokenUrl(
   external_url: string,
+  chainId: number,
   contractAddr: string,
   tokenId: string
 ): string {
   if (external_url && !external_url.includes('generator.artblocks.io')) {
     return external_url
   }
-  return buildArtBlocksTokenURL(contractAddr, tokenId)
+  return buildArtBlocksTokenURL(chainId, contractAddr, tokenId)
 }
 
-export function getProjectUrl(contractAddr: string, projectId: string): string {
-  // TODO: support new curated pages when ready
-  return `https://www.artblocks.io/marketplace/collections/${contractAddr}-${projectId}`
+export function getProjectSlugUrl(slug: string): string {
+  return `https://www.artblocks.io/collection/${slug}`
 }
 
-function buildArtBlocksTokenURL(contractAddr: string, tokenId: string): string {
-  return `https://www.artblocks.io/marketplace/asset/${contractAddr}/${tokenId}`
+export function buildArtBlocksTokenURL(
+  chainId: number,
+  contractAddr: string,
+  tokenId: string
+): string {
+  return `https://www.artblocks.io/token/${chainId}/${contractAddr}/${tokenId}`
+}
+
+/**
+ * Build generator (live script) URL from chain + contract + token.
+ */
+export function buildGeneratorUrl(
+  chainId: number,
+  contractAddress: string,
+  tokenId: string
+): string {
+  contractAddress = contractAddress.toLowerCase()
+  return `https://generator.artblocks.io/${chainId}/${contractAddress}/${tokenId}`
+}
+
+/**
+ * Build media/preview image URL from chain + contract + token.
+ */
+export function buildMediaUrl(
+  chainId: number,
+  contractAddress: string,
+  tokenId: string
+): string {
+  contractAddress = contractAddress.toLowerCase()
+  return `https://media-proxy.artblocks.io/${chainId}/${contractAddress}/${tokenId}.png`
 }
 
 export function buildOpenseaURL(contractAddr: string, tokenId: string): string {
@@ -253,21 +375,33 @@ export function timeout(
   })
 }
 
+export function replaceToPNG(url: string): string {
+  return url.replace(/\.(gif|mp4)$/i, '.png')
+}
+
 // defaulting our discord embeds to always send GIFs
 export async function replaceVideoWithGIF(url: string) {
   if (url.includes('mp4')) {
     const gifURL = url.replace('mp4', 'gif')
 
     // some GIFs are not available, so we fallback to PNG
-
     try {
-      await axios.get(gifURL)
-    } catch (e) {
-      const axiosError = e as AxiosError
-      if (axiosError && e.response?.status === 404) {
-        console.log('GIF not found, returning PNG')
+      const resp = await fetch(gifURL)
+
+      if (!resp.ok) {
+        if (resp.status === 404) {
+          logger.info('GIF not found, returning PNG')
+        } else {
+          logger.info({ status: resp.status, gifURL }, 'Error on fetching token API for GIF')
+        }
+        return url.replace('mp4', 'png')
       }
-      console.log(`Error on fetching token API for ${gifURL}`, e)
+
+      if (resp.headers.get('content-length') === '0') {
+        throw new Error('GIF size 0 for ' + gifURL)
+      }
+    } catch (e: unknown) {
+      logger.info({ err: e, gifURL }, 'Error on fetching token API for GIF')
       return url.replace('mp4', 'png')
     }
 
@@ -280,21 +414,141 @@ export async function replaceVideoWithGIF(url: string) {
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
 export const waitForStudioContracts = async (): Promise<string[]> => {
   while (STUDIO_CONTRACTS.length === 0) {
-    console.log('Waiting for studio contracts to load...')
+    logger.info('Waiting for studio contracts to load')
     await delay(4000)
   }
-  console.log('studio contracts loaded')
   return STUDIO_CONTRACTS
 }
 export const waitForEngineContracts = async (): Promise<string[]> => {
   while (ENGINE_CONTRACTS.length === 0) {
-    console.log('Waiting for engine contracts to load...')
+    logger.info('Waiting for engine contracts to load')
     await delay(5000)
   }
-  console.log('Engine contracts loaded')
   return ENGINE_CONTRACTS
 }
 
 export const ethFromWeiString = (wei: string): string => {
   return `${parseInt(wei) / 1e18}`
+}
+
+// ===== Shared constants for OpenSea bots =====
+
+/** Tolerance for detecting duplicate price events */
+export const IDENTICAL_TOLERANCE = 0.0001
+
+/** Time-to-live for deduplication caches (24 hours) */
+export const EVENT_DEDUP_TTL_MS = 24 * 60 * 60 * 1000
+
+/** Interval for cleaning up old deduplication caches (1 hour) */
+export const CLEANUP_INTERVAL_MS = 60 * 60 * 1000
+
+// ===== Shared functions for OpenSea bots =====
+
+/**
+ * Parses an OpenSea NFT ID and extracts contract address and token ID
+ * @param nftId - Format: "ethereum/0x2308742aa28cc460522ff855d24a365f99deba7b/7111"
+ * @returns {contractAddress, tokenId} or null if invalid format
+ */
+const CHAIN_NAME_TO_ID: Record<string, number> = {
+  ethereum: 1,
+  arbitrum: 42161,
+  base: 8453,
+}
+
+export function parseNftId(
+  nftId: string
+): { chainId: number; contractAddress: string; tokenId: string } | null {
+  const parts = nftId.split('/')
+  if (parts.length !== 3) {
+    logger.warn({ nftId }, 'Invalid NFT ID format')
+    return null
+  }
+
+  const chainId = CHAIN_NAME_TO_ID[parts[0]]
+  if (chainId === undefined) {
+    logger.warn({ chain: parts[0], nftId }, 'Unknown chain in NFT ID')
+    return null
+  }
+
+  return {
+    chainId,
+    contractAddress: parts[1].toLowerCase(),
+    tokenId: parts[2],
+  }
+}
+
+/**
+ * Determines the curation status string for display in embeds.
+ * Shared between OpenSeaListBot and OpenSeaSaleBot.
+ */
+export function getCurationStatus(
+  artBlocksData: ArtBlocksTokenData,
+  contractAddress: string
+): string {
+  if (artBlocksData?.platform?.includes('Art Blocks x Pace')) {
+    return 'AB x Pace'
+  } else if (artBlocksData?.platform === 'Art Blocks × Bright Moments') {
+    return 'AB x Bright Moments'
+  } else if (isExplorationsContract(contractAddress)) {
+    return 'Explorations'
+  } else if (isStudioContract(contractAddress)) {
+    return 'Studio'
+  } else if (isEngineContract(contractAddress)) {
+    return 'Engine'
+  }
+
+  if (artBlocksData?.curation_status) {
+    return (
+      artBlocksData.curation_status[0].toUpperCase() +
+      artBlocksData.curation_status.slice(1).toLowerCase()
+    )
+  }
+
+  return ''
+}
+
+/**
+ * Builds the embed title, prepending the platform name for Engine projects.
+ */
+export function buildEmbedTitle(
+  artBlocksData: ArtBlocksTokenData,
+  contractAddress: string
+): string {
+  let title = `${artBlocksData.name} - ${artBlocksData.artist}`
+  if (isEngineContract(contractAddress) && artBlocksData?.platform) {
+    title = `${artBlocksData.platform} - ${title}`
+  }
+  return title
+}
+
+/** Minimal type for Art Blocks token API response data used in shared functions */
+export interface ArtBlocksTokenData {
+  name: string
+  artist: string
+  collection_name?: string
+  curation_status?: string
+  platform?: string
+  external_url?: string
+  preview_asset_url?: string
+  project_id?: string
+  generator_url?: string
+}
+
+/**
+ * Cleanup entries older than ttlMs from a timestamp-keyed cache object.
+ * Returns the number of entries removed.
+ */
+export function cleanupTimestampCache(
+  cache: { [key: string]: { timestamp: number } },
+  ttlMs: number
+): number {
+  const now = Date.now()
+  let removed = 0
+  for (const [key, value] of Object.entries(cache)) {
+    if (now - value.timestamp > ttlMs) {
+      delete cache[key]
+      removed++
+    }
+  }
+  return removed
 }

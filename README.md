@@ -56,7 +56,7 @@ The core engine of Artbot is built around the discord.js package. It serves seve
 
 - Sales/Listing Feeds
 
-  Artbot also provides a feeds for sales and listings of Art Blocks projects. It polls the (incredible) [Reservoir API](https://docs.reservoir.tools/reference/overview) to get the latest activity across all marketplaces (using the `ReservoirListBot.ts` and `ReservoirSaleBot.ts` classes, respectively), and then posts them to the appropriate Discord channels (`Utils/activityTriager.js`).
+  Artbot also provides feeds for sales and listings of Art Blocks projects. It uses the OpenSea Stream API to get the latest activity (using the `OpenSeaListBot.ts` and `OpenSeaSaleBot.ts` classes, respectively), and then posts them to the appropriate Discord channels (`Utils/activityTriager.ts`).
 
 - SmartBot Responses
 
@@ -99,7 +99,7 @@ Here are the currently valid contract names.
           - (optional) key: `"tokenIdTriggers"`:
             - value: object:
               - key: [Bot ID](#bot-id)
-                - value: length-2 array defining range of token IDs that trigger artbot to use the project bot. e.g. [555, null] means all tokens >= 555 should use the project bot defined in key. [100, 200] means all tokens from 100 to 200 should use the project bot bot defined in key.
+                - value: length-2 array defining range of token IDs that trigger artbot to use the project bot. e.g. [555, null] means all tokens >= 555 should use the project bot defined in key. [100, 200] means all tokens from 100 to 200 should use the project bot defined in key.
 
 ### Optional Configuration
 

@@ -43,3 +43,16 @@ export const getMonthName = (date = new Date()) => MONTH_NAMES[date.getMonth()]
  * @param date @param date A date may be provided as input. If none is provided, use the current date.
  */
 export const getDayOfMonth = (date = new Date()) => date.getDate()
+
+/**
+ * Formats a number with commas as thousand separators.
+ * E.g. 1234.56 becomes "1,234.56"
+ * @param number The number to format
+ * @param decimalPlaces Optional number of decimal places (defaults to 2)
+ */
+export const formatNumberWithCommas = (
+  number: number,
+  decimalPlaces = 2
+): string => {
+  return number.toFixed(decimalPlaces).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}

@@ -1,35 +1,47 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
-import { Client, Events, GatewayIntentBits } from 'discord.js'
+import { Client, Events, GatewayIntentBits, Status } from 'discord.js'
+import * as dns from 'dns'
+import * as https from 'https'
 const express = require('express')
 const bodyParser = require('body-parser')
 import { ProjectConfig } from './ProjectConfig/projectConfig'
 export let STUDIO_CONTRACTS: string[] = []
 export let ENGINE_CONTRACTS: string[] = []
-export let ARBITRUM_CONTRACTS: string[] = []
+export let ARTIST_TWITTER_HANDLES: Map<string, string> = new Map()
 export const projectConfig = new ProjectConfig()
 
 import { ArtIndexerBot } from './Classes/ArtIndexerBot'
 import { MintBot } from './Classes/MintBot'
-import { ReservoirListBot } from './Classes/APIBots/ReservoirListBot'
-import { ReservoirSaleBot } from './Classes/APIBots/ReservoirSaleBot'
+
 import {
-  getArbitrumContracts,
   getArtBlocksXBMProjects,
   getArtBlocksXPaceProjects,
   getEngineContracts,
   getEngineProjects,
   getStudioContracts,
+  getArtistsTwitterHandles,
 } from './Data/queryGraphQL'
 import { TriviaBot } from './Classes/TriviaBot'
-import {
-  waitForEngineContracts,
-  waitForStudioContracts,
-} from './Classes/APIBots/utils'
 import { ScheduleBot } from './Classes/SchedulerBot'
 import { verifyTwitter } from './Utils/twitterUtils'
+import { TwitterBot } from './Classes/TwitterBot'
 
-const smartBotResponse = require('./Utils/smartBotResponse').smartBotResponse
+import { OpenSeaStreamClient } from '@opensea/stream-js'
+import { WebSocket } from 'ws'
+import { LocalStorage } from 'node-localstorage'
+import { OpenSeaListBot } from './Classes/APIBots/OpenSeaListBot'
+import { OpenSeaSaleBot } from './Classes/APIBots/OpenSeaSaleBot'
+import { OpenSeaEventsPollBot } from './Classes/APIBots/OpenSeaEventsPollBot'
+import {
+  waitForStudioContracts,
+  waitForEngineContracts,
+} from './Classes/APIBots/utils'
+
+import { smartBotResponse } from './Utils/smartBotResponse'
+import { logContext } from './Utils/logger'
+import { randomUUID } from 'crypto'
+import { logger } from './logger'
 
 // Misc. server configuration info.
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN
@@ -50,8 +62,8 @@ getStudioContracts().then((contracts) => {
 getEngineContracts().then((contracts) => {
   ENGINE_CONTRACTS = contracts ?? []
 })
-getArbitrumContracts().then((contracts) => {
-  ARBITRUM_CONTRACTS = contracts ?? []
+getArtistsTwitterHandles().then((handles) => {
+  ARTIST_TWITTER_HANDLES = handles
 })
 
 export const artIndexerBot = new ArtIndexerBot()
@@ -63,7 +75,7 @@ const abXbmIndexerBot = new ArtIndexerBot(getArtBlocksXBMProjects)
 const CHANNEL_FACTORY = projectConfig.chIdByName['factory-projects']
 
 // Block Talk
-const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
+export const CHANNEL_BLOCK_TALK = projectConfig.chIdByName['block-talk']
 
 // PBAB Chat
 const CHANNEL_ENGINE_CHAT = projectConfig.chIdByName['engine-chat']
@@ -77,107 +89,341 @@ const CHANNEL_ART_CHAT = projectConfig.chIdByName['ab-art-chat']
 
 const CHANNEL_ARTBOT_TESTING = projectConfig.chIdByName['artbot-test-channel']
 
-// Rate (in ms) to poll API endpoints
-const API_POLL_TIME_MS = 10000
-const reservoirListLimit = 50
-const reservoirSaleLimit = 100
-
 // Note: Please set PRODUCTION_MODE to true if testing locally
 const PRODUCTION_MODE =
   process.env.PRODUCTION_MODE &&
   process.env.PRODUCTION_MODE.toLowerCase() === 'true'
 
-console.log('PRODUCTION_MODE: ', PRODUCTION_MODE)
+logger.info({ PRODUCTION_MODE }, 'PRODUCTION_MODE')
 
 // App setup.
 const app = express()
 
 app.use(bodyParser.json())
 
-app.post('/update', function (req: any, res: any) {
-  console.log(
-    'received update with body:\n',
-    JSON.stringify(req.body, null, 2),
-    '\n'
-  )
+app.post(
+  '/update',
+  function (
+    req: { body: unknown },
+    res: {
+      setHeader: (key: string, value: string) => void
+      json: (data: unknown) => void
+    }
+  ) {
+    logger.info({ body: req.body }, 'received update with body')
 
-  res.setHeader('Content-Type', 'application/json')
-  res.json({
-    success: true,
-  })
-})
+    res.setHeader('Content-Type', 'application/json')
+    res.json({
+      success: true,
+    })
+  }
+)
 
-app.get('/update', function (req: any, res: any) {
-  console.log('received get with body:\n', req.body, '\n')
+app.get(
+  '/update',
+  function (
+    req: { body: unknown },
+    res: {
+      setHeader: (key: string, value: string) => void
+      json: (data: unknown) => void
+    }
+  ) {
+    logger.info({ body: req.body }, 'received get with body')
 
-  res.setHeader('Content-Type', 'application/json')
-  res.json({
-    success: true,
-  })
-})
+    res.setHeader('Content-Type', 'application/json')
+    res.json({
+      success: true,
+    })
+  }
+)
 
-type MintEvent = {
+// Hasura event trigger payload format (tokens_metadata_image_id_update)
+type MintEventPayload = {
   event: {
     data: {
       new: {
+        chain_id: number
         contract_address: string
         owner_address: string
         project_name: string
+        project_id: string
         token_id: string
+        invocation: number
         minted_at: string
       }
     }
   }
 }
 
-app.post('/new-mint', function (req: any, res: any) {
-  const mintEvent = req.body as MintEvent
-  const mintData = mintEvent.event.data.new
+app.post(
+  '/new-mint',
+  function (
+    req: { body: MintEventPayload; headers: Record<string, string | undefined> },
+    res: {
+      setHeader: (key: string, value: string) => void
+      json: (data: unknown) => void
+      status: (code: number) => { json: (data: unknown) => void }
+    }
+  ) {
+    const mintData = req.body.event.data.new
 
-  if (req.headers.webhook_secret !== process.env.MINT_WEBHOOK_SECRET) {
-    console.log('Invalid mint webhook secret')
-    res.status(401).json({ status: 'unauthorized' })
-    return
+    if (req.headers.webhook_secret !== process.env.MINT_WEBHOOK_SECRET) {
+      logger.warn('Invalid mint webhook secret')
+      res.status(401).json({ status: 'unauthorized' })
+      return
+    }
+
+    logContext({ requestId: randomUUID() }, () => {
+      mintBot.addMint(
+        mintData.contract_address,
+        String(mintData.token_id),
+        mintData.owner_address,
+        String(mintData.invocation),
+        mintData.project_id,
+        mintData.project_name,
+        mintData.chain_id
+      )
+    })
+    res.setHeader('Content-Type', 'application/json')
+    res.json({
+      success: true,
+    })
   }
+)
 
-  mintBot.addMint(
-    mintData.contract_address,
-    mintData.token_id,
-    mintData.owner_address
-  )
-  res.setHeader('Content-Type', 'application/json')
-  res.json({
-    success: true,
-  })
+app.listen(PORT, '0.0.0.0', function () {
+  logger.info({ PORT }, 'Server is listening on port')
 })
 
-app.listen(PORT, function () {
-  console.log('Server is listening on port ', PORT)
-})
-
-app.get('/callback', (req: any, res: any) => {
+app.get('/callback', (req: unknown, res: unknown) => {
   // Used for Twitter OAuth
   verifyTwitter(res, req)
 })
 
+// Store references to all bots that need cleanup
+const botsToCleanup: { cleanup: () => void }[] = []
+
+// Register ArtIndexerBot instances for cleanup on shutdown
+botsToCleanup.push(
+  artIndexerBot,
+  pbabIndexerBot,
+  abXpaceIndexerBot,
+  abXbmIndexerBot
+)
+
 // Bot setup.
-const bot = new Client({
+export const discordClient = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
   ],
 })
-if (PRODUCTION_MODE) {
-  bot.login(DISCORD_TOKEN)
+
+logger.info('Discord client created')
+logger.info({ PRODUCTION_MODE }, 'PRODUCTION_MODE')
+logger.info({ discordTokenExists: !!DISCORD_TOKEN }, 'DISCORD_TOKEN exists')
+
+const MAX_LOGIN_RETRIES = 5
+let loginRetryCount = 0
+
+/** Resolve a hostname via DNS and log the result for connectivity diagnostics. */
+async function checkDnsResolution(hostname: string): Promise<void> {
+  return new Promise((resolve) => {
+    dns.lookup(hostname, (err, address, family) => {
+      if (err) {
+        logger.warn({ hostname, err }, 'DNS lookup failed for Discord host')
+      } else {
+        logger.info({ hostname, address, family }, 'DNS lookup succeeded')
+      }
+      resolve()
+    })
+  })
 }
-export const triviaBot = new TriviaBot(bot)
-new ScheduleBot(bot.channels.cache, projectConfig)
-bot.on('ready', () => {
-  console.info(`Logged in as ${bot.user?.tag}!`)
+
+const DISCORD_GATEWAY_URL = 'https://discord.com/api/v10/gateway'
+// Extended timeout to allow Discord.js to wait out rate-limit Retry-After delays.
+// Render.com's shared IPs often get 429'd by Discord; Discord.js will back off
+// internally but needs more than 30s to do so.
+const DISCORD_LOGIN_TIMEOUT = 5 * 60 * 1000 // 5 minutes
+
+/**
+ * Make a GET request to the Discord gateway endpoint, read the Retry-After
+ * header if rate-limited, and wait out the backoff before returning.
+ * Returns true if the gateway is reachable (any non-429 response or no error).
+ */
+async function waitForDiscordGateway(): Promise<boolean> {
+  return new Promise((resolve) => {
+    const startMs = Date.now()
+    const req = https.request(
+      DISCORD_GATEWAY_URL,
+      { method: 'GET', timeout: 15000 },
+      (res) => {
+        const latencyMs = Date.now() - startMs
+        const retryAfterHeader = res.headers['retry-after']
+        const retryAfterSec = retryAfterHeader ? parseFloat(String(retryAfterHeader)) : null
+
+        if (res.statusCode === 429) {
+          const waitMs = retryAfterSec != null ? retryAfterSec * 1000 : 60_000
+          logger.warn(
+            {
+              url: DISCORD_GATEWAY_URL,
+              statusCode: 429,
+              latencyMs,
+              retryAfterSec,
+              waitMs,
+            },
+            'Discord gateway rate-limited (429) — waiting before login attempt'
+          )
+          res.resume()
+          setTimeout(() => resolve(false), waitMs)
+        } else {
+          logger.info(
+            { url: DISCORD_GATEWAY_URL, statusCode: res.statusCode, latencyMs },
+            'Discord gateway reachable'
+          )
+          res.resume()
+          resolve(true)
+        }
+      }
+    )
+    req.on('error', (err) => {
+      logger.warn(
+        { url: DISCORD_GATEWAY_URL, latencyMs: Date.now() - startMs, err },
+        'Discord gateway connectivity check failed'
+      )
+      resolve(true) // proceed anyway; the error may be transient
+    })
+    req.on('timeout', () => {
+      logger.warn({ url: DISCORD_GATEWAY_URL }, 'Discord gateway connectivity check timed out')
+      req.destroy()
+      resolve(true)
+    })
+    req.end()
+  })
+}
+
+async function runPreLoginDiagnostics(): Promise<void> {
+  logger.info(
+    {
+      nodeVersion: process.version,
+      platform: process.platform,
+      arch: process.arch,
+      env: process.env.NODE_ENV,
+      httpProxy: process.env.HTTP_PROXY ?? process.env.http_proxy ?? 'none',
+      httpsProxy: process.env.HTTPS_PROXY ?? process.env.https_proxy ?? 'none',
+    },
+    'Pre-login environment info'
+  )
+  await checkDnsResolution('discord.com')
+  await checkDnsResolution('gateway.discord.gg')
+  // Wait out any active rate limit before handing off to Discord.js
+  let gatewayReady = false
+  while (!gatewayReady) {
+    gatewayReady = await waitForDiscordGateway()
+  }
+}
+
+async function attemptDiscordLogin() {
+  logger.info({ attempt: loginRetryCount + 1, MAX_LOGIN_RETRIES }, 'Attempting Discord login')
+
+  await runPreLoginDiagnostics()
+
+  // Capture Discord.js internal debug output during the login window so we can
+  // see exactly where the handshake stalls if it times out.
+  const debugLogs: string[] = []
+  const debugListener = (msg: string) => {
+    debugLogs.push(msg)
+    logger.debug({ discordInternalDebug: msg }, 'Discord.js debug')
+  }
+  discordClient.on('debug', debugListener)
+
+  let timeoutHandle: NodeJS.Timeout | undefined
+
+  try {
+    const loginStartMs = Date.now()
+    const loginPromise = discordClient.login(DISCORD_TOKEN)
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => {
+        const elapsedMs = Date.now() - loginStartMs
+        logger.error(
+          {
+            elapsedMs,
+            wsStatus: discordClient.ws.status,
+            wsStatusName: Status[discordClient.ws.status] ?? 'unknown',
+            shardCount: discordClient.ws.shards.size,
+            recentDebugLogs: debugLogs.slice(-20),
+          },
+          'Discord login timed out — WebSocket state at timeout'
+        )
+        reject(new Error('Discord login timed out'))
+      }, DISCORD_LOGIN_TIMEOUT)
+    })
+
+    await Promise.race([loginPromise, timeoutPromise])
+    clearTimeout(timeoutHandle)
+    logger.info({ elapsedMs: Date.now() - loginStartMs }, 'Discord login attempt successful')
+    loginRetryCount = 0
+  } catch (error) {
+    clearTimeout(timeoutHandle)
+    logger.error({ err: error }, 'Discord login failed')
+
+    if (loginRetryCount < MAX_LOGIN_RETRIES) {
+      loginRetryCount++
+      // Exponential backoff: 5s, 10s, 20s, 40s, 80s
+      const backoffTime = Math.min(
+        5000 * Math.pow(2, loginRetryCount - 1),
+        80000
+      )
+      logger.info(
+        { loginRetryCount, MAX_LOGIN_RETRIES, backoffSeconds: backoffTime / 1000 },
+        'Retrying Discord login attempt'
+      )
+      setTimeout(attemptDiscordLogin, backoffTime)
+    } else {
+      logger.error('Max login retries reached. Giving up.')
+      process.exit(1)
+    }
+  } finally {
+    discordClient.off('debug', debugListener)
+  }
+}
+
+discordClient.on('ready', () => {
+  logger.info({ tag: discordClient.user?.tag }, 'Logged in to Discord')
 })
 
-bot.on(Events.MessageCreate, async (msg) => {
+discordClient.on('error', (error) => {
+  logger.error({ err: error }, 'Discord client error')
+})
+
+discordClient.on('shardError', (error, shardId) => {
+  logger.error({ err: error, shardId }, 'Discord shard error')
+})
+
+discordClient.on('shardDisconnect', (closeEvent, shardId) => {
+  logger.warn(
+    { shardId, code: closeEvent.code, reason: closeEvent.reason, wasClean: closeEvent.wasClean },
+    'Discord shard disconnected'
+  )
+})
+
+discordClient.on('shardReconnecting', (shardId) => {
+  logger.info({ shardId }, 'Discord shard reconnecting')
+})
+
+discordClient.on('disconnect', () => {
+  logger.info('Discord client disconnected')
+  // Cleanup all bots
+  botsToCleanup.forEach((bot) => bot.cleanup())
+})
+
+export const triviaBot = new TriviaBot(discordClient)
+
+const scheduleBot = new ScheduleBot(discordClient.channels.cache, projectConfig)
+botsToCleanup.push(scheduleBot)
+
+discordClient.on(Events.MessageCreate, async (msg) => {
   const msgAuthor = msg.author.username
   const msgContent = msg.content
   const msgContentLowercase = msgContent.toLowerCase()
@@ -217,10 +463,10 @@ bot.on(Events.MessageCreate, async (msg) => {
       return
     }
   } catch (e) {
-    console.error('Error handling number message: ', e)
+    logger.error({ err: e }, 'Error handling number message')
   }
   // Handle special info questions that ArtBot knows how to answer.
-  const artBotID = bot.user?.id
+  const artBotID = discordClient.user?.id ?? ''
   // TODO: refactor smartbotresponse to be less irritating / have fewer args
   smartBotResponse(
     msgContentLowercase,
@@ -228,7 +474,7 @@ bot.on(Events.MessageCreate, async (msg) => {
     artBotID,
     channelID,
     msg
-  ).then((smartResponse: string) => {
+  ).then((smartResponse) => {
     if (smartResponse !== null && smartResponse !== undefined) {
       if (typeof smartResponse === 'string') {
         msg.reply(smartResponse)
@@ -239,64 +485,442 @@ bot.on(Events.MessageCreate, async (msg) => {
   })
 })
 
-const initReservoirBots = async () => {
+// Only instantiate TwitterBot if TWITTER_ENABLED is true
+const isTwitterEnabled = process.env.TWITTER_ENABLED?.toLowerCase() === 'true'
+logger.info({ isTwitterEnabled }, 'Twitter functionality enabled')
+
+const abTwitterBot = isTwitterEnabled
+  ? new TwitterBot({
+      appKey: process.env.AB_TWITTER_API_KEY ?? '',
+      appSecret: process.env.AB_TWITTER_API_SECRET ?? '',
+      accessToken: process.env.AB_TWITTER_OAUTH_TOKEN ?? '',
+      accessSecret: process.env.AB_TWITTER_OAUTH_SECRET ?? '',
+    })
+  : undefined
+
+if (!isTwitterEnabled) {
+  logger.info('TwitterBot disabled via TWITTER_ENABLED environment variable')
+}
+
+export const mintBot = new MintBot(discordClient, abTwitterBot)
+
+/**
+ * OpenSea Stream integration with robust error handling and reconnection logic
+ *
+ * This implementation addresses the common 502 "Bad Gateway" errors from OpenSea's WebSocket stream API
+ * by implementing:
+ *
+ * 1. **Automatic Reconnection**: Exponential backoff with jitter (5s → 10s → 20s → ... up to 5 minutes)
+ * 2. **Error Detection**: Specific handling for 502 errors with contextual logging
+ * 3. **Connection Monitoring**: Health checks every minute with connection stats
+ * 4. **Graceful Degradation**: Falls back to API polling when max reconnections reached
+ * 5. **Configuration**: Environment variables for customizing reconnection behavior
+ * 6. **Resource Management**: Proper cleanup of timers and connections on shutdown
+ *
+ * Debug access: `getOpenSeaConnectionStats()` in Node.js console
+ */
+
+// WebSocket connection management
+interface ConnectionState {
+  isConnected: boolean
+  reconnectAttempts: number
+  lastError?: Error
+  lastConnectTime?: number
+}
+
+const connectionState: ConnectionState = {
+  isConnected: false,
+  reconnectAttempts: 0,
+}
+
+// Configuration with environment variable overrides
+const MAX_RECONNECT_ATTEMPTS = parseInt(
+  process.env.OPENSEA_MAX_RECONNECT_ATTEMPTS || '10'
+)
+const INITIAL_RECONNECT_DELAY = parseInt(
+  process.env.OPENSEA_INITIAL_RECONNECT_DELAY || '5000'
+) // 5 seconds
+const MAX_RECONNECT_DELAY = parseInt(
+  process.env.OPENSEA_MAX_RECONNECT_DELAY || '300000'
+) // 5 minutes
+const CONNECTION_HEALTH_CHECK_INTERVAL = parseInt(
+  process.env.OPENSEA_HEALTH_CHECK_INTERVAL || '60000'
+) // 1 minute
+
+let openseaStreamClient: OpenSeaStreamClient
+let reconnectTimeout: NodeJS.Timeout | null = null
+let healthCheckInterval: NodeJS.Timeout | null = null
+
+// Calculate exponential backoff delay with jitter
+function getReconnectDelay(attemptNumber: number): number {
+  const exponentialDelay = Math.min(
+    INITIAL_RECONNECT_DELAY * Math.pow(2, attemptNumber),
+    MAX_RECONNECT_DELAY
+  )
+  // Add jitter (±25% randomization) to prevent thundering herd
+  const jitter = exponentialDelay * 0.25 * (Math.random() * 2 - 1)
+  return Math.max(1000, exponentialDelay + jitter)
+}
+
+// Initialize OpenSea Stream Client with error handling
+function initializeOpenSeaStreamClient(): OpenSeaStreamClient {
+  logger.info('Initializing OpenSea Stream Client')
+
+  const client = new OpenSeaStreamClient({
+    token: process.env.OPENSEA_API_KEY ?? '',
+    connectOptions: {
+      transport: WebSocket,
+      sessionStorage: LocalStorage,
+    },
+    onError: (error: unknown) => {
+      logger.error({ err: error }, 'OpenSea Stream Client error')
+      connectionState.lastError = error as Error
+      connectionState.isConnected = false
+
+      // Check if it's a 502 error specifically and provide context
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
+      if (
+        errorMessage.includes('502') ||
+        errorMessage.includes('Bad Gateway')
+      ) {
+        logger.warn('Detected 502 Bad Gateway error - OpenSea server issue. Automatic reconnection will be attempted with exponential backoff.')
+      }
+
+      // Schedule reconnection for connection errors
+      if (
+        errorMessage.includes('WebSocket') ||
+        errorMessage.includes('Connection') ||
+        errorMessage.includes('502')
+      ) {
+        scheduleReconnection()
+      }
+    },
+  })
+
+  // The OpenSeaStreamClient handles connection internally using Phoenix channels
+  // We'll rely on the onError callback and add additional monitoring
+  logger.info('OpenSea Stream Client initialized with error handling')
+  connectionState.isConnected = true
+  connectionState.reconnectAttempts = 0
+  connectionState.lastConnectTime = Date.now()
+
+  // Start health check monitoring
+  if (!healthCheckInterval) {
+    startHealthCheckMonitoring()
+  }
+
+  return client
+}
+
+// Schedule reconnection with exponential backoff
+function scheduleReconnection() {
+  if (reconnectTimeout) {
+    clearTimeout(reconnectTimeout)
+  }
+
+  if (connectionState.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+    logger.error({ MAX_RECONNECT_ATTEMPTS }, 'Max reconnection attempts reached. Stopping reconnection attempts. Falling back to API polling only for OpenSea events.')
+    return
+  }
+
+  const delay = getReconnectDelay(connectionState.reconnectAttempts)
+  connectionState.reconnectAttempts++
+
+  logger.info(
+    { attempt: connectionState.reconnectAttempts, maxAttempts: MAX_RECONNECT_ATTEMPTS, delaySeconds: delay / 1000 },
+    'Scheduling OpenSea WebSocket reconnection attempt'
+  )
+
+  reconnectTimeout = setTimeout(() => {
+    logger.info(
+      { attempt: connectionState.reconnectAttempts, maxAttempts: MAX_RECONNECT_ATTEMPTS },
+      'Attempting OpenSea WebSocket reconnection'
+    )
+    try {
+      // Reinitialize the stream client
+      openseaStreamClient = initializeOpenSeaStreamClient()
+      setupStreamEventHandlers()
+    } catch (error) {
+      logger.error({ err: error }, 'Failed to reinitialize OpenSea Stream Client')
+      scheduleReconnection()
+    }
+  }, delay)
+}
+
+// Health check monitoring
+function startHealthCheckMonitoring() {
+  healthCheckInterval = setInterval(() => {
+    const now = Date.now()
+    const timeSinceLastConnect = connectionState.lastConnectTime
+      ? now - connectionState.lastConnectTime
+      : Infinity
+
+    if (!connectionState.isConnected) {
+      logger.warn('OpenSea WebSocket health check: Connection lost, reconnection should be in progress')
+    } else if (timeSinceLastConnect > 600000) {
+      // 10 minutes
+      logger.info(
+        { stableMinutes: Math.round(timeSinceLastConnect / 60000) },
+        'OpenSea WebSocket health check: Connection stable'
+      )
+    }
+
+    // Log connection stats
+    if (connectionState.reconnectAttempts > 0) {
+      logger.info(
+        { reconnectAttempts: connectionState.reconnectAttempts, isConnected: connectionState.isConnected },
+        'OpenSea WebSocket stats'
+      )
+    }
+  }, CONNECTION_HEALTH_CHECK_INTERVAL)
+}
+
+// Setup stream event handlers
+function setupStreamEventHandlers() {
+  // Note: OpenSeaStreamClient doesn't expose removeAllListeners
+  // Duplicate listeners are handled internally by the Phoenix channels
+
+  // Your existing event handlers with additional error handling
+  openseaStreamClient.onItemListed('*', async (event) => {
+    if (!PRODUCTION_MODE) {
+      return
+    }
+    try {
+      // Get all contracts (ensures async contracts are loaded)
+      const allContracts = Object.values(CORE_CONTRACTS)
+        .concat(Object.values(COLLAB_CONTRACTS))
+        .concat(Object.values(EXPLORATIONS_CONTRACTS))
+        .concat(STUDIO_CONTRACTS)
+        .concat(ENGINE_CONTRACTS)
+
+      if (event.payload && event.payload.item && event.payload.item.nft_id) {
+        const nftId = event.payload.item.nft_id
+
+        if (isTrackedContract(nftId, allContracts)) {
+          // Process the listing with the old OpenSeaListBot for now
+          // This is the primary source for listings
+          openSeaListBot.handleListingEvent(event).catch((err) => {
+            logger.error({ err }, 'Error processing OpenSea listing event')
+          })
+        }
+      }
+    } catch (error) {
+      logger.error({ err: error }, 'Error handling OpenSea listing event')
+    }
+  })
+
+  openseaStreamClient.onItemSold('*', async (event) => {
+    if (!PRODUCTION_MODE) {
+      return
+    }
+    try {
+      // Get all contracts (ensures async contracts are loaded)
+      const allContracts = Object.values(CORE_CONTRACTS)
+        .concat(Object.values(COLLAB_CONTRACTS))
+        .concat(Object.values(EXPLORATIONS_CONTRACTS))
+        .concat(STUDIO_CONTRACTS)
+        .concat(ENGINE_CONTRACTS)
+
+      if (event.payload && event.payload.item && event.payload.item.nft_id) {
+        const nftId = event.payload.item.nft_id
+
+        if (isTrackedContract(nftId, allContracts)) {
+          // Parse the NFT ID to get contract and token info
+          const parts = nftId.split('/')
+          const contractAddress = parts[1]?.toLowerCase()
+          const tokenId = parts[2]
+
+          // Register this sale with the polling bot to avoid duplicate processing
+          if (openSeaEventsBot && event.payload.transaction) {
+            const seller = event.payload.maker.address || ''
+            const buyer = event.payload.taker.address || ''
+            openSeaEventsBot.registerStreamSale(
+              event.payload.transaction.hash,
+              contractAddress,
+              tokenId,
+              seller,
+              buyer
+            )
+          }
+
+          // Process the sale with the old OpenSeaSaleBot for now
+          // This is the primary source for sales
+          openSeaSaleBot.handleSaleEvent(event).catch((err: unknown) => {
+            logger.error({ err }, 'Error processing OpenSea sale event')
+          })
+        }
+      }
+    } catch (error) {
+      logger.error({ err: error }, 'Error handling OpenSea sale event')
+    }
+  })
+}
+
+// Utility function to get connection statistics
+function getOpenSeaConnectionStats() {
+  return {
+    isConnected: connectionState.isConnected,
+    reconnectAttempts: connectionState.reconnectAttempts,
+    lastError: connectionState.lastError?.message,
+    lastConnectTime: connectionState.lastConnectTime,
+    uptime: connectionState.lastConnectTime
+      ? Date.now() - connectionState.lastConnectTime
+      : 0,
+    config: {
+      maxReconnectAttempts: MAX_RECONNECT_ATTEMPTS,
+      initialReconnectDelay: INITIAL_RECONNECT_DELAY,
+      maxReconnectDelay: MAX_RECONNECT_DELAY,
+      healthCheckInterval: CONNECTION_HEALTH_CHECK_INTERVAL,
+    },
+  }
+}
+
+// Expose stats for debugging (global for console access)
+if (typeof global !== 'undefined') {
+  ;(
+    global as { getOpenSeaConnectionStats?: typeof getOpenSeaConnectionStats }
+  ).getOpenSeaConnectionStats = getOpenSeaConnectionStats
+}
+
+// Initialize the stream client
+logger.info('Starting OpenSea WebSocket Stream integration')
+openseaStreamClient = initializeOpenSeaStreamClient()
+setupStreamEventHandlers()
+
+logger.info(
+  { MAX_RECONNECT_ATTEMPTS, INITIAL_RECONNECT_DELAY, MAX_RECONNECT_DELAY },
+  'OpenSea Stream Config'
+)
+
+// OpenSea Stream Bots - Primary handlers, API polling for sales backfill
+const openSeaListBot = new OpenSeaListBot(discordClient)
+const openSeaSaleBot = new OpenSeaSaleBot(discordClient, abTwitterBot) // Primary sales handler
+botsToCleanup.push(openSeaListBot)
+botsToCleanup.push(openSeaSaleBot)
+
+// Global reference to the polling bot for stream integration
+let openSeaEventsBot: OpenSeaEventsPollBot | null = null
+
+// Initialize new OpenSea API polling bots
+const initOpenSeaApiPollingBots = async () => {
+  logger.info('Initializing OpenSea API polling bots')
+
+  // Wait for contracts to be loaded
   const studioContracts = await waitForStudioContracts()
   const engineContracts = await waitForEngineContracts()
 
-  const buildContractsString = (contracts: string[]): string => {
-    const ans = 'contracts=' + contracts.join('&contracts=')
-    return ans
-  }
-
-  const createReservoirBots = (
-    listParams: string,
-    saleParams: string,
-    pollTimeMs: number
-  ) => {
-    new ReservoirListBot(
-      `https://api.reservoir.tools/orders/asks/v5?${listParams}&sortBy=createdAt&limit=${reservoirListLimit}&normalizeRoyalties=true`,
-      pollTimeMs,
-      bot,
-      {
-        Accept: 'application/json',
-        'x-api-key': process.env.RESERVOIR_API_KEY,
-      }
-    )
-
-    new ReservoirSaleBot(
-      `https://api.reservoir.tools/sales/v4?${saleParams}&limit=${reservoirSaleLimit}`,
-      pollTimeMs,
-      bot,
-      {
-        Accept: 'application/json',
-        'x-api-key': process.env.RESERVOIR_API_KEY,
-      }
-    )
-  }
-
+  // Get all contracts we care about
   const allContracts = Object.values(CORE_CONTRACTS)
     .concat(Object.values(COLLAB_CONTRACTS))
     .concat(Object.values(EXPLORATIONS_CONTRACTS))
-    .concat(studioContracts ?? [])
-    .concat(engineContracts ?? [])
+    .concat(studioContracts)
+    .concat(engineContracts)
 
-  const RESERVOIR_CONTRACT_LIMIT = 20
-  const numBotInstances = Math.ceil(
-    allContracts.length / RESERVOIR_CONTRACT_LIMIT
-  )
-  for (let i = 0; i < numBotInstances; i++) {
-    const start = i * RESERVOIR_CONTRACT_LIMIT
-    const end = start + RESERVOIR_CONTRACT_LIMIT
-    const listParams = buildContractsString(allContracts.slice(start, end))
-    const saleParams = listParams.replaceAll('contracts', 'contract')
+  logger.info({ count: allContracts.length }, 'Tracking contracts for OpenSea API polling')
 
-    createReservoirBots(listParams, saleParams, API_POLL_TIME_MS + i * 3000)
+  // OpenSea API configuration
+  const OPENSEA_API_BASE = 'https://api.opensea.io/api/v2/events'
+  const API_POLL_TIME_MS = 30000 // Poll every 30 seconds (less frequent since it's backfill)
+  const headers = {
+    Accept: 'application/json',
+    'x-api-key': process.env.OPENSEA_API_KEY,
   }
+
+  // Initialize OpenSea API Events Bot (SALES ONLY for backfill)
+  openSeaEventsBot = new OpenSeaEventsPollBot(
+    OPENSEA_API_BASE, // Base URL, will be updated with parameters in constructor
+    API_POLL_TIME_MS,
+    discordClient,
+    headers,
+    abTwitterBot,
+    allContracts,
+    openSeaSaleBot
+  )
+  botsToCleanup.push(openSeaEventsBot)
+
+  logger.info('OpenSea API polling bot initialized successfully (sales backfill only)')
 }
 
-export const mintBot = new MintBot(bot)
+// Helper function to check if an OpenSea NFT ID contains any of our tracked contracts
+const isTrackedContract = (
+  nftId: string,
+  contractsArray: string[]
+): boolean => {
+  // NFT ID format: "ethereum/0x2308742aa28cc460522ff855d24a365f99deba7b/7111"
+  // Extract the contract address (middle part)
+  const parts = nftId.split('/')
+  if (parts.length !== 3) return false
 
-// Instantiate API Pollers (if not in test mode)
+  if (parts[0] !== 'ethereum') return false
+
+  const contractAddress = parts[1].toLowerCase()
+
+  // Check if this contract address is in our tracked contracts
+  return contractsArray.some(
+    (contract) => contract.toLowerCase() === contractAddress
+  )
+}
+
 if (PRODUCTION_MODE) {
-  initReservoirBots()
+  attemptDiscordLogin()
+  // Initialize OpenSea API polling bots after Discord login
+  initOpenSeaApiPollingBots().catch((err) => {
+    logger.error({ err }, 'Error initializing OpenSea API polling bots')
+  })
 }
+
+// Cleanup function for OpenSea WebSocket connections
+function cleanupOpenSeaConnections() {
+  logger.info('Cleaning up OpenSea WebSocket connections')
+
+  // Clear reconnection timeout
+  if (reconnectTimeout) {
+    clearTimeout(reconnectTimeout)
+    reconnectTimeout = null
+  }
+
+  // Clear health check interval
+  if (healthCheckInterval) {
+    clearInterval(healthCheckInterval)
+    healthCheckInterval = null
+  }
+
+  // Disconnect OpenSea stream client gracefully
+  if (openseaStreamClient) {
+    try {
+      openseaStreamClient.disconnect(() => {
+        logger.info('OpenSea WebSocket disconnected successfully')
+      })
+    } catch (error) {
+      logger.error({ err: error }, 'Error disconnecting OpenSea WebSocket')
+    }
+  }
+
+  // Reset connection state
+  connectionState.isConnected = false
+  connectionState.reconnectAttempts = 0
+}
+
+// Handle application shutdown
+process.on('SIGINT', () => {
+  logger.info('Received SIGINT. Cleaning up.')
+  // Cleanup OpenSea connections first
+  cleanupOpenSeaConnections()
+  // Cleanup all bots
+  botsToCleanup.forEach((bot) => bot.cleanup())
+  // Disconnect Discord client
+  discordClient.destroy()
+  process.exit(0)
+})
+
+process.on('SIGTERM', () => {
+  logger.info('Received SIGTERM. Cleaning up.')
+  // Cleanup OpenSea connections first
+  cleanupOpenSeaConnections()
+  // Cleanup all bots
+  botsToCleanup.forEach((bot) => bot.cleanup())
+  // Disconnect Discord client
+  discordClient.destroy()
+  process.exit(0)
+})
