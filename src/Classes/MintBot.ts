@@ -9,16 +9,11 @@ import {
   replaceToPNG,
   waitForEngineContracts,
   waitForStudioContracts,
+  isBlockedMintContract,
 } from './APIBots/utils'
 import { ensOrAddress } from './APIBots/utils'
 import { TwitterBot } from './TwitterBot'
 import { logger } from '../logger'
-
-// When true, only post mints from mainnet (chain ID 1). Non-mainnet mints are skipped.
-// Set to false in a couple weeks to enable L2/other chain mints.
-const HIDE_NON_MAINNET_MINTS = true
-
-const MAINNET_CHAIN_ID = 1
 
 const MINT_CONFIG: {
   [id: string]: string[]
@@ -144,7 +139,10 @@ export class MintBot {
 
               const contentType = imageRes.headers.get('content-type')
               if (!contentType?.startsWith('image/')) {
-                logger.info({ id, contentType }, 'Invalid content type for mint')
+                logger.info(
+                  { id, contentType },
+                  'Invalid content type for mint'
+                )
                 return
               }
 
@@ -199,8 +197,11 @@ export class MintBot {
       return
     }
 
-    if (HIDE_NON_MAINNET_MINTS && chainId !== MAINNET_CHAIN_ID) {
-      logger.info({ chainId }, 'Skipping mint for non-mainnet chain (HIDE_NON_MAINNET_MINTS=true)')
+    if (isBlockedMintContract(chainId, contractAddress)) {
+      logger.info(
+        { contractAddress, chainId },
+        'Skipping mint for blocked contract'
+      )
       return
     }
 
@@ -222,7 +223,10 @@ export class MintBot {
   startRoutine() {
     this.intervalId = setInterval(async () => {
       if (Object.keys(this.mintsToPost).length > 0) {
-        logger.info({ count: Object.keys(this.mintsToPost).length }, 'mints to post')
+        logger.info(
+          { count: Object.keys(this.mintsToPost).length },
+          'mints to post'
+        )
       }
       await this.checkAndPostMints()
     }, parseInt(MINT_REFRESH_TIME_SECONDS) * 1000)

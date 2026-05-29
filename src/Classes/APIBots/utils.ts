@@ -29,6 +29,7 @@ const publicClient = createPublicClient({
 const EXPLORATIONS_CONTRACTS = require('../../ProjectConfig/explorationsContracts.json')
 
 const CORE_CONTRACTS = require('../../ProjectConfig/coreContracts.json')
+const BLOCKED_MINT_CONTRACTS: Record<string, Record<string, string>> = require('../../ProjectConfig/blockedMintContracts.json')
 
 // ENS cache: stores resolved names ('' means no ENS name exists)
 const ensAddressMap: { [id: string]: string } = {}
@@ -281,6 +282,21 @@ export function isEngineContract(contractAddress: string): boolean {
 
 export function isCoreContract(contractAddress: string): boolean {
   return Object.values(CORE_CONTRACTS).includes(contractAddress.toLowerCase())
+}
+
+export function isBlockedMintContract(
+  chainId: number,
+  contractAddress: string
+): boolean {
+  const blocked = BLOCKED_MINT_CONTRACTS[String(chainId)]
+  if (!blocked) {
+    return false
+  }
+
+  const normalized = contractAddress.toLowerCase()
+  return Object.values(blocked).some(
+    (address) => address.toLowerCase() === normalized
+  )
 }
 
 export async function getCollectionType(
