@@ -250,6 +250,93 @@ const OTC_MESSAGE = new EmbedBuilder()
 
 let grantThanks = 0
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function isArtBotMentioned(msg: Message, artBotID: string): boolean {
+  return msg.mentions.users.has(artBotID)
+}
+
+/**
+ * Matches intentional bot commands like "help?" or "art blocks?" rather than
+ * incidental keywords in normal conversation.
+ */
+function matchesBotCommand(
+  msgContentLowercase: string,
+  keywords: string | string[]
+): boolean {
+  const keywordList = Array.isArray(keywords) ? keywords : [keywords]
+  const trimmedMessage = msgContentLowercase.trim()
+
+  return keywordList.some((keyword) => {
+    const escapedKeyword = escapeRegExp(keyword).replace(/\s+/g, '\\s+')
+    const pattern = new RegExp(`^${escapedKeyword}\\s*\\?$`)
+    return pattern.test(trimmedMessage)
+  })
+}
+
+function messageIncludesKeyword(
+  msgContentLowercase: string,
+  keywords: string | string[]
+): boolean {
+  const keywordList = Array.isArray(keywords) ? keywords : [keywords]
+
+  return keywordList.some((keyword) => {
+    const escapedKeyword = escapeRegExp(keyword).replace(/\s+/g, '\\s+')
+    return new RegExp(`\\b${escapedKeyword}\\b`).test(msgContentLowercase)
+  })
+}
+
+function shouldRespondToSmartBot(
+  msg: Message,
+  artBotID: string,
+  msgContentLowercase: string,
+  keywords: string | string[]
+): boolean {
+  if (matchesBotCommand(msgContentLowercase, keywords)) {
+    return true
+  }
+
+  return (
+    isArtBotMentioned(msg, artBotID) &&
+    messageIncludesKeyword(msgContentLowercase, keywords)
+  )
+}
+
+function isArtBotInvoked(
+  msg: Message,
+  artBotID: string,
+  msgContentLowercase: string
+): boolean {
+  return (
+    isArtBotMentioned(msg, artBotID) ||
+    matchesBotCommand(msgContentLowercase, [
+      'help',
+      'artblocks',
+      'art blocks',
+      'genart',
+      'gen art',
+      'staysafe',
+      'safety',
+      'drop',
+      'curated',
+      'presents',
+      'heritage',
+      'explorations',
+      'collaborations',
+      'v2',
+      'opensea',
+      'application',
+      'applications',
+      'apply',
+      'gas',
+      'hashtag',
+      'named',
+    ])
+  )
+}
+
 // Returns a message containing information about the current gas prices.
 async function generateGasPriceMessage(): Promise<EmbedBuilder> {
   try {
@@ -304,7 +391,6 @@ export async function smartBotResponse(
     return null
   }
 
-  const CHANNEL_HELP: string = projectConfig.chIdByName['help']
   const CHANNEL_SNOWFRO: string = projectConfig.chIdByName['snowfro']
 
   const CHANNEL_FOR_SALE_LISTINGS: string =
@@ -322,14 +408,8 @@ export async function smartBotResponse(
     return null
   }
 
-  // Some shared helper variables.
-  const inHelpChannel: boolean = channelID == CHANNEL_HELP
-  const mentionedArtBot: boolean =
-    msgContentLowercase.includes(ARTBOT_USERNAME) ||
-    msgContentLowercase.includes(ARTBOT_JR_USERNAME) ||
-    msgContentLowercase.includes(artBotID)
-  const mentionedArtBotOrInOrHelp: boolean = mentionedArtBot || inHelpChannel
   const containsQuestion: boolean = msgContentLowercase.includes('?')
+  const artBotMentioned: boolean = isArtBotMentioned(msg, artBotID)
 
   // Handle questions about the mint pausing for Chromie Squiggles.
   const inSnowfroChannel: boolean = channelID == CHANNEL_SNOWFRO
@@ -349,12 +429,15 @@ export async function smartBotResponse(
     msgContentLowercase.includes('squiglle')
   const squiggleChannelPauseMentioned: boolean =
     mentionsPause && inSnowfroChannel
-  const artbotOrHelpChannelSquigglePauseMentioned: boolean =
-    mentionsPause && messageMentionsSquiggle && mentionedArtBotOrInOrHelp
-  if (
-    squiggleChannelPauseMentioned ||
-    artbotOrHelpChannelSquigglePauseMentioned
-  ) {
+  const artbotSquigglePauseMentioned: boolean =
+    mentionsPause &&
+    messageMentionsSquiggle &&
+    (isArtBotMentioned(msg, artBotID) ||
+      matchesBotCommand(msgContentLowercase, [
+        'squiggle paused',
+        'squiggle stopped',
+      ]))
+  if (squiggleChannelPauseMentioned || artbotSquigglePauseMentioned) {
     return SQUIGGLE_PAUSE_MESSAGE
   }
 
@@ -395,7 +478,7 @@ export async function smartBotResponse(
     channelID == CHANNEL_BLOCK_TALK &&
     msgContentLowercase.includes('alias') &&
     containsQuestion &&
-    mentionedArtBot
+    artBotMentioned
   ) {
     let msg = ''
     for (const [alias, name] of Object.entries(PROJECT_ALIASES)) {
@@ -420,14 +503,6 @@ export async function smartBotResponse(
     return OTC_MESSAGE
   }
 
-  /*
-   * Only answer the following questions if ArtBlot is pinged directly
-   * Or the message was sent in #general.
-   */
-  if (!mentionedArtBotOrInOrHelp) {
-    return null
-  }
-
   // Handle requests for help!
   if (msgContentLowercase.includes('gm')) {
     return 'gm'
@@ -439,72 +514,92 @@ export async function smartBotResponse(
   }
 
   // Handle requests for help!
-  const mentionsHelp: boolean = msgContentLowercase.includes('help')
-  if (containsQuestion && mentionsHelp) {
+  if (
+    shouldRespondToSmartBot(msg, artBotID, msgContentLowercase, 'help') &&
+    containsQuestion
+  ) {
     return HELP_MESSAGE
   }
 
   // Handle requests for ArtBlocks info!
-  const mentionsArtBlocks: boolean =
-    msgContentLowercase.includes('artblocks') ||
-    msgContentLowercase.includes('art blocks')
-  if (containsQuestion && mentionsArtBlocks) {
+  if (
+    shouldRespondToSmartBot(msg, artBotID, msgContentLowercase, [
+      'artblocks',
+      'art blocks',
+    ]) &&
+    containsQuestion
+  ) {
     return ARTBLOCKS_MESSAGE
   }
 
   // Handle requests for GenArt info!
-  const mentionsGenArt: boolean =
-    msgContentLowercase.includes('genart') ||
-    msgContentLowercase.includes('gen art')
-  if (containsQuestion && mentionsGenArt) {
+  if (
+    shouldRespondToSmartBot(msg, artBotID, msgContentLowercase, [
+      'genart',
+      'gen art',
+    ]) &&
+    containsQuestion
+  ) {
     return GENART_MESSAGE
   }
 
   // Handle requests for safety tips!
-  const mentionsSafety: boolean =
-    msgContentLowercase.includes('staysafe') ||
-    msgContentLowercase.includes('safety')
-  if (containsQuestion && mentionsSafety) {
+  if (
+    shouldRespondToSmartBot(msg, artBotID, msgContentLowercase, [
+      'staysafe',
+      'safety',
+    ]) &&
+    containsQuestion
+  ) {
     return SAFETY_MESSAGE
   }
 
   // Handle drop questions.
-  const mentionsDrop: boolean = msgContentLowercase.includes('drop')
-  if (containsQuestion && mentionsDrop) {
+  if (
+    shouldRespondToSmartBot(msg, artBotID, msgContentLowercase, 'drop') &&
+    containsQuestion
+  ) {
     return NEXT_DROP_MESSAGE
   }
   // Handle when people are confused about OpenSea is saying a project is curated
   const mentionedOpenSeaCurated: boolean =
     msgContentLowercase.includes('opensea') &&
     msgContentLowercase.includes('curated')
-  if (mentionedArtBot && containsQuestion && mentionedOpenSeaCurated) {
+  if (artBotMentioned && containsQuestion && mentionedOpenSeaCurated) {
     return OPENSEA_CURATED_MESSAGE
   }
   // Handle questions about Curated Projects vs. Artist Playground vs. Factory.
-  const mentionedVerticals: boolean =
-    msgContentLowercase.includes('curated') ||
-    msgContentLowercase.includes('presents') ||
-    msgContentLowercase.includes('heritage') ||
-    msgContentLowercase.includes('explorations') ||
-    msgContentLowercase.includes('collaborations')
-  if (containsQuestion && mentionedVerticals) {
+  if (
+    shouldRespondToSmartBot(msg, artBotID, msgContentLowercase, [
+      'curated',
+      'presents',
+      'heritage',
+      'explorations',
+      'collaborations',
+    ]) &&
+    containsQuestion
+  ) {
     return VERTICALS_MESSAGE
   }
-  const mentionedV2: boolean = msgContentLowercase.includes('v2')
-  if (containsQuestion && mentionedV2) {
+  if (
+    shouldRespondToSmartBot(msg, artBotID, msgContentLowercase, 'v2') &&
+    containsQuestion
+  ) {
     return V2_MESSAGE
   }
 
   // Handle OpenSea link requests.
-  const mentionedOpenSea: boolean = msgContentLowercase.includes('opensea')
-  if (containsQuestion && mentionedOpenSea) {
+  if (
+    shouldRespondToSmartBot(msg, artBotID, msgContentLowercase, 'opensea') &&
+    containsQuestion
+  ) {
     return OPENSEA_LINKS_MESSAGE
   }
 
   // Handle how are you messages.
   const mentionedHowAreYou: boolean =
     msgContentLowercase.includes('how are you')
-  if (mentionedArtBot && mentionedHowAreYou) {
+  if (artBotMentioned && mentionedHowAreYou) {
     return (
       ARTBOT_HOW_ARE_YOU
         // Set the title of the field and append the message sender
@@ -515,31 +610,43 @@ export async function smartBotResponse(
   }
 
   // Handle application questions.
-  const mentionedApplications: boolean =
-    msgContentLowercase.includes('application') ||
-    msgContentLowercase.includes('apply')
-  if (containsQuestion && mentionedApplications) {
+  if (
+    shouldRespondToSmartBot(msg, artBotID, msgContentLowercase, [
+      'application',
+      'applications',
+      'apply',
+    ]) &&
+    containsQuestion
+  ) {
     return APPLICATIONS_OPEN_MESSAGE
   }
   // Handle metamask high gas questions.
   const mentionedHighGas: boolean =
     msgContentLowercase.includes('gas') && msgContentLowercase.includes('high')
-  if (mentionedArtBot && containsQuestion && mentionedHighGas) {
+  if (artBotMentioned && containsQuestion && mentionedHighGas) {
     return MM_HIGH_GAS_MESSAGE
   }
   // Handle gas questions.
-  const mentionedGas: boolean = msgContentLowercase.includes('gas')
-  if (containsQuestion && mentionedGas) {
+  if (
+    shouldRespondToSmartBot(msg, artBotID, msgContentLowercase, 'gas') &&
+    containsQuestion
+  ) {
     if (msgContentLowercase.includes('price')) {
       return generateGasPriceMessage()
     }
     return GAS_MESSAGE
   }
 
-  if (containsQuestion && msgContentLowercase.includes('hashtag')) {
+  if (
+    shouldRespondToSmartBot(msg, artBotID, msgContentLowercase, 'hashtag') &&
+    containsQuestion
+  ) {
     return HASHTAG_MESSAGE
   }
-  if (msgContentLowercase.includes('leaderboard')) {
+  if (
+    isArtBotInvoked(msg, artBotID, msgContentLowercase) &&
+    msgContentLowercase.includes('leaderboard')
+  ) {
     if (
       msgContentLowercase.includes('all-time') ||
       msgContentLowercase.includes('alltime') ||
@@ -551,11 +658,17 @@ export async function smartBotResponse(
     }
   }
 
-  if (msgContentLowercase.includes('question')) {
+  if (
+    isArtBotInvoked(msg, artBotID, msgContentLowercase) &&
+    msgContentLowercase.includes('question')
+  ) {
     triviaBot.resurfaceQuestion(msg)
   }
 
-  if (msgContentLowercase.includes('named')) {
+  if (
+    shouldRespondToSmartBot(msg, artBotID, msgContentLowercase, 'named') ||
+    (artBotMentioned && messageIncludesKeyword(msgContentLowercase, 'named'))
+  ) {
     const projects = artIndexerBot.getProjectsWithNamedMappings()
     let msg = ''
     for (const project of projects) {
