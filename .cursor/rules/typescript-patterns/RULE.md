@@ -1,5 +1,6 @@
 ---
 description: "TypeScript coding conventions and patterns for ArtBot"
+globs: "**/*.{ts,tsx}"
 alwaysApply: false
 ---
 
@@ -29,7 +30,6 @@ const name = project.name  // Error if project could be null
 - Import generated types from `generated/graphql.ts` for GraphQL data
 
 ```typescript
-// Interface for object shapes
 interface SaleEvent {
   contractAddress: string
   tokenId: string
@@ -37,55 +37,40 @@ interface SaleEvent {
   currency: string
 }
 
-// Type for unions
 type MessageType = 'random' | 'project' | 'artist' | 'wallet'
 
-// Explicit return types
-async function getProject(id: string): Promise<ProjectDetailFragment> {
+async function getProject(
+  projectId: number,
+  contractAddress?: string
+): Promise<ProjectDetailFragment> {
   // ...
 }
 ```
 
 ## Async Patterns
 
-Use `async/await` over raw promises:
-
-```typescript
-// Good
-async function fetchData() {
-  const result = await client.query(SomeDocument, {}).toPromise()
-  return result.data
-}
-
-// Avoid chained .then() when possible
-```
+Prefer `async/await` over chained `.then()`.
 
 ## Import Organization
 
-Order imports: external packages first, then internal modules:
+External packages first, then internal modules:
 
 ```typescript
-// External packages
 import { Client, EmbedBuilder } from 'discord.js'
-import axios from 'axios'
+import fetch from 'node-fetch'
 
-// Internal modules
 import { ProjectBot } from './ProjectBot'
 import { getProject } from '../Data/queryGraphQL'
-import { CHANNEL_BLOCK_TALK } from '..'
+import { logger } from '../logger'
 ```
 
 ## Error Handling
 
-Use try/catch blocks around external API calls. Log errors with context:
-
 ```typescript
 try {
   const data = await someApiCall()
-  // process data
 } catch (err) {
-  console.error('Error in someOperation:', err)
-  // Handle gracefully - don't rethrow unless necessary
+  logger.error({ err }, 'Error in someOperation')
 }
 ```
 

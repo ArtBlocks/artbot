@@ -1,17 +1,22 @@
 ---
 description: "GraphQL and Hasura patterns for ArtBot data queries"
+globs: "**/Data/**,**/generated/**,**/codegen.ts"
 alwaysApply: false
 ---
 
 # GraphQL & Hasura Patterns
 
-## Query File Location
+## Endpoint
 
-Define all GraphQL queries in `.graphql` files under `src/Data/graphql/`:
+- Public Hasura: `https://data.artblocks.io/v1/graphql` (hardcoded in `queryGraphQL.ts` and `codegen.ts`)
+- Optional auth: `HASURA_GRAPHQL_ADMIN_SECRET` → `x-hasura-admin-secret`
+- **One client only** — there is no separate Arbitrum Hasura endpoint/client in this repo
+
+## Query Files
+
+Define documents under `src/Data/graphql/`:
 
 ```graphql
-# src/Data/graphql/artbot-hasura-queries.graphql
-
 fragment ProjectDetail on projects_metadata {
   id
   project_id
@@ -21,138 +26,42 @@ fragment ProjectDetail on projects_metadata {
   invocations
   max_invocations
 }
-
-query getProject($id: String!) {
-  projects_metadata(where: { id: { _eq: $id } }) {
-    ...ProjectDetail
-  }
-}
 ```
 
 ## Code Generation
-
-After modifying `.graphql` files, regenerate TypeScript types:
 
 ```bash
 yarn codegen
 ```
 
-This generates types in `generated/graphql.ts`. Import from there:
+Writes `generated/graphql.ts` (gitignored). `postinstall` and pre-commit also run codegen. Import generated types/documents from there.
+
+## Query Wrapper Pattern
+
+Wrappers live in `src/Data/queryGraphQL.ts` (urql, `requestPolicy: 'network-only'`).
 
 ```typescript
-import {
-  ProjectDetailFragment,
-  GetProjectDocument,
-  TokenDetailFragment,
-} from '../../generated/graphql'
-```
-
-## Query Function Pattern
-
-Create wrapper functions in `src/Data/queryGraphQL.ts`:
-
-```typescript
-import { createClient } from 'urql/core'
-import { GetProjectDocument, ProjectDetailFragment } from '../../generated/graphql'
-
-const client = createClient({
-  url: PUBLIC_HASURA_ENDPOINT,
-  fetch: fetch,
-  requestPolicy: 'network-only',
-})
-
-export async function getProject(projectId: string): Promise<ProjectDetailFragment> {
-  const { data, error } = await client
-    .query(GetProjectDocument, { id: projectId })
-    .toPromise()
-
-  if (error) {
-    throw Error(error.message)
-  }
-
-  if (!data || !data.projects_metadata?.length) {
-    throw Error('No data returned from getProject query')
-  }
-
-  return data.projects_metadata[0]
+export async function getProject(
+  projectId: number,
+  contractAddress?: string
+): Promise<ProjectDetailFragment> {
+  // builds Hasura id, queries, throws if missing
 }
 ```
 
-## Pagination Pattern
+Token IDs in Hasura are typically `{contractAddress}-{tokenId}` where tokenId encodes invocation + project number × 1e6.
 
-For queries that may return many results, use pagination:
+## Pagination
 
-```typescript
-const maxProjectsPerQuery = 1000
+Large lists use 1000-item loops (`first` / `skip`) until a short page is returned — see `getAllProjects` and similar helpers.
 
-export async function getAllProjects(): Promise<ProjectDetailFragment[]> {
-  const allProjects: ProjectDetailFragment[] = []
-  let loop = true
-  
-  while (loop) {
-    const { data } = await client
-      .query(GetAllProjectsDocument, {
-        first: maxProjectsPerQuery,
-        skip: allProjects.length,
-      })
-      .toPromise()
-      
-    if (!data) {
-      throw Error('No data returned from query')
-    }
-    
-    allProjects.push(...data.projects_metadata)
-    
-    if (data.projects_metadata.length !== maxProjectsPerQuery) {
-      loop = false
-    }
-  }
-  
-  return allProjects
-}
-```
+## Multi-Chain Note
 
-## Multi-Chain Support
+Hasura rows may include `chain_id` for Ethereum / Arbitrum / Base. That does **not** imply OpenSea Discord feeds cover those chains — stream filtering in `index.ts` is Ethereum-oriented. Do not document a phantom `arbitrumClient`.
 
-ArtBot supports both Ethereum mainnet and Arbitrum. Use the appropriate client:
+## After Schema/Query Changes
 
-```typescript
-const client = createClient({ url: PUBLIC_HASURA_ENDPOINT })
-const arbitrumClient = createClient({ url: PUBLIC_ARB_HASURA_ENDPOINT })
-
-const getClientForContract = (contract: string) => {
-  if (isArbitrumContract(contract)) {
-    return arbitrumClient
-  }
-  return client
-}
-```
-
-## Fragment Reuse
-
-Use fragments for consistent field selection across queries:
-
-```graphql
-fragment TokenDetail on tokens_metadata {
-  invocation
-  preview_asset_url
-  live_view_url
-  owner { public_address }
-  list_price
-  list_currency_symbol
-  project { name, artist_name }
-  contract { token_base_url, name }
-}
-
-query getToken($token_id: String!) {
-  tokens_metadata(where: { id: { _eq: $token_id } }) {
-    ...TokenDetail
-  }
-}
-
-query getWalletTokens($wallet: String!, $contracts: [String!]!) {
-  tokens_metadata(where: { owner_address: { _eq: $wallet } }) {
-    ...TokenDetail
-  }
-}
-```
+1. Edit `.graphql`
+2. `yarn codegen`
+3. Update `queryGraphQL.ts` callers/types
+4. Smoke with `yarn start` (CI uses `PRODUCTION_MODE=false`)
