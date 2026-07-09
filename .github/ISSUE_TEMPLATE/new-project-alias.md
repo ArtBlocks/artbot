@@ -3,7 +3,6 @@ name: Project Alias
 about: 'Ticket for requesting bot support for new project aliases.'
 title: '[ALIAS] Project #N'
 labels: project-query-support
-assignees: grantoesterling
 ---
 
 ######################################################################

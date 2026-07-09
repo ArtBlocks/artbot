@@ -3,7 +3,6 @@ name: Project Named Set
 about: 'Ticket for requesting bot support for new named sets. '
 title: '[SETS] Project #N'
 labels: project-query-support
-assignees: grantoesterling
 ---
 
 ######################################################################

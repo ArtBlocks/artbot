@@ -1,27 +1,31 @@
 ---
 description: "Project and channel configuration patterns for ArtBot"
+globs: "**/ProjectConfig/**,**/NamedMappings/**"
 alwaysApply: false
 ---
 
 # Project Configuration
 
-## Configuration Files
+Full task checklists: `docs/MAINTENANCE.md`. Env flag that selects prod vs dev JSON: `ARTBOT_IS_PROD` (not `PRODUCTION_MODE`).
 
-Configuration lives in `src/ProjectConfig/`:
+## Configuration Files
 
 | File | Purpose |
 |------|---------|
-| `channels.json` | Discord channel IDs and their project bot handlers |
-| `channels_dev.json` | Development channel configuration |
-| `projectBots.json` | Named mappings and custom config per project |
-| `coreContracts.json` | Art Blocks core contract addresses |
-| `partnerContracts.json` | Partner/Engine contract addresses |
-| `collaborationContracts.json` | Collaboration contract addresses |
-| `explorationsContracts.json` | Explorations contract addresses |
+| `channels.json` / `channels_dev.json` | Discord channel IDs → name + `projectBotHandlers` |
+| `projectBots.json` / `projectBots_dev.json` | Named mapping refs per bot ID |
+| `coreContracts.json` | Art Blocks core contracts |
+| `partnerContracts.json` | Engine partner contracts |
+| `collaborationContracts.json` | Collab contracts (Pace, BM, …) |
+| `explorationsContracts.json` | Explorations contracts |
+| `blockedEngineContracts.json` | Excluded from Engine index |
+| `blockedMintContracts.json` | Mint suppression |
+| `stagingContracts.json` | Staging mint routing |
+| `mintBotConfig.json` | Partner/collection → Discord channel **names** |
+| `project_aliases.json` | User shorthand → project name |
+| `contract_aliases.json` | Platform aliases |
 
 ## Channel Configuration
-
-Each channel can have a `projectBotHandlers` object:
 
 ```json
 {
@@ -40,40 +44,36 @@ Each channel can have a `projectBotHandlers` object:
 }
 ```
 
-- `default`: Project ID to handle messages by default
-- `stringTriggers`: Map project IDs to trigger words
-- `tokenIdTriggers`: Map project IDs to token ID ranges
+- `default`: Bot ID when no trigger matches
+- `stringTriggers`: Bot ID → trigger words (substring match on lowercase content)
+- `tokenIdTriggers`: Bot ID → `[min, max]` inclusive ranges
+
+**Gotcha:** Open-ended ranges with `null` (e.g. `[555, null]`) are documented historically but **not handled** by the active comparison in `projectConfig.ts` (uses `<= ranges[1]`). Use a large numeric max until fixed. Prefer updating both `channels.json` and `channels_dev.json`.
 
 ## Contract Addresses
 
-**Always use lowercase for contract addresses:**
+Always lowercase:
 
 ```json
 {
-  "DOODLE": "0x28f2d3805652fb5d359486dffb7d08320d403240",
-  "PLOTTABLES": "0xa319c382a702682129fcbf55d514e61a16f97f9c"
+  "PLOTTABLES": "0xa319c382a702682129fcbf55d514e61a16f97f9c",
+  "HODLERS": "0x9f79e46a309f804aa4b7b53a1f72c69137427794"
 }
 ```
+
+Current partners live in `partnerContracts.json` (PLOTTABLES, BM, HODLERS, etc.). Do not copy stale DOODLE examples — DOODLE is blocked, not a live partner entry.
 
 ## Named Mappings
 
-For projects with community-named tokens, create JSON files in `NamedMappings/`:
-
 ```json
-// ringerSingles.json - single token aliases
-{
-  "goose": "879",
-  "theone": "109"
-}
+// *Singles.json — single token aliases
+{ "goose": "879", "theone": "109" }
 
-// ringerSets.json - sets of tokens
-{
-  "perfects": [109, 879, 1024],
-  "rainbows": [42, 156, 789]
-}
+// *Sets.json — sets of tokens
+{ "perfects": [109, 879, 1024] }
 ```
 
-Reference in `projectBots.json`:
+In `projectBots.json`:
 
 ```json
 {
@@ -86,62 +86,20 @@ Reference in `projectBots.json`:
 }
 ```
 
-## Adding a New Project Channel
+## mintBotConfig
 
-1. Get the Discord channel ID
-2. Add entry to `channels.json`:
+Keys are collection types or partner contract names; values are arrays of channel **names** that must exist in `channels.json`:
 
 ```json
 {
-  "CHANNEL_ID": {
-    "name": "artist-channel-name",
-    "projectBotHandlers": {
-      "default": "PROJECT_ID"
-    }
-  }
+  "STUDIO": ["studio-mints"],
+  "PLOTTABLES": ["plottables-mints"]
 }
 ```
-
-3. Optionally add named mappings in `projectBots.json`
 
 ## Adding a New Contract
 
-1. Add to appropriate contracts file (lowercase address):
-
-```json
-{
-  "CONTRACT_NAME": "0xcontractaddress..."
-}
-```
-
-2. If it's a new Engine partner, also add to `partnerContracts.json`
-
-## Environment-Based Config
-
-The bot loads different configs based on environment:
-
-```typescript
-const ARTBOT_IS_PROD = process.env.ARTBOT_IS_PROD?.toLowerCase() === 'true'
-
-const CHANNELS = ARTBOT_IS_PROD
-  ? require('./channels.json')
-  : require('./channels_dev.json')
-
-const PROJECT_BOTS = ARTBOT_IS_PROD
-  ? require('./projectBots.json')
-  : require('./projectBots_dev.json')
-```
-
-## Project Aliases
-
-Common project name aliases are in `project_aliases.json`:
-
-```json
-{
-  "squig": "Chromie Squiggle",
-  "fiddy": "Fidenza",
-  "ringer": "Ringers"
-}
-```
-
-These allow users to use shorthand in commands like `#? squig`.
+1. Lowercase address → appropriate `*Contracts.json`
+2. Mints → `mintBotConfig.json` (+ channel if needed)
+3. Sales/listings → often `activityTriager.ts` as well
+4. Update README partner table if public
