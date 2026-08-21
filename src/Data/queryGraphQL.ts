@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv'
-import { createClient } from 'urql/core'
+import { createClient, dedupExchange, fetchExchange } from 'urql/core'
 import * as fs from 'fs'
 import * as path from 'path'
 import { sanitizeTwitterHandle } from '../Utils/twitterUtils'
@@ -79,6 +79,9 @@ const client = createClient({
       })
     : undefined,
   requestPolicy: 'network-only',
+  // Long-running process: skip cacheExchange so unique queries do not accumulate forever.
+  // Keep dedupExchange so in-flight identical queries still share one request.
+  exchanges: [dedupExchange, fetchExchange],
 })
 
 const maxProjectsPerQuery = 1000

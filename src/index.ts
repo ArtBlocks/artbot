@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
-import { Client, Events, GatewayIntentBits, Status } from 'discord.js'
+import { Client, Events, GatewayIntentBits, Options, Status, User } from 'discord.js'
 import * as dns from 'dns'
 import * as https from 'https'
 const express = require('express')
@@ -218,6 +218,19 @@ export const discordClient = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
   ],
+  // Sweep stale messages/users; leave channel and emoji caches alone
+  // (channel lookups and the `gmsquig` gm-reaction depend on them).
+  sweepers: {
+    ...Options.DefaultSweeperSettings,
+    messages: {
+      interval: 3600,
+      lifetime: 1800,
+    },
+    users: {
+      interval: 3600,
+      filter: () => (user: User) => user.id !== user.client.user?.id,
+    },
+  },
 })
 
 logger.info('Discord client created')
@@ -515,7 +528,11 @@ export const mintBot = new MintBot(discordClient, abTwitterBot)
  * 3. **Connection Monitoring**: Health checks every minute with connection stats
  * 4. **Graceful Degradation**: Falls back to API polling when max reconnections reached
  * 5. **Configuration**: Environment variables for customizing reconnection behavior
- * 6. **Resource Management**: Proper cleanup of timers and connections on shutdown
+ * 6. **Resource Management**: Disconnect the previous Phoenix client before opening a new one
+ *    (creating a new client without disconnect leaked sockets and `*` firehose listeners)
+ *
+ * Subscriptions stay on `*` (all collections) and are filtered by contract address. OpenSea
+ * topics are collection slugs, which do not map 1:1 to Art Blocks/Engine/Studio contracts.
  *
  * Debug access: `getOpenSeaConnectionStats()` in Node.js console
  */
@@ -547,9 +564,11 @@ const CONNECTION_HEALTH_CHECK_INTERVAL = parseInt(
   process.env.OPENSEA_HEALTH_CHECK_INTERVAL || '60000'
 ) // 1 minute
 
-let openseaStreamClient: OpenSeaStreamClient
+let openseaStreamClient: OpenSeaStreamClient | undefined
 let reconnectTimeout: NodeJS.Timeout | null = null
 let healthCheckInterval: NodeJS.Timeout | null = null
+/** Bumped on every replace/shutdown so stale clients cannot schedule reconnects. */
+let streamClientGeneration = 0
 
 // Calculate exponential backoff delay with jitter
 function getReconnectDelay(attemptNumber: number): number {
@@ -562,9 +581,42 @@ function getReconnectDelay(attemptNumber: number): number {
   return Math.max(1000, exponentialDelay + jitter)
 }
 
+function disconnectOpenSeaStreamClient() {
+  const client = openseaStreamClient
+  if (!client) {
+    return
+  }
+  openseaStreamClient = undefined
+  try {
+    client.disconnect(() => {
+      logger.info('OpenSea WebSocket disconnected')
+    })
+  } catch (error) {
+    logger.error({ err: error }, 'Error disconnecting OpenSea WebSocket')
+  }
+}
+
+/** Confirm the socket is live; only then reset the reconnect budget. */
+function markOpenSeaConnected() {
+  if (!connectionState.isConnected) {
+    logger.info(
+      { reconnectAttempts: connectionState.reconnectAttempts },
+      'OpenSea WebSocket connection confirmed via stream event'
+    )
+  }
+  connectionState.isConnected = true
+  connectionState.reconnectAttempts = 0
+  connectionState.lastConnectTime = Date.now()
+}
+
 // Initialize OpenSea Stream Client with error handling
 function initializeOpenSeaStreamClient(): OpenSeaStreamClient {
-  logger.info('Initializing OpenSea Stream Client')
+  // Invalidate the previous client first so its onError cannot reconnect.
+  streamClientGeneration += 1
+  const generation = streamClientGeneration
+  disconnectOpenSeaStreamClient()
+
+  logger.info({ generation }, 'Initializing OpenSea Stream Client')
 
   const client = new OpenSeaStreamClient({
     token: process.env.OPENSEA_API_KEY ?? '',
@@ -573,6 +625,9 @@ function initializeOpenSeaStreamClient(): OpenSeaStreamClient {
       sessionStorage: LocalStorage,
     },
     onError: (error: unknown) => {
+      if (generation !== streamClientGeneration) {
+        return
+      }
       logger.error({ err: error }, 'OpenSea Stream Client error')
       connectionState.lastError = error as Error
       connectionState.isConnected = false
@@ -598,12 +653,9 @@ function initializeOpenSeaStreamClient(): OpenSeaStreamClient {
     },
   })
 
-  // The OpenSeaStreamClient handles connection internally using Phoenix channels
-  // We'll rely on the onError callback and add additional monitoring
+  // Do not mark connected or reset reconnectAttempts here — Phoenix may still
+  // be connecting. Confirmation happens when a stream event arrives.
   logger.info('OpenSea Stream Client initialized with error handling')
-  connectionState.isConnected = true
-  connectionState.reconnectAttempts = 0
-  connectionState.lastConnectTime = Date.now()
 
   // Start health check monitoring
   if (!healthCheckInterval) {
@@ -638,9 +690,8 @@ function scheduleReconnection() {
       'Attempting OpenSea WebSocket reconnection'
     )
     try {
-      // Reinitialize the stream client
       openseaStreamClient = initializeOpenSeaStreamClient()
-      setupStreamEventHandlers()
+      setupStreamEventHandlers(openseaStreamClient)
     } catch (error) {
       logger.error({ err: error }, 'Failed to reinitialize OpenSea Stream Client')
       scheduleReconnection()
@@ -657,7 +708,11 @@ function startHealthCheckMonitoring() {
       : Infinity
 
     if (!connectionState.isConnected) {
-      logger.warn('OpenSea WebSocket health check: Connection lost, reconnection should be in progress')
+      if (connectionState.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+        logger.warn('OpenSea WebSocket health check: max reconnects reached, relying on API polling')
+      } else {
+        logger.warn('OpenSea WebSocket health check: Connection lost, reconnection should be in progress')
+      }
     } else if (timeSinceLastConnect > 600000) {
       // 10 minutes
       logger.info(
@@ -677,12 +732,11 @@ function startHealthCheckMonitoring() {
 }
 
 // Setup stream event handlers
-function setupStreamEventHandlers() {
-  // Note: OpenSeaStreamClient doesn't expose removeAllListeners
-  // Duplicate listeners are handled internally by the Phoenix channels
-
-  // Your existing event handlers with additional error handling
-  openseaStreamClient.onItemListed('*', async (event) => {
+function setupStreamEventHandlers(client: OpenSeaStreamClient) {
+  // Wildcard `*` is required: OpenSea topics are collection slugs, not contract
+  // addresses, and Art Blocks/Engine/Studio inventory is tracked by contract.
+  client.onItemListed('*', async (event) => {
+    markOpenSeaConnected()
     if (!PRODUCTION_MODE) {
       return
     }
@@ -710,7 +764,8 @@ function setupStreamEventHandlers() {
     }
   })
 
-  openseaStreamClient.onItemSold('*', async (event) => {
+  client.onItemSold('*', async (event) => {
+    markOpenSeaConnected()
     if (!PRODUCTION_MODE) {
       return
     }
@@ -786,7 +841,7 @@ if (typeof global !== 'undefined') {
 // Initialize the stream client
 logger.info('Starting OpenSea WebSocket Stream integration')
 openseaStreamClient = initializeOpenSeaStreamClient()
-setupStreamEventHandlers()
+setupStreamEventHandlers(openseaStreamClient)
 
 logger.info(
   { MAX_RECONNECT_ATTEMPTS, INITIAL_RECONNECT_DELAY, MAX_RECONNECT_DELAY },
@@ -874,6 +929,9 @@ if (PRODUCTION_MODE) {
 function cleanupOpenSeaConnections() {
   logger.info('Cleaning up OpenSea WebSocket connections')
 
+  // Invalidate the current client so in-flight onError cannot reconnect
+  streamClientGeneration += 1
+
   // Clear reconnection timeout
   if (reconnectTimeout) {
     clearTimeout(reconnectTimeout)
@@ -886,16 +944,7 @@ function cleanupOpenSeaConnections() {
     healthCheckInterval = null
   }
 
-  // Disconnect OpenSea stream client gracefully
-  if (openseaStreamClient) {
-    try {
-      openseaStreamClient.disconnect(() => {
-        logger.info('OpenSea WebSocket disconnected successfully')
-      })
-    } catch (error) {
-      logger.error({ err: error }, 'Error disconnecting OpenSea WebSocket')
-    }
-  }
+  disconnectOpenSeaStreamClient()
 
   // Reset connection state
   connectionState.isConnected = false
