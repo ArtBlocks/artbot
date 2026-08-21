@@ -68,7 +68,7 @@ Four indexers are constructed in `index.ts`: main (`getAllProjects`), Engine (`g
 ### Data
 
 - **Hasura** (public): `https://data.artblocks.io/v1/graphql` — hardcoded in `queryGraphQL.ts` / `codegen.ts`. Optional `HASURA_GRAPHQL_ADMIN_SECRET`.
-- **One GraphQL client** — there is **no** separate Arbitrum Hasura client (older docs were wrong).
+- **One GraphQL client** — there is **no** separate Arbitrum Hasura client (older docs were wrong). urql uses `dedupExchange` + `fetchExchange` only (no document cache) so unique queries do not accumulate in a long-running process.
 - **Supabase**: trivia scores + Twitter OAuth/state only (`src/Data/supabase.ts`).
 - Queries live in `src/Data/graphql/*.graphql`; wrappers in `src/Data/queryGraphQL.ts`.
 
@@ -135,6 +135,8 @@ Token/mint data can include chain IDs (Ethereum, Arbitrum, Base). **OpenSea stre
 8. **Issue templates** under `.github/ISSUE_TEMPLATE/` map 1:1 to maintenance tasks — follow those file touch lists.
 9. **No health endpoint** — hosting liveness is process + logs. `/update` is a stub.
 10. **CODEOWNERS**: `@ArtBlocks/Eng-Approvers-Product`. Do not assign personal Discord handles from the old README.
+11. **OpenSea stream reconnect must `disconnect()` the previous Phoenix client** before constructing a new one. Do not reset `reconnectAttempts` until a stream event confirms the socket is live. Keep wildcard `*` subscriptions (OpenSea topics are collection slugs, not contracts; ArtBot filters by contract address).
+12. **Do not add urql `cacheExchange`** — this process is long-lived; the document cache never expires. App-level caches (project dicts, wallet TTL) are the right layer.
 
 ## Common tasks
 
