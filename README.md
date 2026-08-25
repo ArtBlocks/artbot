@@ -33,7 +33,7 @@ yarn install
 | Variable | Local testing | Production |
 |----------|---------------|------------|
 | `ARTBOT_IS_PROD` | `false` → `channels_dev.json` | `true` → `channels.json` |
-| `PRODUCTION_MODE` | `true` to connect Discord / process OpenSea | `true` |
+| `PRODUCTION_MODE` | `true` to connect Discord, then process OpenSea | `true` |
 
 - Start:
 

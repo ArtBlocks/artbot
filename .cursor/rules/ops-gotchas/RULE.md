@@ -13,7 +13,7 @@ Read `AGENTS.md` for the full matrix. This rule is the short always-on checklist
 |------|---------|
 | `ARTBOT_IS_PROD=true` | Load `channels.json` + `projectBots.json` |
 | `ARTBOT_IS_PROD` unset/false | Load `*_dev.json` (a-t test server) |
-| `PRODUCTION_MODE=true` | Discord login + process OpenSea events + start poll bot |
+| `PRODUCTION_MODE=true` | Discord login, then OpenSea stream/poll + scheduler |
 | `PRODUCTION_MODE=false` | Boot Express/indexers; skip Discord login (CI) |
 
 Never assume one flag implies the other.
@@ -22,7 +22,7 @@ Never assume one flag implies the other.
 
 - Host: **Render.com**, command `yarn start`, binds `0.0.0.0:$PORT`
 - No in-repo Dockerfile / health route; `/update` is a stub
-- Shared Render IPs can hit Discord 429 — login retries/backoff exist in `index.ts`
+- Shared Render IPs can hit Discord 429 — login retries/backoff exist in `index.ts`. OpenSea/scheduler wait until Discord is ready; do not restart to "kick" a 429.
 - Secrets live in the host dashboard; keep `.env` out of git
 
 ## Codegen

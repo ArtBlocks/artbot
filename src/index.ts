@@ -285,6 +285,7 @@ async function waitForDiscordGateway(): Promise<boolean> {
               latencyMs,
               retryAfterSec,
               waitMs,
+              waitHours: Math.round((waitMs / 3_600_000) * 10) / 10,
             },
             'Discord gateway rate-limited (429) — waiting before login attempt'
           )
@@ -337,68 +338,86 @@ async function runPreLoginDiagnostics(): Promise<void> {
   }
 }
 
-async function attemptDiscordLogin() {
-  logger.info({ attempt: loginRetryCount + 1, MAX_LOGIN_RETRIES }, 'Attempting Discord login')
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
-  await runPreLoginDiagnostics()
+/** Resolves only after Discord login succeeds. Exits the process after max retries. */
+async function attemptDiscordLogin(): Promise<void> {
+  while (true) {
+    logger.info(
+      { attempt: loginRetryCount + 1, MAX_LOGIN_RETRIES },
+      'Attempting Discord login'
+    )
 
-  // Capture Discord.js internal debug output during the login window so we can
-  // see exactly where the handshake stalls if it times out.
-  const debugLogs: string[] = []
-  const debugListener = (msg: string) => {
-    debugLogs.push(msg)
-    logger.debug({ discordInternalDebug: msg }, 'Discord.js debug')
-  }
-  discordClient.on('debug', debugListener)
+    await runPreLoginDiagnostics()
 
-  let timeoutHandle: NodeJS.Timeout | undefined
-
-  try {
-    const loginStartMs = Date.now()
-    const loginPromise = discordClient.login(DISCORD_TOKEN)
-    const timeoutPromise = new Promise((_, reject) => {
-      timeoutHandle = setTimeout(() => {
-        const elapsedMs = Date.now() - loginStartMs
-        logger.error(
-          {
-            elapsedMs,
-            wsStatus: discordClient.ws.status,
-            wsStatusName: Status[discordClient.ws.status] ?? 'unknown',
-            shardCount: discordClient.ws.shards.size,
-            recentDebugLogs: debugLogs.slice(-20),
-          },
-          'Discord login timed out — WebSocket state at timeout'
-        )
-        reject(new Error('Discord login timed out'))
-      }, DISCORD_LOGIN_TIMEOUT)
-    })
-
-    await Promise.race([loginPromise, timeoutPromise])
-    clearTimeout(timeoutHandle)
-    logger.info({ elapsedMs: Date.now() - loginStartMs }, 'Discord login attempt successful')
-    loginRetryCount = 0
-  } catch (error) {
-    clearTimeout(timeoutHandle)
-    logger.error({ err: error }, 'Discord login failed')
-
-    if (loginRetryCount < MAX_LOGIN_RETRIES) {
-      loginRetryCount++
-      // Exponential backoff: 5s, 10s, 20s, 40s, 80s
-      const backoffTime = Math.min(
-        5000 * Math.pow(2, loginRetryCount - 1),
-        80000
-      )
-      logger.info(
-        { loginRetryCount, MAX_LOGIN_RETRIES, backoffSeconds: backoffTime / 1000 },
-        'Retrying Discord login attempt'
-      )
-      setTimeout(attemptDiscordLogin, backoffTime)
-    } else {
-      logger.error('Max login retries reached. Giving up.')
-      process.exit(1)
+    // Capture Discord.js internal debug output during the login window so we can
+    // see exactly where the handshake stalls if it times out.
+    const debugLogs: string[] = []
+    const debugListener = (msg: string) => {
+      debugLogs.push(msg)
+      logger.debug({ discordInternalDebug: msg }, 'Discord.js debug')
     }
-  } finally {
-    discordClient.off('debug', debugListener)
+    discordClient.on('debug', debugListener)
+
+    let timeoutHandle: NodeJS.Timeout | undefined
+
+    try {
+      const loginStartMs = Date.now()
+      const loginPromise = discordClient.login(DISCORD_TOKEN)
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutHandle = setTimeout(() => {
+          const elapsedMs = Date.now() - loginStartMs
+          logger.error(
+            {
+              elapsedMs,
+              wsStatus: discordClient.ws.status,
+              wsStatusName: Status[discordClient.ws.status] ?? 'unknown',
+              shardCount: discordClient.ws.shards.size,
+              recentDebugLogs: debugLogs.slice(-20),
+            },
+            'Discord login timed out — WebSocket state at timeout'
+          )
+          reject(new Error('Discord login timed out'))
+        }, DISCORD_LOGIN_TIMEOUT)
+      })
+
+      await Promise.race([loginPromise, timeoutPromise])
+      clearTimeout(timeoutHandle)
+      logger.info(
+        { elapsedMs: Date.now() - loginStartMs },
+        'Discord login attempt successful'
+      )
+      loginRetryCount = 0
+      return
+    } catch (error) {
+      clearTimeout(timeoutHandle)
+      logger.error({ err: error }, 'Discord login failed')
+
+      if (loginRetryCount < MAX_LOGIN_RETRIES) {
+        loginRetryCount++
+        // Exponential backoff: 5s, 10s, 20s, 40s, 80s
+        const backoffTime = Math.min(
+          5000 * Math.pow(2, loginRetryCount - 1),
+          80000
+        )
+        logger.info(
+          {
+            loginRetryCount,
+            MAX_LOGIN_RETRIES,
+            backoffSeconds: backoffTime / 1000,
+          },
+          'Retrying Discord login attempt'
+        )
+        await sleep(backoffTime)
+      } else {
+        logger.error('Max login retries reached. Giving up.')
+        process.exit(1)
+      }
+    } finally {
+      discordClient.off('debug', debugListener)
+    }
   }
 }
 
@@ -432,9 +451,6 @@ discordClient.on('disconnect', () => {
 })
 
 export const triviaBot = new TriviaBot(discordClient)
-
-const scheduleBot = new ScheduleBot(discordClient.channels.cache, projectConfig)
-botsToCleanup.push(scheduleBot)
 
 discordClient.on(Events.MessageCreate, async (msg) => {
   const msgAuthor = msg.author.username
@@ -838,17 +854,7 @@ if (typeof global !== 'undefined') {
   ).getOpenSeaConnectionStats = getOpenSeaConnectionStats
 }
 
-// Initialize the stream client
-logger.info('Starting OpenSea WebSocket Stream integration')
-openseaStreamClient = initializeOpenSeaStreamClient()
-setupStreamEventHandlers(openseaStreamClient)
-
-logger.info(
-  { MAX_RECONNECT_ATTEMPTS, INITIAL_RECONNECT_DELAY, MAX_RECONNECT_DELAY },
-  'OpenSea Stream Config'
-)
-
-// OpenSea Stream Bots - Primary handlers, API polling for sales backfill
+// OpenSea Stream Bots - constructed here; stream/poll start after Discord login.
 const openSeaListBot = new OpenSeaListBot(discordClient)
 const openSeaSaleBot = new OpenSeaSaleBot(discordClient, abTwitterBot) // Primary sales handler
 botsToCleanup.push(openSeaListBot)
@@ -917,11 +923,47 @@ const isTrackedContract = (
   )
 }
 
-if (PRODUCTION_MODE) {
-  attemptDiscordLogin()
-  // Initialize OpenSea API polling bots after Discord login
+/**
+ * Express stays up so Render can bind PORT. Discord-dependent work
+ * (OpenSea stream, sales poll, scheduler) starts only after login succeeds.
+ */
+async function startProductionBots() {
+  logger.info('Waiting for Discord login before starting OpenSea and scheduled bots')
+  await attemptDiscordLogin()
+
+  logger.info(
+    {
+      tag: discordClient.user?.tag,
+      guildCount: discordClient.guilds.cache.size,
+      channelCount: discordClient.channels.cache.size,
+      blockTalkCached: discordClient.channels.cache.has(CHANNEL_BLOCK_TALK),
+    },
+    'Discord ready — starting OpenSea and scheduled bots'
+  )
+
+  logger.info('Starting OpenSea WebSocket Stream integration')
+  openseaStreamClient = initializeOpenSeaStreamClient()
+  setupStreamEventHandlers(openseaStreamClient)
+  logger.info(
+    { MAX_RECONNECT_ATTEMPTS, INITIAL_RECONNECT_DELAY, MAX_RECONNECT_DELAY },
+    'OpenSea Stream Config'
+  )
+
+  const scheduleBot = new ScheduleBot(
+    discordClient.channels.cache,
+    projectConfig
+  )
+  botsToCleanup.push(scheduleBot)
+
   initOpenSeaApiPollingBots().catch((err) => {
     logger.error({ err }, 'Error initializing OpenSea API polling bots')
+  })
+}
+
+if (PRODUCTION_MODE) {
+  startProductionBots().catch((err) => {
+    logger.error({ err }, 'Failed to start production bots')
+    process.exit(1)
   })
 }
 

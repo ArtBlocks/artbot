@@ -79,8 +79,8 @@ Non-`#` → `smartBotResponse.ts`. Channel must be present in active `channels*.
 
 ## OpenSea Dual Path
 
-1. **Stream** (`@opensea/stream-js`): primary listings + sales; gated by `PRODUCTION_MODE` in handlers
-2. **REST poll** (`OpenSeaEventsPollBot`): sales backfill; registers stream sale IDs to dedupe
+1. **Stream** (`@opensea/stream-js`): primary listings + sales; started only after Discord login succeeds (`startProductionBots` in `index.ts`). Handlers also no-op when `PRODUCTION_MODE` is false.
+2. **REST poll** (`OpenSeaEventsPollBot`): sales backfill; starts after Discord ready; registers stream sale IDs to dedupe
 
 Activity posts go through `activityTriager.ts` (hardcoded artist/platform → channel mapping + ban list). New sale destinations usually need code there, not only JSON.
 
