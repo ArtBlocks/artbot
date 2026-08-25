@@ -100,6 +100,9 @@ export class MintBot {
   // Go through all mints in the queue and make sure the media image exists.
   // Uses event data only (no token API call). Polls media URL until available, then posts.
   async checkAndPostMints() {
+    if (!this.bot.isReady()) {
+      return
+    }
     if (Object.keys(this.mintsToPost).length === 0) {
       return
     }
@@ -222,6 +225,9 @@ export class MintBot {
   // tries to report any new mints to the discord!
   startRoutine() {
     this.intervalId = setInterval(async () => {
+      if (!this.bot.isReady()) {
+        return
+      }
       if (Object.keys(this.mintsToPost).length > 0) {
         logger.info(
           { count: Object.keys(this.mintsToPost).length },
