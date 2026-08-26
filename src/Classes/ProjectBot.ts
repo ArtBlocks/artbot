@@ -11,6 +11,7 @@ import {
   PROJECTBOT_EXPLORE_UTM,
   PROJECTBOT_UTM,
   ethFromWeiString,
+  buildGeneratorUrl,
   getProjectSlugUrl,
   getTokenApiUrl,
   getTokenUrl,
@@ -278,6 +279,9 @@ export class ProjectBot {
         { err: e, msgContent: msg.content, tokenId: `${this.coreContract}-${tokenID}` },
         'Error getting token metadata'
       )
+      await msg.channel.send(
+        `Sorry, I couldn't load that ${this.projectName} token. Try again in a bit!`
+      )
       return
     }
     let external_url = tokenMetadata.contract?.token_base_url
@@ -322,40 +326,63 @@ export class ProjectBot {
         PROJECTBOT_UTM
       : ''
 
-    const embedContent = new EmbedBuilder()
-      // Set the title of the field.
-      .setTitle(title)
-      // Add link to title.
-      .setURL(titleLink)
-      // Set the full image for embed.
-      .setImage(assetUrl)
+    const generatorUrl = tokenMetadata.live_view_url
+      ? tokenMetadata.live_view_url + PROJECTBOT_UTM
+      : buildGeneratorUrl(this.chainId, this.coreContract, tokenID) +
+        PROJECTBOT_UTM
 
-    if (ownerText) {
+    try {
+      const embedContent = new EmbedBuilder().setTitle(title)
+
+      if (titleLink.startsWith('http')) {
+        embedContent.setURL(titleLink)
+      }
+      if (assetUrl.startsWith('http')) {
+        embedContent.setImage(assetUrl)
+      }
+
+      if (ownerText) {
+        embedContent.addFields({
+          name: 'Owner',
+          value: `[${ownerText}](${ownerProfileLink})`,
+          inline: true,
+        })
+      }
+
       embedContent.addFields({
-        name: 'Owner',
-        value: `[${ownerText}](${ownerProfileLink})`,
+        name: 'Live Script',
+        value: `[Generator](${generatorUrl})`,
         inline: true,
       })
+
+      const listPrice = tokenMetadata.list_price
+      const listCurrencySymbol = tokenMetadata.list_currency_symbol
+      if (listPrice && listCurrencySymbol) {
+        embedContent.addFields({
+          name: 'Buy Now',
+          value: `[${listPrice} ${listCurrencySymbol} on Art Blocks Marketplace](${
+            tokenUrl + PROJECTBOT_BUY_UTM
+          })`,
+        })
+      }
+
+      await msg.channel.send({ embeds: [embedContent] })
+    } catch (err) {
+      logger.error(
+        {
+          err,
+          msgContent: msg.content,
+          projectName: this.projectName,
+          tokenId: `${this.coreContract}-${tokenID}`,
+          titleLink,
+          assetUrl,
+        },
+        'Error sending token embed'
+      )
+      await msg.channel.send(
+        `Sorry, I found ${this.projectName} but couldn't post it. Try again in a bit!`
+      )
     }
-
-    embedContent.addFields({
-      name: 'Live Script',
-      value: `[Generator](${tokenMetadata.live_view_url + PROJECTBOT_UTM})`,
-      inline: true,
-    })
-
-    const listPrice = tokenMetadata.list_price
-    const listCurrencySymbol = tokenMetadata.list_currency_symbol
-    if (listPrice && listCurrencySymbol) {
-      embedContent.addFields({
-        name: 'Buy Now',
-        value: `[${listPrice} ${listCurrencySymbol} on Art Blocks Marketplace](${
-          tokenUrl + PROJECTBOT_BUY_UTM
-        })`,
-      })
-    }
-
-    msg.channel.send({ embeds: [embedContent] })
   }
 
   async sendBirthdayMessage(channels: Collection<string, Channel>) {

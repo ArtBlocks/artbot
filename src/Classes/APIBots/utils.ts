@@ -402,7 +402,10 @@ export async function replaceVideoWithGIF(url: string) {
 
     // some GIFs are not available, so we fallback to PNG
     try {
-      const resp = await fetch(gifURL)
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000)
+      const resp = await fetch(gifURL, { signal: controller.signal })
+      clearTimeout(timeoutId)
 
       if (!resp.ok) {
         if (resp.status === 404) {

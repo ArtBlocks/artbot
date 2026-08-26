@@ -524,8 +524,21 @@ export class ArtIndexerBot {
 
     if (!projectBot) {
       logger.info({ content }, "Wasn't able to parse message")
+      msg.channel.send(
+        `Sorry, I wasn't able to understand that: ${content}`
+      )
       return
     }
+
+    logger.info(
+      {
+        content,
+        messageType,
+        projectName: projectBot.projectName,
+        projectId: projectBot.id,
+      },
+      'Resolved # command to project'
+    )
 
     if (
       messageType === MessageTypes.ARTIST &&
