@@ -11,7 +11,6 @@ import {
   PROJECTBOT_EXPLORE_UTM,
   PROJECTBOT_UTM,
   ethFromWeiString,
-  buildGeneratorUrl,
   getProjectSlugUrl,
   getTokenApiUrl,
   getTokenUrl,
@@ -279,9 +278,6 @@ export class ProjectBot {
         { err: e, msgContent: msg.content, tokenId: `${this.coreContract}-${tokenID}` },
         'Error getting token metadata'
       )
-      await msg.channel.send(
-        `Sorry, I couldn't load that ${this.projectName} token. Try again in a bit!`
-      )
       return
     }
     let external_url = tokenMetadata.contract?.token_base_url
@@ -326,20 +322,14 @@ export class ProjectBot {
         PROJECTBOT_UTM
       : ''
 
-    const generatorUrl = tokenMetadata.live_view_url
-      ? tokenMetadata.live_view_url + PROJECTBOT_UTM
-      : buildGeneratorUrl(this.chainId, this.coreContract, tokenID) +
-        PROJECTBOT_UTM
-
     try {
-      const embedContent = new EmbedBuilder().setTitle(title)
-
-      if (titleLink.startsWith('http')) {
-        embedContent.setURL(titleLink)
-      }
-      if (assetUrl.startsWith('http')) {
-        embedContent.setImage(assetUrl)
-      }
+      const embedContent = new EmbedBuilder()
+        // Set the title of the field.
+        .setTitle(title)
+        // Add link to title.
+        .setURL(titleLink)
+        // Set the full image for embed.
+        .setImage(assetUrl)
 
       if (ownerText) {
         embedContent.addFields({
@@ -351,7 +341,7 @@ export class ProjectBot {
 
       embedContent.addFields({
         name: 'Live Script',
-        value: `[Generator](${generatorUrl})`,
+        value: `[Generator](${tokenMetadata.live_view_url + PROJECTBOT_UTM})`,
         inline: true,
       })
 
@@ -378,9 +368,6 @@ export class ProjectBot {
           assetUrl,
         },
         'Error sending token embed'
-      )
-      await msg.channel.send(
-        `Sorry, I found ${this.projectName} but couldn't post it. Try again in a bit!`
       )
     }
   }

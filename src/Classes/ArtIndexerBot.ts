@@ -524,9 +524,6 @@ export class ArtIndexerBot {
 
     if (!projectBot) {
       logger.info({ content }, "Wasn't able to parse message")
-      msg.channel.send(
-        `Sorry, I wasn't able to understand that: ${content}`
-      )
       return
     }
 
