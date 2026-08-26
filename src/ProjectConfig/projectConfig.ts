@@ -261,7 +261,7 @@ export class ProjectConfig {
    * @param {string} channelID Channel ID the incoming msg has been sent from.
    * @param msg Incoming discord.js message object
    */
-  routeProjectNumberMsg(channelID: string, msg: Message) {
+  async routeProjectNumberMsg(channelID: string, msg: Message) {
     const channel = this.channels[channelID]
     const botName = channel.botNameFromNumberMsgContent(
       msg.content.toLowerCase()
@@ -271,6 +271,6 @@ export class ProjectConfig {
       logger.error({ channelID }, 'Channel does not have a ProjectBot')
       return
     }
-    this.projectBots[botName].handleNumberMessage(msg)
+    await this.projectBots[botName].handleNumberMessage(msg)
   }
 }

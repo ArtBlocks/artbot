@@ -470,23 +470,23 @@ discordClient.on(Events.MessageCreate, async (msg) => {
     if (msgContent.startsWith('#')) {
       switch (channelID) {
         case CHANNEL_ENGINE_CHAT:
-          pbabIndexerBot.handleNumberMessage(msg)
+          await pbabIndexerBot.handleNumberMessage(msg)
           break
         case CHANNEL_AB_X_PACE:
-          abXpaceIndexerBot.handleNumberMessage(msg)
+          await abXpaceIndexerBot.handleNumberMessage(msg)
           break
         case CHANNEL_AB_X_BM:
-          abXbmIndexerBot.handleNumberMessage(msg)
+          await abXbmIndexerBot.handleNumberMessage(msg)
           break
         case CHANNEL_BLOCK_TALK:
         case CHANNEL_FACTORY:
         case CHANNEL_ARTBOT_TESTING:
         case CHANNEL_ART_CHAT:
-          artIndexerBot.handleNumberMessage(msg)
+          await artIndexerBot.handleNumberMessage(msg)
           break
         // Fall-back - expect a project bot to handle
         default:
-          projectConfig.routeProjectNumberMsg(channelID, msg)
+          await projectConfig.routeProjectNumberMsg(channelID, msg)
           break
       }
       return

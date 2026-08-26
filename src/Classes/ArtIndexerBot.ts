@@ -527,6 +527,16 @@ export class ArtIndexerBot {
       return
     }
 
+    logger.info(
+      {
+        content,
+        messageType,
+        projectName: projectBot.projectName,
+        projectId: projectBot.id,
+      },
+      'Resolved # command to project'
+    )
+
     if (
       messageType === MessageTypes.ARTIST &&
       triviaBot.isArtistActiveTriviaAnswer(projectBot?.artistName)

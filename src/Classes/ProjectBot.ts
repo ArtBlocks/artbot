@@ -322,40 +322,54 @@ export class ProjectBot {
         PROJECTBOT_UTM
       : ''
 
-    const embedContent = new EmbedBuilder()
-      // Set the title of the field.
-      .setTitle(title)
-      // Add link to title.
-      .setURL(titleLink)
-      // Set the full image for embed.
-      .setImage(assetUrl)
+    try {
+      const embedContent = new EmbedBuilder()
+        // Set the title of the field.
+        .setTitle(title)
+        // Add link to title.
+        .setURL(titleLink)
+        // Set the full image for embed.
+        .setImage(assetUrl)
 
-    if (ownerText) {
+      if (ownerText) {
+        embedContent.addFields({
+          name: 'Owner',
+          value: `[${ownerText}](${ownerProfileLink})`,
+          inline: true,
+        })
+      }
+
       embedContent.addFields({
-        name: 'Owner',
-        value: `[${ownerText}](${ownerProfileLink})`,
+        name: 'Live Script',
+        value: `[Generator](${tokenMetadata.live_view_url + PROJECTBOT_UTM})`,
         inline: true,
       })
+
+      const listPrice = tokenMetadata.list_price
+      const listCurrencySymbol = tokenMetadata.list_currency_symbol
+      if (listPrice && listCurrencySymbol) {
+        embedContent.addFields({
+          name: 'Buy Now',
+          value: `[${listPrice} ${listCurrencySymbol} on Art Blocks Marketplace](${
+            tokenUrl + PROJECTBOT_BUY_UTM
+          })`,
+        })
+      }
+
+      await msg.channel.send({ embeds: [embedContent] })
+    } catch (err) {
+      logger.error(
+        {
+          err,
+          msgContent: msg.content,
+          projectName: this.projectName,
+          tokenId: `${this.coreContract}-${tokenID}`,
+          titleLink,
+          assetUrl,
+        },
+        'Error sending token embed'
+      )
     }
-
-    embedContent.addFields({
-      name: 'Live Script',
-      value: `[Generator](${tokenMetadata.live_view_url + PROJECTBOT_UTM})`,
-      inline: true,
-    })
-
-    const listPrice = tokenMetadata.list_price
-    const listCurrencySymbol = tokenMetadata.list_currency_symbol
-    if (listPrice && listCurrencySymbol) {
-      embedContent.addFields({
-        name: 'Buy Now',
-        value: `[${listPrice} ${listCurrencySymbol} on Art Blocks Marketplace](${
-          tokenUrl + PROJECTBOT_BUY_UTM
-        })`,
-      })
-    }
-
-    msg.channel.send({ embeds: [embedContent] })
   }
 
   async sendBirthdayMessage(channels: Collection<string, Channel>) {
