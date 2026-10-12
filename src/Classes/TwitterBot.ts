@@ -27,6 +27,10 @@ import {
   updateStatusRefreshToken,
 } from '../Data/supabase'
 import { logger } from '../logger'
+import {
+  reportDestinationDown,
+  reportDestinationUp,
+} from '../Utils/destinationHealth'
 
 // Twitter Bot Feature Toggles - Modify these to enable/disable functionality
 const TWITTER_LISTENING_ENABLED = false // Enables listening and responding to tweet mentions
@@ -87,7 +91,7 @@ export class TwitterBot {
     }
 
     if (!appKey || !appSecret || !accessToken || !accessSecret) {
-      logger.warn('Twitter credentials are missing - not initializing TwitterBot')
+      reportDestinationDown('twitter', 'Twitter credentials are missing')
       return
     }
 
@@ -104,14 +108,18 @@ export class TwitterBot {
       logger.info('Starting Twitter listener')
       this.startSearchAndReplyRoutine()
     } else {
-      logger.info('Twitter listener disabled via TWITTER_LISTENING_ENABLED constant')
+      logger.info(
+        'Twitter listener disabled via TWITTER_LISTENING_ENABLED constant'
+      )
     }
   }
 
   async startSearchAndReplyRoutine() {
     // Check if Twitter is globally disabled
     if (!isTwitterGloballyEnabled) {
-      logger.info('Twitter listener disabled via TWITTER_ENABLED environment variable')
+      logger.info(
+        'Twitter listener disabled via TWITTER_ENABLED environment variable'
+      )
       return
     }
 
@@ -159,7 +167,10 @@ export class TwitterBot {
         error.rateLimitError &&
         error.rateLimit
       ) {
-        logger.info({ resetTimestamp: error.rateLimit.reset }, 'Search rate limit hit')
+        logger.info(
+          { resetTimestamp: error.rateLimit.reset },
+          'Search rate limit hit'
+        )
       } else if (
         error instanceof ApiResponseError &&
         error.code === 400 &&
@@ -173,7 +184,10 @@ export class TwitterBot {
         ).message.split(' ')
         const lastId = BigInt(messageSplit[messageSplit.length - 1])
         const adjustedLastId = (lastId + BigInt('100000000000')).toString()
-        logger.info({ adjustedLastId }, 'TwitterBot since_id is invalid - setting to new value')
+        logger.info(
+          { adjustedLastId },
+          'TwitterBot since_id is invalid - setting to new value'
+        )
         this.lastTweetId = adjustedLastId
       } else {
         logger.error({ err: error }, 'Error searching Twitter')
@@ -186,7 +200,10 @@ export class TwitterBot {
       return
     }
 
-    logger.info({ resultCount: artbotTweets?.meta?.result_count }, 'artbotTweets search result')
+    logger.info(
+      { resultCount: artbotTweets?.meta?.result_count },
+      'artbotTweets search result'
+    )
 
     if (artbotTweets.meta.result_count === 0) {
       logger.info('No new tweets found')
@@ -197,7 +214,10 @@ export class TwitterBot {
       try {
         this.replyToTweet(tweet)
       } catch (e) {
-        logger.error({ err: e, tweetText: tweet.text }, 'Error responding to tweet')
+        logger.error(
+          { err: e, tweetText: tweet.text },
+          'Error responding to tweet'
+        )
       }
     }
     if (artbotTweets.meta.newest_id) {
@@ -236,9 +256,9 @@ export class TwitterBot {
       return
     }
 
-    const artBlocksData = await fetch(
+    const artBlocksData = (await fetch(
       getTokenApiUrl(projectBot.chainId, projectBot.coreContract, tokenId)
-    ).then((r) => r.json()) as ArtBlocksTokenData
+    ).then((r) => r.json())) as ArtBlocksTokenData
 
     const assetUrl = artBlocksData.preview_asset_url ?? ''
 
@@ -274,7 +294,10 @@ export class TwitterBot {
 
     const tweetMessage = `${artBlocksData.name} by ${artBlocksData.artist} ${platform}\n\n${tokenUrl}`
 
-    logger.info({ tweetId: tweet.id, name: artBlocksData.name }, 'Replying to tweet')
+    logger.info(
+      { tweetId: tweet.id, name: artBlocksData.name },
+      'Replying to tweet'
+    )
     for (let i = 0; i < NUM_RETRIES; i++) {
       try {
         await this.twitterClient?.v2.reply(tweetMessage, tweet.id, {
@@ -286,7 +309,11 @@ export class TwitterBot {
       } catch (error) {
         if (error instanceof ApiResponseError && error.rateLimit) {
           logger.info(
-            { limit: error.rateLimit.limit, remaining: error.rateLimit.remaining, reset: error.rateLimit.reset },
+            {
+              limit: error.rateLimit.limit,
+              remaining: error.rateLimit.remaining,
+              reset: error.rateLimit.reset,
+            },
             'Rate limit hit on tweet sending'
           )
           const reset = new Date(error.rateLimit.reset * 1000)
@@ -303,8 +330,14 @@ export class TwitterBot {
           }
           return
         } else {
-          logger.info({ tweetId: tweet.id, err: error }, 'Error replying to tweet')
-          logger.info({ attempt: i, numRetries: NUM_RETRIES }, 'Retrying tweet reply')
+          logger.info(
+            { tweetId: tweet.id, err: error },
+            'Error replying to tweet'
+          )
+          logger.info(
+            { attempt: i, numRetries: NUM_RETRIES },
+            'Retrying tweet reply'
+          )
           await delay(RETRY_DELAY_MS)
         }
       }
@@ -314,7 +347,7 @@ export class TwitterBot {
 
   async uploadMedia(assetUrl: string): Promise<string> {
     const res = await fetch(assetUrl)
-    let buff = Buffer.from(await res.arrayBuffer() as ArrayBuffer)
+    let buff = Buffer.from((await res.arrayBuffer()) as ArrayBuffer)
 
     while (buff.length > TWITTER_MEDIA_BYTE_LIMIT) {
       if (assetUrl.includes('.mp4')) {
@@ -341,7 +374,10 @@ export class TwitterBot {
         return mediaId
       } catch (err) {
         logger.info({ err, assetUrl }, 'Error uploading media')
-        logger.info({ attempt: i, numRetries: NUM_RETRIES }, 'Retrying media upload')
+        logger.info(
+          { attempt: i, numRetries: NUM_RETRIES },
+          'Retrying media upload'
+        )
         await delay(RETRY_DELAY_MS)
       }
     }
@@ -361,26 +397,36 @@ export class TwitterBot {
   async _tweetMint(artBlock: Mint) {
     // Check if Twitter is globally disabled
     if (!isTwitterGloballyEnabled) {
-      logger.info('Twitter mint posting disabled via TWITTER_ENABLED environment variable')
+      logger.info(
+        'Twitter mint posting disabled via TWITTER_ENABLED environment variable'
+      )
       return
     }
 
     // Check if Twitter mint posting is enabled
     if (!TWITTER_MINT_POSTING_ENABLED) {
-      logger.info('Twitter mint posting disabled via TWITTER_MINT_POSTING_ENABLED constant')
+      logger.info(
+        'Twitter mint posting disabled via TWITTER_MINT_POSTING_ENABLED constant'
+      )
       return
     }
 
     const assetUrl = artBlock.image
     if (!artBlock.image) {
-      logger.error({ artBlock: JSON.stringify(artBlock) }, 'No artblock image defined')
+      logger.error(
+        { artBlock: JSON.stringify(artBlock) },
+        'No artblock image defined'
+      )
       return
     }
 
     const mediaId = await this.uploadMedia(assetUrl)
 
     if (!mediaId) {
-      logger.error('no media id returned, not tweeting')
+      reportDestinationDown(
+        'twitter',
+        'Twitter mint media upload returned no media id'
+      )
       return
     }
 
@@ -396,6 +442,7 @@ export class TwitterBot {
       media: { media_ids: [mediaId] },
     })
 
+    reportDestinationUp('twitter')
     return {
       tweetRes,
     }
@@ -405,7 +452,7 @@ export class TwitterBot {
     try {
       await this._tweetMint(mint)
     } catch (e) {
-      logger.error({ err: e }, 'Error posting to Twitter')
+      reportDestinationDown('twitter', 'Twitter mint post failed', { err: e })
     }
   }
 
@@ -430,13 +477,17 @@ export class TwitterBot {
   async sendStatusMessage(message: string, replyId?: string) {
     // Check if Twitter is globally disabled
     if (!isTwitterGloballyEnabled) {
-      logger.info('Twitter status messaging disabled via TWITTER_ENABLED environment variable')
+      logger.info(
+        'Twitter status messaging disabled via TWITTER_ENABLED environment variable'
+      )
       return
     }
 
     // Check if Twitter listening is enabled (status messages are mainly for user interactions)
     if (!TWITTER_LISTENING_ENABLED) {
-      logger.info('Twitter status messaging disabled via TWITTER_LISTENING_ENABLED constant')
+      logger.info(
+        'Twitter status messaging disabled via TWITTER_LISTENING_ENABLED constant'
+      )
       return
     }
 
@@ -459,9 +510,9 @@ export class TwitterBot {
    * Throws an error if the API call fails
    */
   private async getEthToUsdRate(): Promise<number> {
-    const data = await fetch(
+    const data = (await fetch(
       'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'
-    ).then((r) => r.json()) as { ethereum: { usd: number } }
+    ).then((r) => r.json())) as { ethereum: { usd: number } }
     return data.ethereum.usd
   }
 
@@ -561,13 +612,22 @@ export class TwitterBot {
   }) {
     // Check if Twitter is globally disabled
     if (!isTwitterGloballyEnabled) {
-      logger.info('Twitter sale posting disabled via TWITTER_ENABLED environment variable')
+      logger.info(
+        'Twitter sale posting disabled via TWITTER_ENABLED environment variable'
+      )
       return
     }
 
     // Check if Twitter sale posting is enabled
     if (!TWITTER_SALE_POSTING_ENABLED) {
-      logger.info('Twitter sale posting disabled via TWITTER_SALE_POSTING_ENABLED constant')
+      logger.info(
+        'Twitter sale posting disabled via TWITTER_SALE_POSTING_ENABLED constant'
+      )
+      return
+    }
+
+    if (!this.twitterClient) {
+      reportDestinationDown('twitter', 'Twitter client is not initialized')
       return
     }
 
@@ -579,7 +639,10 @@ export class TwitterBot {
       try {
         media_id = await this.uploadMedia(saleData.assetUrl)
       } catch (error) {
-        logger.error({ err: error }, 'Error uploading media for sale tweet')
+        reportDestinationDown('twitter', 'Twitter sale media upload failed', {
+          err: error,
+          tokenName: saleData.tokenName,
+        })
         return
       }
 
@@ -602,7 +665,11 @@ export class TwitterBot {
         try {
           usdPrice = await this.convertEthToUsd(saleData.salePrice)
           logger.info(
-            { salePrice: saleData.salePrice, currency: saleData.currency, usdPrice: usdPrice.toFixed(2) },
+            {
+              salePrice: saleData.salePrice,
+              currency: saleData.currency,
+              usdPrice: usdPrice.toFixed(2),
+            },
             'Converted ETH to USD using CoinGecko rate'
           )
         } catch (error) {
@@ -642,7 +709,7 @@ export class TwitterBot {
       // Add view link
       tweetMessage += `\n\nview: ${saleData.tokenUrl + TWITTER_PROJECTBOT_UTM}`
 
-        logger.info({ tokenName: saleData.tokenName }, 'Posting sale tweet')
+      logger.info({ tokenName: saleData.tokenName }, 'Posting sale tweet')
 
       // Post the tweet with retry logic
       for (let i = 0; i < NUM_RETRIES; i++) {
@@ -652,13 +719,23 @@ export class TwitterBot {
               media_ids: [media_id],
             },
           })
-          logger.info({ tokenName: saleData.tokenName }, 'Successfully tweeted sale')
+          logger.info(
+            { tokenName: saleData.tokenName },
+            'Successfully tweeted sale'
+          )
+          reportDestinationUp('twitter')
           return
         } catch (error) {
           if (error instanceof ApiResponseError && error.rateLimit) {
-            logger.info(
-              { limit: error.rateLimit.limit, remaining: error.rateLimit.remaining, reset: error.rateLimit.reset },
-              'Rate limit hit on sale tweet'
+            reportDestinationDown(
+              'twitter',
+              'Twitter sale tweet rate limited',
+              {
+                limit: error.rateLimit.limit,
+                remaining: error.rateLimit.remaining,
+                reset: error.rateLimit.reset,
+                tokenName: saleData.tokenName,
+              }
             )
             const reset = new Date(error.rateLimit.reset * 1000)
             const now = new Date()
@@ -669,19 +746,33 @@ export class TwitterBot {
                 `Sale tweet rate limited :( Will retry in ${diffMinutes} minutes`
               )
             } catch (e) {
-              logger.error({ err: e }, 'Error sending rate limit status message')
+              logger.error(
+                { err: e },
+                'Error sending rate limit status message'
+              )
             }
             return
           } else {
             logger.info({ err: error }, 'Error posting sale tweet')
-            logger.info({ attempt: i + 1, numRetries: NUM_RETRIES }, 'Retrying sale tweet')
+            logger.info(
+              { attempt: i + 1, numRetries: NUM_RETRIES },
+              'Retrying sale tweet'
+            )
             await delay(RETRY_DELAY_MS)
           }
         }
       }
-      logger.error('Failed to post sale tweet after all retry attempts')
+      reportDestinationDown(
+        'twitter',
+        'Twitter sale tweet failed after retries',
+        {
+          tokenName: saleData.tokenName,
+        }
+      )
     } catch (error) {
-      logger.error({ err: error }, 'Error in tweetSale')
+      reportDestinationDown('twitter', 'Twitter sale tweet failed', {
+        err: error,
+      })
     }
   }
 }

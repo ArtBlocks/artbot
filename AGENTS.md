@@ -46,12 +46,12 @@ src/index.ts
   │     POST /new-mint     ← Hasura mint webhook (header: webhook_secret)
   │     GET  /callback     ← Twitter OAuth
   │     GET|POST /update   ← stub OK responses (not a real health check)
-  ├── Discord client (if PRODUCTION_MODE) — must login before feeds start
+  ├── Discord client (if PRODUCTION_MODE) — login retries in the background
   │     MessageCreate → # commands OR smartBotResponse
   ├── OpenSea WebSocket stream → OpenSeaListBot / OpenSeaSaleBot → activityTriager
-  ├── OpenSeaEventsPollBot (sales backfill, 30s) after Discord ready
-  ├── MintBot (queue + media-proxy poll → Discord; posts only when client is ready)
-  ├── ScheduleBot (birthdays + optional trivia; starts after Discord ready)
+  ├── OpenSeaEventsPollBot (sales backfill, 30s) — starts with the stream, not after Discord
+  ├── MintBot (queue + media-proxy poll → Discord if connected, Twitter if connected)
+  ├── ScheduleBot (birthdays + optional trivia; starts once Discord is ready)
   └── TwitterBot (optional, TWITTER_ENABLED)
 ```
 
@@ -137,7 +137,7 @@ Token/mint data can include chain IDs (Ethereum, Arbitrum, Base). **OpenSea stre
 10. **CODEOWNERS**: `@ArtBlocks/Eng-Approvers-Product`. Do not assign personal Discord handles from the old README.
 11. **OpenSea stream reconnect must `disconnect()` the previous Phoenix client** before constructing a new one. Do not reset `reconnectAttempts` until a stream event confirms the socket is live. Keep wildcard `*` subscriptions (OpenSea topics are collection slugs, not contracts; ArtBot filters by contract address).
 12. **Do not add urql `cacheExchange`** — this process is long-lived; the document cache never expires. App-level caches (project dicts, wallet TTL) are the right layer.
-13. **OpenSea stream, sales poll, and ScheduleBot start only after Discord login succeeds.** Express binds PORT immediately (Render). Mint webhooks may queue, but MintBot does not post until `client.isReady()`. Do not start feed handlers in parallel with `login()`.
+13. **OpenSea stream and sales poll start even if Discord login fails.** Express binds PORT immediately (Render). A down Discord or Twitter destination must not exit the process or stop the other one. Posts go to whichever destination is connected. Log sustained failures with `alert:destination_down` and recovery with `alert:destination_recovered` (`destination` is `discord` or `twitter`) so Datadog can page on those fields. ScheduleBot still starts only after Discord is ready. Do not `process.exit` on login failure.
 
 ## Common tasks
 

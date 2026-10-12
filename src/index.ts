@@ -1,6 +1,13 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
-import { Client, Events, GatewayIntentBits, Options, Status, User } from 'discord.js'
+import {
+  Client,
+  Events,
+  GatewayIntentBits,
+  Options,
+  Status,
+  User,
+} from 'discord.js'
 import * as dns from 'dns'
 import * as https from 'https'
 const express = require('express')
@@ -42,6 +49,10 @@ import { smartBotResponse } from './Utils/smartBotResponse'
 import { logContext } from './Utils/logger'
 import { randomUUID } from 'crypto'
 import { logger } from './logger'
+import {
+  reportDestinationDown,
+  reportDestinationUp,
+} from './Utils/destinationHealth'
 
 // Misc. server configuration info.
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN
@@ -158,7 +169,10 @@ type MintEventPayload = {
 app.post(
   '/new-mint',
   function (
-    req: { body: MintEventPayload; headers: Record<string, string | undefined> },
+    req: {
+      body: MintEventPayload
+      headers: Record<string, string | undefined>
+    },
     res: {
       setHeader: (key: string, value: string) => void
       json: (data: unknown) => void
@@ -237,8 +251,51 @@ logger.info('Discord client created')
 logger.info({ PRODUCTION_MODE }, 'PRODUCTION_MODE')
 logger.info({ discordTokenExists: !!DISCORD_TOKEN }, 'DISCORD_TOKEN exists')
 
-const MAX_LOGIN_RETRIES = 5
 let loginRetryCount = 0
+let scheduleBotStarted = false
+let discordDownTimer: NodeJS.Timeout | undefined
+
+function clearDiscordDownTimer() {
+  if (discordDownTimer) {
+    clearTimeout(discordDownTimer)
+    discordDownTimer = undefined
+  }
+}
+
+/** Alert if Discord is still gone after a short reconnect window. */
+function scheduleDiscordDownAlert(reason: string) {
+  if (discordDownTimer) {
+    return
+  }
+  discordDownTimer = setTimeout(() => {
+    discordDownTimer = undefined
+    if (!discordClient.isReady()) {
+      reportDestinationDown('discord', reason)
+    }
+  }, 60_000)
+}
+
+/** Clear a down alert if the client is still connected after a noisy error. */
+function scheduleDiscordRecoveryCheck() {
+  setTimeout(() => {
+    if (discordClient.isReady()) {
+      clearDiscordDownTimer()
+      reportDestinationUp('discord')
+    }
+  }, 60_000)
+}
+
+function startScheduleBot() {
+  if (scheduleBotStarted) {
+    return
+  }
+  scheduleBotStarted = true
+  const scheduleBot = new ScheduleBot(
+    discordClient.channels.cache,
+    projectConfig
+  )
+  botsToCleanup.push(scheduleBot)
+}
 
 /** Resolve a hostname via DNS and log the result for connectivity diagnostics. */
 async function checkDnsResolution(hostname: string): Promise<void> {
@@ -274,7 +331,9 @@ async function waitForDiscordGateway(): Promise<boolean> {
       (res) => {
         const latencyMs = Date.now() - startMs
         const retryAfterHeader = res.headers['retry-after']
-        const retryAfterSec = retryAfterHeader ? parseFloat(String(retryAfterHeader)) : null
+        const retryAfterSec = retryAfterHeader
+          ? parseFloat(String(retryAfterHeader))
+          : null
 
         if (res.statusCode === 429) {
           const waitMs = retryAfterSec != null ? retryAfterSec * 1000 : 60_000
@@ -309,7 +368,10 @@ async function waitForDiscordGateway(): Promise<boolean> {
       resolve(true) // proceed anyway; the error may be transient
     })
     req.on('timeout', () => {
-      logger.warn({ url: DISCORD_GATEWAY_URL }, 'Discord gateway connectivity check timed out')
+      logger.warn(
+        { url: DISCORD_GATEWAY_URL },
+        'Discord gateway connectivity check timed out'
+      )
       req.destroy()
       resolve(true)
     })
@@ -342,13 +404,13 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-/** Resolves only after Discord login succeeds. Exits the process after max retries. */
-async function attemptDiscordLogin(): Promise<void> {
-  while (true) {
-    logger.info(
-      { attempt: loginRetryCount + 1, MAX_LOGIN_RETRIES },
-      'Attempting Discord login'
-    )
+/**
+ * Keeps trying Discord login in the background. A failed login does not
+ * exit the process; OpenSea and Twitter keep running.
+ */
+async function maintainDiscordLogin(): Promise<void> {
+  while (!discordClient.isReady()) {
+    logger.info({ attempt: loginRetryCount + 1 }, 'Attempting Discord login')
 
     await runPreLoginDiagnostics()
 
@@ -393,28 +455,24 @@ async function attemptDiscordLogin(): Promise<void> {
       return
     } catch (error) {
       clearTimeout(timeoutHandle)
-      logger.error({ err: error }, 'Discord login failed')
+      const reason =
+        error instanceof Error ? error.message : 'Discord login failed'
+      reportDestinationDown('discord', reason, {
+        err: error,
+        attempt: loginRetryCount + 1,
+      })
 
-      if (loginRetryCount < MAX_LOGIN_RETRIES) {
-        loginRetryCount++
-        // Exponential backoff: 5s, 10s, 20s, 40s, 80s
-        const backoffTime = Math.min(
-          5000 * Math.pow(2, loginRetryCount - 1),
-          80000
-        )
-        logger.info(
-          {
-            loginRetryCount,
-            MAX_LOGIN_RETRIES,
-            backoffSeconds: backoffTime / 1000,
-          },
-          'Retrying Discord login attempt'
-        )
-        await sleep(backoffTime)
-      } else {
-        logger.error('Max login retries reached. Giving up.')
-        process.exit(1)
-      }
+      loginRetryCount++
+      // Exponential backoff: 5s, 10s, 20s, 40s, 80s, then stay at 80s.
+      const backoffTime = Math.min(
+        5000 * Math.pow(2, Math.min(loginRetryCount - 1, 4)),
+        80000
+      )
+      logger.info(
+        { attempt: loginRetryCount, backoffSeconds: backoffTime / 1000 },
+        'Retrying Discord login attempt'
+      )
+      await sleep(backoffTime)
     } finally {
       discordClient.off('debug', debugListener)
     }
@@ -422,21 +480,44 @@ async function attemptDiscordLogin(): Promise<void> {
 }
 
 discordClient.on('ready', () => {
-  logger.info({ tag: discordClient.user?.tag }, 'Logged in to Discord')
+  clearDiscordDownTimer()
+  reportDestinationUp('discord')
+  logger.info(
+    {
+      tag: discordClient.user?.tag,
+      guildCount: discordClient.guilds.cache.size,
+      channelCount: discordClient.channels.cache.size,
+      blockTalkCached: discordClient.channels.cache.has(CHANNEL_BLOCK_TALK),
+    },
+    'Logged in to Discord'
+  )
+  if (PRODUCTION_MODE) {
+    startScheduleBot()
+  }
 })
 
 discordClient.on('error', (error) => {
-  logger.error({ err: error }, 'Discord client error')
+  reportDestinationDown('discord', error.message, { err: error })
+  scheduleDiscordRecoveryCheck()
 })
 
 discordClient.on('shardError', (error, shardId) => {
-  logger.error({ err: error, shardId }, 'Discord shard error')
+  reportDestinationDown('discord', error.message, { err: error, shardId })
+  scheduleDiscordRecoveryCheck()
 })
 
 discordClient.on('shardDisconnect', (closeEvent, shardId) => {
   logger.warn(
-    { shardId, code: closeEvent.code, reason: closeEvent.reason, wasClean: closeEvent.wasClean },
+    {
+      shardId,
+      code: closeEvent.code,
+      reason: closeEvent.reason,
+      wasClean: closeEvent.wasClean,
+    },
     'Discord shard disconnected'
+  )
+  scheduleDiscordDownAlert(
+    `Discord shard disconnected (code ${closeEvent.code})`
   )
 })
 
@@ -445,9 +526,8 @@ discordClient.on('shardReconnecting', (shardId) => {
 })
 
 discordClient.on('disconnect', () => {
-  logger.info('Discord client disconnected')
-  // Cleanup all bots
-  botsToCleanup.forEach((bot) => bot.cleanup())
+  logger.warn('Discord client disconnected')
+  reportDestinationDown('discord', 'Discord client disconnected')
 })
 
 export const triviaBot = new TriviaBot(discordClient)
@@ -655,7 +735,9 @@ function initializeOpenSeaStreamClient(): OpenSeaStreamClient {
         errorMessage.includes('502') ||
         errorMessage.includes('Bad Gateway')
       ) {
-        logger.warn('Detected 502 Bad Gateway error - OpenSea server issue. Automatic reconnection will be attempted with exponential backoff.')
+        logger.warn(
+          'Detected 502 Bad Gateway error - OpenSea server issue. Automatic reconnection will be attempted with exponential backoff.'
+        )
       }
 
       // Schedule reconnection for connection errors
@@ -688,7 +770,10 @@ function scheduleReconnection() {
   }
 
   if (connectionState.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-    logger.error({ MAX_RECONNECT_ATTEMPTS }, 'Max reconnection attempts reached. Stopping reconnection attempts. Falling back to API polling only for OpenSea events.')
+    logger.error(
+      { MAX_RECONNECT_ATTEMPTS },
+      'Max reconnection attempts reached. Stopping reconnection attempts. Falling back to API polling only for OpenSea events.'
+    )
     return
   }
 
@@ -696,20 +781,30 @@ function scheduleReconnection() {
   connectionState.reconnectAttempts++
 
   logger.info(
-    { attempt: connectionState.reconnectAttempts, maxAttempts: MAX_RECONNECT_ATTEMPTS, delaySeconds: delay / 1000 },
+    {
+      attempt: connectionState.reconnectAttempts,
+      maxAttempts: MAX_RECONNECT_ATTEMPTS,
+      delaySeconds: delay / 1000,
+    },
     'Scheduling OpenSea WebSocket reconnection attempt'
   )
 
   reconnectTimeout = setTimeout(() => {
     logger.info(
-      { attempt: connectionState.reconnectAttempts, maxAttempts: MAX_RECONNECT_ATTEMPTS },
+      {
+        attempt: connectionState.reconnectAttempts,
+        maxAttempts: MAX_RECONNECT_ATTEMPTS,
+      },
       'Attempting OpenSea WebSocket reconnection'
     )
     try {
       openseaStreamClient = initializeOpenSeaStreamClient()
       setupStreamEventHandlers(openseaStreamClient)
     } catch (error) {
-      logger.error({ err: error }, 'Failed to reinitialize OpenSea Stream Client')
+      logger.error(
+        { err: error },
+        'Failed to reinitialize OpenSea Stream Client'
+      )
       scheduleReconnection()
     }
   }, delay)
@@ -725,9 +820,13 @@ function startHealthCheckMonitoring() {
 
     if (!connectionState.isConnected) {
       if (connectionState.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-        logger.warn('OpenSea WebSocket health check: max reconnects reached, relying on API polling')
+        logger.warn(
+          'OpenSea WebSocket health check: max reconnects reached, relying on API polling'
+        )
       } else {
-        logger.warn('OpenSea WebSocket health check: Connection lost, reconnection should be in progress')
+        logger.warn(
+          'OpenSea WebSocket health check: Connection lost, reconnection should be in progress'
+        )
       }
     } else if (timeSinceLastConnect > 600000) {
       // 10 minutes
@@ -740,7 +839,10 @@ function startHealthCheckMonitoring() {
     // Log connection stats
     if (connectionState.reconnectAttempts > 0) {
       logger.info(
-        { reconnectAttempts: connectionState.reconnectAttempts, isConnected: connectionState.isConnected },
+        {
+          reconnectAttempts: connectionState.reconnectAttempts,
+          isConnected: connectionState.isConnected,
+        },
         'OpenSea WebSocket stats'
       )
     }
@@ -854,7 +956,7 @@ if (typeof global !== 'undefined') {
   ).getOpenSeaConnectionStats = getOpenSeaConnectionStats
 }
 
-// OpenSea Stream Bots - constructed here; stream/poll start after Discord login.
+// OpenSea Stream Bots - constructed here; stream and poll start in startProductionBots.
 const openSeaListBot = new OpenSeaListBot(discordClient)
 const openSeaSaleBot = new OpenSeaSaleBot(discordClient, abTwitterBot) // Primary sales handler
 botsToCleanup.push(openSeaListBot)
@@ -878,7 +980,10 @@ const initOpenSeaApiPollingBots = async () => {
     .concat(studioContracts)
     .concat(engineContracts)
 
-  logger.info({ count: allContracts.length }, 'Tracking contracts for OpenSea API polling')
+  logger.info(
+    { count: allContracts.length },
+    'Tracking contracts for OpenSea API polling'
+  )
 
   // OpenSea API configuration
   const OPENSEA_API_BASE = 'https://api.opensea.io/api/v2/events'
@@ -900,7 +1005,9 @@ const initOpenSeaApiPollingBots = async () => {
   )
   botsToCleanup.push(openSeaEventsBot)
 
-  logger.info('OpenSea API polling bot initialized successfully (sales backfill only)')
+  logger.info(
+    'OpenSea API polling bot initialized successfully (sales backfill only)'
+  )
 }
 
 // Helper function to check if an OpenSea NFT ID contains any of our tracked contracts
@@ -924,24 +1031,13 @@ const isTrackedContract = (
 }
 
 /**
- * Express stays up so Render can bind PORT. Discord-dependent work
- * (OpenSea stream, sales poll, scheduler) starts only after login succeeds.
+ * Express binds PORT immediately. OpenSea listeners start whether or not
+ * Discord or Twitter is up. Each post goes to the destinations that are
+ * connected. Discord login retries in the background and never exits the
+ * process. ScheduleBot starts from the Discord ready handler.
  */
 async function startProductionBots() {
-  logger.info('Waiting for Discord login before starting OpenSea and scheduled bots')
-  await attemptDiscordLogin()
-
-  logger.info(
-    {
-      tag: discordClient.user?.tag,
-      guildCount: discordClient.guilds.cache.size,
-      channelCount: discordClient.channels.cache.size,
-      blockTalkCached: discordClient.channels.cache.has(CHANNEL_BLOCK_TALK),
-    },
-    'Discord ready — starting OpenSea and scheduled bots'
-  )
-
-  logger.info('Starting OpenSea WebSocket Stream integration')
+  logger.info('Starting OpenSea listeners')
   openseaStreamClient = initializeOpenSeaStreamClient()
   setupStreamEventHandlers(openseaStreamClient)
   logger.info(
@@ -949,14 +1045,13 @@ async function startProductionBots() {
     'OpenSea Stream Config'
   )
 
-  const scheduleBot = new ScheduleBot(
-    discordClient.channels.cache,
-    projectConfig
-  )
-  botsToCleanup.push(scheduleBot)
-
   initOpenSeaApiPollingBots().catch((err) => {
     logger.error({ err }, 'Error initializing OpenSea API polling bots')
+  })
+
+  logger.info('Starting Discord login in the background')
+  void maintainDiscordLogin().catch((err) => {
+    reportDestinationDown('discord', 'Discord login loop stopped', { err })
   })
 }
 
