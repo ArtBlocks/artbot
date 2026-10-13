@@ -17,7 +17,7 @@ export const Logger = ({
   /** If this is local development (pretty print the logs, etc) */
   devMode?: boolean
   /**
-   * The log level to show. Defaults to "debug"
+   * The log level to show. Defaults to "info"
    *
    * process.env.LOG_LEVEL will overwrite this value
    */
@@ -35,7 +35,7 @@ export const Logger = ({
 
   // setup logging options
   const options: pino.LoggerOptions = {
-    level: process.env.LOG_LEVEL || 'debug',
+    level: process.env.LOG_LEVEL || 'info',
     base: baseLogOptions,
     transport: devMode
       ? {
