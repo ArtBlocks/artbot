@@ -100,12 +100,10 @@ export class MintBot {
   // Go through all mints in the queue and make sure the media image exists.
   // Uses event data only (no token API call). Polls media URL until available, then posts.
   async checkAndPostMints() {
-    if (!this.bot.isReady()) {
-      return
-    }
     if (Object.keys(this.mintsToPost).length === 0) {
       return
     }
+    const discordReady = this.bot.isReady()
 
     try {
       await Promise.all(
@@ -164,8 +162,29 @@ export class MintBot {
                 mint.contractAddress,
                 mint.tokenId
               )
-              await mint.postToDiscord()
-              await this.postToTwitter(mint)
+              if (discordReady) {
+                try {
+                  await mint.postToDiscord()
+                } catch (e) {
+                  logger.error(
+                    { err: e, id, destination: 'discord' },
+                    'Discord mint post failed'
+                  )
+                }
+              } else {
+                logger.info(
+                  { id, destination: 'discord' },
+                  'Skipping Discord mint post; client is not connected'
+                )
+              }
+              try {
+                await this.postToTwitter(mint)
+              } catch (e) {
+                logger.error(
+                  { err: e, id, destination: 'twitter' },
+                  'Twitter mint post failed'
+                )
+              }
             } catch (e) {
               logger.info({ err: e, id }, 'Error fetching image for mint')
               // Keep in queue to retry later
@@ -225,9 +244,6 @@ export class MintBot {
   // tries to report any new mints to the discord!
   startRoutine() {
     this.intervalId = setInterval(async () => {
-      if (!this.bot.isReady()) {
-        return
-      }
       if (Object.keys(this.mintsToPost).length > 0) {
         logger.info(
           { count: Object.keys(this.mintsToPost).length },

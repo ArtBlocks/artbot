@@ -114,6 +114,17 @@ export const BAN_ADDRESSES = new Set([
   '0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270',
 ])
 
+function discordIsConnected(bot: Client): boolean {
+  if (bot.isReady()) {
+    return true
+  }
+  logger.info(
+    { destination: 'discord' },
+    'Skipping Discord post; client is not connected'
+  )
+  return false
+}
+
 function sendEmbedToChannel(
   bot: Client,
   embed: EmbedBuilder,
@@ -130,7 +141,11 @@ function sendEmbedToChannel(
     })
     .catch((err) => {
       logger.info(
-        { channelName: projectConfig.channels[channelId].name, channelId, errMessage: err.message },
+        {
+          channelName: projectConfig.channels[channelId].name,
+          channelId,
+          errMessage: err.message,
+        },
         'Error posting message in channel'
       )
     })
@@ -145,6 +160,9 @@ export function sendEmbedToSaleChannels(
   artBlocksData: any,
   collectionType: CollectionType
 ) {
+  if (!discordIsConnected(bot)) {
+    return
+  }
   try {
     switch (collectionType) {
       case CollectionType.ENGINE:
@@ -237,6 +255,9 @@ export function sendEmbedToListChannels(
   artBlocksData: any,
   collectionType: CollectionType
 ) {
+  if (!discordIsConnected(bot)) {
+    return
+  }
   try {
     switch (collectionType) {
       case CollectionType.ENGINE:

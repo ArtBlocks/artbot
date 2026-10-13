@@ -78,7 +78,10 @@ export class OpenSeaSaleBot {
     try {
       const nftInfo = parseNftId(event.payload.item.nft_id)
       if (!nftInfo) {
-        logger.warn({ nftId: event.payload.item.nft_id }, 'Could not parse NFT ID')
+        logger.warn(
+          { nftId: event.payload.item.nft_id },
+          'Could not parse NFT ID'
+        )
         return
       }
 
@@ -151,7 +154,10 @@ export class OpenSeaSaleBot {
     const now = Date.now()
     const timeDiff = now - timestamp
     if (timeDiff > 1000 * 60 * 60 * 4) {
-      logger.info({ timestamp }, 'Skipping OpenSea sale from more than 4 hours ago')
+      logger.info(
+        { timestamp },
+        'Skipping OpenSea sale from more than 4 hours ago'
+      )
       return
     }
 
@@ -197,7 +203,11 @@ export class OpenSeaSaleBot {
 
       let sellerText = await ensOrAddress(seller)
       let buyerText = await ensOrAddress(buyer)
-      const platformUrl = buildArtBlocksTokenURL(sale.chainId, contractAddress, tokenId)
+      const platformUrl = buildArtBlocksTokenURL(
+        sale.chainId,
+        contractAddress,
+        tokenId
+      )
 
       // Add OpenSea usernames if available (same logic as ReservoirSaleBot)
       if (!sellerText.includes('.eth')) {
@@ -263,15 +273,19 @@ export class OpenSeaSaleBot {
 
       if (artBlocksData.collection_name) {
         logger.info({ name: artBlocksData.name }, 'OpenSea SALE')
-        sendEmbedToSaleChannels(
-          this.bot,
-          embed,
-          artBlocksData,
-          await getCollectionType(contractAddress)
-        )
+        try {
+          sendEmbedToSaleChannels(
+            this.bot,
+            embed,
+            artBlocksData,
+            await getCollectionType(contractAddress)
+          )
+        } catch (error) {
+          logger.error({ err: error }, 'Error posting OpenSea sale to Discord')
+        }
       }
 
-      // Post to Twitter if TwitterBot is available and sale meets criteria
+      // Twitter is independent of whether the Discord post succeeded.
       if (
         this.twitterBot &&
         this.shouldTweetNormalizedSale(sale, artBlocksData)
@@ -318,7 +332,10 @@ export class OpenSeaSaleBot {
     }
 
     if (sale.price < 0.1 && sale.currency.includes('ETH')) {
-      logger.info({ price: sale.price, currency: sale.currency }, 'Skipping twitter sale for low-value OpenSea sale')
+      logger.info(
+        { price: sale.price, currency: sale.currency },
+        'Skipping twitter sale for low-value OpenSea sale'
+      )
       return false
     }
 
