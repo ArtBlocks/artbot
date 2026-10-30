@@ -2006,12 +2006,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opensea/stream-js@npm:^0.2.1":
-  version: 0.2.3
-  resolution: "@opensea/stream-js@npm:0.2.3"
+"@opensea/stream-js@npm:0.4.0":
+  version: 0.4.0
+  resolution: "@opensea/stream-js@npm:0.4.0"
   dependencies:
     phoenix: "npm:^1.6.15"
-  checksum: 10c0/cd60e1b374682fbdad87ffe91b94fc3a666ff142aec81d26d9e87627239084c2974a20fda8db5328b11123a1977104fd03221159f1dfc70f5035bb6f03481d33
+  checksum: 10c0/b05e82068e1669ecebfe7299c0f57048a5d2866c2f930fd149a5c8c01c3606b4817b37ed26c886587f0e42f2630f0d73e19bc3a01984be9451d6122cad1f85a9
   languageName: node
   linkType: hard
 
@@ -3001,7 +3001,7 @@ __metadata:
     "@graphql-codegen/typescript-urql": "npm:^3.7.3"
     "@graphql-codegen/urql-introspection": "npm:^2.2.1"
     "@graphql-tools/utils": "npm:^8.3.0"
-    "@opensea/stream-js": "npm:^0.2.1"
+    "@opensea/stream-js": "npm:0.4.0"
     "@supabase/supabase-js": "npm:^2.29.0"
     "@types/node": "npm:^22.19.15"
     "@types/node-cron": "npm:^3.0.8"
