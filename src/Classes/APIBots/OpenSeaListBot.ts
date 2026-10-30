@@ -91,7 +91,7 @@ export class OpenSeaListBot {
       Math.abs(this.recentListings[tokenId].price - price) <=
         IDENTICAL_TOLERANCE
     ) {
-      logger.info({ tokenId }, 'Skipping identical OpenSea relisting')
+      logger.debug({ tokenId }, 'Skipping identical OpenSea relisting')
       return
     }
     this.recentListings[tokenId] = { price, timestamp: Date.now() }
